@@ -45,7 +45,7 @@ export default function Home() {
           <div className="hero-proof">
             <span><ShieldCheck size={15} /> Observation-only</span>
             <span><VolumeX size={15} /> Interruptible</span>
-            <span><Zap size={15} /> BeTenshi-routed</span>
+            <span><Zap size={15} /> AI-layer routed</span>
           </div>
         </div>
         <div className="companion-demo" aria-label="Example AI companion exchange">
@@ -94,7 +94,7 @@ export default function Home() {
             <BrainCircuit size={22} />
             <h3>Respects fog of war</h3>
             <p>The model receives only the compact observation already visible to you. Hidden enemies stay hidden.</p>
-            <span>Snapshot → BeTenshi → one line</span>
+            <span>Snapshot → AI layer → one line</span>
           </article>
           <article>
             <Mic2 size={22} />
@@ -111,7 +111,7 @@ export default function Home() {
         <div className="architecture-copy">
           <span className="section-number">03 / BUILT TO EVOLVE</span>
           <h2>The experience stays stable.<br />The models can change.</h2>
-          <p>The game never talks to a provider directly. BeTenshi owns model credentials and named capabilities, so cloud models can be replaced by local ones later without rewriting the OpenRA integration.</p>
+          <p>The game never talks to a model provider directly. A private AI layer owns model credentials and named capabilities, so cloud models can be replaced by local ones later without rewriting the OpenRA integration.</p>
           <a href={github} target="_blank" rel="noreferrer">Read the architecture <ArrowRight size={16} /></a>
         </div>
         <div className="route-diagram" aria-label="AI routing architecture">
@@ -119,7 +119,7 @@ export default function Home() {
           <i />
           <div className="active-route"><Sparkles size={18} /><span>OpenRA AI<small>relevance + interruption</small></span></div>
           <i />
-          <div><RadioTower size={18} /><span>BeTenshi<small>named model routes</small></span></div>
+          <div><RadioTower size={18} /><span>AI layer<small>named model routes</small></span></div>
           <i />
           <div className="model-routes">
             <span>gpt-5.5<small>battlefield language</small></span>

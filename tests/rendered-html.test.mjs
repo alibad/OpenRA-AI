@@ -22,7 +22,7 @@ test("renders the complete marketing and mission-creation surface", async () => 
   assert.match(html, /Your battlefield/);
   assert.match(html, /Mission studio/);
   assert.match(html, /Point anywhere/);
-  assert.match(html, /BeTenshi/);
+  assert.match(html, /AI layer/);
   assert.match(html, /OpenStreetMap contributors/);
   assert.doesNotMatch(html, /codex-preview|SkeletonPreview|react-loading-skeleton/);
 });
