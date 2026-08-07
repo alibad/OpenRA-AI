@@ -1,0 +1,25 @@
+# Local configuration and secrets
+.env
+.env.*
+!.env.example
+
+# Editor and OS files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Build output
+artifacts/
+bin/
+obj/
+dist/
+coverage/
+node_modules/
+
+# Generated games, maps, and geographic caches
+.cache/
+generated/
+downloads/
+*.oramap
+

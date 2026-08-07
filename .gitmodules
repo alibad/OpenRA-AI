@@ -1,0 +1,3 @@
+[submodule "engine/openra"]
+	path = engine/openra
+	url = https://github.com/alibad/OpenRA.git
