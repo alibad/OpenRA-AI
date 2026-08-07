@@ -4,10 +4,13 @@ import hashlib
 import json
 import tempfile
 import unittest
+import urllib.error
 from pathlib import Path
+from unittest import mock
 from zipfile import ZipFile
 
 from openra_ai_worldgen import GeoSelection, MissionGenerator
+from openra_ai_worldgen.osm import fetch_features
 from openra_ai_worldgen.validator import validate_package
 
 
@@ -44,6 +47,18 @@ class WorldgenTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             with self.assertRaises(ValueError):
                 MissionGenerator(allow_network=False).generate(GeoSelection(100, 0), Path(directory))
+
+    def test_geographic_acquisition_falls_back_to_second_overpass_instance(self) -> None:
+        payload = self.fixture.read_bytes()
+        response = mock.MagicMock()
+        response.__enter__.return_value.read.return_value = payload
+        with mock.patch(
+            "openra_ai_worldgen.osm.urllib.request.urlopen",
+            side_effect=[urllib.error.URLError("primary unavailable"), response],
+        ) as urlopen:
+            features = fetch_features(GeoSelection(24.7136, 46.7219), timeout=0.1)
+        self.assertEqual(urlopen.call_count, 2)
+        self.assertGreater(len(features), 0)
 
 
 if __name__ == "__main__":

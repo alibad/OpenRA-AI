@@ -53,6 +53,10 @@ try {
         if ($LASTEXITCODE -ne 0) { throw "Web tests failed." }
         npm audit --omit=dev
         if ($LASTEXITCODE -ne 0) { throw "Production dependency audit failed." }
+        $webMap = Join-Path $repositoryRoot "artifacts\check\browser-riyadh-crossing-42.oramap"
+        New-Item -ItemType Directory -Path (Split-Path -Parent $webMap) -Force | Out-Null
+        npx tsx tests\build-openra-fixture.ts $webMap
+        if ($LASTEXITCODE -ne 0) { throw "Browser mission fixture generation failed." }
     }
     finally {
         Pop-Location
@@ -93,6 +97,10 @@ try {
         if ($LASTEXITCODE -ne 0) { throw "Generated mission failed OpenRA validation." }
         .\bin\OpenRA.Utility.exe ra --map-hash $map
         if ($LASTEXITCODE -ne 0) { throw "Generated mission hashing failed." }
+        .\bin\OpenRA.Utility.exe ra --check-yaml $webMap
+        if ($LASTEXITCODE -ne 0) { throw "Browser-generated mission failed OpenRA validation." }
+        .\bin\OpenRA.Utility.exe ra --map-hash $webMap
+        if ($LASTEXITCODE -ne 0) { throw "Browser-generated mission hashing failed." }
     }
     finally {
         Pop-Location

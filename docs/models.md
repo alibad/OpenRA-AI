@@ -2,9 +2,9 @@
 
 ## Current routes
 
-OpenRA AI talks only to BeTenshi's OpenAI-compatible router. The application
+OpenRA AI talks only to a private OpenAI-compatible AI layer. The application
 `.env` contains route names and a loopback URL, but no provider credential.
-BeTenshi owns the provider key and maps capabilities to backends:
+The router owns the provider key and maps capabilities to backends:
 
 - `gpt-5.5` writes a single short response from a compact game snapshot;
 - `openai-transcribe` turns a push-to-talk WAV into the player question;
@@ -25,7 +25,7 @@ game-command tool.
 ## Moving local
 
 The public contracts do not name a provider. A future local rollout changes
-BeTenshi aliases to local text, speech-recognition, and speech-synthesis
+AI-layer routes to local text, speech-recognition, and speech-synthesis
 backends, then compares latency and quality against recorded fog-respecting
 snapshots. The engine, companion API, interruption model, and UI remain the
 same.

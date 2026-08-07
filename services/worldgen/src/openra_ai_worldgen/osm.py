@@ -11,7 +11,10 @@ from typing import Any
 
 from .models import GeoSelection
 
-OVERPASS_URL = "https://overpass-api.de/api/interpreter"
+OVERPASS_URLS = (
+    "https://overpass-api.de/api/interpreter",
+    "https://overpass.private.coffee/api/interpreter",
+)
 USER_AGENT = "OpenRA-AI/0.1 (+https://github.com/alibad/OpenRA-AI)"
 
 
@@ -64,18 +67,21 @@ def fetch_features(selection: GeoSelection, timeout: float = 18.0) -> list[GeoFe
 );
 out tags geom;"""
     body = urllib.parse.urlencode({"data": query}).encode("utf-8")
-    request = urllib.request.Request(
-        OVERPASS_URL,
-        data=body,
-        headers={"User-Agent": USER_AGENT, "Content-Type": "application/x-www-form-urlencoded"},
-        method="POST",
-    )
-    try:
-        with urllib.request.urlopen(request, timeout=timeout) as response:
-            payload = json.loads(response.read().decode("utf-8"))
-    except (OSError, TimeoutError, urllib.error.URLError, json.JSONDecodeError) as exc:
-        raise RuntimeError(f"OpenStreetMap acquisition failed: {exc}") from exc
-    return parse_overpass(payload)
+    failures: list[str] = []
+    for endpoint in OVERPASS_URLS:
+        request = urllib.request.Request(
+            endpoint,
+            data=body,
+            headers={"User-Agent": USER_AGENT, "Content-Type": "application/x-www-form-urlencoded"},
+            method="POST",
+        )
+        try:
+            with urllib.request.urlopen(request, timeout=timeout) as response:
+                payload = json.loads(response.read().decode("utf-8"))
+            return parse_overpass(payload)
+        except (OSError, TimeoutError, urllib.error.URLError, json.JSONDecodeError) as exc:
+            failures.append(f"{urllib.parse.urlparse(endpoint).netloc}: {exc}")
+    raise RuntimeError(f"OpenStreetMap acquisition failed across public Overpass instances: {'; '.join(failures)}")
 
 
 def project_point(

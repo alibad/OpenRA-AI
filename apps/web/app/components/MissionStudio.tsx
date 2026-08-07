@@ -13,6 +13,7 @@ import {
 import { useEffect, useRef, useState } from "react";
 import type { Map as MapLibreMap, Marker } from "maplibre-gl";
 import { generateEarthMission, type MissionPackage } from "../../lib/oramap";
+import { windowsRelease } from "../../lib/release";
 
 const presets = [
   { label: "Riyadh", latitude: 24.7136, longitude: 46.6753 },
@@ -212,7 +213,7 @@ export function MissionStudio() {
                   <span>4/4<small>checks</small></span>
                 </div>
                 <a className="download-button" href={mission.downloadUrl} download={mission.filename}><Download size={17} /> Download .oramap</a>
-                <small className="install-note">Drop it into your OpenRA maps folder or open it in the map editor.</small>
+                <small className="install-note">Already have the Windows alpha? Drag this file onto <b>Play-OpenRAAI.cmd</b>. <a href={windowsRelease.url}>Get the game bundle.</a></small>
               </div>
             </div>
           ) : (

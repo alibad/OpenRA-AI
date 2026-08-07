@@ -39,10 +39,10 @@ class Settings:
             return os.environ.get(name, file_values.get(name, default))
 
         return cls(
-            router_url=get("BETENSHI_AI_ROUTER_URL", cls.router_url).rstrip("/"),
-            text_model=get("BETENSHI_AI_MODEL", cls.text_model),
-            transcribe_model=get("BETENSHI_TRANSCRIBE_MODEL", cls.transcribe_model),
-            speech_model=get("BETENSHI_TTS_MODEL", cls.speech_model),
-            speech_voice=get("BETENSHI_TTS_VOICE", cls.speech_voice),
-            timeout_seconds=float(get("BETENSHI_TIMEOUT_SECONDS", str(cls.timeout_seconds))),
+            router_url=get("OPENRA_AI_ROUTER_URL", cls.router_url).rstrip("/"),
+            text_model=get("OPENRA_AI_TEXT_MODEL", cls.text_model),
+            transcribe_model=get("OPENRA_AI_TRANSCRIBE_MODEL", cls.transcribe_model),
+            speech_model=get("OPENRA_AI_TTS_MODEL", cls.speech_model),
+            speech_voice=get("OPENRA_AI_TTS_VOICE", cls.speech_voice),
+            timeout_seconds=float(get("OPENRA_AI_ROUTER_TIMEOUT_SECONDS", str(cls.timeout_seconds))),
         )

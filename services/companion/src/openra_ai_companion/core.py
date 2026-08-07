@@ -6,7 +6,7 @@ import time
 
 from .insights import InsightEngine
 from .models import CompanionResponse, GameSnapshot, Insight
-from .router import BeTenshiRouter, RouterError
+from .router import AIRouter, RouterError
 
 SYSTEM_PROMPT = """You are a calm battlefield companion inside OpenRA, a classic RTS.
 Speak in one short sentence, under 22 words. Mention only facts in the supplied fog-respecting snapshot.
@@ -14,8 +14,8 @@ Prioritize an actionable observation. Never claim to control units. Never use ma
 
 
 class Companion:
-    def __init__(self, router: BeTenshiRouter | None = None, insights: InsightEngine | None = None):
-        self.router = router or BeTenshiRouter()
+    def __init__(self, router: AIRouter | None = None, insights: InsightEngine | None = None):
+        self.router = router or AIRouter()
         self.insights = insights or InsightEngine()
         self.latest_snapshot: GameSnapshot | None = None
         self.enabled = True
@@ -62,7 +62,7 @@ class Companion:
         ]
         try:
             result = self.router.chat(messages)
-            response = CompanionResponse(result.text, "betenshi", utterance_id=generation, insight=insight, latency_ms=result.latency_ms, metadata={"model": result.model})
+            response = CompanionResponse(result.text, "ai-layer", utterance_id=generation, insight=insight, latency_ms=result.latency_ms, metadata={"model": result.model})
         except RouterError as exc:
             response = CompanionResponse(insight.fallback_text, "deterministic-fallback", utterance_id=generation, insight=insight, latency_ms=round((time.perf_counter() - started) * 1000), metadata={"degraded": True, "reason": str(exc)})
         if self._interrupted(generation):
@@ -94,7 +94,7 @@ class Companion:
                 {"role": "system", "content": SYSTEM_PROMPT},
                 {"role": "user", "content": json.dumps({"player_question": question, "snapshot": snapshot.compact()}, separators=(",", ":"))},
             ])
-            response = CompanionResponse(result.text, "betenshi", utterance_id=generation, latency_ms=result.latency_ms, metadata={"model": result.model})
+            response = CompanionResponse(result.text, "ai-layer", utterance_id=generation, latency_ms=result.latency_ms, metadata={"model": result.model})
         except RouterError as exc:
             response = CompanionResponse("The AI router is unavailable; I can still watch for critical deterministic alerts.", "deterministic-fallback", utterance_id=generation, latency_ms=round((time.perf_counter() - started) * 1000), metadata={"degraded": True, "reason": str(exc)})
         if self._interrupted(generation):
@@ -109,7 +109,7 @@ class Companion:
         if not self.enabled:
             return CompanionResponse("", "disabled", utterance_id=generation)
         result = self.router.transcribe(audio, filename)
-        response = CompanionResponse(result.text, "betenshi", utterance_id=generation, latency_ms=result.latency_ms, metadata={"model": result.model})
+        response = CompanionResponse(result.text, "ai-layer", utterance_id=generation, latency_ms=result.latency_ms, metadata={"model": result.model})
         if self._interrupted(generation):
             response.text = ""
             response.interrupted = True

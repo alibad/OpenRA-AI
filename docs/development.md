@@ -17,7 +17,7 @@ preserving a single local command for contributors.
 ## Secrets
 
 Do not store model-provider or geographic-data credentials in the repository.
-The companion will call named capabilities through BeTenshi. OpenAI can be the
+The companion will call named capabilities through the private AI layer. OpenAI can be the
 initial backend while the game-facing contracts remain compatible with a local
 model later.
 
@@ -27,9 +27,9 @@ Release tooling will:
 
 1. verify a clean worktree and pinned submodules;
 2. run local tests;
-3. build Windows and macOS packages;
-4. sign and notarize where applicable;
+3. build and smoke-test the Windows package;
+4. sign and notarize future installer and macOS artifacts where applicable;
 5. generate checksums and a release manifest;
-6. require explicit confirmation before uploading a GitHub release.
+6. upload an explicit versioned GitHub release from the local machine.
 
 No release occurs implicitly after a push.

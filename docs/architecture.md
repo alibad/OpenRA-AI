@@ -4,9 +4,8 @@
 
 OpenRA AI has two user-facing applications:
 
-1. The installed launcher downloads and updates the game, manages local
-   services, registers the `openra-ai://` protocol, installs generated maps,
-   and launches OpenRA on Windows and macOS.
+1. The Windows alpha launcher verifies required game content, installs generated
+   maps, starts the local companion, and launches OpenRA directly into a match.
 2. The web application lets a player choose a place, create or discover a
    mission, download the launcher, and send a generated mission to an installed
    launcher through a deep link.
@@ -21,7 +20,7 @@ experience and the local game.
 OpenRA engine
   <-> OpenRA adapter
        <-> companion service
-            <-> BeTenshi AI router
+            <-> private AI layer
                  <-> OpenAI API initially
                  <-> local model later
 
@@ -57,7 +56,7 @@ The companion owns:
 - compact, fog-respecting game snapshots;
 - player questions and short responses;
 - interruption, cancellation, cooldowns, and speech queues;
-- model-provider routing through BeTenshi;
+- model-provider routing through the private AI layer;
 - transcripts, latency measurements, and cost measurements.
 
 The model never receives raw game frames continuously. Deterministic code
@@ -91,12 +90,17 @@ Contracts are provider-neutral and versioned. Initial concepts include:
 
 ## Distribution
 
-Local scripts will build:
+Local scripts currently build:
 
-- a signed Windows installer;
-- a signed, notarized macOS application;
-- versioned game and mission packages;
-- checksums and a release manifest consumed by the web application.
+- a self-contained Windows x64 ZIP with the engine, companion, launcher, and a
+  sample mission;
+- a SHA-256 checksum and release manifest;
+- normal `.oramap` mission packages generated in Python or directly in the
+  browser.
+
+Code signing, a native installer, protocol deep links, automatic updates, and a
+notarized macOS application are later distribution stages. The public site must
+label them as unavailable until their artifacts exist.
 
 Release uploads remain an explicit local operation. No hosted workflows are
 required.

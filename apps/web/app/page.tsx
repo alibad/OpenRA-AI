@@ -2,6 +2,8 @@ import {
   ArrowRight,
   AudioLines,
   BrainCircuit,
+  Download,
+  FileArchive,
   Github,
   Map,
   Mic2,
@@ -13,6 +15,7 @@ import {
   Zap,
 } from "lucide-react";
 import { MissionStudio } from "./components/MissionStudio";
+import { windowsRelease } from "../lib/release";
 
 const github = "https://github.com/alibad/OpenRA-AI";
 
@@ -27,6 +30,7 @@ export default function Home() {
         <div className="nav-links">
           <a href="#companion">Companion</a>
           <a href="#mission-studio">Mission studio</a>
+          <a href="#download">Download</a>
           <a href="#architecture">How it works</a>
         </div>
         <a className="nav-source" href={github} target="_blank" rel="noreferrer"><Github size={15} /> Source</a>
@@ -39,8 +43,8 @@ export default function Home() {
           <h1>Your battlefield.<br /><em>Now it talks back.</em></h1>
           <p className="hero-lede">A quiet AI companion for OpenRA—and a map generator that turns any place on Earth into a fictional, playable skirmish.</p>
           <div className="hero-actions">
-            <a className="primary-action" href="#mission-studio">Build a mission <ArrowRight size={17} /></a>
-            <a className="text-action" href={github} target="_blank" rel="noreferrer"><Github size={17} /> Explore the code</a>
+            <a className="primary-action" href="#download"><Download size={17} /> Download Windows alpha</a>
+            <a className="text-action" href="#mission-studio">Build a mission <ArrowRight size={17} /></a>
           </div>
           <div className="hero-proof">
             <span><ShieldCheck size={15} /> Observation-only</span>
@@ -76,6 +80,24 @@ export default function Home() {
         <span>03 <b>Turns Earth into terrain</b></span>
         <span>04 <b>Ships ordinary .oramap files</b></span>
       </div>
+
+      <section className="download-section" id="download" aria-labelledby="download-title">
+        <div className="download-intro">
+          <span className="section-number">PLAYABLE BUILD / {windowsRelease.version}</span>
+          <h2 id="download-title">From a ZIP to a live match.</h2>
+          <p>The Windows alpha bundles the pinned engine, AI companion, launcher, and a generated Riyadh skirmish. No installer and no hosted workflow.</p>
+          <div className="download-actions">
+            <a className="primary-action" href={windowsRelease.url}><Download size={17} /> Download for Windows x64</a>
+            <a className="checksum-link" href={windowsRelease.checksumUrl}>SHA-256 checksum</a>
+          </div>
+        </div>
+        <ol className="play-steps">
+          <li><span>01</span><div><b>Extract the ZIP</b><p>Keep the included folders together. The package is portable.</p></div></li>
+          <li><span>02</span><div><b>Run Play-OpenRAAI.cmd</b><p>The first run verifies and downloads OpenRA&apos;s supported Red Alert content, then starts the generated map.</p></div></li>
+          <li><span>03</span><div><b>Hold F8 to ask</b><p>Release to hear the answer. F9 mutes; F10 disables or enables the companion.</p></div></li>
+        </ol>
+        <div className="download-footnote"><FileArchive size={15} /><span>Windows 10/11 x64 alpha. The model-backed companion expects your private AI layer on this machine; the game itself still runs if that layer is offline.</span></div>
+      </section>
 
       <section className="companion-section" id="companion">
         <div className="section-intro">
@@ -135,10 +157,10 @@ export default function Home() {
           <h2>Pick a place.<br />Start a story.</h2>
         </div>
         <div>
-          <p>Generate a mission now, or build the companion and engine locally on Windows. macOS packaging follows once signing infrastructure is ready.</p>
+          <p>Generate a mission now or download the tested Windows alpha. macOS packaging follows once a real signed artifact is ready.</p>
           <div className="hero-actions">
-            <a className="primary-action" href="#mission-studio">Open mission studio <ArrowRight size={17} /></a>
-            <a className="text-action" href={`${github}#development`} target="_blank" rel="noreferrer">Local setup</a>
+            <a className="primary-action" href={windowsRelease.url}><Download size={17} /> Download Windows alpha</a>
+            <a className="text-action" href="#mission-studio">Open mission studio <ArrowRight size={17} /></a>
           </div>
         </div>
       </section>

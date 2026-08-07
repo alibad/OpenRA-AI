@@ -3,10 +3,13 @@ from __future__ import annotations
 import threading
 import time
 import unittest
+import wave
+from io import BytesIO
 
 from openra_ai_companion.core import Companion
 from openra_ai_companion.models import GameSnapshot
 from openra_ai_companion.router import RouterResult
+from openra_ai_companion.voice import _wav_bytes
 
 
 class FakeRouter:
@@ -90,6 +93,14 @@ class CompanionTests(unittest.TestCase):
         audio, metadata = companion.speech("Hold the center")
         self.assertEqual(audio, b"RIFFfake")
         self.assertFalse(metadata["interrupted"])
+
+    def test_push_to_talk_frames_are_packaged_as_mono_wav(self) -> None:
+        audio = _wav_bytes([b"\x00\x00" * 160], 16_000)
+        self.assertTrue(audio.startswith(b"RIFF"))
+        with wave.open(BytesIO(audio), "rb") as wav:
+            self.assertEqual(wav.getnchannels(), 1)
+            self.assertEqual(wav.getframerate(), 16_000)
+            self.assertEqual(wav.getnframes(), 160)
 
 
 if __name__ == "__main__":

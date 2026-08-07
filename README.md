@@ -62,7 +62,27 @@ OpenRA AI is a separate product repository so its launcher, web application,
 companion, and world-generation pipeline can evolve without treating
 OpenRA-RL as the product boundary.
 
-## Try it locally
+## Play the Windows alpha
+
+Download the latest Windows ZIP from the project releases, extract it, and
+double-click `Play-OpenRAAI.cmd`. The bundle contains the pinned OpenRA engine,
+the AI companion, and a generated Riyadh skirmish. On first launch it downloads
+OpenRA's checksum-verified Red Alert quick-install content from OpenRA's
+official mirror list.
+
+During the match:
+
+- hold `F8`, ask a question, and release it to hear a short answer;
+- tap `F9` to mute or unmute the companion;
+- tap `F10` to disable or enable the companion;
+- drag any generated `.oramap` onto `Play-OpenRAAI.cmd` to play that map.
+
+The companion expects an OpenAI-compatible AI layer on
+`http://127.0.0.1:4000`. Provider credentials stay in that layer. If it is
+offline, the game still runs and deterministic battlefield alerts remain
+available in the companion log.
+
+## Build it locally
 
 On Windows, install the local dependencies and build the pinned engine fork:
 
@@ -77,8 +97,9 @@ Generate and validate a playable Earth map:
 ./apps/launcher/Start-OpenRAAI.ps1 -Map ./generated/missions/riyadh-crossing-42.oramap
 ```
 
-OpenRA's normal content installer may appear on first launch. This project does
-not redistribute proprietary Red Alert assets.
+The launcher installs OpenRA's supported 2008 freeware Red Alert package on
+first launch after checking its published checksum. The game data is not stored
+in this repository or bundled in the release ZIP.
 
 Start the product site and browser mission studio:
 
@@ -89,10 +110,10 @@ npm run dev
 
 ## Models
 
-The game never reads an OpenAI key. It calls named capabilities through the
-local BeTenshi router:
+The game never reads an OpenAI key. It calls named capabilities through a
+private AI layer:
 
-| Capability | BeTenshi alias | Initial backend |
+| Capability | AI-layer route | Initial backend |
 | --- | --- | --- |
 | short battlefield language | `gpt-5.5` | OpenAI GPT-5.5 |
 | voice input | `openai-transcribe` | OpenAI transcription |
@@ -114,6 +135,13 @@ Run the repository checks from PowerShell:
 Add `-FullEngine` to lint every Red Alert rule and bundled map. All validation,
 builds, packaging, and releases are local; this repository intentionally has
 no GitHub workflow configuration.
+
+Build and smoke-test the portable Windows ZIP locally:
+
+```powershell
+./scripts/package-windows.ps1
+./scripts/smoke-windows-package.ps1
+```
 
 See [Local development](docs/development.md) and
 [Architecture](docs/architecture.md).

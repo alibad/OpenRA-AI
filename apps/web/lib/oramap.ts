@@ -36,6 +36,10 @@ type Feature = {
 const LAND = 0;
 const WATER = 1;
 const ROAD = 2;
+const overpassEndpoints = [
+  "https://overpass-api.de/api/interpreter",
+  "https://overpass.private.coffee/api/interpreter",
+] as const;
 
 function random(seed: number) {
   let state = seed >>> 0 || 1;
@@ -51,34 +55,40 @@ way(around:${selection.radiusM},${selection.latitude},${selection.longitude})[na
 way(around:${selection.radiusM},${selection.latitude},${selection.longitude})[waterway];
 way(around:${selection.radiusM},${selection.latitude},${selection.longitude})[highway~"motorway|trunk|primary|secondary|tertiary"];
 );out tags geom;`;
-  const controller = new AbortController();
-  const timeout = window.setTimeout(() => controller.abort(), 9000);
-  try {
-    const response = await fetch("https://overpass-api.de/api/interpreter", {
-      method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: new URLSearchParams({ data: query }),
-      signal: controller.signal,
-    });
-    if (!response.ok) throw new Error(`Overpass returned ${response.status}`);
-    const payload = (await response.json()) as {
-      elements?: Array<{
-        tags?: Record<string, string>;
-        geometry?: Array<{ lat: number; lon: number }>;
-      }>;
-    };
-    return (payload.elements ?? []).flatMap((element) => {
-      const tags = element.tags ?? {};
-      const geometry = element.geometry ?? [];
-      if (geometry.length < 2) return [];
-      const kind = tags.highway ? "road" : tags.waterway || tags.natural ? "water" : null;
-      return kind
-        ? [{ kind, points: geometry.map((point) => [point.lat, point.lon] as [number, number]) }]
-        : [];
-    });
-  } finally {
-    window.clearTimeout(timeout);
+  let lastError: unknown = new Error("No Overpass endpoint was available");
+  for (const endpoint of overpassEndpoints) {
+    const controller = new AbortController();
+    const timeout = window.setTimeout(() => controller.abort(), 9000);
+    try {
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams({ data: query }),
+        signal: controller.signal,
+      });
+      if (!response.ok) throw new Error(`Overpass returned ${response.status}`);
+      const payload = (await response.json()) as {
+        elements?: Array<{
+          tags?: Record<string, string>;
+          geometry?: Array<{ lat: number; lon: number }>;
+        }>;
+      };
+      return (payload.elements ?? []).flatMap((element) => {
+        const tags = element.tags ?? {};
+        const geometry = element.geometry ?? [];
+        if (geometry.length < 2) return [];
+        const kind = tags.highway ? "road" : tags.waterway || tags.natural ? "water" : null;
+        return kind
+          ? [{ kind, points: geometry.map((point) => [point.lat, point.lon] as [number, number]) }]
+          : [];
+      });
+    } catch (error) {
+      lastError = error;
+    } finally {
+      window.clearTimeout(timeout);
+    }
   }
+  throw lastError;
 }
 
 function line(a: [number, number], b: [number, number]) {

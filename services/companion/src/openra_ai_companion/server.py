@@ -82,7 +82,7 @@ class CompanionHandler(BaseHTTPRequestHandler):
         except (ValueError, TypeError, json.JSONDecodeError) as exc:
             self._json(HTTPStatus.BAD_REQUEST, {"error": "invalid_request", "detail": str(exc)})
         except RouterError as exc:
-            self._json(HTTPStatus.BAD_GATEWAY, {"error": "betenshi_error", "detail": str(exc)})
+            self._json(HTTPStatus.BAD_GATEWAY, {"error": "ai_router_error", "detail": str(exc)})
 
     def log_message(self, fmt: str, *args: object) -> None:
         print(f"companion: {fmt % args}")

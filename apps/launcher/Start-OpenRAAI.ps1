@@ -2,6 +2,11 @@
 param(
     [string]$Map,
     [switch]$NoSpeech,
+    [switch]$NoVoiceHotkeys,
+    [switch]$SkipContentInstall,
+    [switch]$Headless,
+    [ValidateSet("beginner", "easy", "medium", "rush", "normal", "turtle", "naval")]
+    [string]$OpponentBot = "normal",
     [int]$BridgePort = 9998
 )
 
@@ -10,15 +15,35 @@ $repositoryRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
 $engineRoot = Join-Path $repositoryRoot "engine\openra"
 $python = Join-Path $repositoryRoot ".venv\Scripts\python.exe"
 $companion = Join-Path $repositoryRoot ".venv\Scripts\openra-ai-companion.exe"
+$bundledCompanion = Join-Path $repositoryRoot "bin\openra-ai-companion.exe"
 $game = Join-Path $engineRoot "bin\OpenRA.exe"
+$contentInstaller = Join-Path $PSScriptRoot "Install-OpenRAContent.ps1"
 
-foreach ($required in @($python, $companion, $game)) {
+foreach ($required in @($game, $contentInstaller)) {
     if (-not (Test-Path -LiteralPath $required)) {
         throw "Missing local build output: $required. Run scripts\setup.ps1 first."
     }
 }
 
+if (-not (Test-Path -LiteralPath $bundledCompanion)) {
+    foreach ($required in @($python, $companion)) {
+        if (-not (Test-Path -LiteralPath $required)) {
+            throw "Missing local companion output: $required. Run scripts\setup.ps1 first."
+        }
+    }
+}
+
 $supportRoot = Join-Path $env:APPDATA "OpenRA"
+$requiredContent = Join-Path $supportRoot "Content\ra\v2\allies.mix"
+if ($SkipContentInstall) {
+    if (-not (Test-Path -LiteralPath $requiredContent)) {
+        throw "OpenRA Red Alert content is missing. Run apps\launcher\Install-OpenRAContent.ps1 first."
+    }
+}
+else {
+    & $contentInstaller
+}
+
 $mapArgument = $null
 if ($Map) {
     $mapSource = (Resolve-Path -LiteralPath $Map).Path
@@ -36,29 +61,67 @@ if ($Map) {
 
 $logDirectory = Join-Path $repositoryRoot "artifacts\companion"
 New-Item -ItemType Directory -Path $logDirectory -Force | Out-Null
-$watchArguments = @("-m", "openra_ai_companion.cli", "watch", "--bridge", "127.0.0.1:$BridgePort")
-if (-not $NoSpeech) {
-    $watchArguments += "--speak"
-}
-
-$watcher = Start-Process -FilePath $python -ArgumentList $watchArguments `
-    -WorkingDirectory $repositoryRoot -WindowStyle Hidden -PassThru `
-    -RedirectStandardOutput (Join-Path $logDirectory "watch.out.log") `
-    -RedirectStandardError (Join-Path $logDirectory "watch.err.log")
-
 $env:DOTNET_ROLL_FORWARD = "Major"
 $env:OPENRA_AI_COMPANION = "1"
 $env:OPENRA_AI_GRPC_PORT = "$BridgePort"
-$arguments = @("Engine.EngineDir=$engineRoot", "Game.Mod=ra")
+$arguments = @("Engine.EngineDir=$engineRoot", "Game.Mod=ra", "Launch.Bots=Multi1:$OpponentBot")
+if ($Headless) {
+    $arguments += "Game.Platform=Null"
+}
 if ($mapArgument) {
     $arguments += $mapArgument
 }
 
+if (-not $NoSpeech -and -not $NoVoiceHotkeys) {
+    Write-Host "AI companion controls: hold F8 to ask, F9 to mute, F10 to disable or enable." -ForegroundColor Cyan
+}
+
+$gameStart = @{
+    FilePath = $game
+    ArgumentList = $arguments
+    WorkingDirectory = $engineRoot
+    PassThru = $true
+}
+if ($Headless) {
+    $gameStart["WindowStyle"] = "Hidden"
+    $gameStart["RedirectStandardOutput"] = Join-Path $logDirectory "game.out.log"
+    $gameStart["RedirectStandardError"] = Join-Path $logDirectory "game.err.log"
+}
+
+$gameProcess = Start-Process @gameStart
+$watchProgram = $python
+$watchArguments = @("-u", "-m", "openra_ai_companion.cli", "watch")
+if (Test-Path -LiteralPath $bundledCompanion) {
+    $watchProgram = $bundledCompanion
+    $watchArguments = @("watch")
+}
+$watchArguments += @("--bridge", "127.0.0.1:$BridgePort", "--game-pid", "$($gameProcess.Id)")
+if (-not $NoSpeech) {
+    $watchArguments += "--speak"
+    if (-not $NoVoiceHotkeys) {
+        $watchArguments += "--voice-hotkeys"
+    }
+}
+
+$env:PYTHONUNBUFFERED = "1"
+$watcher = $null
 try {
-    & $game @arguments
+    $watcher = Start-Process -FilePath $watchProgram -ArgumentList $watchArguments `
+        -WorkingDirectory $repositoryRoot -WindowStyle Hidden -PassThru `
+        -RedirectStandardOutput (Join-Path $logDirectory "watch.out.log") `
+        -RedirectStandardError (Join-Path $logDirectory "watch.err.log")
+    $gameProcess.WaitForExit()
+    if ($gameProcess.ExitCode -ne 0) {
+        throw "OpenRA exited with code $($gameProcess.ExitCode)."
+    }
 }
 finally {
-    if (-not $watcher.HasExited) {
-        Stop-Process -Id $watcher.Id
+    if ($watcher -and -not $watcher.HasExited) {
+        if (-not $watcher.WaitForExit(2500)) {
+            Stop-Process -Id $watcher.Id
+        }
+    }
+    if (-not $gameProcess.HasExited) {
+        Stop-Process -Id $gameProcess.Id -Force -ErrorAction SilentlyContinue
     }
 }

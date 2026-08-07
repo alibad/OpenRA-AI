@@ -4,7 +4,7 @@ The companion service turns relevant game context and player speech into short,
 interruptible responses.
 
 It owns relevance scoring, cooldowns, deduplication, conversation state,
-transcription, speech playback coordination, cancellation, and BeTenshi
+transcription, speech playback coordination, cancellation, and private AI-layer
 routing. OpenAI is the initial inference backend; local models can replace it
 without changing the game-facing contract.
 
@@ -19,11 +19,15 @@ accept game commands.
 ```powershell
 python -m pip install -e "services/companion[voice]"
 $env:OPENRA_AI_COMPANION="1"
-openra-ai-companion watch --speak
+openra-ai-companion watch --speak --voice-hotkeys
 ```
+
+On Windows, hold `F8` for push-to-talk, tap `F9` to mute, and tap `F10` to
+disable or enable the companion. The launcher supplies the OpenRA process ID so
+the watcher shuts down with the game.
 
 For local application integration, run `openra-ai-companion serve`. Its small
 HTTP API supports snapshot observation, player questions, transcription,
 speech, mute/disable controls, and immediate interruption. All model traffic
-uses the named BeTenshi routes in the project `.env`; provider keys stay in
-BeTenshi and are never copied into this repository.
+uses the named AI-layer routes in the project `.env`; provider keys stay in
+the router and are never copied into this repository.
