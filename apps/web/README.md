@@ -13,4 +13,3 @@ Initial journeys:
 
 The web application does not pretend that a browser can directly run the native
 game. It hands off through an explicit download or registered launcher link.
-

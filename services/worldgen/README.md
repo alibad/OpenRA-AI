@@ -14,4 +14,3 @@ Internal stages:
 - packaging and manifest generation.
 
 Each stage is independently testable and cacheable.
-

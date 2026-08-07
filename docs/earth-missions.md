@@ -91,4 +91,3 @@ The first generator should deliberately be narrow:
 
 Narrative missions and current-event context should follow after geographic
 maps are consistently fun to play.
-

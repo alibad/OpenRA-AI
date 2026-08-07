@@ -9,4 +9,3 @@ routing. OpenAI is the initial inference backend; local models can replace it
 without changing the game-facing contract.
 
 The initial companion is observation-only and cannot issue game orders.
-

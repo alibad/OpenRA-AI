@@ -18,6 +18,4 @@ and validate them locally before committing.
 ```powershell
 ./scripts/check.ps1
 ```
-
 Component-specific checks will be added beside each application or service.
-

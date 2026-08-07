@@ -29,7 +29,7 @@ foreach ($requiredPath in $requiredPaths) {
 
 Push-Location $repositoryRoot
 try {
-    git diff --check
+    git diff --check HEAD
     if ($LASTEXITCODE -ne 0) {
         throw "Git whitespace validation failed."
     }
@@ -39,4 +39,3 @@ finally {
 }
 
 Write-Host "OpenRA AI local checks passed."
-

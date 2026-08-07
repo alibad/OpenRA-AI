@@ -80,4 +80,3 @@ See [Local development](docs/development.md) and
 
 OpenRA AI is licensed under GPL-3.0. Third-party datasets, game assets, and
 dependencies retain their own licenses and attribution requirements.
-

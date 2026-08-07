@@ -16,4 +16,3 @@ Responsibilities:
 The UI framework will be selected after a small Windows/macOS spike comparing
 native packaging, update support, code sharing with the web app, signing, and
 accessibility.
-

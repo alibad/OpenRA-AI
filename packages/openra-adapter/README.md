@@ -10,4 +10,3 @@ This package owns the boundary between OpenRA and the rest of OpenRA AI:
 
 It will extract the useful platform concepts from OpenRA-RL while presenting a
 small, stable contract designed for the player-facing product.
-

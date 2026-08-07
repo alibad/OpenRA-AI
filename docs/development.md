@@ -33,4 +33,3 @@ Release tooling will:
 6. require explicit confirmation before uploading a GitHub release.
 
 No release occurs implicitly after a push.
-
