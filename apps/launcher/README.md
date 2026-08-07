@@ -1,18 +1,19 @@
-# Launcher
+# Local launcher
 
-The installed launcher is the local product shell for Windows and macOS.
+The first product launcher is deliberately small and auditable. It installs an
+optional `.oramap`, starts the observation-only spoken companion in the
+background, enables the engine bridge, and launches Red Alert:
 
-Responsibilities:
+```powershell
+./scripts/setup.ps1
+./apps/launcher/Start-OpenRAAI.ps1 -Map ./generated/missions/riyadh-crossing-42.oramap
+```
 
-- install and update the compatible OpenRA AI game build;
-- manage required game assets without redistributing unlicensed content;
-- register and handle `openra-ai://` links from the web application;
-- download, verify, install, and remove mission packages;
-- launch the game with the selected mission;
-- start and stop the local companion bridge;
-- display download progress and actionable errors;
-- support full offline play for already-installed content.
+Use `-NoSpeech` for text-only companion logs. During a match, a separate shell
+can run `openra-ai-companion voice` for a four-second voice question. The
+watcher exits when OpenRA exits.
 
-The UI framework will be selected after a small Windows/macOS spike comparing
-native packaging, update support, code sharing with the web app, signing, and
-accessibility.
+OpenRA will offer its normal content installer on first launch. The launcher
+does not redistribute proprietary Red Alert game assets. A signed Windows UI
+and notarized macOS wrapper can replace this script later without changing the
+worldgen, companion, or engine contracts.

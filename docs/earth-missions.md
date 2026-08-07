@@ -79,15 +79,17 @@ The output is a normal versioned OpenRA map package containing terrain,
 metadata, rules, Lua scripts, preview imagery, attribution, and a generation
 manifest. It can be opened in OpenRA's in-game map editor for human editing.
 
-## First useful slice
+## Implemented first slice
 
-The first generator should deliberately be narrow:
+The first generator is deliberately narrow:
 
-1. choose a coastal or river location;
-2. import water, major roads, elevation, and land-cover shapes;
-3. generate a two-player skirmish with a deterministic seed;
-4. validate connectivity and resource fairness;
-5. open the result in OpenRA's map editor.
+1. choose any coordinate or click the web map;
+2. import nearby water and major roads from OpenStreetMap;
+3. generate a two-player Red Alert skirmish with a deterministic seed;
+4. repair and validate connectivity, spawns, binary layout, and resource fairness;
+5. emit a normal `.oramap`, preview, briefing, and attribution manifest.
 
-Narrative missions and current-event context should follow after geographic
-maps are consistently fun to play.
+When the geographic endpoint is unavailable, the generator labels and uses a
+deterministic terrain fallback. Elevation, buildings, Lua objectives, and
+source-backed narrative context remain later stages; current-event stories are
+not presented as factual simulations.

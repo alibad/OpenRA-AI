@@ -1,0 +1,25 @@
+{
+  "elements": [
+    {
+      "type": "way",
+      "id": 1,
+      "tags": {"waterway": "river", "name": "Test River"},
+      "geometry": [
+        {"lat": 24.7500, "lon": 46.7000},
+        {"lat": 24.7300, "lon": 46.7150},
+        {"lat": 24.7100, "lon": 46.7200},
+        {"lat": 24.6900, "lon": 46.7350}
+      ]
+    },
+    {
+      "type": "way",
+      "id": 2,
+      "tags": {"highway": "primary", "name": "Test Road"},
+      "geometry": [
+        {"lat": 24.7150, "lon": 46.6750},
+        {"lat": 24.7150, "lon": 46.7000},
+        {"lat": 24.7150, "lon": 46.7500}
+      ]
+    }
+  ]
+}

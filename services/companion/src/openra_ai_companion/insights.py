@@ -1,0 +1,53 @@
+from __future__ import annotations
+
+from .models import GameSnapshot, Insight
+
+
+class InsightEngine:
+    """Selects scarce, actionable interruptions before any model is called."""
+
+    def __init__(self, cooldown_ticks: int = 750):
+        self.cooldown_ticks = cooldown_ticks
+        self.last_emitted: dict[str, int] = {}
+        self.previous_enemy_ids: set[int] = set()
+        self.previous_enemy_building_ids: set[int] = set()
+        self.last_snapshot: GameSnapshot | None = None
+
+    def _ready(self, key: str, tick: int) -> bool:
+        return tick - self.last_emitted.get(key, -10_000_000) >= self.cooldown_ticks
+
+    def candidates(self, snapshot: GameSnapshot) -> list[Insight]:
+        candidates: list[Insight] = []
+        new_enemies = [u for u in snapshot.visible_enemies if u.actor_id not in self.previous_enemy_ids]
+        new_structures = [u for u in snapshot.visible_enemy_buildings if u.actor_id not in self.previous_enemy_building_ids]
+
+        if new_enemies and self._ready("enemy_spotted", snapshot.tick):
+            kinds = ", ".join(dict.fromkeys(u.kind for u in new_enemies[:4]))
+            candidates.append(Insight("enemy_spotted", 96, f"New enemy units visible: {kinds}", f"New contact: {kinds}. Check the visible approach.", snapshot.tick))
+        if new_structures and self._ready("structure_spotted", snapshot.tick):
+            kinds = ", ".join(dict.fromkeys(u.kind for u in new_structures[:3]))
+            candidates.append(Insight("structure_spotted", 88, f"New enemy structures visible: {kinds}", f"Enemy structure identified: {kinds}.", snapshot.tick))
+        if snapshot.power_drained > snapshot.power_provided and self._ready("low_power", snapshot.tick):
+            deficit = snapshot.power_drained - snapshot.power_provided
+            candidates.append(Insight("low_power", 91, f"Power deficit is {deficit}", f"Power is short by {deficit}. Production and defenses may be impaired.", snapshot.tick))
+        if snapshot.tick > 400 and snapshot.harvester_count == 0 and self._ready("no_harvester", snapshot.tick):
+            candidates.append(Insight("no_harvester", 94, "No active harvester", "You have no active harvester. Your economy will stall.", snapshot.tick))
+        if snapshot.cash < 350 and not snapshot.production and snapshot.tick > 600 and self._ready("economy_idle", snapshot.tick):
+            candidates.append(Insight("economy_idle", 68, f"Cash is {snapshot.cash} with no active production", "Cash is low and every production queue is idle.", snapshot.tick))
+        critical = [u for u in (*snapshot.units, *snapshot.buildings) if u.hp_percent <= 0.22]
+        if critical and self._ready("critical_damage", snapshot.tick):
+            target = critical[0]
+            candidates.append(Insight("critical_damage", 84, f"{target.kind} is at {round(target.hp_percent * 100)}% health", f"Your {target.kind} is critically damaged.", snapshot.tick))
+        if snapshot.done and self._ready("game_over", snapshot.tick):
+            candidates.append(Insight("game_over", 100, f"Match result: {snapshot.result or 'complete'}", f"Match complete: {snapshot.result or 'result pending'}.", snapshot.tick))
+        return sorted(candidates, key=lambda item: item.score, reverse=True)
+
+    def select(self, snapshot: GameSnapshot, threshold: int = 80) -> Insight | None:
+        candidates = self.candidates(snapshot)
+        selected = candidates[0] if candidates and candidates[0].score >= threshold else None
+        self.previous_enemy_ids = {u.actor_id for u in snapshot.visible_enemies}
+        self.previous_enemy_building_ids = {u.actor_id for u in snapshot.visible_enemy_buildings}
+        self.last_snapshot = snapshot
+        if selected:
+            self.last_emitted[selected.key] = selected.tick
+        return selected

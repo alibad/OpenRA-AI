@@ -62,6 +62,44 @@ OpenRA AI is a separate product repository so its launcher, web application,
 companion, and world-generation pipeline can evolve without treating
 OpenRA-RL as the product boundary.
 
+## Try it locally
+
+On Windows, install the local dependencies and build the pinned engine fork:
+
+```powershell
+./scripts/setup.ps1
+```
+
+Generate and validate a playable Earth map:
+
+```powershell
+./.venv/Scripts/openra-ai-worldgen.exe generate --lat 24.7136 --lon 46.6753 --title "Riyadh Crossing" --seed 42
+./apps/launcher/Start-OpenRAAI.ps1 -Map ./generated/missions/riyadh-crossing-42.oramap
+```
+
+OpenRA's normal content installer may appear on first launch. This project does
+not redistribute proprietary Red Alert assets.
+
+Start the product site and browser mission studio:
+
+```powershell
+cd apps/web
+npm run dev
+```
+
+## Models
+
+The game never reads an OpenAI key. It calls named capabilities through the
+local BeTenshi router:
+
+| Capability | BeTenshi alias | Initial backend |
+| --- | --- | --- |
+| short battlefield language | `gpt-5.5` | OpenAI GPT-5.5 |
+| voice input | `openai-transcribe` | OpenAI transcription |
+| spoken response | `openai-tts` | OpenAI text-to-speech |
+
+See [Model routing](docs/models.md) for the boundary and local-model migration.
+
 ## Development
 
 All validation, builds, packaging, and releases are intentionally local.
@@ -72,6 +110,10 @@ Run the repository checks from PowerShell:
 ```powershell
 ./scripts/check.ps1
 ```
+
+Add `-FullEngine` to lint every Red Alert rule and bundled map. All validation,
+builds, packaging, and releases are local; this repository intentionally has
+no GitHub workflow configuration.
 
 See [Local development](docs/development.md) and
 [Architecture](docs/architecture.md).

@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=75"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "openra-ai-companion"
+version = "0.1.0"
+description = "Interruptible, BeTenshi-routed OpenRA game companion"
+requires-python = ">=3.11"
+dependencies = [
+  "grpcio>=1.67,<2",
+  "protobuf>=5.29,<7"
+]
+
+[project.optional-dependencies]
+voice = ["sounddevice>=0.5,<1"]
+dev = ["grpcio-tools>=1.67,<2"]
+
+[project.scripts]
+openra-ai-companion = "openra_ai_companion.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]

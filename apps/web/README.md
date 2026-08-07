@@ -1,15 +1,15 @@
-# Web application
+# OpenRA AI web
 
-The web application is the discovery and creation surface.
+The public product site and browser-based mission studio. Players can select
+any point on an OpenStreetMap basemap, translate nearby roads and waterways,
+and download a validated Red Alert `.oramap` package without uploading their
+selection to OpenRA AI.
 
-Initial journeys:
+```powershell
+npm install
+npm run dev
+npm test
+```
 
-- understand OpenRA AI and download the correct launcher;
-- choose a location on an interactive globe or map;
-- configure a small number of mission inputs;
-- preview the interpreted terrain and mission premise;
-- generate and download a mission package;
-- open the mission in an installed launcher through `openra-ai://`.
-
-The web application does not pretend that a browser can directly run the native
-game. It hands off through an explicit download or registered launcher link.
+The app is packaged and deployed through OpenAI Sites. It does not require a
+database, user account, hosted workflow, or model-provider credential.

@@ -16,9 +16,18 @@ obj/
 dist/
 coverage/
 node_modules/
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+*.egg-info/
 
 # Generated games, maps, and geographic caches
 .cache/
 generated/
 downloads/
 *.oramap
+
+# Local development logs
+*.dev-server.out.log
+*.dev-server.err.log

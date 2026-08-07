@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://openra.ai/contracts/game-snapshot.v1.json",
+  "title": "GameSnapshot",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["tick", "economy", "military", "visible_enemies"],
+  "properties": {
+    "tick": { "type": "integer", "minimum": 0 },
+    "economy": {
+      "type": "object",
+      "required": ["cash", "power_provided", "power_drained", "harvester_count"],
+      "properties": {
+        "cash": { "type": "integer" },
+        "power_provided": { "type": "integer" },
+        "power_drained": { "type": "integer" },
+        "harvester_count": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "military": { "type": "object" },
+    "visible_enemies": { "type": "array", "items": { "$ref": "#/$defs/unit" } },
+    "visible_enemy_buildings": { "type": "array", "items": { "$ref": "#/$defs/unit" } },
+    "done": { "type": "boolean" },
+    "result": { "type": "string" }
+  },
+  "$defs": {
+    "unit": {
+      "type": "object",
+      "required": ["actor_id", "type", "cell_x", "cell_y"],
+      "properties": {
+        "actor_id": { "type": "integer", "minimum": 0 },
+        "type": { "type": "string" },
+        "cell_x": { "type": "integer" },
+        "cell_y": { "type": "integer" },
+        "hp_percent": { "type": "number", "minimum": 0, "maximum": 1 }
+      }
+    }
+  }
+}

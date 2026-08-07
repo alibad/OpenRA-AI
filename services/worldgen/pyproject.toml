@@ -1,0 +1,15 @@
+[build-system]
+requires = ["setuptools>=75"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "openra-ai-worldgen"
+version = "0.1.0"
+description = "Deterministic Earth-to-OpenRA mission generator"
+requires-python = ">=3.11"
+
+[project.scripts]
+openra-ai-worldgen = "openra_ai_worldgen.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]

@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://openra.ai/contracts/geo-selection.v1.json",
+  "title": "GeoSelection",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["latitude", "longitude", "radius_m", "map_size", "seed"],
+  "properties": {
+    "latitude": { "type": "number", "minimum": -90, "maximum": 90 },
+    "longitude": { "type": "number", "minimum": -180, "maximum": 180 },
+    "radius_m": { "type": "integer", "minimum": 500, "maximum": 20000 },
+    "map_size": { "enum": [64, 96, 128] },
+    "seed": { "type": "integer", "minimum": 0, "maximum": 2147483647 },
+    "title": { "type": "string", "maxLength": 80 },
+    "story_seed": { "type": "string", "maxLength": 500 }
+  }
+}
