@@ -25,3 +25,35 @@ Verified implementation captures:
 ## Final result
 
 Passed. The implementation resolves the raw-route-field experience in the reference and keeps endpoint configuration limited to the custom-provider path.
+
+---
+
+# Design QA: Earth-to-Battlefield Workbench
+
+Reference: `codex-clipboard-cc19f9e3-cee2-443b-96fc-5689e9d6708c.png`
+
+Verified implementation captures:
+
+- `openra-earth-workbench-live-v5.png` — native initial state
+- `openra-earth-workbench-generated-v2.png` — generated and validated battlefield state
+- `openra-earth-workbench-design-comparison.png` — side-by-side reference comparison
+
+## Checklist
+
+| Check | Result | Notes |
+| --- | --- | --- |
+| Single native journey | Passed | World Tools opens one in-game workbench. A generated map can be played or continued directly into the native editor from the same surface. |
+| Reference structure | Passed | The implementation matches the proposed split Earth/translation workbench, mission controls, terrain analysis, progress, and bottom action hierarchy. |
+| Real Earth interaction | Passed | The left panel renders a free OpenTopoMap/OpenStreetMap terrain view, selection center, area radius, search, and click-to-recenter behavior. |
+| Honest AI input | Passed | The exact terrain view shown to the player is passed through the AI layer as multimodal image content during generation. |
+| Playable preview | Passed | The right panel loads the installed OpenRA map preview with both spawn points after package validation and cache indexing. |
+| Observable generation | Passed | Six live stages report Earth geometry, terrain capture, AI terrain vision, gameplay translation, validation, and ready-to-play state from the asynchronous backend job. |
+| Terrain DNA | Passed | Relief, water, urban density, vegetation, and landmarks populate from the returned synthesis and geographic feature counts. |
+| Configuration clarity | Passed | Area, map size, mission shape, and translation style use native dropdowns; precise coordinates and seed stay behind Advanced. |
+| Layout quality | Passed | The full workbench is centered, unclipped, readable, and preserves the native OpenRA chrome at the tested 2560×1440 viewport and configured UI scale. |
+| Failure resilience | Passed | Search, terrain capture, generation, AI analysis, and map indexing errors remain inside the workbench without disrupting the running game. |
+| Automated verification | Passed | Engine build, OpenRA mod tests, 23 companion tests, and 13 world-generation tests pass. |
+
+## Final result
+
+Passed. The old form-only studio has been replaced by the proposed visual workbench, with real Earth terrain on the left, a validated playable OpenRA translation on the right, and the entire generation-to-play/editor path kept inside the game.

@@ -4,8 +4,10 @@ import json
 import math
 import shutil
 import tempfile
+import threading
 import time
 import unicodedata
+import uuid
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -64,6 +66,73 @@ class WorldgenHandler(BaseHTTPRequestHandler):
         self.send_header("Cache-Control", "public, max-age=604800")
         self.end_headers()
         self.wfile.write(body)
+
+    def _generation_payload(self) -> dict:
+        size = int(self.headers.get("Content-Length", "0"))
+        if size > 64_000:
+            raise ValueError("request too large")
+        payload = json.loads(self.rfile.read(size) or b"{}")
+        if not isinstance(payload, dict):
+            raise ValueError("request body must be an object")
+        return payload
+
+    def _generate_mission(self, payload: dict, progress=None) -> dict:
+        selection = GeoSelection(
+            latitude=float(payload["latitude"]),
+            longitude=float(payload["longitude"]),
+            title=str(payload.get("title", "Earth Skirmish")),
+            location_name=str(payload.get("location_name", "Selected Earth location")),
+            radius_m=int(payload.get("radius_m", 3500)),
+            map_size=int(payload.get("map_size", 64)),
+            seed=int(payload.get("seed", 1)),
+            source=str(payload.get("source", "openstreetmap")),
+            story_seed=str(payload.get("story_seed", "")),
+            generation_mode=str(payload.get("generation_mode", "reality-first")),
+        )
+        analyzer = TerrainAnalyzer(self.server.companion_url) if self.server.companion_url else None  # type: ignore[attr-defined]
+        result = MissionGenerator(allow_network=True, terrain_analyzer=analyzer).generate(
+            selection,
+            Path(self.server.output_directory),  # type: ignore[attr-defined]
+            progress=progress,
+        )
+        install_directory = Path(self.server.install_directory)  # type: ignore[attr-defined]
+        install_directory.mkdir(parents=True, exist_ok=True)
+        installed_path = install_directory / result.package_path.name
+        shutil.copy2(result.package_path, installed_path)
+        response = result.as_dict()
+        response["download_url"] = f"/v1/missions/{result.package_path.name}"
+        response["filename"] = result.package_path.name
+        response["installed_path"] = str(installed_path)
+        manifest = json.loads(result.manifest_path.read_text(encoding="utf-8"))
+        response["synthesis"] = {
+            "analysis": manifest.get("analysis", {}),
+            "feature_counts": manifest.get("design", {}).get("feature_counts", {}),
+            "terrain_view": manifest.get("terrain_view", {}),
+            "tileset": manifest.get("game", {}).get("tileset", "TEMPERAT"),
+        }
+        return response
+
+    def _set_job(self, job_id: str, **values) -> None:
+        with self.server.generation_jobs_lock:  # type: ignore[attr-defined]
+            job = self.server.generation_jobs.get(job_id)  # type: ignore[attr-defined]
+            if job is not None:
+                job.update(values)
+
+    def _run_generation_job(self, job_id: str, payload: dict) -> None:
+        def progress(stage: int, message: str) -> None:
+            self._set_job(job_id, state="running", stage=stage, message=message)
+
+        try:
+            result = self._generate_mission(payload, progress)
+            self._set_job(
+                job_id,
+                state="succeeded",
+                stage=6,
+                message="Playable battlefield is ready",
+                result=result,
+            )
+        except Exception as exc:  # The polling client receives a structured failure.
+            self._set_job(job_id, state="failed", message=str(exc), error=type(exc).__name__)
 
     def do_OPTIONS(self) -> None:  # noqa: N802
         self.send_response(HTTPStatus.NO_CONTENT)
@@ -167,6 +236,16 @@ class WorldgenHandler(BaseHTTPRequestHandler):
             except (OSError, TimeoutError, ValueError) as exc:
                 self._json(HTTPStatus.BAD_GATEWAY, {"error": "terrain_view_failed", "detail": str(exc)})
             return
+        if path.startswith("/v1/jobs/"):
+            job_id = Path(path).name
+            with self.server.generation_jobs_lock:  # type: ignore[attr-defined]
+                job = self.server.generation_jobs.get(job_id)  # type: ignore[attr-defined]
+                snapshot = dict(job) if job is not None else None
+            if snapshot is None:
+                self._json(HTTPStatus.NOT_FOUND, {"error": "job_not_found"})
+            else:
+                self._json(HTTPStatus.OK, snapshot)
+            return
         if path.startswith("/v1/missions/"):
             name = Path(path).name
             candidate = Path(self.server.output_directory) / name  # type: ignore[attr-defined]
@@ -182,46 +261,28 @@ class WorldgenHandler(BaseHTTPRequestHandler):
         self._json(HTTPStatus.NOT_FOUND, {"error": "not_found"})
 
     def do_POST(self) -> None:  # noqa: N802
-        if urlparse(self.path).path != "/v1/missions/generate":
+        path = urlparse(self.path).path
+        if path not in {"/v1/missions/generate", "/v1/missions/generate-async"}:
             self._json(HTTPStatus.NOT_FOUND, {"error": "not_found"})
             return
         try:
-            size = int(self.headers.get("Content-Length", "0"))
-            if size > 64_000:
-                raise ValueError("request too large")
-            payload = json.loads(self.rfile.read(size) or b"{}")
-            selection = GeoSelection(
-                latitude=float(payload["latitude"]),
-                longitude=float(payload["longitude"]),
-                title=str(payload.get("title", "Earth Skirmish")),
-                location_name=str(payload.get("location_name", "Selected Earth location")),
-                radius_m=int(payload.get("radius_m", 3500)),
-                map_size=int(payload.get("map_size", 64)),
-                seed=int(payload.get("seed", 1)),
-                source=str(payload.get("source", "openstreetmap")),
-                story_seed=str(payload.get("story_seed", "")),
-                generation_mode=str(payload.get("generation_mode", "reality-first")),
-            )
-            analyzer = TerrainAnalyzer(self.server.companion_url) if self.server.companion_url else None  # type: ignore[attr-defined]
-            result = MissionGenerator(allow_network=True, terrain_analyzer=analyzer).generate(
-                selection, Path(self.server.output_directory)  # type: ignore[attr-defined]
-            )
-            install_directory = Path(self.server.install_directory)  # type: ignore[attr-defined]
-            install_directory.mkdir(parents=True, exist_ok=True)
-            installed_path = install_directory / result.package_path.name
-            shutil.copy2(result.package_path, installed_path)
-            response = result.as_dict()
-            response["download_url"] = f"/v1/missions/{result.package_path.name}"
-            response["filename"] = result.package_path.name
-            response["installed_path"] = str(installed_path)
-            manifest = json.loads(result.manifest_path.read_text(encoding="utf-8"))
-            response["synthesis"] = {
-                "analysis": manifest.get("analysis", {}),
-                "feature_counts": manifest.get("design", {}).get("feature_counts", {}),
-                "terrain_view": manifest.get("terrain_view", {}),
-                "tileset": manifest.get("game", {}).get("tileset", "TEMPERAT"),
-            }
-            self._json(HTTPStatus.CREATED, response)
+            payload = self._generation_payload()
+            if path == "/v1/missions/generate-async":
+                job_id = uuid.uuid4().hex
+                with self.server.generation_jobs_lock:  # type: ignore[attr-defined]
+                    jobs = self.server.generation_jobs  # type: ignore[attr-defined]
+                    while len(jobs) >= 32:
+                        jobs.pop(next(iter(jobs)))
+                    jobs[job_id] = {
+                        "id": job_id,
+                        "state": "queued",
+                        "stage": 0,
+                        "message": "Generation queued",
+                    }
+                threading.Thread(target=self._run_generation_job, args=(job_id, payload), daemon=True).start()
+                self._json(HTTPStatus.ACCEPTED, {"job_id": job_id, "poll_url": f"/v1/jobs/{job_id}"})
+            else:
+                self._json(HTTPStatus.CREATED, self._generate_mission(payload))
         except (KeyError, TypeError, ValueError, json.JSONDecodeError) as exc:
             self._json(HTTPStatus.BAD_REQUEST, {"error": "invalid_request", "detail": str(exc)})
 
@@ -242,6 +303,8 @@ def create_server(
     server.output_directory = str(directory)  # type: ignore[attr-defined]
     server.install_directory = str(install_directory or directory)  # type: ignore[attr-defined]
     server.companion_url = companion_url  # type: ignore[attr-defined]
+    server.generation_jobs = {}  # type: ignore[attr-defined]
+    server.generation_jobs_lock = threading.Lock()  # type: ignore[attr-defined]
     return server
 
 

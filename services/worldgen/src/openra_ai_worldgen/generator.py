@@ -4,6 +4,7 @@ from collections import Counter
 import json
 from pathlib import Path
 import time
+from typing import Callable
 
 from .ai import TerrainAnalyzer
 from .models import GeoSelection, MissionResult, TerrainAnalysis
@@ -87,13 +88,21 @@ class MissionGenerator:
             confidence=0.45,
         )
 
-    def generate(self, selection: GeoSelection, output_directory: Path) -> MissionResult:
+    def generate(
+        self,
+        selection: GeoSelection,
+        output_directory: Path,
+        progress: Callable[[int, str], None] | None = None,
+    ) -> MissionResult:
+        report = progress or (lambda _stage, _message: None)
         selection.validated()
+        report(1, "Reading roads, waterways, buildings, and land use")
         features, source_status = self._features(selection, output_directory)
         terrain_view: TerrainView | None = None
         analysis = self._fallback_analysis(selection, features)
         if self.allow_network and not self.fixture:
             try:
+                report(2, "Capturing the terrain view used by the AI")
                 terrain_view = fetch_terrain_view(selection, output_directory)
                 source_status += "+terrain-view"
             except (OSError, TimeoutError, ValueError) as exc:
@@ -101,16 +110,19 @@ class MissionGenerator:
                 analysis = self._fallback_analysis(selection, features, str(exc))
         if terrain_view and self.terrain_analyzer:
             try:
+                report(3, "AI is interpreting terrain character and visual context")
                 analysis = self.terrain_analyzer.analyze(selection, features, terrain_view)
                 source_status += "+ai-vision"
             except RuntimeError as exc:
                 source_status += "+vision-fallback"
                 analysis = self._fallback_analysis(selection, features, str(exc))
 
+        report(4, "Translating geography into playable OpenRA terrain")
         plan = build_terrain(selection, features, analysis, terrain_view)
         package_path, preview_path, manifest_path = create_package(
             selection, plan, output_directory, source_status, terrain_view=terrain_view
         )
+        report(5, "Validating spawns, resources, terrain, and package integrity")
         validation = validate_package(package_path)
         if not validation.valid:
             package_path.unlink(missing_ok=True)

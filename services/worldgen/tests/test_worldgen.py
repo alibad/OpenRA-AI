@@ -4,6 +4,7 @@ import hashlib
 import json
 import tempfile
 import threading
+import time
 import unittest
 import urllib.error
 import urllib.request
@@ -44,6 +45,17 @@ class WorldgenTests(unittest.TestCase):
             with ZipFile(one) as a, ZipFile(two) as b:
                 for name in ("map.yaml", "map.bin", "map.png"):
                     self.assertEqual(hashlib.sha256(a.read(name)).digest(), hashlib.sha256(b.read(name)).digest())
+
+    def test_generation_reports_real_pipeline_stages(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            stages: list[tuple[int, str]] = []
+            MissionGenerator(self.fixture).generate(
+                GeoSelection(24.7136, 46.7219, "Progress Test", map_size=64),
+                Path(directory),
+                progress=lambda stage, message: stages.append((stage, message)),
+            )
+        self.assertEqual([stage for stage, _ in stages], [1, 4, 5])
+        self.assertTrue(all(message for _, message in stages))
 
     def test_validator_rejects_non_package(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -131,6 +143,45 @@ class WorldgenTests(unittest.TestCase):
                 self.assertTrue(installed.is_file())
                 with urllib.request.urlopen(base + payload["download_url"], timeout=3) as response:
                     self.assertTrue(response.read().startswith(b"PK"))
+            finally:
+                server.shutdown()
+                server.server_close()
+                worker.join()
+
+    def test_world_studio_exposes_pollable_generation_progress(self) -> None:
+        with tempfile.TemporaryDirectory() as output, tempfile.TemporaryDirectory() as install:
+            server = create_server("127.0.0.1", 0, Path(output), Path(install))
+            worker = threading.Thread(target=server.serve_forever)
+            worker.start()
+            try:
+                base = f"http://127.0.0.1:{server.server_address[1]}"
+                body = json.dumps({
+                    "latitude": 24.7136,
+                    "longitude": 46.7219,
+                    "title": "Async Studio Test",
+                    "location_name": "Riyadh, Saudi Arabia",
+                    "map_size": 64,
+                    "seed": 8,
+                }).encode()
+                request = urllib.request.Request(
+                    base + "/v1/missions/generate-async",
+                    data=body,
+                    headers={"Content-Type": "application/json"},
+                )
+                fixture_generator = MissionGenerator(self.fixture)
+                with mock.patch("openra_ai_worldgen.server.MissionGenerator", return_value=fixture_generator):
+                    with urllib.request.urlopen(request, timeout=3) as response:
+                        accepted = json.loads(response.read())
+                    for _ in range(50):
+                        with urllib.request.urlopen(base + accepted["poll_url"], timeout=3) as response:
+                            job = json.loads(response.read())
+                        if job["state"] in {"succeeded", "failed"}:
+                            break
+                        time.sleep(0.02)
+
+                self.assertEqual(job["state"], "succeeded", job)
+                self.assertEqual(job["stage"], 6)
+                self.assertTrue(Path(job["result"]["installed_path"]).is_file())
             finally:
                 server.shutdown()
                 server.server_close()
