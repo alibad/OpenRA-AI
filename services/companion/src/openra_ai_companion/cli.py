@@ -130,6 +130,8 @@ def main(argv: list[str] | None = None) -> int:
                 muted=companion.muted,
             )
 
+        control_server.status_publisher = publish_status
+
         hotkeys = (
             VoiceHotkeys(companion, player, lambda text: _speak(companion, text, player), publish_status)
             if args.voice_hotkeys and player
@@ -163,18 +165,16 @@ def main(argv: list[str] | None = None) -> int:
                     response = companion.observe(snapshot)
                 if response and response.text:
                     print(f"[{response.insight.key}] {response.text}")
-                    publish_status("speaking" if player else "insight", f"AI  •  {response.text}")
+                    publish_status(
+                        "speaking" if player and not companion.muted else "insight",
+                        f"AI  •  {response.text}",
+                    )
                     if player:
                         _speak(companion, response.text, player)
                     insight_expires_at = time.monotonic() + 8
                 elif insight_expires_at and time.monotonic() >= insight_expires_at:
                     if not hotkeys or not hotkeys.active.is_set():
-                        if not companion.enabled:
-                            publish_status("disabled", "AI OFF  •  CTRL+SHIFT+A TO ENABLE")
-                        elif companion.muted:
-                            publish_status("muted", "AI MUTED  •  CTRL+SHIFT+M TO UNMUTE")
-                        else:
-                            publish_status("ready", "AI READY  •  HOLD CTRL+SPACE TO ASK")
+                        publish_status(*companion.idle_status())
                         insight_expires_at = 0.0
                 time.sleep(max(0.1, args.interval))
         except KeyboardInterrupt:

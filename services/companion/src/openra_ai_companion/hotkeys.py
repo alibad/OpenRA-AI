@@ -88,10 +88,6 @@ class VoiceHotkeys:
                 print("Companion is disabled. Press Ctrl+Shift+A to enable it.")
                 self._wait_for_release(self.PUSH_TO_TALK)
                 return
-            if self.companion.muted:
-                print("Companion is muted. Press Ctrl+Shift+M to unmute it.")
-                self._wait_for_release(self.PUSH_TO_TALK)
-                return
 
             self._set_status("listening", "● LISTENING  •  RELEASE TO ASK")
             print("Listening... release Ctrl+Space when you finish speaking.")
@@ -109,8 +105,12 @@ class VoiceHotkeys:
             self._stop.wait(max(0.0, 1.25 - (time.monotonic() - transcript_started)))
             if answer.text and not answer.interrupted:
                 print(f"Companion: {answer.text}")
-                self._set_status("speaking", f"AI  •  {answer.text}")
-                self.speak(answer.text)
+                self._set_status(
+                    "insight" if self.companion.muted else "speaking",
+                    f"AI  •  {answer.text}",
+                )
+                if not self.companion.muted:
+                    self.speak(answer.text)
                 self._stop.wait(min(6.0, max(2.0, len(answer.text) / 14)))
         except Exception as exc:  # Keep the match running if microphone or routing fails.
             print(f"Voice question failed: {exc}")
@@ -118,8 +118,8 @@ class VoiceHotkeys:
             self._stop.wait(3)
         finally:
             self.active.clear()
-            if self.companion.enabled and not self.companion.muted:
-                self._set_status("ready", "AI READY  •  HOLD CTRL+SPACE TO ASK")
+            if self.companion.enabled:
+                self._set_status(*self.companion.idle_status())
 
     def _run(self) -> None:
         previous_push_to_talk = False
@@ -146,13 +146,8 @@ class VoiceHotkeys:
                 state = self.companion.configure(muted=not self.companion.muted)
                 if state["muted"]:
                     self.player.stop()
-                self._set_status(
-                    "muted" if state["muted"] else "ready",
-                    "AI MUTED  •  CTRL+SHIFT+M TO UNMUTE"
-                    if state["muted"]
-                    else "AI READY  •  HOLD CTRL+SPACE TO ASK",
-                )
-                print("Companion muted." if state["muted"] else "Companion unmuted.")
+                self._set_status(*self.companion.idle_status())
+                print("Companion voice off." if state["muted"] else "Companion voice on.")
             if enabled and not previous_enabled:
                 state = self.companion.configure(enabled=not self.companion.enabled)
                 if not state["enabled"]:

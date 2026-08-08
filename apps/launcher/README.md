@@ -13,7 +13,9 @@ human-versus-bot skirmish:
 
 Use `-NoSpeech` for text-only companion logs or `-NoVoiceHotkeys` to keep spoken
 alerts without push-to-talk. During a normal match, hold `Ctrl+Space` to ask a question,
-press `Ctrl+Shift+M` to mute, and press `Ctrl+Shift+A` to disable or enable the companion. Speech and
+click the banner's voice control or press `Ctrl+Shift+M` to switch spoken audio off or on,
+and press `Ctrl+Shift+A` to disable or enable the companion. Text insights remain active
+while voice is off. Speech and
 in-flight model responses are discarded when interrupted. The watcher exits
 when OpenRA exits.
 

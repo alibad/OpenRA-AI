@@ -52,9 +52,16 @@ class Companion:
                 self.interrupt()
         return {"enabled": self.enabled, "muted": self.muted}
 
+    def idle_status(self) -> tuple[str, str]:
+        if not self.enabled:
+            return "disabled", "AI OFF  •  CTRL+SHIFT+A TO ENABLE"
+        if self.muted:
+            return "muted", "AI VOICE OFF  •  TEXT INSIGHTS STAY ON"
+        return "ready", "AI READY  •  HOLD CTRL+SPACE TO ASK"
+
     def _render_insight(self, snapshot: GameSnapshot, insight: Insight, generation: int) -> CompanionResponse:
         started = time.perf_counter()
-        if not self.enabled or self.muted:
+        if not self.enabled:
             return CompanionResponse("", "disabled", utterance_id=generation, insight=insight)
         messages = [
             {"role": "system", "content": SYSTEM_PROMPT},
@@ -86,7 +93,7 @@ class Companion:
         if not question:
             raise ValueError("question must not be empty")
         generation = self._begin()
-        if not self.enabled or self.muted:
+        if not self.enabled:
             return CompanionResponse("", "disabled", utterance_id=generation)
         snapshot = self.latest_snapshot
         if snapshot is None:

@@ -12,7 +12,7 @@ The AI belongs in the rhythm of the game:
 
 - it notices a genuinely useful battlefield detail and says it briefly;
 - the player can hold a key and ask about the current match;
-- speech stops immediately when the player interrupts, mutes, or disables it;
+- speech stops immediately when the player interrupts, switches voice off, or disables the companion;
 - no modal dialogs, chat dashboards, or configuration modes interrupt play.
 
 The first version is talk-only. It observes and responds, but does not control
@@ -73,13 +73,14 @@ official mirror list.
 During the match:
 
 - hold `Ctrl+Space`, ask a question, and release it to hear a short answer;
-- press `Ctrl+Shift+M` to mute or unmute the companion;
+- click `VOICE: ON` in the AI banner, or press `Ctrl+Shift+M`, to switch spoken audio off or on;
 - press `Ctrl+Shift+A` to disable or enable the companion;
 - drag any generated `.oramap` onto `Play-OpenRAAI.cmd` to play that map.
 
 Voice is enabled by default. Each useful AI observation is spoken through the
 configured speech route as well as shown in the HUD; speech can be interrupted
-immediately with `Ctrl+Space` or muted with `Ctrl+Shift+M`.
+immediately with `Ctrl+Space` or switched off from the banner. Text insights and
+push-to-talk transcription remain available while voice is off.
 
 Transient HUD observations clear after eight seconds. When production, power,
 force composition, harvesting, or visible contacts change, the companion can

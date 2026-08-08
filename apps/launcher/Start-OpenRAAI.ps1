@@ -85,7 +85,7 @@ if ($mapArgument) {
 }
 
 if (-not $NoSpeech -and -not $NoVoiceHotkeys) {
-    Write-Host "AI companion controls: hold Ctrl+Space to ask, Ctrl+Shift+M to mute, Ctrl+Shift+A to disable or enable." -ForegroundColor Cyan
+    Write-Host "AI companion controls: hold Ctrl+Space to ask, use the in-game VOICE button or Ctrl+Shift+M for spoken audio, Ctrl+Shift+A to disable or enable." -ForegroundColor Cyan
 }
 
 $gameStart = @{

@@ -180,12 +180,21 @@ class CompanionTests(unittest.TestCase):
 
     def test_power_alert_and_controls(self) -> None:
         companion = Companion(router=FakeRouter())
+        companion.configure(muted=True)
         response = companion.observe(snapshot(power_provided=50, power_drained=125))
         self.assertEqual(response.insight.key, "low_power")
-        companion.configure(muted=True)
+        self.assertTrue(response.text)
         audio, metadata = companion.speech("test")
         self.assertEqual(audio, b"")
         self.assertTrue(metadata["disabled"])
+
+    def test_voice_off_keeps_transcription_and_text_answers(self) -> None:
+        companion = Companion(router=FakeRouter())
+        companion.latest_snapshot = snapshot()
+        companion.configure(muted=True)
+        self.assertEqual(companion.transcribe(b"audio").text, "Where is the threat?")
+        self.assertTrue(companion.ask("Where is the threat?").text)
+        self.assertEqual(companion.idle_status(), ("muted", "AI VOICE OFF  •  TEXT INSIGHTS STAY ON"))
 
     def test_voice_routes_share_same_router(self) -> None:
         companion = Companion(router=FakeRouter())
@@ -235,6 +244,8 @@ class CompanionTests(unittest.TestCase):
         router = FakeRouter()
         player = FakePlayer()
         server = create_server("127.0.0.1", 0, Companion(router=router), player)
+        statuses = []
+        server.status_publisher = lambda state, message: statuses.append((state, message))
         worker = threading.Thread(target=server.serve_forever)
         worker.start()
         try:
@@ -246,6 +257,16 @@ class CompanionTests(unittest.TestCase):
                 payload = response.read()
             self.assertIn(b'"ok": true', payload)
             self.assertEqual(player.audio, b"RIFFfake")
+            request = urllib.request.Request(
+                base + "/v1/control",
+                data=b'{"muted":true}',
+                headers={"Content-Type": "application/json"},
+            )
+            with urllib.request.urlopen(request, timeout=3) as response:
+                payload = response.read()
+            self.assertIn(b'"muted": true', payload)
+            self.assertEqual(player.audio, b"")
+            self.assertEqual(statuses[-1], ("muted", "AI VOICE OFF  •  TEXT INSIGHTS STAY ON"))
         finally:
             server.shutdown()
             server.server_close()

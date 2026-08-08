@@ -121,7 +121,16 @@ class CompanionHandler(BaseHTTPRequestHandler):
                 self._json(HTTPStatus.OK, {"interrupted": True, "generation": self.companion.interrupt()})
             elif path == "/v1/control":
                 payload = json.loads(self._payload() or b"{}")
-                self._json(HTTPStatus.OK, self.companion.configure(enabled=payload.get("enabled"), muted=payload.get("muted")))
+                state = self.companion.configure(enabled=payload.get("enabled"), muted=payload.get("muted"))
+                if state["muted"]:
+                    self.player.stop()
+                publisher = getattr(self.server, "status_publisher", None)
+                if publisher:
+                    try:
+                        publisher(*self.companion.idle_status())
+                    except Exception:
+                        pass
+                self._json(HTTPStatus.OK, state)
             elif path == "/v1/transcribe":
                 query = parse_qs(urlparse(self.path).query)
                 filename = query.get("filename", ["question.wav"])[0]
@@ -156,6 +165,7 @@ def create_server(
     server = ThreadingHTTPServer((host, port), CompanionHandler)
     server.companion = companion or Companion()  # type: ignore[attr-defined]
     server.player = player or AudioPlayer()  # type: ignore[attr-defined]
+    server.status_publisher = None  # type: ignore[attr-defined]
     return server
 
 
