@@ -54,6 +54,15 @@ class FakeRouter:
             "estimate_only": True,
         }
 
+    def catalogue(self):
+        return {
+            "router_available": True,
+            "detail": "test catalogue",
+            "providers": [{"id": "openai", "label": "OpenAI", "requires_endpoint": False}],
+            "models": [{"id": "fake", "label": "Fake", "provider": "openai", "mode": "chat", "local": False}],
+            "voices": [{"id": "alloy", "label": "Alloy"}],
+        }
+
     def transcribe(self, audio, filename="question.wav"):  # noqa: ANN001
         return RouterResult("Where is the threat?", 4, "fake-transcribe")
 
@@ -281,6 +290,31 @@ class CompanionTests(unittest.TestCase):
         self.assertTrue(content[1]["image_url"]["url"].startswith("data:image/png;base64,"))
         self.assertEqual(content[1]["image_url"]["detail"], "high")
 
+    def test_router_catalogue_groups_hosted_and_local_models(self) -> None:
+        router = AIRouter(Settings())
+        payload = {
+            "data": [
+                {
+                    "model_name": "gpt-5.5",
+                    "litellm_params": {"model": "openai/gpt-5.5"},
+                    "model_info": {"mode": "chat", "litellm_provider": "openai"},
+                },
+                {
+                    "model_name": "local-small",
+                    "litellm_params": {"model": "openai/qwen-small", "api_base": "http://localhost:8006/v1"},
+                    "model_info": {"mode": "chat", "litellm_provider": "openai"},
+                },
+            ]
+        }
+        with mock.patch.object(router, "_get_json", return_value=payload):
+            catalogue = router.catalogue()
+        models = {model["id"]: model for model in catalogue["models"]}
+        self.assertEqual(models["gpt-5.5"]["provider"], "openai")
+        self.assertEqual(models["local-small"]["provider"], "local")
+        self.assertTrue(models["local-small"]["local"])
+        self.assertFalse(next(provider for provider in catalogue["providers"] if provider["id"] == "openai")["requires_endpoint"])
+        self.assertTrue(next(provider for provider in catalogue["providers"] if provider["id"] == "custom")["requires_endpoint"])
+
     def test_playback_failure_does_not_terminate_the_companion(self) -> None:
         companion = Companion(router=FakeRouter())
         self.assertFalse(_speak(companion, "Hold the center", FailingPlayer()))
@@ -333,6 +367,9 @@ class CompanionTests(unittest.TestCase):
             with urllib.request.urlopen(base + "/v1/state", timeout=3) as response:
                 state = response.read()
             self.assertIn(b'"session_cost_usd": 0.001', state)
+            with urllib.request.urlopen(base + "/v1/catalog", timeout=3) as response:
+                catalogue = response.read()
+            self.assertIn(b'"requires_endpoint": false', catalogue)
             request = urllib.request.Request(
                 base + "/v1/state",
                 data=b'{"notification_pace":"balanced","voice_priority":"important"}',

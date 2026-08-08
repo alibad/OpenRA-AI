@@ -63,6 +63,8 @@ class CompanionHandler(BaseHTTPRequestHandler):
             self._json(HTTPStatus.OK, self.companion.status())
         elif path == "/v1/config":
             self._json(HTTPStatus.OK, self.companion.router.settings.as_dict())
+        elif path == "/v1/catalog":
+            self._json(HTTPStatus.OK, self.companion.router.catalogue())
         elif path in {"/v1/state", "/v1/usage"}:
             state = {
                 "enabled": self.companion.enabled,
@@ -87,7 +89,7 @@ class CompanionHandler(BaseHTTPRequestHandler):
                 payload = json.loads(self._payload() or b"{}")
                 config_values = dict(payload.get("config") or {})
                 for key in (
-                    "router_url", "text_model", "vision_model", "transcribe_model", "speech_model", "speech_voice",
+                    "router_url", "model_provider", "text_model", "vision_model", "transcribe_model", "speech_model", "speech_voice",
                     "notification_pace", "voice_priority", "companion_enabled", "voice_enabled",
                 ):
                     if key in payload:

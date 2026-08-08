@@ -6,6 +6,7 @@ import json
 import threading
 import time
 import urllib.error
+import urllib.parse
 import urllib.request
 import uuid
 import wave
@@ -64,6 +65,117 @@ class AIRouter:
         except (OSError, TimeoutError, urllib.error.URLError) as exc:
             raise RouterError(f"AI router is unavailable at {self.settings.router_url}: {exc}") from exc
         return payload, round((time.perf_counter() - started) * 1000), response_type
+
+    def _get_json(self, path: str) -> dict:
+        request = urllib.request.Request(
+            f"{self.settings.router_url}{path}",
+            headers={"Accept": "application/json"},
+            method="GET",
+        )
+        try:
+            with urllib.request.urlopen(request, timeout=min(5, self.settings.timeout_seconds)) as response:
+                return json.loads(response.read())
+        except urllib.error.HTTPError as exc:
+            detail = exc.read().decode("utf-8", errors="replace")[:500]
+            raise RouterError(f"AI router returned HTTP {exc.code}: {detail}") from exc
+        except (OSError, TimeoutError, urllib.error.URLError, json.JSONDecodeError) as exc:
+            raise RouterError(f"AI router catalogue is unavailable at {self.settings.router_url}: {exc}") from exc
+
+    @staticmethod
+    def _fallback_models() -> list[dict]:
+        return [
+            {"id": "gpt-5.5", "label": "GPT-5.5", "provider": "openai", "mode": "chat", "local": False},
+            {"id": "claude-opus", "label": "Claude Opus", "provider": "anthropic", "mode": "chat", "local": False},
+            {"id": "claude-sonnet", "label": "Claude Sonnet", "provider": "anthropic", "mode": "chat", "local": False},
+            {"id": "claude-haiku", "label": "Claude Haiku", "provider": "anthropic", "mode": "chat", "local": False},
+            {"id": "gemini-pro", "label": "Gemini Pro", "provider": "gemini", "mode": "chat", "local": False},
+            {"id": "gemini-flash", "label": "Gemini Flash", "provider": "gemini", "mode": "chat", "local": False},
+            {"id": "local-small", "label": "Local Small", "provider": "local", "mode": "chat", "local": True},
+            {"id": "local-coder", "label": "Local Coder", "provider": "local", "mode": "chat", "local": True},
+            {"id": "openai-transcribe", "label": "OpenAI Transcription", "provider": "openai", "mode": "audio_transcription", "local": False},
+            {"id": "local-whisper", "label": "Local Whisper", "provider": "local", "mode": "audio_transcription", "local": True},
+            {"id": "openai-tts", "label": "OpenAI Voice", "provider": "openai", "mode": "audio_speech", "local": False},
+            {"id": "local-kokoro", "label": "Local Voice", "provider": "local", "mode": "audio_speech", "local": True},
+        ]
+
+    @staticmethod
+    def _catalogue_model(raw: dict) -> dict | None:
+        model_id = str(raw.get("model_name") or "").strip()
+        if not model_id:
+            return None
+        params = raw.get("litellm_params") or {}
+        info = raw.get("model_info") or {}
+        api_base = str(params.get("api_base") or "")
+        hostname = (urllib.parse.urlparse(api_base).hostname or "").lower()
+        local = hostname in {"localhost", "127.0.0.1", "::1"}
+        provider = "local" if local else str(info.get("litellm_provider") or "unknown").lower()
+        provider = {"vertex_ai": "gemini"}.get(provider, provider)
+        labels = {
+            "gpt-5.5": "GPT-5.5",
+            "claude-opus": "Claude Opus",
+            "claude-sonnet": "Claude Sonnet",
+            "claude-haiku": "Claude Haiku",
+            "gemini-pro": "Gemini Pro",
+            "gemini-flash": "Gemini Flash",
+            "local-small": "Local Small",
+            "local-coder": "Local Coder",
+            "openai-transcribe": "OpenAI Transcription",
+            "local-whisper": "Local Whisper",
+            "openai-tts": "OpenAI Voice",
+            "local-kokoro": "Local Voice",
+        }
+        return {
+            "id": model_id,
+            "label": labels.get(model_id, model_id.replace("-", " ").title()),
+            "provider": provider,
+            "mode": str(info.get("mode") or "chat"),
+            "local": local,
+        }
+
+    def catalogue(self) -> dict:
+        router_available = True
+        detail = "Models are managed by the AI layer; hosted providers do not need an endpoint URL."
+        try:
+            raw_models = self._get_json("/v1/model/info").get("data") or []
+            models = [model for value in raw_models if (model := self._catalogue_model(value))]
+            if not models:
+                raise RouterError("AI router returned an empty model catalogue")
+        except RouterError as exc:
+            router_available = False
+            detail = str(exc)
+            models = self._fallback_models()
+
+        provider_labels = {
+            "openai": "OpenAI",
+            "anthropic": "Anthropic / Claude",
+            "gemini": "Google / Gemini",
+            "local": "Local models",
+            "custom": "Custom endpoint",
+        }
+        provider_order = ("openai", "anthropic", "gemini", "local", "custom")
+        providers = [
+            {
+                "id": provider,
+                "label": provider_labels[provider],
+                "requires_endpoint": provider == "custom",
+            }
+            for provider in provider_order
+            if provider == "custom" or any(model["provider"] == provider and model["mode"] == "chat" for model in models)
+        ]
+        return {
+            "router_available": router_available,
+            "detail": detail,
+            "providers": providers,
+            "models": models,
+            "voices": [
+                {"id": "alloy", "label": "Alloy"},
+                {"id": "echo", "label": "Echo"},
+                {"id": "fable", "label": "Fable"},
+                {"id": "onyx", "label": "Onyx"},
+                {"id": "nova", "label": "Nova"},
+                {"id": "shimmer", "label": "Shimmer"},
+            ],
+        }
 
     def _chat(self, messages: list[dict[str, object]], model: str) -> RouterResult:
         body = json.dumps(
