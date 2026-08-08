@@ -3,14 +3,17 @@ from __future__ import annotations
 import hashlib
 import json
 import tempfile
+import threading
 import unittest
 import urllib.error
+import urllib.request
 from pathlib import Path
 from unittest import mock
 from zipfile import ZipFile
 
 from openra_ai_worldgen import GeoSelection, MissionGenerator
 from openra_ai_worldgen.osm import fetch_features
+from openra_ai_worldgen.server import create_server
 from openra_ai_worldgen.validator import validate_package
 
 
@@ -59,6 +62,40 @@ class WorldgenTests(unittest.TestCase):
             features = fetch_features(GeoSelection(24.7136, 46.7219), timeout=0.1)
         self.assertEqual(urlopen.call_count, 2)
         self.assertGreater(len(features), 0)
+
+    def test_world_studio_generates_installs_and_downloads_a_map(self) -> None:
+        with tempfile.TemporaryDirectory() as output, tempfile.TemporaryDirectory() as install:
+            server = create_server("127.0.0.1", 0, Path(output), Path(install))
+            worker = threading.Thread(target=server.serve_forever)
+            worker.start()
+            try:
+                base = f"http://127.0.0.1:{server.server_address[1]}"
+                with urllib.request.urlopen(base + "/", timeout=3) as response:
+                    self.assertIn(b"Mission Studio", response.read())
+                body = json.dumps({
+                    "latitude": 24.7136,
+                    "longitude": 46.7219,
+                    "title": "HTTP Studio Test",
+                    "map_size": 64,
+                    "seed": 7,
+                }).encode()
+                request = urllib.request.Request(
+                    base + "/v1/missions/generate",
+                    data=body,
+                    headers={"Content-Type": "application/json"},
+                )
+                fixture_generator = MissionGenerator(self.fixture)
+                with mock.patch("openra_ai_worldgen.server.MissionGenerator", return_value=fixture_generator):
+                    with urllib.request.urlopen(request, timeout=5) as response:
+                        payload = json.loads(response.read())
+                installed = Path(payload["installed_path"])
+                self.assertTrue(installed.is_file())
+                with urllib.request.urlopen(base + payload["download_url"], timeout=3) as response:
+                    self.assertTrue(response.read().startswith(b"PK"))
+            finally:
+                server.shutdown()
+                server.server_close()
+                worker.join()
 
 
 if __name__ == "__main__":

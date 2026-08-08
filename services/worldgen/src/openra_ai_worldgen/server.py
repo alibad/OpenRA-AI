@@ -1,14 +1,17 @@
 from __future__ import annotations
 
 import json
+import shutil
 import tempfile
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
-from urllib.parse import urlparse
+from urllib.parse import parse_qs, urlencode, urlparse
+from urllib.request import Request, urlopen
 
 from .generator import MissionGenerator
 from .models import GeoSelection
+from .webui import WORLD_STUDIO_HTML
 
 
 class WorldgenHandler(BaseHTTPRequestHandler):
@@ -23,6 +26,14 @@ class WorldgenHandler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(body)
 
+    def _html(self, value: str) -> None:
+        body = value.encode("utf-8")
+        self.send_response(HTTPStatus.OK)
+        self.send_header("Content-Type", "text/html; charset=utf-8")
+        self.send_header("Content-Length", str(len(body)))
+        self.end_headers()
+        self.wfile.write(body)
+
     def do_OPTIONS(self) -> None:  # noqa: N802
         self.send_response(HTTPStatus.NO_CONTENT)
         self.send_header("Access-Control-Allow-Origin", "*")
@@ -32,8 +43,35 @@ class WorldgenHandler(BaseHTTPRequestHandler):
 
     def do_GET(self) -> None:  # noqa: N802
         path = urlparse(self.path).path
+        if path == "/":
+            self._html(WORLD_STUDIO_HTML)
+            return
         if path == "/health":
             self._json(HTTPStatus.OK, {"ok": True, "service": "worldgen", "version": "0.1.0"})
+            return
+        if path == "/v1/geocode":
+            query = parse_qs(urlparse(self.path).query).get("query", [""])[0].strip()
+            if not query:
+                self._json(HTTPStatus.BAD_REQUEST, {"error": "query_required"})
+                return
+            try:
+                request = Request(
+                    "https://nominatim.openstreetmap.org/search?" + urlencode({"q": query, "format": "jsonv2", "limit": 1}),
+                    headers={"User-Agent": "OpenRA-AI/0.1 local mission generator"},
+                )
+                with urlopen(request, timeout=12) as response:
+                    matches = json.loads(response.read())
+                if not matches:
+                    self._json(HTTPStatus.NOT_FOUND, {"error": "location_not_found"})
+                    return
+                match = matches[0]
+                self._json(HTTPStatus.OK, {
+                    "name": match.get("display_name", query),
+                    "latitude": float(match["lat"]),
+                    "longitude": float(match["lon"]),
+                })
+            except (OSError, TimeoutError, ValueError, KeyError, json.JSONDecodeError) as exc:
+                self._json(HTTPStatus.BAD_GATEWAY, {"error": "geocoding_failed", "detail": str(exc)})
             return
         if path.startswith("/v1/missions/"):
             name = Path(path).name
@@ -71,8 +109,14 @@ class WorldgenHandler(BaseHTTPRequestHandler):
             result = MissionGenerator(allow_network=True).generate(
                 selection, Path(self.server.output_directory)  # type: ignore[attr-defined]
             )
+            install_directory = Path(self.server.install_directory)  # type: ignore[attr-defined]
+            install_directory.mkdir(parents=True, exist_ok=True)
+            installed_path = install_directory / result.package_path.name
+            shutil.copy2(result.package_path, installed_path)
             response = result.as_dict()
             response["download_url"] = f"/v1/missions/{result.package_path.name}"
+            response["filename"] = result.package_path.name
+            response["installed_path"] = str(installed_path)
             self._json(HTTPStatus.CREATED, response)
         except (KeyError, TypeError, ValueError, json.JSONDecodeError) as exc:
             self._json(HTTPStatus.BAD_REQUEST, {"error": "invalid_request", "detail": str(exc)})
@@ -81,10 +125,21 @@ class WorldgenHandler(BaseHTTPRequestHandler):
         print(f"worldgen: {fmt % args}")
 
 
-def serve(host: str = "127.0.0.1", port: int = 8788, output_directory: Path | None = None) -> None:
+def create_server(
+    host: str = "127.0.0.1",
+    port: int = 8788,
+    output_directory: Path | None = None,
+    install_directory: Path | None = None,
+) -> ThreadingHTTPServer:
     directory = output_directory or Path(tempfile.gettempdir()) / "openra-ai-missions"
     directory.mkdir(parents=True, exist_ok=True)
     server = ThreadingHTTPServer((host, port), WorldgenHandler)
     server.output_directory = str(directory)  # type: ignore[attr-defined]
+    server.install_directory = str(install_directory or directory)  # type: ignore[attr-defined]
+    return server
+
+
+def serve(host: str = "127.0.0.1", port: int = 8788, output_directory: Path | None = None) -> None:
+    server = create_server(host, port, output_directory)
     print(f"OpenRA AI worldgen listening on http://{host}:{port}")
     server.serve_forever()

@@ -3,12 +3,17 @@ from __future__ import annotations
 import threading
 import time
 import unittest
+import urllib.request
 import wave
 from io import BytesIO
+from tempfile import TemporaryDirectory
+from unittest import mock
 
 from openra_ai_companion.core import Companion
 from openra_ai_companion.models import GameSnapshot
 from openra_ai_companion.router import RouterResult
+from openra_ai_companion.server import create_server
+from openra_ai_companion.settings import Settings
 from openra_ai_companion.voice import _wav_bytes
 
 
@@ -16,6 +21,11 @@ class FakeRouter:
     def __init__(self, delay: float = 0):
         self.delay = delay
         self.calls = 0
+        self.settings = Settings(router_url="http://127.0.0.1:4000", text_model="fake")
+
+    def configure(self, values, persist=True):  # noqa: ANN001, ARG002
+        self.settings = self.settings.with_updates(values)
+        return self.settings.as_dict()
 
     def chat(self, messages, temperature=0.2):  # noqa: ANN001
         self.calls += 1
@@ -30,6 +40,14 @@ class FakeRouter:
 
     def speech(self, text):  # noqa: ANN001
         return b"RIFFfake", 5, "audio/wav"
+
+
+class FakePlayer:
+    def __init__(self):
+        self.audio = b""
+
+    def play(self, audio):  # noqa: ANN001
+        self.audio = audio
 
 
 def snapshot(**changes) -> GameSnapshot:
@@ -101,6 +119,35 @@ class CompanionTests(unittest.TestCase):
             self.assertEqual(wav.getnchannels(), 1)
             self.assertEqual(wav.getframerate(), 16_000)
             self.assertEqual(wav.getnframes(), 160)
+
+    def test_settings_are_validated_and_saved_outside_the_repository(self) -> None:
+        with TemporaryDirectory() as directory, mock.patch.dict("os.environ", {"APPDATA": directory}, clear=True):
+            updated = Settings().with_updates({"text_model": "local-companion", "timeout_seconds": 12})
+            path = updated.save()
+            self.assertEqual(path.parent.name, "OpenRA-AI")
+            self.assertEqual(Settings.from_env().text_model, "local-companion")
+            with self.assertRaises(ValueError):
+                updated.with_updates({"router_url": "not-a-url"})
+
+    def test_companion_console_and_full_diagnostic_http_path(self) -> None:
+        router = FakeRouter()
+        player = FakePlayer()
+        server = create_server("127.0.0.1", 0, Companion(router=router), player)
+        worker = threading.Thread(target=server.serve_forever)
+        worker.start()
+        try:
+            base = f"http://127.0.0.1:{server.server_address[1]}"
+            with urllib.request.urlopen(base + "/", timeout=3) as response:
+                self.assertIn(b"Companion Console", response.read())
+            request = urllib.request.Request(base + "/v1/test/full", data=b"{}", headers={"Content-Type": "application/json"})
+            with urllib.request.urlopen(request, timeout=3) as response:
+                payload = response.read()
+            self.assertIn(b'"ok": true', payload)
+            self.assertEqual(player.audio, b"RIFFfake")
+        finally:
+            server.shutdown()
+            server.server_close()
+            worker.join()
 
 
 if __name__ == "__main__":

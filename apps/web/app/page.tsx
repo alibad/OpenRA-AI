@@ -94,7 +94,7 @@ export default function Home() {
         <ol className="play-steps">
           <li><span>01</span><div><b>Extract the ZIP</b><p>Keep the included folders together. The package is portable.</p></div></li>
           <li><span>02</span><div><b>Run Play-OpenRAAI.cmd</b><p>The first run verifies and downloads OpenRA&apos;s supported Red Alert content, then starts the generated map.</p></div></li>
-          <li><span>03</span><div><b>Hold F8 to ask</b><p>Release to hear the answer. F9 mutes; F10 disables or enables the companion.</p></div></li>
+          <li><span>03</span><div><b>Hold Ctrl+Space to ask</b><p>Release to hear the answer. Ctrl+Shift+M mutes; Ctrl+Shift+A disables or enables the companion.</p></div></li>
         </ol>
         <div className="download-footnote"><FileArchive size={15} /><span>Windows 10/11 x64 alpha. The model-backed companion expects your private AI layer on this machine; the game itself still runs if that layer is offline.</span></div>
       </section>

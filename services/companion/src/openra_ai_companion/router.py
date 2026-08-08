@@ -27,6 +27,12 @@ class AIRouter:
     def __init__(self, settings: Settings | None = None):
         self.settings = settings or Settings.from_env()
 
+    def configure(self, values: dict, *, persist: bool = True) -> dict[str, str | float]:
+        self.settings = self.settings.with_updates(values)
+        if persist:
+            self.settings.save()
+        return self.settings.as_dict()
+
     def _request(self, path: str, body: bytes, content_type: str) -> tuple[bytes, int, str]:
         started = time.perf_counter()
         request = urllib.request.Request(

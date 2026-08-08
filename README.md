@@ -72,10 +72,23 @@ official mirror list.
 
 During the match:
 
-- hold `F8`, ask a question, and release it to hear a short answer;
-- tap `F9` to mute or unmute the companion;
-- tap `F10` to disable or enable the companion;
+- hold `Ctrl+Space`, ask a question, and release it to hear a short answer;
+- press `Ctrl+Shift+M` to mute or unmute the companion;
+- press `Ctrl+Shift+A` to disable or enable the companion;
 - drag any generated `.oramap` onto `Play-OpenRAAI.cmd` to play that map.
+
+From the OpenRA main menu:
+
+- choose **AI Companion** to configure AI-layer routes and run connection,
+  text, microphone, speech, or full-path diagnostics;
+- choose **World Tools → Earth Mission Studio** to select a point on Earth
+  and generate, validate, install, or download a playable `.oramap`;
+- choose **World Tools → Native Map Editor** to refine installed maps with
+  OpenRA's editor.
+
+Both companion tools bind only to `127.0.0.1`. The configuration screen stores
+route names and the AI-layer URL under the current Windows user profile; it
+does not accept, reveal, or persist provider API keys.
 
 The companion expects an OpenAI-compatible AI layer on
 `http://127.0.0.1:4000`. Provider credentials stay in that layer. If it is

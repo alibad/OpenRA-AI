@@ -5,7 +5,9 @@
 OpenRA AI has two user-facing applications:
 
 1. The Windows alpha launcher verifies required game content, installs generated
-   maps, starts the local companion, and launches OpenRA directly into a match.
+   maps, starts the local companion and Earth Mission Studio, and launches
+   OpenRA. Main-menu entry points open the local AI configuration/diagnostics
+   console, the Earth map picker, and OpenRA's native map editor.
 2. The web application lets a player choose a place, create or discover a
    mission, download the launcher, and send a generated mission to an installed
    launcher through a deep link.

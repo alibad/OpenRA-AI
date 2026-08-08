@@ -5,12 +5,16 @@ import ctypes
 import json
 import os
 import platform
+import threading
 import time
+from pathlib import Path
+
+from openra_ai_worldgen.server import create_server as create_worldgen_server
 
 from .bridge import OpenRABridge
 from .core import Companion
 from .hotkeys import VoiceHotkeys
-from .server import serve
+from .server import create_server as create_companion_server, serve
 from .voice import AudioPlayer, play_wav, record_question
 
 
@@ -26,6 +30,10 @@ def _parser() -> argparse.ArgumentParser:
     watch.add_argument("--speak", action="store_true")
     watch.add_argument("--voice-hotkeys", action="store_true")
     watch.add_argument("--game-pid", type=int, default=0)
+    watch.add_argument("--control-port", type=int, default=8787)
+    watch.add_argument("--worldgen-port", type=int, default=8788)
+    watch.add_argument("--mission-output", type=Path, default=Path("generated/missions"))
+    watch.add_argument("--mission-install", type=Path)
     ask = commands.add_parser("ask", help="ask about a supplied snapshot")
     ask.add_argument("question")
     ask.add_argument("--snapshot", required=True, help="path to a JSON GameSnapshot")
@@ -91,6 +99,21 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     player = AudioPlayer() if args.speak else None
+    control_server = create_companion_server("127.0.0.1", args.control_port, companion, player)
+    worldgen_server = create_worldgen_server(
+        "127.0.0.1",
+        args.worldgen_port,
+        args.mission_output,
+        args.mission_install,
+    )
+    for name, server in (("control", control_server), ("worldgen", worldgen_server)):
+        threading.Thread(
+            target=server.serve_forever,
+            name=f"OpenRA-AI-{name}-server",
+            daemon=True,
+        ).start()
+    print(f"AI Console: http://127.0.0.1:{args.control_port}/")
+    print(f"Earth Mission Studio: http://127.0.0.1:{args.worldgen_port}/")
     with OpenRABridge(args.bridge) as bridge:
         def publish_status(state: str, message: str) -> None:
             bridge.update_companion_status(

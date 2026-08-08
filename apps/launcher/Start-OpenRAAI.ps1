@@ -7,7 +7,9 @@ param(
     [switch]$Headless,
     [ValidateSet("beginner", "easy", "medium", "rush", "normal", "turtle", "naval")]
     [string]$OpponentBot = "normal",
-    [int]$BridgePort = 9998
+    [int]$BridgePort = 9998,
+    [int]$AIConsolePort = 8787,
+    [int]$WorldStudioPort = 8788
 )
 
 $ErrorActionPreference = "Stop"
@@ -44,6 +46,12 @@ else {
     & $contentInstaller
 }
 
+$version = (Get-Content -LiteralPath (Join-Path $engineRoot "VERSION") -Raw).Trim()
+$mapDirectory = Join-Path $supportRoot "maps\ra\$version"
+$missionOutput = Join-Path $repositoryRoot "generated\missions"
+New-Item -ItemType Directory -Path $mapDirectory -Force | Out-Null
+New-Item -ItemType Directory -Path $missionOutput -Force | Out-Null
+
 $mapArgument = $null
 if ($Map) {
     $mapSource = (Resolve-Path -LiteralPath $Map).Path
@@ -51,9 +59,6 @@ if ($Map) {
         throw "The selected map must be an .oramap package."
     }
 
-    $version = (Get-Content -LiteralPath (Join-Path $engineRoot "VERSION") -Raw).Trim()
-    $mapDirectory = Join-Path $supportRoot "maps\ra\$version"
-    New-Item -ItemType Directory -Path $mapDirectory -Force | Out-Null
     $installedMap = Join-Path $mapDirectory ([IO.Path]::GetFileName($mapSource))
     Copy-Item -LiteralPath $mapSource -Destination $installedMap -Force
     $mapArgument = "Launch.Map=$([IO.Path]::GetFileName($installedMap))"
@@ -64,6 +69,8 @@ New-Item -ItemType Directory -Path $logDirectory -Force | Out-Null
 $env:DOTNET_ROLL_FORWARD = "Major"
 $env:OPENRA_AI_COMPANION = "1"
 $env:OPENRA_AI_GRPC_PORT = "$BridgePort"
+$env:OPENRA_AI_CONSOLE_URL = "http://127.0.0.1:$AIConsolePort/"
+$env:OPENRA_AI_WORLD_STUDIO_URL = "http://127.0.0.1:$WorldStudioPort/"
 $arguments = @("Engine.EngineDir=$engineRoot", "Game.Mod=ra", "Launch.Bots=Multi1:$OpponentBot")
 if ($Headless) {
     $arguments += "Game.Platform=Null"
@@ -101,6 +108,12 @@ if (Test-Path -LiteralPath $bundledCompanion) {
     $watchArguments = @("watch")
 }
 $watchArguments += @("--bridge", "127.0.0.1:$BridgePort", "--game-pid", "$($gameProcess.Id)")
+$watchArguments += @(
+    "--control-port", "$AIConsolePort",
+    "--worldgen-port", "$WorldStudioPort",
+    "--mission-output", "`"$missionOutput`"",
+    "--mission-install", "`"$mapDirectory`""
+)
 if (-not $NoSpeech) {
     $watchArguments += "--speak"
     if (-not $NoVoiceHotkeys) {
