@@ -9,12 +9,13 @@ from io import BytesIO
 from tempfile import TemporaryDirectory
 from unittest import mock
 
+from openra_ai_companion.cli import _speak
 from openra_ai_companion.core import Companion
 from openra_ai_companion.models import GameSnapshot
-from openra_ai_companion.router import RouterResult
+from openra_ai_companion.router import AIRouter, RouterError, RouterResult
 from openra_ai_companion.server import create_server
 from openra_ai_companion.settings import Settings
-from openra_ai_companion.voice import _wav_bytes
+from openra_ai_companion.voice import _normalize_wav, _wav_bytes
 
 
 class FakeRouter:
@@ -48,6 +49,11 @@ class FakePlayer:
 
     def play(self, audio):  # noqa: ANN001
         self.audio = audio
+
+
+class FailingPlayer:
+    def play(self, audio):  # noqa: ANN001, ARG002
+        raise RuntimeError("output device unavailable")
 
 
 def snapshot(**changes) -> GameSnapshot:
@@ -112,6 +118,16 @@ class CompanionTests(unittest.TestCase):
         self.assertEqual(audio, b"RIFFfake")
         self.assertFalse(metadata["interrupted"])
 
+    def test_playback_failure_does_not_terminate_the_companion(self) -> None:
+        companion = Companion(router=FakeRouter())
+        self.assertFalse(_speak(companion, "Hold the center", FailingPlayer()))
+
+    def test_speech_route_rejects_non_wav_payloads(self) -> None:
+        router = AIRouter(Settings())
+        with mock.patch.object(router, "_request", return_value=(b'{"error":"bad route"}', 4, "application/json")):
+            with self.assertRaises(RouterError):
+                router.speech("Test")
+
     def test_push_to_talk_frames_are_packaged_as_mono_wav(self) -> None:
         audio = _wav_bytes([b"\x00\x00" * 160], 16_000)
         self.assertTrue(audio.startswith(b"RIFF"))
@@ -119,6 +135,16 @@ class CompanionTests(unittest.TestCase):
             self.assertEqual(wav.getnchannels(), 1)
             self.assertEqual(wav.getframerate(), 16_000)
             self.assertEqual(wav.getnframes(), 160)
+
+    def test_streaming_wav_lengths_are_normalized_for_windows(self) -> None:
+        audio = bytearray(_wav_bytes([b"\x00\x00" * 160], 24_000))
+        audio[4:8] = b"\xff\xff\xff\xff"
+        data = audio.index(b"data")
+        audio[data + 4 : data + 8] = b"\xff\xff\xff\xff"
+        normalized = _normalize_wav(bytes(audio))
+        with wave.open(BytesIO(normalized), "rb") as wav:
+            self.assertEqual(wav.getnframes(), 160)
+            self.assertEqual(wav.getframerate(), 24_000)
 
     def test_settings_are_validated_and_saved_outside_the_repository(self) -> None:
         with TemporaryDirectory() as directory, mock.patch.dict("os.environ", {"APPDATA": directory}, clear=True):

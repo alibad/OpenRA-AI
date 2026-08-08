@@ -27,7 +27,12 @@ def _parser() -> argparse.ArgumentParser:
     watch = commands.add_parser("watch", help="watch a running OpenRA match")
     watch.add_argument("--bridge", default="127.0.0.1:9998")
     watch.add_argument("--interval", type=float, default=0.5)
-    watch.add_argument("--speak", action="store_true")
+    watch.add_argument(
+        "--speak",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help="speak companion responses (enabled by default; use --no-speak to disable)",
+    )
     watch.add_argument("--voice-hotkeys", action="store_true")
     watch.add_argument("--game-pid", type=int, default=0)
     watch.add_argument("--control-port", type=int, default=8787)
@@ -43,17 +48,19 @@ def _parser() -> argparse.ArgumentParser:
     return parser
 
 
-def _speak(companion: Companion, text: str, player: AudioPlayer | None = None) -> None:
+def _speak(companion: Companion, text: str, player: AudioPlayer | None = None) -> bool:
     try:
         audio, metadata = companion.speech(text)
-    except Exception as exc:
-        print(f"Speech unavailable: {exc}")
-        return
-    if not metadata.get("interrupted"):
+        if metadata.get("interrupted"):
+            return False
         if player:
             player.play(audio)
         else:
             play_wav(audio)
+    except Exception as exc:
+        print(f"Speech unavailable: {exc}")
+        return False
+    return bool(audio)
 
 
 def _pid_alive(pid: int) -> bool:

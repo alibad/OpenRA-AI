@@ -3,6 +3,7 @@ from __future__ import annotations
 import atexit
 import io
 import platform
+import struct
 import subprocess
 import tempfile
 import threading
@@ -20,6 +21,27 @@ def _wav_bytes(frames: list[bytes], sample_rate: int) -> bytes:
         wav.setframerate(sample_rate)
         wav.writeframes(b"".join(frames))
     return output.getvalue()
+
+
+def _normalize_wav(audio: bytes) -> bytes:
+    """Replace streaming WAV sentinel sizes with concrete file lengths."""
+    if len(audio) < 44 or audio[:4] != b"RIFF" or audio[8:12] != b"WAVE":
+        raise ValueError("speech audio is not a valid RIFF/WAVE file")
+
+    normalized = bytearray(audio)
+    struct.pack_into("<I", normalized, 4, len(normalized) - 8)
+    offset = 12
+    while offset + 8 <= len(normalized):
+        chunk_id = normalized[offset : offset + 4]
+        chunk_size = struct.unpack_from("<I", normalized, offset + 4)[0]
+        data_offset = offset + 8
+        if chunk_id == b"data":
+            struct.pack_into("<I", normalized, offset + 4, len(normalized) - data_offset)
+            return bytes(normalized)
+        if chunk_size == 0xFFFFFFFF or data_offset + chunk_size > len(normalized):
+            break
+        offset = data_offset + chunk_size + (chunk_size & 1)
+    raise ValueError("speech WAV does not contain a readable data chunk")
 
 
 def record_question(seconds: float = 4.0, sample_rate: int = 16_000) -> bytes:
@@ -93,6 +115,7 @@ class AudioPlayer:
     def play(self, audio: bytes) -> None:
         if not audio:
             return
+        audio = _normalize_wav(audio)
         with self._lock:
             self._stop_locked()
             with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as handle:
@@ -118,16 +141,19 @@ class AudioPlayer:
 def play_wav(audio: bytes) -> None:
     if not audio:
         return
-    if platform.system() == "Windows":
-        import winsound
-
-        winsound.PlaySound(audio, winsound.SND_MEMORY)
-        return
+    audio = _normalize_wav(audio)
     with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as handle:
         handle.write(audio)
         path = Path(handle.name)
     try:
-        command = ["afplay", str(path)] if platform.system() == "Darwin" else ["aplay", "-q", str(path)]
-        subprocess.run(command, check=False)
+        if platform.system() == "Windows":
+            import winsound
+
+            # SND_MEMORY rejects WAV variants that Windows accepts from a file.
+            # The live AudioPlayer uses the same filename-based path.
+            winsound.PlaySound(str(path), winsound.SND_FILENAME | winsound.SND_NODEFAULT)
+        else:
+            command = ["afplay", str(path)] if platform.system() == "Darwin" else ["aplay", "-q", str(path)]
+            subprocess.run(command, check=False)
     finally:
         path.unlink(missing_ok=True)

@@ -77,6 +77,10 @@ During the match:
 - press `Ctrl+Shift+A` to disable or enable the companion;
 - drag any generated `.oramap` onto `Play-OpenRAAI.cmd` to play that map.
 
+Voice is enabled by default. Each useful AI observation is spoken through the
+configured speech route as well as shown in the HUD; speech can be interrupted
+immediately with `Ctrl+Space` or muted with `Ctrl+Shift+M`.
+
 From the OpenRA main menu:
 
 - choose **AI Companion** to configure AI-layer routes and run connection,

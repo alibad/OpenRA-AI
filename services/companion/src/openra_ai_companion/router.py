@@ -101,9 +101,10 @@ class AIRouter:
             }
         ).encode("utf-8")
         payload, latency, content_type = self._request("/v1/audio/speech", body, "application/json")
-        if payload.startswith(b"RIFF"):
-            content_type = "audio/wav"
-        return payload, latency, content_type or "audio/wav"
+        if not payload.startswith(b"RIFF"):
+            detail = payload[:300].decode("utf-8", errors="replace")
+            raise RouterError(f"AI router returned invalid WAV speech: {detail}")
+        return payload, latency, "audio/wav"
 
     def health(self) -> dict[str, str | bool]:
         request = urllib.request.Request(f"{self.settings.router_url}/health/liveliness", method="GET")

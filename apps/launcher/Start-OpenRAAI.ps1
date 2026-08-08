@@ -120,6 +120,9 @@ if (-not $NoSpeech) {
         $watchArguments += "--voice-hotkeys"
     }
 }
+else {
+    $watchArguments += "--no-speak"
+}
 
 $env:PYTHONUNBUFFERED = "1"
 $watcher = $null
