@@ -18,6 +18,15 @@ class InsightEngine:
         self.last_situation_tick = 0
         self.last_situation_signature: tuple | None = None
 
+    def configure_pace(self, pace: str) -> None:
+        """Tune routine chatter without delaying genuinely important events."""
+        timings = {
+            "calm": (1000, 750),
+            "balanced": (750, 500),
+            "frequent": (500, 250),
+        }
+        self.cooldown_ticks, self.situation_interval_ticks = timings.get(pace, timings["calm"])
+
     def _ready(self, key: str, tick: int) -> bool:
         return tick - self.last_emitted.get(key, -10_000_000) >= self.cooldown_ticks
 
@@ -68,15 +77,15 @@ class InsightEngine:
 
         if new_enemies and self._ready("enemy_spotted", snapshot.tick):
             kinds = ", ".join(dict.fromkeys(u.kind for u in new_enemies[:4]))
-            candidates.append(Insight("enemy_spotted", 96, f"New enemy units visible: {kinds}", f"New contact: {kinds}. Check the visible approach.", snapshot.tick))
+            candidates.append(Insight("enemy_spotted", 96, f"New enemy units visible: {kinds}", f"New contact: {kinds}. Check the visible approach.", snapshot.tick, "important"))
         if new_structures and self._ready("structure_spotted", snapshot.tick):
             kinds = ", ".join(dict.fromkeys(u.kind for u in new_structures[:3]))
-            candidates.append(Insight("structure_spotted", 88, f"New enemy structures visible: {kinds}", f"Enemy structure identified: {kinds}.", snapshot.tick))
+            candidates.append(Insight("structure_spotted", 88, f"New enemy structures visible: {kinds}", f"Enemy structure identified: {kinds}.", snapshot.tick, "important"))
         if snapshot.power_drained > snapshot.power_provided and self._ready("low_power", snapshot.tick):
             deficit = snapshot.power_drained - snapshot.power_provided
-            candidates.append(Insight("low_power", 91, f"Power deficit is {deficit}", f"Power is short by {deficit}. Production and defenses may be impaired.", snapshot.tick))
+            candidates.append(Insight("low_power", 91, f"Power deficit is {deficit}", f"Power is short by {deficit}. Production and defenses may be impaired.", snapshot.tick, "critical"))
         if snapshot.tick > 400 and snapshot.harvester_count == 0 and self._ready("no_harvester", snapshot.tick):
-            candidates.append(Insight("no_harvester", 94, "No active harvester", "You have no active harvester. Your economy will stall.", snapshot.tick))
+            candidates.append(Insight("no_harvester", 94, "No active harvester", "You have no active harvester. Your economy will stall.", snapshot.tick, "critical"))
         if previous and previous.harvester_count == 0 and snapshot.harvester_count > 0:
             candidates.append(Insight(
                 "economy_recovered",
@@ -84,6 +93,7 @@ class InsightEngine:
                 f"Harvester count recovered to {snapshot.harvester_count}",
                 "A harvester is active now; the earlier economy warning is resolved.",
                 snapshot.tick,
+                "important",
             ))
         if (
             previous
@@ -96,6 +106,7 @@ class InsightEngine:
                 f"Power recovered to {snapshot.power_provided}/{snapshot.power_drained}",
                 "Power is back online; the earlier deficit is resolved.",
                 snapshot.tick,
+                "important",
             ))
         if previous and len(snapshot.units) + len(snapshot.buildings) > len(previous.units) + len(previous.buildings):
             previous_production = {str(item.get("item", "unknown")) for item in previous.production}
@@ -113,13 +124,13 @@ class InsightEngine:
                         snapshot.tick,
                     ))
         if snapshot.cash < 350 and not snapshot.production and snapshot.tick > 600 and self._ready("economy_idle", snapshot.tick):
-            candidates.append(Insight("economy_idle", 68, f"Cash is {snapshot.cash} with no active production", "Cash is low and every production queue is idle.", snapshot.tick))
+            candidates.append(Insight("economy_idle", 68, f"Cash is {snapshot.cash} with no active production", "Cash is low and every production queue is idle.", snapshot.tick, "important"))
         critical = [u for u in (*snapshot.units, *snapshot.buildings) if u.hp_percent <= 0.22]
         if critical and self._ready("critical_damage", snapshot.tick):
             target = critical[0]
-            candidates.append(Insight("critical_damage", 84, f"{target.kind} is at {round(target.hp_percent * 100)}% health", f"Your {target.kind} is critically damaged.", snapshot.tick))
+            candidates.append(Insight("critical_damage", 84, f"{target.kind} is at {round(target.hp_percent * 100)}% health", f"Your {target.kind} is critically damaged.", snapshot.tick, "critical"))
         if snapshot.done and self._ready("game_over", snapshot.tick):
-            candidates.append(Insight("game_over", 100, f"Match result: {snapshot.result or 'complete'}", f"Match complete: {snapshot.result or 'result pending'}.", snapshot.tick))
+            candidates.append(Insight("game_over", 100, f"Match result: {snapshot.result or 'complete'}", f"Match complete: {snapshot.result or 'result pending'}.", snapshot.tick, "critical"))
         signature = self._situation_signature(snapshot)
         if (
             self.last_situation_signature is not None

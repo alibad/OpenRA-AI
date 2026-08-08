@@ -30,7 +30,7 @@ def user_settings_path() -> Path:
     return root / "OpenRA-AI" / "settings.json"
 
 
-def _load_user_settings() -> dict[str, str | float]:
+def _load_user_settings() -> dict[str, str | float | bool]:
     path = user_settings_path()
     if not path.is_file():
         return {}
@@ -49,6 +49,10 @@ class Settings:
     speech_model: str = "openai-tts"
     speech_voice: str = "alloy"
     timeout_seconds: float = 20.0
+    companion_enabled: bool = True
+    voice_enabled: bool = True
+    notification_pace: str = "calm"
+    voice_priority: str = "critical"
 
     @classmethod
     def from_env(cls) -> "Settings":
@@ -63,8 +67,16 @@ class Settings:
                 "OPENRA_AI_TTS_MODEL": "speech_model",
                 "OPENRA_AI_TTS_VOICE": "speech_voice",
                 "OPENRA_AI_ROUTER_TIMEOUT_SECONDS": "timeout_seconds",
+                "OPENRA_AI_NOTIFICATION_PACE": "notification_pace",
+                "OPENRA_AI_VOICE_PRIORITY": "voice_priority",
             }[name]
             return str(os.environ.get(name, user_values.get(field_name, file_values.get(name, default))))
+
+        def get_bool(name: str, field_name: str, default: bool) -> bool:
+            value = os.environ.get(name, user_values.get(field_name, file_values.get(name, default)))
+            if isinstance(value, bool):
+                return value
+            return str(value).strip().lower() not in {"0", "false", "no", "off"}
 
         return cls(
             router_url=get("OPENRA_AI_ROUTER_URL", cls.router_url).rstrip("/"),
@@ -73,6 +85,10 @@ class Settings:
             speech_model=get("OPENRA_AI_TTS_MODEL", cls.speech_model),
             speech_voice=get("OPENRA_AI_TTS_VOICE", cls.speech_voice),
             timeout_seconds=float(get("OPENRA_AI_ROUTER_TIMEOUT_SECONDS", str(cls.timeout_seconds))),
+            companion_enabled=get_bool("OPENRA_AI_COMPANION_ENABLED", "companion_enabled", cls.companion_enabled),
+            voice_enabled=get_bool("OPENRA_AI_VOICE_ENABLED", "voice_enabled", cls.voice_enabled),
+            notification_pace=get("OPENRA_AI_NOTIFICATION_PACE", cls.notification_pace),
+            voice_priority=get("OPENRA_AI_VOICE_PRIORITY", cls.voice_priority),
         ).validated()
 
     def validated(self) -> "Settings":
@@ -85,21 +101,40 @@ class Settings:
                 raise ValueError(f"{name} must contain 1 to 160 characters")
         if not 1 <= self.timeout_seconds <= 120:
             raise ValueError("timeout_seconds must be between 1 and 120")
+        if self.notification_pace not in {"calm", "balanced", "frequent"}:
+            raise ValueError("notification_pace must be calm, balanced, or frequent")
+        if self.voice_priority not in {"off", "critical", "important"}:
+            raise ValueError("voice_priority must be off, critical, or important")
         return self
 
     def with_updates(self, values: dict) -> "Settings":
-        allowed = {"router_url", "text_model", "transcribe_model", "speech_model", "speech_voice", "timeout_seconds"}
+        allowed = {
+            "router_url",
+            "text_model",
+            "transcribe_model",
+            "speech_model",
+            "speech_voice",
+            "timeout_seconds",
+            "companion_enabled",
+            "voice_enabled",
+            "notification_pace",
+            "voice_priority",
+        }
         updates = {key: values[key] for key in allowed if key in values}
         if "timeout_seconds" in updates:
             updates["timeout_seconds"] = float(updates["timeout_seconds"])
-        for key in allowed - {"timeout_seconds"}:
+        for key in ("companion_enabled", "voice_enabled"):
+            if key in updates:
+                value = updates[key]
+                updates[key] = value if isinstance(value, bool) else str(value).strip().lower() not in {"0", "false", "no", "off"}
+        for key in allowed - {"timeout_seconds", "companion_enabled", "voice_enabled"}:
             if key in updates:
                 updates[key] = str(updates[key]).strip()
         if "router_url" in updates:
             updates["router_url"] = updates["router_url"].rstrip("/")
         return replace(self, **updates).validated()
 
-    def as_dict(self) -> dict[str, str | float]:
+    def as_dict(self) -> dict[str, str | float | bool]:
         return asdict(self)
 
     def save(self) -> Path:

@@ -107,6 +107,7 @@ class Insight:
     fact: str
     fallback_text: str
     tick: int
+    importance: str = "routine"
 
     def as_dict(self) -> dict[str, Any]:
         return asdict(self)

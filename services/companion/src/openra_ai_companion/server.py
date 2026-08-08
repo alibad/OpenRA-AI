@@ -63,6 +63,15 @@ class CompanionHandler(BaseHTTPRequestHandler):
             self._json(HTTPStatus.OK, self.companion.status())
         elif path == "/v1/config":
             self._json(HTTPStatus.OK, self.companion.router.settings.as_dict())
+        elif path in {"/v1/state", "/v1/usage"}:
+            state = {
+                "enabled": self.companion.enabled,
+                "voice_enabled": not self.companion.muted,
+                "config": self.companion.router.settings.as_dict(),
+                "usage": self.companion.router.usage_summary(),
+                "router": self.companion.router.health(),
+            }
+            self._json(HTTPStatus.OK, state if path == "/v1/state" else state["usage"])
         else:
             self._json(HTTPStatus.NOT_FOUND, {"error": "not_found"})
 
@@ -71,7 +80,35 @@ class CompanionHandler(BaseHTTPRequestHandler):
         try:
             if path == "/v1/config":
                 payload = json.loads(self._payload() or b"{}")
-                self._json(HTTPStatus.OK, self.companion.router.configure(payload))
+                config = self.companion.router.configure(payload)
+                self.companion.apply_settings()
+                self._json(HTTPStatus.OK, config)
+            elif path == "/v1/state":
+                payload = json.loads(self._payload() or b"{}")
+                config_values = dict(payload.get("config") or {})
+                for key in (
+                    "router_url", "text_model", "transcribe_model", "speech_model", "speech_voice",
+                    "notification_pace", "voice_priority", "companion_enabled", "voice_enabled",
+                ):
+                    if key in payload:
+                        config_values[key] = payload[key]
+                self.companion.router.configure(config_values)
+                self.companion.apply_settings()
+                if self.companion.muted:
+                    self.player.stop()
+                publisher = getattr(self.server, "status_publisher", None)
+                if publisher:
+                    try:
+                        publisher(*self.companion.idle_status())
+                    except Exception:
+                        pass
+                self._json(HTTPStatus.OK, {
+                    "enabled": self.companion.enabled,
+                    "voice_enabled": not self.companion.muted,
+                    "config": self.companion.router.settings.as_dict(),
+                    "usage": self.companion.router.usage_summary(),
+                    "router": self.companion.router.health(),
+                })
             elif path == "/v1/test/connection":
                 self._payload()
                 health = self.companion.router.health()
@@ -121,7 +158,7 @@ class CompanionHandler(BaseHTTPRequestHandler):
                 self._json(HTTPStatus.OK, {"interrupted": True, "generation": self.companion.interrupt()})
             elif path == "/v1/control":
                 payload = json.loads(self._payload() or b"{}")
-                state = self.companion.configure(enabled=payload.get("enabled"), muted=payload.get("muted"))
+                state = self.companion.configure(enabled=payload.get("enabled"), muted=payload.get("muted"), persist=True)
                 if state["muted"]:
                     self.player.stop()
                 publisher = getattr(self.server, "status_publisher", None)

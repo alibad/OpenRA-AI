@@ -56,8 +56,13 @@ class WorldgenHandler(BaseHTTPRequestHandler):
                 return
             try:
                 request = Request(
-                    "https://nominatim.openstreetmap.org/search?" + urlencode({"q": query, "format": "jsonv2", "limit": 1}),
-                    headers={"User-Agent": "OpenRA-AI/0.1 local mission generator"},
+                    "https://nominatim.openstreetmap.org/search?" + urlencode(
+                        {"q": query, "format": "jsonv2", "limit": 1, "accept-language": "en"}
+                    ),
+                    headers={
+                        "User-Agent": "OpenRA-AI/0.1 local mission generator",
+                        "Accept-Language": "en",
+                    },
                 )
                 with urlopen(request, timeout=12) as response:
                     matches = json.loads(response.read())

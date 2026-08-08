@@ -119,8 +119,8 @@ def main(argv: list[str] | None = None) -> int:
             name=f"OpenRA-AI-{name}-server",
             daemon=True,
         ).start()
-    print(f"AI Console: http://127.0.0.1:{args.control_port}/")
-    print(f"Earth Mission Studio: http://127.0.0.1:{args.worldgen_port}/")
+    print("Native AI settings and diagnostics are ready in OpenRA.")
+    print("Native Earth Mission Studio is ready in OpenRA World Tools.")
     with OpenRABridge(args.bridge) as bridge:
         def publish_status(state: str, message: str) -> None:
             bridge.update_companion_status(
@@ -163,13 +163,18 @@ def main(argv: list[str] | None = None) -> int:
                     response = None
                 else:
                     response = companion.observe(snapshot)
-                if response and response.text:
+                if response and response.metadata.get("clear"):
+                    publish_status(*companion.idle_status())
+                    insight_expires_at = 0.0
+                elif response and response.text:
                     print(f"[{response.insight.key}] {response.text}")
+                    speak = bool(player and companion.should_speak(response.insight))
+                    importance = response.insight.importance
                     publish_status(
-                        "speaking" if player and not companion.muted else "insight",
+                        f"speaking-{importance}" if speak else importance,
                         f"AI  •  {response.text}",
                     )
-                    if player:
+                    if speak:
                         _speak(companion, response.text, player)
                     insight_expires_at = time.monotonic() + 8
                 elif insight_expires_at and time.monotonic() >= insight_expires_at:

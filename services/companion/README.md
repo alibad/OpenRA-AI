@@ -28,6 +28,8 @@ the watcher shuts down with the game.
 
 For local application integration, run `openra-ai-companion serve`. Its small
 HTTP API supports snapshot observation, player questions, transcription,
-speech, mute/disable controls, and immediate interruption. All model traffic
+speech, mute/disable controls, notification priority, session cost estimates,
+and immediate interruption. OpenRA's native AI settings tab uses `/v1/state`,
+`/v1/usage`, and the diagnostic routes; users do not need the HTTP console. All model traffic
 uses the named AI-layer routes in the project `.env`; provider keys stay in
 the router and are never copied into this repository.

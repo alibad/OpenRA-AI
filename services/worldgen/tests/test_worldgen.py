@@ -97,6 +97,32 @@ class WorldgenTests(unittest.TestCase):
                 server.server_close()
                 worker.join()
 
+    def test_geocode_requests_english_place_names(self) -> None:
+        response = mock.MagicMock()
+        response.__enter__.return_value.read.return_value = json.dumps([{
+            "display_name": "Riyadh, Riyadh Region, Saudi Arabia",
+            "lat": "24.638916",
+            "lon": "46.71601",
+        }]).encode()
+        with tempfile.TemporaryDirectory() as output, tempfile.TemporaryDirectory() as install:
+            server = create_server("127.0.0.1", 0, Path(output), Path(install))
+            worker = threading.Thread(target=server.serve_forever)
+            worker.start()
+            try:
+                base = f"http://127.0.0.1:{server.server_address[1]}"
+                with mock.patch("openra_ai_worldgen.server.urlopen", return_value=response) as urlopen:
+                    with urllib.request.urlopen(base + "/v1/geocode?query=Riyadh", timeout=3) as result:
+                        payload = json.loads(result.read())
+
+                request = urlopen.call_args.args[0]
+                self.assertIn("accept-language=en", request.full_url)
+                self.assertEqual(request.get_header("Accept-language"), "en")
+                self.assertEqual(payload["name"], "Riyadh, Riyadh Region, Saudi Arabia")
+            finally:
+                server.shutdown()
+                server.server_close()
+                worker.join()
+
 
 if __name__ == "__main__":
     unittest.main()

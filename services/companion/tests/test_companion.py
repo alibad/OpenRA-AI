@@ -38,6 +38,21 @@ class FakeRouter:
     def health(self):
         return {"reachable": True, "url": "fake://router"}
 
+    def usage_summary(self):
+        return {
+            "session_cost_usd": 0.001,
+            "hourly_cost_usd": 0.01,
+            "text_cost_usd": 0.0005,
+            "speech_cost_usd": 0.0003,
+            "transcription_cost_usd": 0.0002,
+            "input_tokens": 100,
+            "output_tokens": 20,
+            "speech_characters": 30,
+            "transcription_seconds": 3,
+            "assumptions": ["test pricing"],
+            "estimate_only": True,
+        }
+
     def transcribe(self, audio, filename="question.wav"):  # noqa: ANN001
         return RouterResult("Where is the threat?", 4, "fake-transcribe")
 
@@ -105,7 +120,27 @@ class CompanionTests(unittest.TestCase):
         ))
         self.assertIsNotNone(response)
         self.assertEqual(response.insight.key, "situation_update")
+        self.assertEqual(response.insight.importance, "routine")
         self.assertIn("active production: 1tnk", response.insight.fact)
+
+    def test_voice_is_reserved_for_selected_importance(self) -> None:
+        companion = Companion(router=FakeRouter())
+        routine = companion.observe(snapshot(tick=1000))
+        self.assertIsNone(routine)
+        critical = companion.observe(snapshot(tick=1010, power_provided=20, power_drained=100))
+        self.assertEqual(critical.insight.importance, "critical")
+        self.assertTrue(companion.should_speak(critical.insight))
+        companion.router.configure({"voice_priority": "off"}, persist=False)
+        self.assertFalse(companion.should_speak(critical.insight))
+
+    def test_visible_enemy_change_clears_stale_banner(self) -> None:
+        companion = Companion(router=FakeRouter())
+        response = companion.observe(snapshot(visible_enemies=[{"actor_id": 9, "type": "harv"}]))
+        self.assertEqual(response.insight.key, "enemy_spotted")
+        cleared = companion.observe(snapshot(tick=1010, visible_enemies=[]))
+        self.assertIsNotNone(cleared)
+        self.assertTrue(cleared.metadata["clear"])
+        self.assertEqual(cleared.text, "")
 
     def test_snapshot_distinguishes_visible_and_remembered_enemy_buildings(self) -> None:
         current = snapshot(
@@ -252,6 +287,17 @@ class CompanionTests(unittest.TestCase):
             base = f"http://127.0.0.1:{server.server_address[1]}"
             with urllib.request.urlopen(base + "/", timeout=3) as response:
                 self.assertIn(b"Companion Console", response.read())
+            with urllib.request.urlopen(base + "/v1/state", timeout=3) as response:
+                state = response.read()
+            self.assertIn(b'"session_cost_usd": 0.001', state)
+            request = urllib.request.Request(
+                base + "/v1/state",
+                data=b'{"notification_pace":"balanced","voice_priority":"important"}',
+                headers={"Content-Type": "application/json"},
+            )
+            with urllib.request.urlopen(request, timeout=3) as response:
+                state = response.read()
+            self.assertIn(b'"notification_pace": "balanced"', state)
             request = urllib.request.Request(base + "/v1/test/full", data=b"{}", headers={"Content-Type": "application/json"})
             with urllib.request.urlopen(request, timeout=3) as response:
                 payload = response.read()

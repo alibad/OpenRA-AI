@@ -20,11 +20,14 @@ class Companion:
     def __init__(self, router: AIRouter | None = None, insights: InsightEngine | None = None):
         self.router = router or AIRouter()
         self.insights = insights or InsightEngine()
+        if insights is None:
+            self.insights.configure_pace(self.router.settings.notification_pace)
         self.latest_snapshot: GameSnapshot | None = None
-        self.enabled = True
-        self.muted = False
+        self.enabled = self.router.settings.companion_enabled
+        self.muted = not self.router.settings.voice_enabled
         self._generation = 0
         self._lock = threading.Lock()
+        self._display_enemy_signature: tuple[tuple[int, ...], tuple[int, ...]] | None = None
 
     def _begin(self) -> int:
         with self._lock:
@@ -41,7 +44,7 @@ class Companion:
         with self._lock:
             return generation != self._generation
 
-    def configure(self, *, enabled: bool | None = None, muted: bool | None = None) -> dict[str, bool]:
+    def configure(self, *, enabled: bool | None = None, muted: bool | None = None, persist: bool = False) -> dict[str, bool]:
         if enabled is not None:
             self.enabled = enabled
             if not enabled:
@@ -50,7 +53,34 @@ class Companion:
             self.muted = muted
             if muted:
                 self.interrupt()
+        if persist:
+            self.router.configure({
+                "companion_enabled": self.enabled,
+                "voice_enabled": not self.muted,
+            })
         return {"enabled": self.enabled, "muted": self.muted}
+
+    def apply_settings(self) -> None:
+        settings = self.router.settings
+        self.configure(enabled=settings.companion_enabled, muted=not settings.voice_enabled)
+        self.insights.configure_pace(settings.notification_pace)
+
+    def should_speak(self, insight: Insight | None) -> bool:
+        if not insight or self.muted or not self.enabled:
+            return False
+        threshold = self.router.settings.voice_priority
+        if threshold == "off":
+            return False
+        if threshold == "important":
+            return insight.importance in {"important", "critical"}
+        return insight.importance == "critical"
+
+    @staticmethod
+    def _enemy_signature(snapshot: GameSnapshot) -> tuple[tuple[int, ...], tuple[int, ...]]:
+        return (
+            tuple(sorted(unit.actor_id for unit in snapshot.visible_enemies)),
+            tuple(sorted(building.actor_id for building in snapshot.visible_enemy_buildings)),
+        )
 
     def idle_status(self) -> tuple[str, str]:
         if not self.enabled:
@@ -84,9 +114,15 @@ class Companion:
         self.latest_snapshot = snapshot
         insight = self.insights.select(snapshot)
         if not insight:
+            if self._display_enemy_signature is not None and self._display_enemy_signature != self._enemy_signature(snapshot):
+                self._display_enemy_signature = None
+                self.interrupt()
+                return CompanionResponse("", "state-refresh", metadata={"clear": True})
             return None
         generation = self._begin()
-        return self._render_insight(snapshot, insight, generation)
+        response = self._render_insight(snapshot, insight, generation)
+        self._display_enemy_signature = self._enemy_signature(snapshot)
+        return response
 
     def ask(self, question: str) -> CompanionResponse:
         question = question.strip()
@@ -149,4 +185,5 @@ class Companion:
             "muted": self.muted,
             "has_snapshot": self.latest_snapshot is not None,
             "router": self.router.health(),
+            "usage": self.router.usage_summary(),
         }

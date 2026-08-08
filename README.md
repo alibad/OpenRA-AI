@@ -77,26 +77,32 @@ During the match:
 - press `Ctrl+Shift+A` to disable or enable the companion;
 - drag any generated `.oramap` onto `Play-OpenRAAI.cmd` to play that map.
 
-Voice is enabled by default. Each useful AI observation is spoken through the
-configured speech route as well as shown in the HUD; speech can be interrupted
-immediately with `Ctrl+Space` or switched off from the banner. Text insights and
-push-to-talk transcription remain available while voice is off.
+Voice is enabled by default, but routine observations stay text-only. Critical
+updates can use the configured speech route; the AI settings tab can broaden
+that to important updates or disable automatic update speech entirely. Speech
+can be interrupted immediately with `Ctrl+Space` or switched off from the
+banner. Text insights and push-to-talk transcription remain available while
+voice is off.
 
 Transient HUD observations clear after eight seconds. When production, power,
 force composition, harvesting, or visible contacts change, the companion can
-provide a refreshed situation update roughly every ten seconds at normal game
-speed; unchanged state does not generate repetitive model calls.
+provide a refreshed situation update at the selected calm, balanced, or
+frequent pace; unchanged state does not generate repetitive model calls. A
+visible-contact banner is cleared as soon as the engine snapshot no longer
+contains that contact.
 
 From the OpenRA main menu:
 
-- choose **AI Companion** to configure AI-layer routes and run connection,
-  text, microphone, speech, or full-path diagnostics;
+- choose **AI Companion** to open the native AI settings tab, configure routes,
+  control notification and voice priorities, test the full path, and inspect a
+  live session cost estimate;
 - choose **World Tools → Earth Mission Studio** to select a point on Earth
-  and generate, validate, install, or download a playable `.oramap`;
+  inside OpenRA, then generate, validate, install, play, or edit a `.oramap`;
 - choose **World Tools → Native Map Editor** to refine installed maps with
   OpenRA's editor.
 
-Both companion tools bind only to `127.0.0.1`. The configuration screen stores
+No game menu button opens a browser. Both local services bind only to
+`127.0.0.1`. The configuration screen stores
 route names and the AI-layer URL under the current Windows user profile; it
 does not accept, reveal, or persist provider API keys.
 
