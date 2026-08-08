@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 import json
+import math
 import shutil
 import tempfile
+import time
 import unicodedata
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -49,6 +51,15 @@ class WorldgenHandler(BaseHTTPRequestHandler):
         self.send_response(HTTPStatus.OK)
         self.send_header("Content-Type", "text/html; charset=utf-8")
         self.send_header("Content-Length", str(len(body)))
+        self.end_headers()
+        self.wfile.write(body)
+
+    def _bytes(self, status: int, body: bytes, content_type: str) -> None:
+        self.send_response(status)
+        self.send_header("Content-Type", content_type)
+        self.send_header("Content-Length", str(len(body)))
+        self.send_header("Access-Control-Allow-Origin", "*")
+        self.send_header("Cache-Control", "public, max-age=604800")
         self.end_headers()
         self.wfile.write(body)
 
@@ -103,6 +114,44 @@ class WorldgenHandler(BaseHTTPRequestHandler):
             except (OSError, TimeoutError, ValueError, KeyError, json.JSONDecodeError) as exc:
                 self._json(HTTPStatus.BAD_GATEWAY, {"error": "geocoding_failed", "detail": str(exc)})
             return
+        if path == "/v1/map-tile":
+            query = parse_qs(urlparse(self.path).query)
+            try:
+                latitude = float(query.get("latitude", [""])[0])
+                longitude = float(query.get("longitude", [""])[0])
+                zoom = int(query.get("zoom", ["11"])[0])
+                if not -85.051129 <= latitude <= 85.051129 or not -180 <= longitude <= 180:
+                    raise ValueError("coordinates are outside Web Mercator bounds")
+                if not 4 <= zoom <= 16:
+                    raise ValueError("zoom must be between 4 and 16")
+
+                scale = 1 << zoom
+                tile_x = int((longitude + 180.0) / 360.0 * scale)
+                latitude_radians = math.radians(latitude)
+                tile_y = int((1.0 - math.asinh(math.tan(latitude_radians)) / math.pi) / 2.0 * scale)
+                tile_x = max(0, min(scale - 1, tile_x))
+                tile_y = max(0, min(scale - 1, tile_y))
+
+                cache = Path(self.server.output_directory) / "tile-cache" / str(zoom) / str(tile_x)  # type: ignore[attr-defined]
+                cache.mkdir(parents=True, exist_ok=True)
+                tile_path = cache / f"{tile_y}.png"
+                cache_age = time.time() - tile_path.stat().st_mtime if tile_path.exists() else float("inf")
+                if cache_age >= 7 * 24 * 60 * 60:
+                    tile_url = f"https://tile.openstreetmap.org/{zoom}/{tile_x}/{tile_y}.png"
+                    request = Request(
+                        tile_url,
+                        headers={"User-Agent": "OpenRA-AI/0.1 (+https://github.com/alibad/OpenRA-AI)"},
+                    )
+                    with urlopen(request, timeout=12) as response:
+                        body = response.read(1_000_001)
+                    if len(body) > 1_000_000 or not body.startswith(b"\x89PNG\r\n\x1a\n"):
+                        raise ValueError("tile server returned an invalid image")
+                    tile_path.write_bytes(body)
+
+                self._bytes(HTTPStatus.OK, tile_path.read_bytes(), "image/png")
+            except (OSError, TimeoutError, ValueError) as exc:
+                self._json(HTTPStatus.BAD_GATEWAY, {"error": "map_tile_failed", "detail": str(exc)})
+            return
         if path.startswith("/v1/missions/"):
             name = Path(path).name
             candidate = Path(self.server.output_directory) / name  # type: ignore[attr-defined]
@@ -130,6 +179,7 @@ class WorldgenHandler(BaseHTTPRequestHandler):
                 latitude=float(payload["latitude"]),
                 longitude=float(payload["longitude"]),
                 title=str(payload.get("title", "Earth Skirmish")),
+                location_name=str(payload.get("location_name", "Selected Earth location")),
                 radius_m=int(payload.get("radius_m", 3500)),
                 map_size=int(payload.get("map_size", 64)),
                 seed=int(payload.get("seed", 1)),

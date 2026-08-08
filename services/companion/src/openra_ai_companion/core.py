@@ -15,6 +15,11 @@ Explored percent is cumulative map knowledge. Power balance is the same net valu
 Treat production countdowns as transient: never quote raw tick counts or imply that an old countdown is still current.
 Prioritize an actionable observation. Never claim to control units. Never use markdown, greetings, or filler."""
 
+MISSION_DESIGN_PROMPT = """You are an expert OpenRA mission designer working inside the native map editor.
+Return one vivid, playable mission direction under 34 words. Ground it in the supplied Earth location, map metrics, and requested archetype.
+Include a concrete objective and one tactical twist. Keep real places fictionalized and avoid claims about real people or current events.
+Do not use markdown, labels, greetings, or quotation marks."""
+
 
 class Companion:
     def __init__(self, router: AIRouter | None = None, insights: InsightEngine | None = None):
@@ -143,6 +148,37 @@ class Companion:
             response = CompanionResponse(result.text, "ai-layer", utterance_id=generation, latency_ms=result.latency_ms, metadata={"model": result.model})
         except RouterError as exc:
             response = CompanionResponse("The AI router is unavailable; I can still watch for critical deterministic alerts.", "deterministic-fallback", utterance_id=generation, latency_ms=round((time.perf_counter() - started) * 1000), metadata={"degraded": True, "reason": str(exc)})
+        if self._interrupted(generation):
+            response.text = ""
+            response.interrupted = True
+        return response
+
+    def draft_mission(self, context: dict) -> CompanionResponse:
+        generation = self._begin()
+        started = time.perf_counter()
+        try:
+            result = self.router.chat([
+                {"role": "system", "content": MISSION_DESIGN_PROMPT},
+                {"role": "user", "content": json.dumps(context, separators=(",", ":"))},
+            ])
+            response = CompanionResponse(
+                result.text,
+                "ai-layer",
+                utterance_id=generation,
+                latency_ms=result.latency_ms,
+                metadata={"model": result.model},
+            )
+        except RouterError as exc:
+            location = str(context.get("location") or "the selected region")
+            archetype = str(context.get("archetype") or "balanced skirmish").lower()
+            fallback = f"Secure {location} in a {archetype}; capture the center while a disrupted supply route forces both armies onto exposed flanks."
+            response = CompanionResponse(
+                fallback,
+                "deterministic-fallback",
+                utterance_id=generation,
+                latency_ms=round((time.perf_counter() - started) * 1000),
+                metadata={"degraded": True, "reason": str(exc)},
+            )
         if self._interrupted(generation):
             response.text = ""
             response.interrupted = True

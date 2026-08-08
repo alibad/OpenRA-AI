@@ -165,8 +165,8 @@ def create_package(
     preview = render_preview(plan)
     briefing = (
         f"# {selection.title}\n\n"
-        f"A two-player skirmish translated from the terrain around "
-        f"{selection.latitude:.5f}, {selection.longitude:.5f}.\n\n"
+        f"A two-player skirmish translated from the terrain around {selection.location_name} "
+        f"({selection.latitude:.5f}, {selection.longitude:.5f}).\n\n"
         f"{selection.story_seed.strip() or 'Secure the approaches, protect your supply line, and control the center.'}\n\n"
         "This is a stylized fictional scenario, not a factual simulation of people or events.\n"
     ).encode("utf-8")

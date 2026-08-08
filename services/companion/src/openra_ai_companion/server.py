@@ -153,6 +153,9 @@ class CompanionHandler(BaseHTTPRequestHandler):
             elif path == "/v1/ask":
                 payload = json.loads(self._payload() or b"{}")
                 self._json(HTTPStatus.OK, self.companion.ask(str(payload.get("question", ""))).as_dict())
+            elif path == "/v1/design/mission":
+                payload = json.loads(self._payload() or b"{}")
+                self._json(HTTPStatus.OK, self.companion.draft_mission(payload).as_dict())
             elif path == "/v1/interrupt":
                 self._payload()
                 self._json(HTTPStatus.OK, {"interrupted": True, "generation": self.companion.interrupt()})

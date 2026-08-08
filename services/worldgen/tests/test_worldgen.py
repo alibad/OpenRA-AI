@@ -22,7 +22,7 @@ class WorldgenTests(unittest.TestCase):
 
     def test_generates_valid_playable_package(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
-            selection = GeoSelection(24.7136, 46.7219, "Riyadh River Test", seed=42)
+            selection = GeoSelection(24.7136, 46.7219, "Riyadh River Test", location_name="Riyadh, Saudi Arabia", seed=42)
             result = MissionGenerator(self.fixture).generate(selection, Path(directory))
             self.assertTrue(result.validation.valid)
             with ZipFile(result.package_path) as archive:
@@ -30,6 +30,8 @@ class WorldgenTests(unittest.TestCase):
                 self.assertIn("Tileset: TEMPERAT", archive.read("map.yaml").decode())
                 manifest = json.loads(archive.read("openra-ai-manifest.json"))
                 self.assertTrue(manifest["validation"]["valid"])
+                self.assertEqual(manifest["selection"]["location_name"], "Riyadh, Saudi Arabia")
+                self.assertIn("Riyadh, Saudi Arabia", archive.read("briefing.md").decode())
 
     def test_binary_and_package_are_deterministic(self) -> None:
         selection = GeoSelection(24.7136, 46.7219, "Repeatable", seed=99)
@@ -76,6 +78,7 @@ class WorldgenTests(unittest.TestCase):
                     "latitude": 24.7136,
                     "longitude": 46.7219,
                     "title": "HTTP Studio Test",
+                    "location_name": "Riyadh, Saudi Arabia",
                     "map_size": 64,
                     "seed": 7,
                 }).encode()
@@ -121,6 +124,31 @@ class WorldgenTests(unittest.TestCase):
                 self.assertEqual(request.get_header("Accept-language"), "en")
                 self.assertEqual(payload["name"], "Riyadh")
                 self.assertEqual(payload["native_name"], "الرياض، منطقة الرياض، السعودية")
+            finally:
+                server.shutdown()
+                server.server_close()
+                worker.join()
+
+    def test_map_tile_proxy_identifies_itself_and_caches_for_reuse(self) -> None:
+        tile = b"\x89PNG\r\n\x1a\n" + b"cached-tile"
+        response = mock.MagicMock()
+        response.__enter__.return_value.read.return_value = tile
+        with tempfile.TemporaryDirectory() as output, tempfile.TemporaryDirectory() as install:
+            server = create_server("127.0.0.1", 0, Path(output), Path(install))
+            worker = threading.Thread(target=server.serve_forever)
+            worker.start()
+            try:
+                base = f"http://127.0.0.1:{server.server_address[1]}"
+                with mock.patch("openra_ai_worldgen.server.urlopen", return_value=response) as urlopen:
+                    with urllib.request.urlopen(base + "/v1/map-tile?latitude=24.638916&longitude=46.71601&zoom=11", timeout=3) as result:
+                        self.assertEqual(result.read(), tile)
+                    with urllib.request.urlopen(base + "/v1/map-tile?latitude=24.638916&longitude=46.71601&zoom=11", timeout=3) as result:
+                        self.assertEqual(result.read(), tile)
+
+                self.assertEqual(urlopen.call_count, 1)
+                request = urlopen.call_args.args[0]
+                self.assertEqual(request.full_url, "https://tile.openstreetmap.org/11/1289/879.png")
+                self.assertIn("OpenRA-AI/0.1", request.get_header("User-agent"))
             finally:
                 server.shutdown()
                 server.server_close()

@@ -238,6 +238,17 @@ class CompanionTests(unittest.TestCase):
         self.assertEqual(audio, b"RIFFfake")
         self.assertFalse(metadata["interrupted"])
 
+    def test_mission_draft_does_not_require_a_live_game_snapshot(self) -> None:
+        companion = Companion(router=FakeRouter())
+        response = companion.draft_mission({
+            "location": "Riyadh",
+            "archetype": "River Crossing",
+            "map": {"spawns": 2, "resource_cells": 140},
+        })
+        self.assertEqual(response.source, "ai-layer")
+        self.assertTrue(response.text)
+        self.assertEqual(companion.router.calls, 1)
+
     def test_playback_failure_does_not_terminate_the_companion(self) -> None:
         companion = Companion(router=FakeRouter())
         self.assertFalse(_speak(companion, "Hold the center", FailingPlayer()))
@@ -303,6 +314,14 @@ class CompanionTests(unittest.TestCase):
                 payload = response.read()
             self.assertIn(b'"ok": true', payload)
             self.assertEqual(player.audio, b"RIFFfake")
+            request = urllib.request.Request(
+                base + "/v1/design/mission",
+                data=b'{"location":"Riyadh","archetype":"River Crossing"}',
+                headers={"Content-Type": "application/json"},
+            )
+            with urllib.request.urlopen(request, timeout=3) as response:
+                payload = response.read()
+            self.assertIn(b'"source": "ai-layer"', payload)
             request = urllib.request.Request(
                 base + "/v1/control",
                 data=b'{"muted":true}',
