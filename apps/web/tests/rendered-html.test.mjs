@@ -24,7 +24,7 @@ test("renders the complete marketing and mission-creation surface", async () => 
   assert.match(html, /Point anywhere/);
   assert.match(html, /Download Windows alpha/);
   assert.match(html, /Play-OpenRAAI\.cmd/);
-  assert.match(html, /0\.1\.0-alpha\.6/);
+  assert.match(html, /0\.1\.0-alpha\.7/);
   assert.match(html, /AI layer/);
   assert.match(html, /OpenStreetMap contributors/);
   assert.doesNotMatch(html, /codex-preview|SkeletonPreview|react-loading-skeleton/);
