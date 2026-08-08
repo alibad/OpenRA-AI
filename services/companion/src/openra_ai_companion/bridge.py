@@ -32,6 +32,30 @@ class OpenRABridge:
         message = self.stub.GetState(rl_bridge_pb2.StateRequest(session_id=self.session_id), timeout=self.timeout)
         return MessageToDict(message, preserving_proto_field_name=True)
 
+    def update_companion_status(
+        self,
+        state: str,
+        message: str,
+        *,
+        enabled: bool = True,
+        muted: bool = False,
+    ) -> bool:
+        if not hasattr(self.stub, "UpdateCompanionStatus"):
+            return False
+        try:
+            response = self.stub.UpdateCompanionStatus(
+                rl_bridge_pb2.CompanionStatus(
+                    state=state,
+                    message=message,
+                    enabled=enabled,
+                    muted=muted,
+                ),
+                timeout=self.timeout,
+            )
+        except grpc.RpcError:
+            return False
+        return bool(response.accepted)
+
     def close(self) -> None:
         self.channel.close()
 

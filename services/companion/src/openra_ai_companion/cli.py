@@ -91,14 +91,22 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     player = AudioPlayer() if args.speak else None
-    hotkeys = (
-        VoiceHotkeys(companion, player, lambda text: _speak(companion, text, player))
-        if args.voice_hotkeys and player
-        else None
-    )
-    if hotkeys:
-        hotkeys.start()
     with OpenRABridge(args.bridge) as bridge:
+        def publish_status(state: str, message: str) -> None:
+            bridge.update_companion_status(
+                state,
+                message,
+                enabled=companion.enabled,
+                muted=companion.muted,
+            )
+
+        hotkeys = (
+            VoiceHotkeys(companion, player, lambda text: _speak(companion, text, player), publish_status)
+            if args.voice_hotkeys and player
+            else None
+        )
+        if hotkeys:
+            hotkeys.start()
         print("Watching OpenRA. Press Ctrl+C to stop.")
         waiting_reported = False
         try:
@@ -125,6 +133,7 @@ def main(argv: list[str] | None = None) -> int:
                 if response and response.text:
                     print(f"[{response.insight.key}] {response.text}")
                     if player:
+                        publish_status("speaking", f"AI  •  {response.text}")
                         _speak(companion, response.text, player)
                 time.sleep(max(0.1, args.interval))
         except KeyboardInterrupt:

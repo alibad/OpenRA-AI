@@ -25,6 +25,8 @@ __pycache__/
 # Generated games, maps, and geographic caches
 .cache/
 generated/
+!services/companion/src/openra_ai_companion/generated/
+!services/companion/src/openra_ai_companion/generated/*.py
 downloads/
 *.oramap
 

@@ -68,12 +68,17 @@ $arguments = @("Engine.EngineDir=$engineRoot", "Game.Mod=ra", "Launch.Bots=Multi
 if ($Headless) {
     $arguments += "Game.Platform=Null"
 }
+else {
+    # Always force the interactive renderer. Headless smoke tests persist their
+    # platform choice in settings.yaml, which must not affect the next real game.
+    $arguments += "Game.Platform=Default"
+}
 if ($mapArgument) {
     $arguments += $mapArgument
 }
 
 if (-not $NoSpeech -and -not $NoVoiceHotkeys) {
-    Write-Host "AI companion controls: hold F8 to ask, F9 to mute, F10 to disable or enable." -ForegroundColor Cyan
+    Write-Host "AI companion controls: hold Ctrl+Space to ask, Ctrl+Shift+M to mute, Ctrl+Shift+A to disable or enable." -ForegroundColor Cyan
 }
 
 $gameStart = @{

@@ -22,7 +22,7 @@ $env:OPENRA_AI_COMPANION="1"
 openra-ai-companion watch --speak --voice-hotkeys
 ```
 
-On Windows, hold `F8` for push-to-talk, tap `F9` to mute, and tap `F10` to
+On Windows, hold `Ctrl+Space` for push-to-talk, press `Ctrl+Shift+M` to mute, and press `Ctrl+Shift+A` to
 disable or enable the companion. The launcher supplies the OpenRA process ID so
 the watcher shuts down with the game.
 
