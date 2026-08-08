@@ -139,6 +139,7 @@ def main(argv: list[str] | None = None) -> int:
             hotkeys.start()
         print("Watching OpenRA. Press Ctrl+C to stop.")
         waiting_reported = False
+        insight_expires_at = 0.0
         try:
             while True:
                 if not _pid_alive(args.game_pid):
@@ -162,9 +163,19 @@ def main(argv: list[str] | None = None) -> int:
                     response = companion.observe(snapshot)
                 if response and response.text:
                     print(f"[{response.insight.key}] {response.text}")
+                    publish_status("speaking" if player else "insight", f"AI  •  {response.text}")
                     if player:
-                        publish_status("speaking", f"AI  •  {response.text}")
                         _speak(companion, response.text, player)
+                    insight_expires_at = time.monotonic() + 8
+                elif insight_expires_at and time.monotonic() >= insight_expires_at:
+                    if not hotkeys or not hotkeys.active.is_set():
+                        if not companion.enabled:
+                            publish_status("disabled", "AI OFF  •  CTRL+SHIFT+A TO ENABLE")
+                        elif companion.muted:
+                            publish_status("muted", "AI MUTED  •  CTRL+SHIFT+M TO UNMUTE")
+                        else:
+                            publish_status("ready", "AI READY  •  HOLD CTRL+SPACE TO ASK")
+                        insight_expires_at = 0.0
                 time.sleep(max(0.1, args.interval))
         except KeyboardInterrupt:
             companion.interrupt()

@@ -81,7 +81,8 @@ class GameSnapshot:
             "army_value": self.army_value,
             "explored_percent": round(self.explored_percent, 1),
             "own_units": len(self.units),
-            "own_buildings": len(self.buildings),
+            "own_unit_types": [unit.kind for unit in self.units[:16]],
+            "own_buildings": [building.kind for building in self.buildings[:16]],
             "visible_enemies": [
                 {"type": unit.kind, "x": unit.cell_x, "y": unit.cell_y, "hp": round(unit.hp_percent, 2)}
                 for unit in self.visible_enemies[:12]

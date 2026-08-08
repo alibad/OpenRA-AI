@@ -81,6 +81,11 @@ Voice is enabled by default. Each useful AI observation is spoken through the
 configured speech route as well as shown in the HUD; speech can be interrupted
 immediately with `Ctrl+Space` or muted with `Ctrl+Shift+M`.
 
+Transient HUD observations clear after eight seconds. When production, power,
+force composition, harvesting, or visible contacts change, the companion can
+provide a refreshed situation update roughly every ten seconds at normal game
+speed; unchanged state does not generate repetitive model calls.
+
 From the OpenRA main menu:
 
 - choose **AI Companion** to configure AI-layer routes and run connection,

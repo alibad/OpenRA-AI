@@ -11,6 +11,7 @@ from unittest import mock
 
 from openra_ai_companion.cli import _speak
 from openra_ai_companion.core import Companion
+from openra_ai_companion.insights import InsightEngine
 from openra_ai_companion.models import GameSnapshot
 from openra_ai_companion.router import AIRouter, RouterError, RouterResult
 from openra_ai_companion.server import create_server
@@ -90,6 +91,44 @@ class CompanionTests(unittest.TestCase):
         enemy = [{"actor_id": 9, "type": "3tnk"}]
         self.assertIsNotNone(companion.observe(snapshot(visible_enemies=enemy)))
         self.assertIsNone(companion.observe(snapshot(tick=1020, visible_enemies=enemy)))
+
+    def test_changed_situation_gets_a_periodic_update(self) -> None:
+        companion = Companion(router=FakeRouter(), insights=InsightEngine(situation_interval_ticks=250))
+        self.assertIsNone(companion.observe(snapshot(tick=1000)))
+        response = companion.observe(snapshot(
+            tick=1250,
+            production=[{"item": "1tnk", "progress": 0.9, "remaining_ticks": 80}],
+        ))
+        self.assertIsNotNone(response)
+        self.assertEqual(response.insight.key, "situation_update")
+        self.assertIn("active production: 1tnk", response.insight.fact)
+
+    def test_resolved_economy_warning_is_replaced_immediately(self) -> None:
+        companion = Companion(router=FakeRouter())
+        warning = companion.observe(snapshot(tick=1000, harvester_count=0))
+        self.assertEqual(warning.insight.key, "no_harvester")
+        recovered = companion.observe(snapshot(
+            tick=1010,
+            harvester_count=1,
+            units=[{"actor_id": 12, "type": "harv"}],
+            production=[],
+        ))
+        self.assertIsNotNone(recovered)
+        self.assertEqual(recovered.insight.key, "economy_recovered")
+
+    def test_completed_production_replaces_progress_message(self) -> None:
+        companion = Companion(router=FakeRouter())
+        self.assertIsNone(companion.observe(snapshot(
+            tick=1000,
+            production=[{"item": "proc", "progress": 0.95, "remaining_ticks": 20}],
+        )))
+        completed = companion.observe(snapshot(
+            tick=1010,
+            buildings=[{"actor_id": 14, "type": "proc"}],
+            production=[],
+        ))
+        self.assertIsNotNone(completed)
+        self.assertEqual(completed.insight.key, "production_complete:proc")
 
     def test_interrupt_discards_inflight_result(self) -> None:
         companion = Companion(router=FakeRouter(delay=0.1))
