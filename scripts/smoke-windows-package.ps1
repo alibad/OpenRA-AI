@@ -2,6 +2,8 @@
 param(
     [string]$Version = "0.1.0-alpha.1",
     [int]$BridgePort = 10038,
+    [int]$AIConsolePort = 10039,
+    [int]$WorldStudioPort = 10040,
     [switch]$RequireAI,
     [switch]$KeepExtracted
 )
@@ -57,12 +59,20 @@ try {
         "-Map", $map,
         "-Headless",
         "-NoSpeech",
-        "-BridgePort", "$BridgePort"
+        "-BridgePort", "$BridgePort",
+        "-AIConsolePort", "$AIConsolePort",
+        "-WorldStudioPort", "$WorldStudioPort"
     )
     $launcherProcess = Start-Process -FilePath "powershell.exe" -ArgumentList $launcherArguments `
         -WorkingDirectory $packageRoot -WindowStyle Hidden -PassThru
 
-    $verifyArguments = @($verify, "--bridge", "127.0.0.1:$BridgePort", "--timeout", "60")
+    $verifyArguments = @(
+        $verify,
+        "--bridge", "127.0.0.1:$BridgePort",
+        "--ai-console", "http://127.0.0.1:$AIConsolePort",
+        "--world-studio", "http://127.0.0.1:$WorldStudioPort",
+        "--timeout", "60"
+    )
     if ($RequireAI) {
         $verifyArguments += "--require-ai"
     }

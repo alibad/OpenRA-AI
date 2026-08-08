@@ -3,19 +3,41 @@ from __future__ import annotations
 import argparse
 import json
 import time
+from urllib.error import URLError
+from urllib.request import urlopen
 
 from openra_ai_companion.bridge import OpenRABridge
 from openra_ai_companion.core import Companion
 
 
+def wait_for_json(url: str, deadline: float) -> dict[str, object]:
+    last_error = f"{url} did not become ready"
+    while time.monotonic() < deadline:
+        try:
+            with urlopen(url, timeout=2) as response:
+                return json.loads(response.read())
+        except (OSError, TimeoutError, URLError, json.JSONDecodeError) as exc:
+            last_error = str(exc)
+        time.sleep(0.25)
+    raise RuntimeError(f"Local service at {url} was unavailable: {last_error}")
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Verify a live OpenRA AI bridge and optional model response.")
     parser.add_argument("--bridge", default="127.0.0.1:9998")
+    parser.add_argument("--ai-console")
+    parser.add_argument("--world-studio")
     parser.add_argument("--timeout", type=float, default=45.0)
     parser.add_argument("--require-ai", action="store_true")
     args = parser.parse_args()
 
     deadline = time.monotonic() + args.timeout
+    services: dict[str, object] = {}
+    if args.ai_console:
+        services["ai_console"] = wait_for_json(args.ai_console.rstrip("/") + "/health", deadline)
+    if args.world_studio:
+        services["world_studio"] = wait_for_json(args.world_studio.rstrip("/") + "/health", deadline)
+
     snapshot = None
     last_error = "bridge did not become ready"
     with OpenRABridge(args.bridge) as bridge:
@@ -43,6 +65,7 @@ def main() -> int:
         "explored_percent": round(snapshot.explored_percent, 1),
         "power_balance": snapshot.power_provided - snapshot.power_drained,
         "remembered_enemy_buildings": len(snapshot.remembered_enemy_buildings),
+        "services": services,
     }
     if args.require_ai:
         companion = Companion()
