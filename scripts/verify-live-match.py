@@ -31,6 +31,8 @@ def main() -> int:
 
     if snapshot is None:
         raise RuntimeError(last_error)
+    if snapshot.explored_percent <= 0:
+        raise RuntimeError("Live observation reported no explored terrain after the match started.")
 
     result: dict[str, object] = {
         "map": snapshot.map_name,
@@ -38,6 +40,9 @@ def main() -> int:
         "cash": snapshot.cash,
         "units": len(snapshot.units),
         "buildings": len(snapshot.buildings),
+        "explored_percent": round(snapshot.explored_percent, 1),
+        "power_balance": snapshot.power_provided - snapshot.power_drained,
+        "remembered_enemy_buildings": len(snapshot.remembered_enemy_buildings),
     }
     if args.require_ai:
         companion = Companion()

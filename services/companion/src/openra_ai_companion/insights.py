@@ -38,6 +38,7 @@ class InsightEngine:
             tuple(sorted(Counter(building.kind for building in snapshot.buildings).items())),
             tuple(sorted(unit.actor_id for unit in snapshot.visible_enemies)),
             tuple(sorted(building.actor_id for building in snapshot.visible_enemy_buildings)),
+            tuple(sorted(building.actor_id for building in snapshot.remembered_enemy_buildings)),
             production,
         )
 
@@ -53,8 +54,10 @@ class InsightEngine:
             production = "production queues idle"
         return (
             f"Current situation: {snapshot.harvester_count} harvesters, "
-            f"power {snapshot.power_provided}/{snapshot.power_drained}, "
-            f"{len(snapshot.units)} units, {len(snapshot.buildings)} buildings, {production}"
+            f"power balance {snapshot.power_provided - snapshot.power_drained}, "
+            f"{len(snapshot.units)} units, {len(snapshot.buildings)} buildings, "
+            f"{len(snapshot.visible_enemy_buildings)} visible and "
+            f"{len(snapshot.remembered_enemy_buildings)} remembered enemy buildings, {production}"
         )
 
     def candidates(self, snapshot: GameSnapshot) -> list[Insight]:
@@ -131,7 +134,7 @@ class InsightEngine:
         candidates = self.candidates(snapshot)
         selected = candidates[0] if candidates and candidates[0].score >= threshold else None
         self.previous_enemy_ids = {u.actor_id for u in snapshot.visible_enemies}
-        self.previous_enemy_building_ids = {u.actor_id for u in snapshot.visible_enemy_buildings}
+        self.previous_enemy_building_ids.update(u.actor_id for u in snapshot.visible_enemy_buildings)
         self.last_snapshot = snapshot
         signature = self._situation_signature(snapshot)
         if self.last_situation_signature is None or selected:

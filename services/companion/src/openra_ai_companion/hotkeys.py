@@ -98,12 +98,15 @@ class VoiceHotkeys:
             audio = record_while(lambda: self._combo_pressed(self.PUSH_TO_TALK) and not self._stop.is_set())
             if not audio or self._stop.is_set():
                 return
-            self._set_status("thinking", "AI THINKING  •  CTRL+SPACE TO INTERRUPT")
+            self._set_status("transcribing", "AI TRANSCRIBING  •  CTRL+SPACE TO INTERRUPT")
             transcript = self.companion.transcribe(audio).text
             print(f"You: {transcript}")
             if not transcript.strip():
                 return
+            transcript_started = time.monotonic()
+            self._set_status("transcript", f"YOU  •  {transcript.strip()}")
             answer = self.companion.ask(transcript)
+            self._stop.wait(max(0.0, 1.25 - (time.monotonic() - transcript_started)))
             if answer.text and not answer.interrupted:
                 print(f"Companion: {answer.text}")
                 self._set_status("speaking", f"AI  •  {answer.text}")

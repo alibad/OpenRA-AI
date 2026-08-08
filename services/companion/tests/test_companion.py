@@ -11,6 +11,7 @@ from unittest import mock
 
 from openra_ai_companion.cli import _speak
 from openra_ai_companion.core import Companion
+from openra_ai_companion.hotkeys import VoiceHotkeys
 from openra_ai_companion.insights import InsightEngine
 from openra_ai_companion.models import GameSnapshot
 from openra_ai_companion.router import AIRouter, RouterError, RouterResult
@@ -50,6 +51,9 @@ class FakePlayer:
 
     def play(self, audio):  # noqa: ANN001
         self.audio = audio
+
+    def stop(self):
+        self.audio = b""
 
 
 class FailingPlayer:
@@ -102,6 +106,39 @@ class CompanionTests(unittest.TestCase):
         self.assertIsNotNone(response)
         self.assertEqual(response.insight.key, "situation_update")
         self.assertIn("active production: 1tnk", response.insight.fact)
+
+    def test_snapshot_distinguishes_visible_and_remembered_enemy_buildings(self) -> None:
+        current = snapshot(
+            explored_percent=62.5,
+            power_provided=600,
+            power_drained=510,
+            visible_enemy_buildings=[{"actor_id": 20, "type": "tsla"}],
+            remembered_enemy_buildings=[{"actor_id": 21, "type": "weap", "cell_x": 50, "cell_y": 40}],
+        ).compact()
+        self.assertEqual(current["explored_percent"], 62.5)
+        self.assertEqual(current["economy"]["power_balance"], 90)
+        self.assertEqual(current["visible_enemy_buildings"], ["tsla"])
+        self.assertEqual(current["remembered_enemy_buildings"][0]["type"], "weap")
+
+    def test_voice_question_shows_transcript_before_answer(self) -> None:
+        statuses = []
+        companion = Companion(router=FakeRouter())
+        companion.latest_snapshot = snapshot()
+        hotkeys = VoiceHotkeys(
+            companion,
+            FakePlayer(),
+            lambda _text: None,
+            lambda state, message: statuses.append((state, message)),
+        )
+        with (
+            mock.patch("openra_ai_companion.hotkeys.record_while", return_value=b"audio"),
+            mock.patch.object(hotkeys._stop, "wait", return_value=False),
+        ):
+            hotkeys._voice_question()
+        transcript_index = next(i for i, status in enumerate(statuses) if status[0] == "transcript")
+        speaking_index = next(i for i, status in enumerate(statuses) if status[0] == "speaking")
+        self.assertLess(transcript_index, speaking_index)
+        self.assertIn("Where is the threat?", statuses[transcript_index][1])
 
     def test_resolved_economy_warning_is_replaced_immediately(self) -> None:
         companion = Companion(router=FakeRouter())

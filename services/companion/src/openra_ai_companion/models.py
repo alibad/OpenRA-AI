@@ -40,6 +40,7 @@ class GameSnapshot:
     buildings: tuple[Unit, ...] = ()
     visible_enemies: tuple[Unit, ...] = ()
     visible_enemy_buildings: tuple[Unit, ...] = ()
+    remembered_enemy_buildings: tuple[Unit, ...] = ()
     production: tuple[dict[str, Any], ...] = ()
     done: bool = False
     result: str = ""
@@ -63,6 +64,7 @@ class GameSnapshot:
             buildings=tuple(Unit.from_dict(v) for v in value.get("buildings", [])),
             visible_enemies=tuple(Unit.from_dict(v) for v in value.get("visible_enemies", [])),
             visible_enemy_buildings=tuple(Unit.from_dict(v) for v in value.get("visible_enemy_buildings", [])),
+            remembered_enemy_buildings=tuple(Unit.from_dict(v) for v in value.get("remembered_enemy_buildings", [])),
             production=tuple(value.get("production", [])),
             done=bool(value.get("done", False)),
             result=str(value.get("result", "")),
@@ -75,7 +77,7 @@ class GameSnapshot:
             "economy": {
                 "cash": self.cash,
                 "ore": self.ore,
-                "power": f"{self.power_provided}/{self.power_drained}",
+                "power_balance": self.power_provided - self.power_drained,
                 "harvesters": self.harvester_count,
             },
             "army_value": self.army_value,
@@ -88,6 +90,10 @@ class GameSnapshot:
                 for unit in self.visible_enemies[:12]
             ],
             "visible_enemy_buildings": [unit.kind for unit in self.visible_enemy_buildings[:8]],
+            "remembered_enemy_buildings": [
+                {"type": unit.kind, "x": unit.cell_x, "y": unit.cell_y, "hp_last_seen": round(unit.hp_percent, 2)}
+                for unit in self.remembered_enemy_buildings[:16]
+            ],
             "production": list(self.production[:6]),
             "done": self.done,
             "result": self.result,
