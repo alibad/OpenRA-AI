@@ -6,9 +6,11 @@ Choose a location on Earth and receive a playable, stylized OpenRA map with
 terrain, resources, spawn points, objectives, briefing, and optional scripted
 events inspired by that place.
 
-The system preserves recognizable terrain, water, arterial roads, urban form,
-and biome as closely as OpenRA's discrete tiles allow. Playability repairs are
-recorded separately from geographic evidence.
+The system reads recognizable terrain, water, roads, urban form, and biome as
+geographic evidence, then maps that evidence onto one of OpenRA's supported
+native generator profiles. It does not claim that every street or coastline is
+reproduced cell-for-cell. The source view and every translation choice remain
+available for comparison.
 
 ## Generation pipeline
 
@@ -39,14 +41,14 @@ package so a creator can compare source evidence with the OpenRA translation.
 
 ### 3. Translate
 
-The terrain compiler:
+The terrain translator:
 
-- projects geographic data onto the OpenRA cell grid;
-- classifies water, passable land, cliffs, roads, bridges, and obstacles;
-- simplifies noisy geometry;
-- exaggerates strategically meaningful features;
-- assigns a compatible OpenRA tileset;
-- creates candidate resource and spawn regions.
+- classifies biome, relief, water, vegetation, and urban intensity;
+- selects a compatible OpenRA tileset and native terrain profile;
+- chooses symmetry, civilian density, resources, and map scale;
+- passes those constraints to OpenRA's `ClassicMapGenerator`;
+- lets OpenRA's Terraformer build legal transitions, passages, roads, spawn
+  regions, resources, and neutral structures.
 
 ### 4. Design
 
@@ -66,7 +68,7 @@ sources, generation date, fictionalization, and user-selected framing.
 
 Before a map reaches the player, automated local checks test:
 
-- connectivity and pathfinding;
+- connectivity using the selected mod's real tracked-unit locomotor rules;
 - valid spawn and construction space;
 - resource access and travel-time balance;
 - reachable objectives;
@@ -89,16 +91,16 @@ The native editor now supports:
 1. searching or clicking any place in a radius-matched terrain view;
 2. choosing Reality First, Balanced, or Creative Remix generation;
 3. routing that exact terrain PNG through the local AI layer's multimodal route;
-4. reconciling the vision result with OSM water, seasonal waterways, arterial
-   and local roads, rail, land use, vegetation, sand, and rock geometry;
-5. compiling real road cells, biome-appropriate Red Alert tilesets, urban
-   scenery, resources, and two playable starts;
-6. repairing and validating connectivity, spawns, binary layout, and resource
-   fairness before the map is installed;
+4. reconciling the vision result with OSM water, seasonal waterways, roads,
+   rail, land use, vegetation, sand, and rock evidence;
+5. converting that evidence into native ClassicMapGenerator settings and
+   allowing OpenRA's Terraformer to construct the battlefield;
+6. rejecting any result where OpenRA's tracked locomotor cannot reach both
+   spawns or where a spawn lacks a usable base zone;
 7. storing the terrain source, model analysis, confidence, feature counts,
    attribution, preview, and validation report inside the `.oramap`.
 
 When geographic or vision services are unavailable, the manifest explicitly
-labels the degraded path and uses conservative geometry/climate fallback. It
-never invents water. Elevation-derived cliffs, detailed building footprints,
-Lua objectives, and source-backed narrative context remain later stages.
+labels the degraded path and uses conservative climate/profile fallback.
+Detailed building footprints, exact street tracing, Lua objectives, and
+source-backed narrative context remain later stages.

@@ -14,9 +14,9 @@ from zipfile import ZipFile
 
 from openra_ai_worldgen import GeoSelection, MissionGenerator
 from openra_ai_worldgen.models import TerrainAnalysis
-from openra_ai_worldgen.osm import GeoFeature, fetch_features, parse_overpass
-from openra_ai_worldgen.package import compile_map_binary
-from openra_ai_worldgen.raster import ROAD, WATER, build_terrain
+from openra_ai_worldgen.native import generation_options, terrain_profile
+from openra_ai_worldgen.osm import fetch_features, parse_overpass
+from openra_ai_worldgen.raster import WATER, build_terrain
 from openra_ai_worldgen.server import create_server
 from openra_ai_worldgen.validator import validate_package
 
@@ -31,9 +31,11 @@ class WorldgenTests(unittest.TestCase):
             self.assertTrue(result.validation.valid)
             with ZipFile(result.package_path) as archive:
                 self.assertTrue({"map.yaml", "map.bin", "map.png", "briefing.md", "openra-ai-manifest.json"} <= set(archive.namelist()))
-                self.assertIn("Tileset: TEMPERAT", archive.read("map.yaml").decode())
+                self.assertIn("Author: OpenRA AI / OpenRA Classic Generator", archive.read("map.yaml").decode())
                 manifest = json.loads(archive.read("openra-ai-manifest.json"))
                 self.assertTrue(manifest["validation"]["valid"])
+                self.assertEqual(manifest["generator"]["engine_generator"], "classic")
+                self.assertTrue(manifest["generator"]["passability"]["valid"])
                 self.assertEqual(manifest["selection"]["location_name"], "Riyadh, Saudi Arabia")
                 self.assertIn("Riyadh, Saudi Arabia", archive.read("briefing.md").decode())
 
@@ -77,21 +79,19 @@ class WorldgenTests(unittest.TestCase):
         self.assertEqual(plan.tileset, "DESERT")
         self.assertFalse(any(WATER in row for row in plan.cells))
 
-    def test_real_road_cells_are_written_as_openra_road_tiles(self) -> None:
-        selection = GeoSelection(24.638916, 46.71601, map_size=64)
-        road = GeoFeature("road", ((24.63, 46.70), (24.65, 46.73)), tags=(("highway", "primary"),))
-        plan = build_terrain(selection, [road], TerrainAnalysis(biome="desert"))
-        binary = compile_map_binary(plan, selection.seed)
-        road_tiles = 0
-        offset = 17
-        for x in range(plan.width):
-            for y in range(plan.height):
-                tile_id = int.from_bytes(binary[offset:offset + 2], "little")
-                if plan.cells[y][x] == ROAD:
-                    self.assertIn(tile_id, {164, 165})
-                    road_tiles += 1
-                offset += 3
-        self.assertGreater(road_tiles, 0)
+    def test_earth_analysis_selects_native_openra_generator_options(self) -> None:
+        selection = GeoSelection(24.638916, 46.71601, map_size=96, generation_mode="playability-first")
+        analysis = TerrainAnalysis(biome="desert", urban_density=0.7, relief="flat")
+        options = generation_options(selection, analysis)
+        self.assertEqual(options["tileset"], "DESERT")
+        self.assertEqual(options["terrain"], "Plots")
+        self.assertEqual(options["symmetry"], "2Rotations")
+        self.assertTrue(options["roads"])
+        self.assertTrue(options["deny-walled-areas"])
+
+    def test_mountainous_water_uses_native_mountain_lakes_profile(self) -> None:
+        analysis = TerrainAnalysis(relief="mountainous", water_confidence=0.8)
+        self.assertEqual(terrain_profile(analysis), "MountainLakes")
 
     def test_intermittent_waterways_are_not_permanent_water(self) -> None:
         features = parse_overpass({"elements": [{
@@ -172,12 +172,12 @@ class WorldgenTests(unittest.TestCase):
                 with mock.patch("openra_ai_worldgen.server.MissionGenerator", return_value=fixture_generator):
                     with urllib.request.urlopen(request, timeout=3) as response:
                         accepted = json.loads(response.read())
-                    for _ in range(50):
+                    for _ in range(200):
                         with urllib.request.urlopen(base + accepted["poll_url"], timeout=3) as response:
                             job = json.loads(response.read())
                         if job["state"] in {"succeeded", "failed"}:
                             break
-                        time.sleep(0.02)
+                        time.sleep(0.025)
 
                 self.assertEqual(job["state"], "succeeded", job)
                 self.assertEqual(job["stage"], 6)

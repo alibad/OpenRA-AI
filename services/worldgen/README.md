@@ -6,18 +6,19 @@ package.
 Internal stages:
 
 - geographic data acquisition and attribution;
-- projection and feature simplification;
-- OpenRA terrain compilation;
-- spawn, resource, and objective design;
+- terrain-image and feature interpretation;
+- native OpenRA `ClassicMapGenerator` profile selection;
+- OpenRA Terraformer terrain, spawn, resource, and road generation;
 - story and Lua mission generation;
-- playability validation and repair;
+- tracked-unit locomotor and spawn-zone validation;
 - packaging and manifest generation.
 
 Each stage is independently testable and cacheable.
 
 ## Run it
 
-The generator has no runtime dependencies outside Python 3.11+:
+The generator requires Python 3.11+ and a local build of the pinned OpenRA
+engine fork. It never calls a hosted build or workflow:
 
 ```powershell
 python -m pip install -e services/worldgen
@@ -26,7 +27,9 @@ openra-ai-worldgen validate generated/missions/riyadh-crossing-42.oramap
 openra-ai-worldgen serve
 ```
 
-Live generation requests roads and waterways from OpenStreetMap's Overpass
-API and retains attribution in the package manifest. If acquisition is
-unavailable, the generator emits a clearly marked deterministic fallback map
-instead of failing or pretending the synthetic terrain came from real data.
+Live generation requests geographic evidence from OpenStreetMap and retains
+attribution in the package manifest. The evidence selects native OpenRA
+terrain settings; OpenRA itself creates legal tile transitions and checks that
+a tracked unit can reach every player spawn. If acquisition is unavailable,
+the generator records the degraded source path and uses a conservative native
+profile instead of pretending the result is an exact geographic reconstruction.

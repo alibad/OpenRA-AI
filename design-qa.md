@@ -46,13 +46,15 @@ Verified implementation captures:
 | Reference structure | Passed | The implementation matches the proposed split Earth/translation workbench, mission controls, terrain analysis, progress, and bottom action hierarchy. |
 | Real Earth interaction | Passed | The left panel renders a free OpenTopoMap/OpenStreetMap terrain view, selection center, area radius, search, and click-to-recenter behavior. |
 | Honest AI input | Passed | The exact terrain view shown to the player is passed through the AI layer as multimodal image content during generation. |
-| Playable preview | Passed | The right panel loads the installed OpenRA map preview with both spawn points after package validation and cache indexing. |
+| Playable preview | Passed | The right panel loads OpenRA's own rendered map preview with both spawn points after package validation and cache indexing. |
 | Observable generation | Passed | Six live stages report Earth geometry, terrain capture, AI terrain vision, gameplay translation, validation, and ready-to-play state from the asynchronous backend job. |
 | Terrain DNA | Passed | Relief, water, urban density, vegetation, and landmarks populate from the returned synthesis and geographic feature counts. |
 | Configuration clarity | Passed | Area, map size, mission shape, and translation style use native dropdowns; precise coordinates and seed stay behind Advanced. |
 | Layout quality | Passed | The full workbench is centered, unclipped, readable, and preserves the native OpenRA chrome at the tested 2560×1440 viewport and configured UI scale. |
 | Failure resilience | Passed | Search, terrain capture, generation, AI analysis, and map indexing errors remain inside the workbench without disrupting the running game. |
-| Automated verification | Passed | Engine build, OpenRA mod tests, 23 companion tests, and 13 world-generation tests pass. |
+| Native map construction | Passed | Earth evidence selects a Red Alert tileset and ClassicMapGenerator profile; OpenRA Terraformer owns transitions, roads, passages, spawns, resources, and scenery. |
+| Unit passability gate | Passed | A map is rejected unless the real Red Alert tracked locomotor reaches every spawn and each spawn retains a usable base zone. |
+| Automated verification | Passed | Engine build, OpenRA map lint, 23 companion tests, and 14 world-generation tests pass. |
 
 ## Final result
 

@@ -21,9 +21,10 @@ trustworthy, and fast.
 
 ## Earth missions
 
-A player will be able to choose a location, scale, game style, and optional
-story seed. OpenRA AI will convert geographic features into stylized OpenRA
-terrain, validate playability, and generate a skirmish or Lua-scripted mission.
+A player can choose a location, scale, game style, and optional story seed.
+OpenRA AI interprets the geographic evidence, configures OpenRA's native map
+generator, verifies tracked-unit connectivity, and produces a playable
+skirmish package.
 
 The generated result is an ordinary OpenRA map package that can be opened in
 OpenRA's map editor and changed by hand.

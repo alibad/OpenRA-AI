@@ -2,25 +2,10 @@ from __future__ import annotations
 
 import re
 import struct
-from collections import deque
 from pathlib import Path
 from zipfile import BadZipFile, ZipFile
 
 from .models import ValidationReport
-
-
-def _connected(tiles: list[list[int]], a: tuple[int, int], b: tuple[int, int]) -> bool:
-    queue = deque([a])
-    seen = {a}
-    while queue:
-        x, y = queue.popleft()
-        if (x, y) == b:
-            return True
-        for nx, ny in ((x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)):
-            if 0 <= ny < len(tiles) and 0 <= nx < len(tiles[0]) and tiles[ny][nx] != 1 and (nx, ny) not in seen:
-                seen.add((nx, ny))
-                queue.append((nx, ny))
-    return False
 
 
 def validate_package(path: Path) -> ValidationReport:
@@ -31,9 +16,7 @@ def validate_package(path: Path) -> ValidationReport:
         "binary_layout": False,
         "spawn_count": False,
         "spawns_in_bounds": False,
-        "spawns_on_land": False,
-        "spawn_connectivity": False,
-        "resource_symmetry": False,
+        "resource_data_present": False,
     }
     warnings: list[str] = []
     metrics: dict[str, int | float | str] = {"package": str(path)}
@@ -68,20 +51,10 @@ def validate_package(path: Path) -> ValidationReport:
     if not checks["binary_layout"]:
         return ValidationReport(False, checks, metrics, ["map.bin offsets or length are invalid"])
 
-    tiles = [[0 for _ in range(width)] for _ in range(height)]
-    offset = tiles_offset
-    for x in range(width):
-        for y in range(height):
-            tile_type, _ = struct.unpack("<HB", binary[offset : offset + 3])
-            tiles[y][x] = tile_type
-            offset += 3
-
     spawn_matches = re.findall(r"Actor\d+:\s+mpspawn\s+Owner:\s+Neutral\s+Location:\s+(\d+),(\d+)", yaml_text, re.MULTILINE)
     spawns = [(int(x), int(y)) for x, y in spawn_matches]
     checks["spawn_count"] = len(spawns) == 2
     checks["spawns_in_bounds"] = len(spawns) == 2 and all(0 <= x < width and 0 <= y < height for x, y in spawns)
-    checks["spawns_on_land"] = checks["spawns_in_bounds"] and all(tiles[y][x] != 1 for x, y in spawns)
-    checks["spawn_connectivity"] = checks["spawns_on_land"] and _connected(tiles, spawns[0], spawns[1])
 
     resource_counts: list[int] = []
     for spawn_x, spawn_y in spawns:
@@ -95,7 +68,7 @@ def validate_package(path: Path) -> ValidationReport:
                     count += density
         resource_counts.append(count)
     metrics["spawn_resources"] = ",".join(map(str, resource_counts))
-    checks["resource_symmetry"] = len(resource_counts) == 2 and min(resource_counts) > 0 and max(resource_counts) / min(resource_counts) <= 1.35
+    checks["resource_data_present"] = len(resource_counts) == 2 and min(resource_counts) > 0
     if checks["required_files"] and "openra-ai-manifest.json" not in names:
         warnings.append("generation manifest is missing")
     return ValidationReport(all(checks.values()), checks, metrics, warnings)

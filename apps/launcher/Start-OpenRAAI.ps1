@@ -71,6 +71,7 @@ $env:OPENRA_AI_COMPANION = "1"
 $env:OPENRA_AI_GRPC_PORT = "$BridgePort"
 $env:OPENRA_AI_CONSOLE_URL = "http://127.0.0.1:$AIConsolePort/"
 $env:OPENRA_AI_WORLD_STUDIO_URL = "http://127.0.0.1:$WorldStudioPort/"
+$env:OPENRA_AI_ENGINE_DIR = $engineRoot
 $arguments = @("Engine.EngineDir=$engineRoot", "Game.Mod=ra", "Launch.Bots=Multi1:$OpponentBot")
 if ($Headless) {
     $arguments += "Game.Platform=Null"

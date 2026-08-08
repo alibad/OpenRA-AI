@@ -109,6 +109,8 @@ class WorldgenHandler(BaseHTTPRequestHandler):
             "feature_counts": manifest.get("design", {}).get("feature_counts", {}),
             "terrain_view": manifest.get("terrain_view", {}),
             "tileset": manifest.get("game", {}).get("tileset", "TEMPERAT"),
+            "generator": manifest.get("generator", {}),
+            "passability": manifest.get("generator", {}).get("passability", {}),
         }
         return response
 

@@ -17,10 +17,16 @@ def _parser() -> argparse.ArgumentParser:
     generate.add_argument("--lat", type=float, required=True)
     generate.add_argument("--lon", type=float, required=True)
     generate.add_argument("--title", default="Earth Skirmish")
+    generate.add_argument("--location", default="Selected Earth location")
     generate.add_argument("--radius", type=int, default=3500)
     generate.add_argument("--size", type=int, choices=(64, 96, 128), default=64)
     generate.add_argument("--seed", type=int, default=1)
     generate.add_argument("--story", default="")
+    generate.add_argument(
+        "--mode",
+        choices=("reality-first", "playability-first", "creative-remix"),
+        default="reality-first",
+    )
     generate.add_argument("--output", type=Path, default=Path("generated/missions"))
     generate.add_argument("--fixture", type=Path)
     generate.add_argument("--offline", action="store_true")
@@ -36,7 +42,18 @@ def _parser() -> argparse.ArgumentParser:
 def main(argv: list[str] | None = None) -> int:
     args = _parser().parse_args(argv)
     if args.command == "generate":
-        selection = GeoSelection(args.lat, args.lon, args.title, args.radius, args.size, args.seed, "offline" if args.offline else "openstreetmap", args.story)
+        selection = GeoSelection(
+            latitude=args.lat,
+            longitude=args.lon,
+            title=args.title,
+            location_name=args.location,
+            radius_m=args.radius,
+            map_size=args.size,
+            seed=args.seed,
+            source="offline" if args.offline else "openstreetmap",
+            story_seed=args.story,
+            generation_mode=args.mode,
+        )
         result = MissionGenerator(args.fixture, allow_network=not args.offline).generate(selection, args.output)
         print(json.dumps(result.as_dict(), indent=2))
         return 0
