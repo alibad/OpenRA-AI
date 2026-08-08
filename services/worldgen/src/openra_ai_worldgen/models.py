@@ -16,6 +16,7 @@ class GeoSelection:
     seed: int = 1
     source: str = "openstreetmap"
     story_seed: str = ""
+    generation_mode: str = "reality-first"
 
     def validated(self) -> "GeoSelection":
         if not -90 <= self.latitude <= 90:
@@ -28,7 +29,48 @@ class GeoSelection:
             raise ValueError("radius_m must be between 500 and 20000")
         if not 0 <= self.seed <= 2_147_483_647:
             raise ValueError("seed must be between 0 and 2147483647")
+        if self.generation_mode not in {"reality-first", "playability-first", "creative-remix"}:
+            raise ValueError("generation_mode must be reality-first, playability-first, or creative-remix")
         return self
+
+    def as_dict(self) -> dict[str, Any]:
+        return asdict(self)
+
+
+@dataclass(frozen=True)
+class TerrainAnalysis:
+    biome: str = "temperate"
+    relief: str = "flat"
+    vegetation_density: float = 0.2
+    urban_density: float = 0.1
+    water_confidence: float = 0.0
+    fidelity_notes: tuple[str, ...] = ()
+    summary: str = "Terrain translated from available geographic evidence."
+    confidence: float = 0.0
+    vision_used: bool = False
+    model: str = "deterministic"
+    latency_ms: int = 0
+
+    @classmethod
+    def from_dict(cls, value: dict[str, Any]) -> "TerrainAnalysis":
+        def density(name: str, default: float) -> float:
+            return max(0.0, min(1.0, float(value.get(name, default))))
+
+        biome = str(value.get("biome", "temperate")).lower()
+        relief = str(value.get("relief", "flat")).lower()
+        return cls(
+            biome=biome if biome in {"desert", "temperate", "snow"} else "temperate",
+            relief=relief if relief in {"flat", "rolling", "mountainous"} else "flat",
+            vegetation_density=density("vegetation_density", 0.2),
+            urban_density=density("urban_density", 0.1),
+            water_confidence=density("water_confidence", 0.0),
+            fidelity_notes=tuple(str(note)[:120] for note in value.get("fidelity_notes", [])[:3]),
+            summary=str(value.get("summary", cls.summary))[:240],
+            confidence=density("confidence", 0.0),
+            vision_used=bool(value.get("vision_used", False)),
+            model=str(value.get("model", "deterministic"))[:160],
+            latency_ms=max(0, int(value.get("latency_ms", 0))),
+        )
 
     def as_dict(self) -> dict[str, Any]:
         return asdict(self)

@@ -10,9 +10,10 @@ from random import Random
 from zipfile import ZIP_DEFLATED, ZipFile, ZipInfo
 
 from .models import GeoSelection
-from .raster import LAND, ROAD, WATER, TerrainPlan
+from .raster import FOREST, LAND, ROAD, ROUGH, SAND, URBAN, WATER, TerrainPlan
+from .terrain import TerrainView
 
-GENERATOR_VERSION = "0.1.0"
+GENERATOR_VERSION = "0.2.0"
 
 
 def _png_chunk(kind: bytes, payload: bytes) -> bytes:
@@ -24,6 +25,10 @@ def render_preview(plan: TerrainPlan, scale: int = 4) -> bytes:
         LAND: (96, 111, 74),
         WATER: (35, 77, 100),
         ROAD: (165, 145, 105),
+        URBAN: (151, 132, 112),
+        FOREST: (53, 92, 58),
+        ROUGH: (100, 91, 82),
+        SAND: (194, 166, 103),
     }
     spawn_colors = {(x, y): (224, 198, 103) for x, y in plan.spawns}
     mine_colors = {(x, y): (179, 76, 50) for x, y in plan.mines}
@@ -50,10 +55,16 @@ def compile_map_binary(plan: TerrainPlan, seed: int) -> bytes:
     # OpenRA map arrays are serialized column-major.
     for x in range(width):
         for y in range(height):
-            if plan.cells[y][x] == WATER:
-                result.extend(struct.pack("<HB", 1, 0))
+            cell = plan.cells[y][x]
+            if cell == WATER:
+                tile_id, tile_index = (256, 0) if plan.tileset == "DESERT" else (1, 0)
+            elif cell == ROAD:
+                tile_id, tile_index = ((164 if (x + y) % 2 else 165), 0) if plan.tileset == "DESERT" else ((227 if (x + y) % 2 else 228), 0)
+            elif cell == ROUGH:
+                tile_id, tile_index = ((2 + (x + y) % 5), 0) if plan.tileset == "DESERT" else (97, 0)
             else:
-                result.extend(struct.pack("<HB", 255, rng.randrange(16)))
+                tile_id, tile_index = 255, rng.randrange(16)
+            result.extend(struct.pack("<HB", tile_id, tile_index))
 
     resource_cells: dict[tuple[int, int], tuple[int, int]] = {}
     for mine_x, mine_y in plan.mines:
@@ -91,6 +102,13 @@ def compile_map_yaml(selection: GeoSelection, plan: TerrainPlan) -> str:
             f"\t\tLocation: {x},{y}",
         ])
         actor_id += 1
+    for actor, x, y in plan.scenery:
+        actor_lines.extend([
+            f"\tActor{actor_id}: {actor}",
+            "\t\tOwner: Neutral",
+            f"\t\tLocation: {x},{y}",
+        ])
+        actor_id += 1
     margin = max(4, plan.width // 16)
     bounds_size = plan.width - 2 * margin
     return f"""MapFormat: 12
@@ -101,7 +119,7 @@ Title: {safe_title}
 
 Author: OpenRA AI
 
-Tileset: TEMPERAT
+Tileset: {plan.tileset}
 
 MapSize: {plan.width},{plan.height}
 
@@ -151,6 +169,7 @@ def create_package(
     output_directory: Path,
     source_status: str,
     validation: dict | None = None,
+    terrain_view: TerrainView | None = None,
 ) -> tuple[Path, Path, Path]:
     output_directory.mkdir(parents=True, exist_ok=True)
     slug = "".join(c.lower() if c.isalnum() else "-" for c in selection.title).strip("-") or "earth-skirmish"
@@ -175,6 +194,8 @@ def create_package(
         "map.bin": hashlib.sha256(map_binary).hexdigest(),
         "map.png": hashlib.sha256(preview).hexdigest(),
     }
+    if terrain_view:
+        checksums["earth-terrain.png"] = hashlib.sha256(terrain_view.image).hexdigest()
     manifest = {
         "schema": "openra-ai.mission-package/v1",
         "generator_version": GENERATOR_VERSION,
@@ -187,8 +208,16 @@ def create_package(
             "status": source_status,
             "feature_count": plan.source_feature_count,
         },
-        "game": {"mod": "ra", "map_format": 12, "tileset": "TEMPERAT"},
-        "design": {"spawns": plan.spawns, "mines": plan.mines, "mode": "two-player-skirmish"},
+        "terrain_view": terrain_view.metadata() if terrain_view else {"provider": "unavailable"},
+        "analysis": plan.analysis.as_dict(),
+        "game": {"mod": "ra", "map_format": 12, "tileset": plan.tileset},
+        "design": {
+            "spawns": plan.spawns,
+            "mines": plan.mines,
+            "scenery_count": len(plan.scenery),
+            "feature_counts": plan.feature_counts,
+            "mode": selection.generation_mode,
+        },
         "checksums": checksums,
         "validation": validation or {},
     }
@@ -203,6 +232,8 @@ def create_package(
             ("openra-ai-manifest.json", manifest_bytes),
         ):
             archive.writestr(_zip_info(name), content)
+        if terrain_view:
+            archive.writestr(_zip_info("earth-terrain.png"), terrain_view.image)
 
     preview_path.write_bytes(preview)
     manifest_path.write_bytes(manifest_bytes)

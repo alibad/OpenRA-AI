@@ -5,6 +5,7 @@ import time
 import unittest
 import urllib.request
 import wave
+import json
 from io import BytesIO
 from tempfile import TemporaryDirectory
 from unittest import mock
@@ -58,6 +59,14 @@ class FakeRouter:
 
     def speech(self, text):  # noqa: ANN001
         return b"RIFFfake", 5, "audio/wav"
+
+    def vision(self, prompt, image, media_type="image/png"):  # noqa: ANN001, ARG002
+        return RouterResult(
+            '{"biome":"desert","relief":"flat","vegetation_density":0.1,"urban_density":0.8,'
+            '"water_confidence":0,"fidelity_notes":[],"summary":"Dense desert city.","confidence":0.9}',
+            12,
+            "fake-vision",
+        )
 
 
 class FakePlayer:
@@ -248,6 +257,29 @@ class CompanionTests(unittest.TestCase):
         self.assertEqual(response.source, "ai-layer")
         self.assertTrue(response.text)
         self.assertEqual(companion.router.calls, 1)
+
+    def test_terrain_analysis_uses_router_vision(self) -> None:
+        result = Companion(router=FakeRouter()).analyze_terrain({"location": "Riyadh"}, b"PNG")
+        self.assertEqual(result["biome"], "desert")
+        self.assertTrue(result["vision_used"])
+        self.assertEqual(result["model"], "fake-vision")
+
+    def test_router_sends_terrain_as_multimodal_image_content(self) -> None:
+        router = AIRouter(Settings(text_model="text-route", vision_model="vision-route"))
+        captured = {}
+
+        def request(path, body, content_type):  # noqa: ANN001
+            captured.update({"path": path, "body": json.loads(body), "content_type": content_type})
+            return b'{"choices":[{"message":{"content":"ok"}}],"usage":{"prompt_tokens":8,"completion_tokens":1}}', 9, "application/json"
+
+        with mock.patch.object(router, "_request", side_effect=request):
+            result = router.vision("Read this terrain", b"\x89PNG\r\n\x1a\nimage")
+        self.assertEqual(result.model, "vision-route")
+        self.assertEqual(captured["body"]["model"], "vision-route")
+        content = captured["body"]["messages"][0]["content"]
+        self.assertEqual(content[0]["text"], "Read this terrain")
+        self.assertTrue(content[1]["image_url"]["url"].startswith("data:image/png;base64,"))
+        self.assertEqual(content[1]["image_url"]["detail"], "high")
 
     def test_playback_failure_does_not_terminate_the_companion(self) -> None:
         companion = Companion(router=FakeRouter())

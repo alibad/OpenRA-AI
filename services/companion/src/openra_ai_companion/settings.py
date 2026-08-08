@@ -45,6 +45,7 @@ def _load_user_settings() -> dict[str, str | float | bool]:
 class Settings:
     router_url: str = "http://127.0.0.1:4000"
     text_model: str = "gpt-5.5"
+    vision_model: str = "gpt-5.5"
     transcribe_model: str = "openai-transcribe"
     speech_model: str = "openai-tts"
     speech_voice: str = "alloy"
@@ -63,6 +64,7 @@ class Settings:
             field_name = {
                 "OPENRA_AI_ROUTER_URL": "router_url",
                 "OPENRA_AI_TEXT_MODEL": "text_model",
+                "OPENRA_AI_VISION_MODEL": "vision_model",
                 "OPENRA_AI_TRANSCRIBE_MODEL": "transcribe_model",
                 "OPENRA_AI_TTS_MODEL": "speech_model",
                 "OPENRA_AI_TTS_VOICE": "speech_voice",
@@ -81,6 +83,7 @@ class Settings:
         return cls(
             router_url=get("OPENRA_AI_ROUTER_URL", cls.router_url).rstrip("/"),
             text_model=get("OPENRA_AI_TEXT_MODEL", cls.text_model),
+            vision_model=get("OPENRA_AI_VISION_MODEL", cls.vision_model),
             transcribe_model=get("OPENRA_AI_TRANSCRIBE_MODEL", cls.transcribe_model),
             speech_model=get("OPENRA_AI_TTS_MODEL", cls.speech_model),
             speech_voice=get("OPENRA_AI_TTS_VOICE", cls.speech_voice),
@@ -95,7 +98,7 @@ class Settings:
         parsed = urlparse(self.router_url)
         if parsed.scheme not in {"http", "https"} or not parsed.netloc:
             raise ValueError("AI Layer URL must be an absolute http or https URL")
-        for name in ("text_model", "transcribe_model", "speech_model", "speech_voice"):
+        for name in ("text_model", "vision_model", "transcribe_model", "speech_model", "speech_voice"):
             value = str(getattr(self, name)).strip()
             if not value or len(value) > 160:
                 raise ValueError(f"{name} must contain 1 to 160 characters")
@@ -111,6 +114,7 @@ class Settings:
         allowed = {
             "router_url",
             "text_model",
+            "vision_model",
             "transcribe_model",
             "speech_model",
             "speech_voice",

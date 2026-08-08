@@ -112,6 +112,7 @@ def main(argv: list[str] | None = None) -> int:
         args.worldgen_port,
         args.mission_output,
         args.mission_install,
+        f"http://127.0.0.1:{args.control_port}",
     )
     for name, server in (("control", control_server), ("worldgen", worldgen_server)):
         threading.Thread(

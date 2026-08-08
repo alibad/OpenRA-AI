@@ -72,7 +72,8 @@ decides when an event is worth interpreting.
 
 ### World generation
 
-World generation is asynchronous and reproducible. Every output records:
+World generation runs off the game tick and is reproducible for the same
+inputs. Every output records:
 
 - geographic bounds and projection;
 - data sources and attribution;
@@ -80,6 +81,13 @@ World generation is asynchronous and reproducible. Every output records:
 - random seed;
 - story sources and generation settings;
 - validation results.
+
+The current native flow captures a radius-matched OpenTopoMap terrain PNG and
+sends it as a multimodal request through the same provider-neutral AI layer as
+the companion. The model returns constrained biome/relief/density guidance;
+deterministic code combines that guidance with OSM geometry and legal OpenRA
+tiles. The exact terrain PNG and analysis are embedded in the `.oramap` for
+human comparison in the editor.
 
 ### Contracts
 

@@ -87,7 +87,7 @@ class CompanionHandler(BaseHTTPRequestHandler):
                 payload = json.loads(self._payload() or b"{}")
                 config_values = dict(payload.get("config") or {})
                 for key in (
-                    "router_url", "text_model", "transcribe_model", "speech_model", "speech_voice",
+                    "router_url", "text_model", "vision_model", "transcribe_model", "speech_model", "speech_voice",
                     "notification_pace", "voice_priority", "companion_enabled", "voice_enabled",
                 ):
                     if key in payload:
@@ -156,6 +156,14 @@ class CompanionHandler(BaseHTTPRequestHandler):
             elif path == "/v1/design/mission":
                 payload = json.loads(self._payload() or b"{}")
                 self._json(HTTPStatus.OK, self.companion.draft_mission(payload).as_dict())
+            elif path == "/v1/design/terrain":
+                import base64
+
+                payload = json.loads(self._payload(3_000_000) or b"{}")
+                image = base64.b64decode(str(payload.get("image_base64", "")), validate=True)
+                if not image.startswith(b"\x89PNG\r\n\x1a\n"):
+                    raise ValueError("terrain image must be a PNG")
+                self._json(HTTPStatus.OK, self.companion.analyze_terrain(dict(payload.get("context") or {}), image))
             elif path == "/v1/interrupt":
                 self._payload()
                 self._json(HTTPStatus.OK, {"interrupted": True, "generation": self.companion.interrupt()})

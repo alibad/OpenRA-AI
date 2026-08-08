@@ -12,8 +12,10 @@ from pathlib import Path
 from urllib.parse import parse_qs, urlencode, urlparse
 from urllib.request import Request, urlopen
 
+from .ai import TerrainAnalyzer
 from .generator import MissionGenerator
 from .models import GeoSelection
+from .terrain import fetch_terrain_view
 from .webui import WORLD_STUDIO_HTML
 
 
@@ -152,6 +154,19 @@ class WorldgenHandler(BaseHTTPRequestHandler):
             except (OSError, TimeoutError, ValueError) as exc:
                 self._json(HTTPStatus.BAD_GATEWAY, {"error": "map_tile_failed", "detail": str(exc)})
             return
+        if path == "/v1/terrain-view":
+            query = parse_qs(urlparse(self.path).query)
+            try:
+                selection = GeoSelection(
+                    latitude=float(query.get("latitude", [""])[0]),
+                    longitude=float(query.get("longitude", [""])[0]),
+                    radius_m=int(query.get("radius_m", ["3500"])[0]),
+                ).validated()
+                view = fetch_terrain_view(selection, Path(self.server.output_directory))  # type: ignore[attr-defined]
+                self._bytes(HTTPStatus.OK, view.image, "image/png")
+            except (OSError, TimeoutError, ValueError) as exc:
+                self._json(HTTPStatus.BAD_GATEWAY, {"error": "terrain_view_failed", "detail": str(exc)})
+            return
         if path.startswith("/v1/missions/"):
             name = Path(path).name
             candidate = Path(self.server.output_directory) / name  # type: ignore[attr-defined]
@@ -185,8 +200,10 @@ class WorldgenHandler(BaseHTTPRequestHandler):
                 seed=int(payload.get("seed", 1)),
                 source=str(payload.get("source", "openstreetmap")),
                 story_seed=str(payload.get("story_seed", "")),
+                generation_mode=str(payload.get("generation_mode", "reality-first")),
             )
-            result = MissionGenerator(allow_network=True).generate(
+            analyzer = TerrainAnalyzer(self.server.companion_url) if self.server.companion_url else None  # type: ignore[attr-defined]
+            result = MissionGenerator(allow_network=True, terrain_analyzer=analyzer).generate(
                 selection, Path(self.server.output_directory)  # type: ignore[attr-defined]
             )
             install_directory = Path(self.server.install_directory)  # type: ignore[attr-defined]
@@ -197,6 +214,13 @@ class WorldgenHandler(BaseHTTPRequestHandler):
             response["download_url"] = f"/v1/missions/{result.package_path.name}"
             response["filename"] = result.package_path.name
             response["installed_path"] = str(installed_path)
+            manifest = json.loads(result.manifest_path.read_text(encoding="utf-8"))
+            response["synthesis"] = {
+                "analysis": manifest.get("analysis", {}),
+                "feature_counts": manifest.get("design", {}).get("feature_counts", {}),
+                "terrain_view": manifest.get("terrain_view", {}),
+                "tileset": manifest.get("game", {}).get("tileset", "TEMPERAT"),
+            }
             self._json(HTTPStatus.CREATED, response)
         except (KeyError, TypeError, ValueError, json.JSONDecodeError) as exc:
             self._json(HTTPStatus.BAD_REQUEST, {"error": "invalid_request", "detail": str(exc)})
@@ -210,12 +234,14 @@ def create_server(
     port: int = 8788,
     output_directory: Path | None = None,
     install_directory: Path | None = None,
+    companion_url: str | None = None,
 ) -> ThreadingHTTPServer:
     directory = output_directory or Path(tempfile.gettempdir()) / "openra-ai-missions"
     directory.mkdir(parents=True, exist_ok=True)
     server = ThreadingHTTPServer((host, port), WorldgenHandler)
     server.output_directory = str(directory)  # type: ignore[attr-defined]
     server.install_directory = str(install_directory or directory)  # type: ignore[attr-defined]
+    server.companion_url = companion_url  # type: ignore[attr-defined]
     return server
 
 

@@ -12,7 +12,10 @@ from unittest import mock
 from zipfile import ZipFile
 
 from openra_ai_worldgen import GeoSelection, MissionGenerator
-from openra_ai_worldgen.osm import fetch_features
+from openra_ai_worldgen.models import TerrainAnalysis
+from openra_ai_worldgen.osm import GeoFeature, fetch_features, parse_overpass
+from openra_ai_worldgen.package import compile_map_binary
+from openra_ai_worldgen.raster import ROAD, WATER, build_terrain
 from openra_ai_worldgen.server import create_server
 from openra_ai_worldgen.validator import validate_package
 
@@ -52,6 +55,39 @@ class WorldgenTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             with self.assertRaises(ValueError):
                 MissionGenerator(allow_network=False).generate(GeoSelection(100, 0), Path(directory))
+
+    def test_offline_generation_does_not_invent_water(self) -> None:
+        plan = build_terrain(
+            GeoSelection(24.638916, 46.71601, map_size=64),
+            [],
+            TerrainAnalysis(biome="desert"),
+        )
+        self.assertEqual(plan.tileset, "DESERT")
+        self.assertFalse(any(WATER in row for row in plan.cells))
+
+    def test_real_road_cells_are_written_as_openra_road_tiles(self) -> None:
+        selection = GeoSelection(24.638916, 46.71601, map_size=64)
+        road = GeoFeature("road", ((24.63, 46.70), (24.65, 46.73)), tags=(("highway", "primary"),))
+        plan = build_terrain(selection, [road], TerrainAnalysis(biome="desert"))
+        binary = compile_map_binary(plan, selection.seed)
+        road_tiles = 0
+        offset = 17
+        for x in range(plan.width):
+            for y in range(plan.height):
+                tile_id = int.from_bytes(binary[offset:offset + 2], "little")
+                if plan.cells[y][x] == ROAD:
+                    self.assertIn(tile_id, {164, 165})
+                    road_tiles += 1
+                offset += 3
+        self.assertGreater(road_tiles, 0)
+
+    def test_intermittent_waterways_are_not_permanent_water(self) -> None:
+        features = parse_overpass({"elements": [{
+            "type": "way",
+            "tags": {"waterway": "river", "intermittent": "yes"},
+            "geometry": [{"lat": 24.61, "lon": 46.69}, {"lat": 24.62, "lon": 46.70}],
+        }]})
+        self.assertEqual(features[0].kind, "dry-river")
 
     def test_geographic_acquisition_falls_back_to_second_overpass_instance(self) -> None:
         payload = self.fixture.read_bytes()

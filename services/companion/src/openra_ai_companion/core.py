@@ -20,6 +20,14 @@ Return one vivid, playable mission direction under 34 words. Ground it in the su
 Include a concrete objective and one tactical twist. Keep real places fictionalized and avoid claims about real people or current events.
 Do not use markdown, labels, greetings, or quotation marks."""
 
+TERRAIN_ANALYSIS_PROMPT = """You are the terrain intelligence layer for an Earth-to-OpenRA map generator.
+The attached image is the exact topographic terrain view selected by the player. Treat visible relief, water,
+vegetation, settlement texture, and major corridors as evidence. Reconcile it with the supplied OpenStreetMap
+feature counts. Never invent water or landmarks. Return only one compact JSON object with these keys:
+biome (desert|temperate|snow), relief (flat|rolling|mountainous), vegetation_density (0..1),
+urban_density (0..1), water_confidence (0..1), fidelity_notes (array of at most 3 short strings),
+summary (one short sentence), confidence (0..1)."""
+
 
 class Companion:
     def __init__(self, router: AIRouter | None = None, insights: InsightEngine | None = None):
@@ -183,6 +191,23 @@ class Companion:
             response.text = ""
             response.interrupted = True
         return response
+
+    def analyze_terrain(self, context: dict, image: bytes) -> dict:
+        prompt = TERRAIN_ANALYSIS_PROMPT + "\n\nCONTEXT:\n" + json.dumps(context, separators=(",", ":"))
+        result = self.router.vision(prompt, image)
+        text = result.text.strip()
+        if text.startswith("```"):
+            text = text.removeprefix("```json").removeprefix("```").removesuffix("```").strip()
+        try:
+            analysis = json.loads(text)
+        except json.JSONDecodeError as exc:
+            raise RouterError("AI router returned invalid terrain analysis JSON") from exc
+        if not isinstance(analysis, dict):
+            raise RouterError("AI router returned a non-object terrain analysis")
+        analysis["vision_used"] = True
+        analysis["model"] = result.model
+        analysis["latency_ms"] = result.latency_ms
+        return analysis
 
     def transcribe(self, audio: bytes, filename: str = "question.wav") -> CompanionResponse:
         if not audio:

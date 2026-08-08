@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import base64
 import io
 import json
 import threading
@@ -64,10 +65,10 @@ class AIRouter:
             raise RouterError(f"AI router is unavailable at {self.settings.router_url}: {exc}") from exc
         return payload, round((time.perf_counter() - started) * 1000), response_type
 
-    def chat(self, messages: list[dict[str, str]], temperature: float | None = None) -> RouterResult:
+    def _chat(self, messages: list[dict[str, object]], model: str) -> RouterResult:
         body = json.dumps(
             {
-                "model": self.settings.text_model,
+                "model": model,
                 "messages": messages,
                 "max_tokens": 800,
                 "reasoning_effort": "low",
@@ -95,7 +96,30 @@ class AIRouter:
             self._chat_calls += 1
             self._input_tokens += input_tokens
             self._output_tokens += output_tokens
-        return RouterResult(text, latency, self.settings.text_model, input_tokens, output_tokens)
+        return RouterResult(text, latency, model, input_tokens, output_tokens)
+
+    def chat(self, messages: list[dict[str, object]], temperature: float | None = None) -> RouterResult:
+        return self._chat(messages, self.settings.text_model)
+
+    def vision(self, prompt: str, image: bytes, media_type: str = "image/png") -> RouterResult:
+        if not image:
+            raise ValueError("image must not be empty")
+        encoded = base64.b64encode(image).decode("ascii")
+        return self._chat([
+            {
+                "role": "user",
+                "content": [
+                    {"type": "text", "text": prompt},
+                    {
+                        "type": "image_url",
+                        "image_url": {
+                            "url": f"data:{media_type};base64,{encoded}",
+                            "detail": "high",
+                        },
+                    },
+                ],
+            }
+        ], self.settings.vision_model)
 
     def transcribe(self, audio: bytes, filename: str = "question.wav") -> RouterResult:
         boundary = f"----OpenRAAI{uuid.uuid4().hex}"

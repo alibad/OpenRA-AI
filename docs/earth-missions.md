@@ -6,8 +6,9 @@ Choose a location on Earth and receive a playable, stylized OpenRA map with
 terrain, resources, spawn points, objectives, briefing, and optional scripted
 events inspired by that place.
 
-The system does not attempt to reproduce a location building-for-building.
-It translates recognizable geographic structure into readable RTS terrain.
+The system preserves recognizable terrain, water, arterial roads, urban form,
+and biome as closely as OpenRA's discrete tiles allow. Playability repairs are
+recorded separately from geographic evidence.
 
 ## Generation pipeline
 
@@ -25,14 +26,16 @@ The player chooses:
 
 Adapters retrieve appropriately licensed data such as:
 
-- roads, waterways, coastlines, land use, and buildings;
+- roads, waterways, coastlines, land use, and vegetation from OpenStreetMap;
+- a radius-matched OpenTopoMap terrain view with relief and settlement context;
 - elevation and slope;
 - land cover and biome;
 - place names and public geographic context;
 - optional historical or current-event sources.
 
-Every source must retain its license and attribution. Source imagery is never
-assumed to be redistributable.
+Every source retains its license and attribution. The selected terrain view is
+cached locally, passed through the configured AI layer, and stored in the map
+package so a creator can compare source evidence with the OpenRA translation.
 
 ### 3. Translate
 
@@ -79,17 +82,23 @@ The output is a normal versioned OpenRA map package containing terrain,
 metadata, rules, Lua scripts, preview imagery, attribution, and a generation
 manifest. It can be opened in OpenRA's in-game map editor for human editing.
 
-## Implemented first slice
+## Implemented reality-grounded slice
 
-The first generator is deliberately narrow:
+The native editor now supports:
 
-1. choose any coordinate or click the web map;
-2. import nearby water and major roads from OpenStreetMap;
-3. generate a two-player Red Alert skirmish with a deterministic seed;
-4. repair and validate connectivity, spawns, binary layout, and resource fairness;
-5. emit a normal `.oramap`, preview, briefing, and attribution manifest.
+1. searching or clicking any place in a radius-matched terrain view;
+2. choosing Reality First, Balanced, or Creative Remix generation;
+3. routing that exact terrain PNG through the local AI layer's multimodal route;
+4. reconciling the vision result with OSM water, seasonal waterways, arterial
+   and local roads, rail, land use, vegetation, sand, and rock geometry;
+5. compiling real road cells, biome-appropriate Red Alert tilesets, urban
+   scenery, resources, and two playable starts;
+6. repairing and validating connectivity, spawns, binary layout, and resource
+   fairness before the map is installed;
+7. storing the terrain source, model analysis, confidence, feature counts,
+   attribution, preview, and validation report inside the `.oramap`.
 
-When the geographic endpoint is unavailable, the generator labels and uses a
-deterministic terrain fallback. Elevation, buildings, Lua objectives, and
-source-backed narrative context remain later stages; current-event stories are
-not presented as factual simulations.
+When geographic or vision services are unavailable, the manifest explicitly
+labels the degraded path and uses conservative geometry/climate fallback. It
+never invents water. Elevation-derived cliffs, detailed building footprints,
+Lua objectives, and source-backed narrative context remain later stages.
