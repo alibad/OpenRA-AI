@@ -100,7 +100,8 @@ class WorldgenTests(unittest.TestCase):
     def test_geocode_requests_english_place_names(self) -> None:
         response = mock.MagicMock()
         response.__enter__.return_value.read.return_value = json.dumps([{
-            "display_name": "Riyadh, Riyadh Region, Saudi Arabia",
+            "display_name": "الرياض، منطقة الرياض، السعودية",
+            "namedetails": {"name:en": "Riyadh"},
             "lat": "24.638916",
             "lon": "46.71601",
         }]).encode()
@@ -116,8 +117,10 @@ class WorldgenTests(unittest.TestCase):
 
                 request = urlopen.call_args.args[0]
                 self.assertIn("accept-language=en", request.full_url)
+                self.assertIn("namedetails=1", request.full_url)
                 self.assertEqual(request.get_header("Accept-language"), "en")
-                self.assertEqual(payload["name"], "Riyadh, Riyadh Region, Saudi Arabia")
+                self.assertEqual(payload["name"], "Riyadh")
+                self.assertEqual(payload["native_name"], "الرياض، منطقة الرياض، السعودية")
             finally:
                 server.shutdown()
                 server.server_close()

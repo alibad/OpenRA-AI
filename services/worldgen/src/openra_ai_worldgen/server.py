@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import shutil
 import tempfile
+import unicodedata
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -12,6 +13,23 @@ from urllib.request import Request, urlopen
 from .generator import MissionGenerator
 from .models import GeoSelection
 from .webui import WORLD_STUDIO_HTML
+
+
+def _uses_latin_script(value: str) -> bool:
+    return bool(value.strip()) and all(
+        not character.isalpha() or "LATIN" in unicodedata.name(character, "")
+        for character in value
+    )
+
+
+def _readable_place_name(match: dict, query: str) -> str:
+    native_name = str(match.get("display_name", "")).strip()
+    english_name = str((match.get("namedetails") or {}).get("name:en", "")).strip()
+    for candidate in (native_name, english_name, query):
+        if _uses_latin_script(candidate):
+            return candidate
+
+    return "Selected Earth location"
 
 
 class WorldgenHandler(BaseHTTPRequestHandler):
@@ -57,7 +75,13 @@ class WorldgenHandler(BaseHTTPRequestHandler):
             try:
                 request = Request(
                     "https://nominatim.openstreetmap.org/search?" + urlencode(
-                        {"q": query, "format": "jsonv2", "limit": 1, "accept-language": "en"}
+                        {
+                            "q": query,
+                            "format": "jsonv2",
+                            "limit": 1,
+                            "accept-language": "en",
+                            "namedetails": 1,
+                        }
                     ),
                     headers={
                         "User-Agent": "OpenRA-AI/0.1 local mission generator",
@@ -71,7 +95,8 @@ class WorldgenHandler(BaseHTTPRequestHandler):
                     return
                 match = matches[0]
                 self._json(HTTPStatus.OK, {
-                    "name": match.get("display_name", query),
+                    "name": _readable_place_name(match, query),
+                    "native_name": match.get("display_name", query),
                     "latitude": float(match["lat"]),
                     "longitude": float(match["lon"]),
                 })
