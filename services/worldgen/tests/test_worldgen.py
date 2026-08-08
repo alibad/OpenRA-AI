@@ -18,6 +18,7 @@ from openra_ai_worldgen.native import generation_options, terrain_profile
 from openra_ai_worldgen.osm import fetch_features, parse_overpass
 from openra_ai_worldgen.raster import WATER, build_terrain
 from openra_ai_worldgen.server import create_server
+from openra_ai_worldgen.terrain import fetch_terrain_view
 from openra_ai_worldgen.validator import validate_package
 
 
@@ -69,6 +70,37 @@ class WorldgenTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             with self.assertRaises(ValueError):
                 MissionGenerator(allow_network=False).generate(GeoSelection(100, 0), Path(directory))
+
+    def test_invalid_imagery_style_is_rejected(self) -> None:
+        with self.assertRaises(ValueError):
+            GeoSelection(24.638916, 46.71601, imagery_style="street").validated()
+
+    def test_defaults_favor_satellite_evidence_and_playability(self) -> None:
+        selection = GeoSelection(24.638916, 46.71601)
+        self.assertEqual(selection.imagery_style, "satellite")
+        self.assertEqual(selection.generation_mode, "playability-first")
+
+    def test_satellite_view_uses_eox_imagery_and_reports_provenance(self) -> None:
+        import io
+        from PIL import Image
+
+        image = Image.new("RGB", (256, 256), (137, 108, 68))
+        encoded = io.BytesIO()
+        image.save(encoded, format="JPEG")
+        response = mock.MagicMock()
+        response.__enter__.return_value.read.return_value = encoded.getvalue()
+        with tempfile.TemporaryDirectory() as directory:
+            with mock.patch("openra_ai_worldgen.terrain.urlopen", return_value=response) as urlopen:
+                view = fetch_terrain_view(
+                    GeoSelection(24.638916, 46.71601, imagery_style="satellite"),
+                    Path(directory),
+                    output_size=128,
+                )
+
+        self.assertTrue(view.image.startswith(b"\x89PNG\r\n\x1a\n"))
+        self.assertEqual(view.style, "satellite")
+        self.assertIn("Sentinel-2", view.provider)
+        self.assertIn("s2cloudless-2025_3857", urlopen.call_args.args[0].full_url)
 
     def test_offline_generation_does_not_invent_water(self) -> None:
         plan = build_terrain(

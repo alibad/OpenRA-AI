@@ -21,7 +21,7 @@ Include a concrete objective and one tactical twist. Keep real places fictionali
 Do not use markdown, labels, greetings, or quotation marks."""
 
 TERRAIN_ANALYSIS_PROMPT = """You are the terrain intelligence layer for an Earth-to-OpenRA map generator.
-The attached image is the exact topographic terrain view selected by the player. Treat visible relief, water,
+The attached image is the exact satellite or terrain reconnaissance view selected by the player. Treat visible relief, water,
 vegetation, settlement texture, and major corridors as evidence. Reconcile it with the supplied OpenStreetMap
 feature counts. Never invent water or landmarks. Return only one compact JSON object with these keys:
 biome (desert|temperate|snow), relief (flat|rolling|mountainous), vegetation_density (0..1),

@@ -29,7 +29,8 @@ The player chooses:
 Adapters retrieve appropriately licensed data such as:
 
 - roads, waterways, coastlines, land use, and vegetation from OpenStreetMap;
-- a radius-matched OpenTopoMap terrain view with relief and settlement context;
+- radius-matched Sentinel-2 Cloudless satellite imagery by default, with an
+  OpenTopoMap terrain layer available when explicit relief is more useful;
 - elevation and slope;
 - land cover and biome;
 - place names and public geographic context;
@@ -88,9 +89,9 @@ manifest. It can be opened in OpenRA's in-game map editor for human editing.
 
 The native editor now supports:
 
-1. searching or clicking any place in a radius-matched terrain view;
-2. choosing Reality First, Balanced, or Creative Remix generation;
-3. routing that exact terrain PNG through the local AI layer's multimodal route;
+1. searching or clicking any place in a radius-matched satellite or terrain view;
+2. choosing Earth + Balance (the default), Reality First, or Creative Remix generation;
+3. routing that exact displayed PNG through the local AI layer's multimodal route;
 4. reconciling the vision result with OSM water, seasonal waterways, roads,
    rail, land use, vegetation, sand, and rock evidence;
 5. converting that evidence into native ClassicMapGenerator settings and

@@ -82,9 +82,10 @@ inputs. Every output records:
 - story sources and generation settings;
 - validation results.
 
-The current native flow captures a radius-matched OpenTopoMap terrain PNG and
-sends it as a multimodal request through the same provider-neutral AI layer as
-the companion. The model returns constrained biome/relief/density guidance;
+The current native flow captures radius-matched Sentinel-2 Cloudless satellite
+imagery by default (or an optional OpenTopoMap terrain PNG) and sends that exact
+displayed image as a multimodal request through the same provider-neutral AI
+layer as the companion. The model returns constrained biome/relief/density guidance;
 deterministic code combines that guidance with OSM evidence to select OpenRA
 `ClassicMapGenerator` options. OpenRA's Terraformer then owns legal tile
 transitions, passages, roads, spawns, resources, and scenery. The exact terrain

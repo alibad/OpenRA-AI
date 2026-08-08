@@ -87,7 +87,8 @@ class WorldgenHandler(BaseHTTPRequestHandler):
             seed=int(payload.get("seed", 1)),
             source=str(payload.get("source", "openstreetmap")),
             story_seed=str(payload.get("story_seed", "")),
-            generation_mode=str(payload.get("generation_mode", "reality-first")),
+            generation_mode=str(payload.get("generation_mode", "playability-first")),
+            imagery_style=str(payload.get("imagery_style", "satellite")),
         )
         analyzer = TerrainAnalyzer(self.server.companion_url) if self.server.companion_url else None  # type: ignore[attr-defined]
         result = MissionGenerator(allow_network=True, terrain_analyzer=analyzer).generate(
@@ -232,6 +233,7 @@ class WorldgenHandler(BaseHTTPRequestHandler):
                     latitude=float(query.get("latitude", [""])[0]),
                     longitude=float(query.get("longitude", [""])[0]),
                     radius_m=int(query.get("radius_m", ["3500"])[0]),
+                    imagery_style=str(query.get("style", ["satellite"])[0]),
                 ).validated()
                 view = fetch_terrain_view(selection, Path(self.server.output_directory))  # type: ignore[attr-defined]
                 self._bytes(HTTPStatus.OK, view.image, "image/png")

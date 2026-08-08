@@ -59,3 +59,35 @@ Verified implementation captures:
 ## Final result
 
 Passed. The old form-only studio has been replaced by the proposed visual workbench, with real Earth terrain on the left, a validated playable OpenRA translation on the right, and the entire generation-to-play/editor path kept inside the game.
+
+## Satellite reconnaissance iteration (2026-08-09)
+
+Source of truth:
+
+- `C:/Users/Admin/.codex/generated_images/019fbcef-7ff1-77d3-bd57-618d3542810f/exec-484fa1ef-4e80-4010-b6c5-8586cdd24c20.png`
+
+Verified implementation:
+
+- `artifacts/earth-workbench-satellite-generated.png` — 2560×1440 generated and validated state
+- `artifacts/earth-workbench-design-comparison.png` — normalized reference/implementation comparison input
+
+Iteration history:
+
+1. The first satellite build (`artifacts/earth-workbench-world-tools-3.png`) overflowed the viewport under 150% Windows display scaling. This was a P1 layout defect.
+2. The workbench now converts the physical `WINDOW_*` dimensions into UI-scaled bounds, keeps all controls visible, and preserves the reference's split reconnaissance/translation hierarchy.
+3. A live Riyadh generation populated all five Earth-detection cards, produced the native map preview, and reached the validated/ready state.
+
+| Check | Result | Notes |
+| --- | --- | --- |
+| Satellite source | Passed | The default source is EOX Sentinel-2 Cloudless 2025, with its attribution visible in the Earth pane. |
+| Terrain alternative | Passed | The source dropdown can switch to OpenTopoMap terrain imagery without leaving the game. |
+| Exact-image grounding | Passed | The PNG displayed in the reconnaissance pane is the same image embedded in the package and sent to the AI terrain route. |
+| Detected-from-Earth quality | Passed | Relief, water, built area, vegetation, and landmarks use scan cards with values, confidence bars, concise details, and a provenance/status header. |
+| Truthful playable preview | Passed | The right pane renders the generated OpenRA map rather than an illustrative mock. Spawn points and validated status are visible. |
+| Native playability | Passed | The output uses `ClassicMapGenerator`; tracked locomotor reached both spawns, 9,001 cells, and 169 cells in the smallest spawn zone. |
+| Layout fidelity | Passed | Search, dual visual panes, controls, analysis, pipeline, and bottom actions match the reference structure with no clipping at 2560×1440. |
+| Remaining differences | Accepted | The reference's isometric battlefield art is aspirational. The product deliberately shows OpenRA's real generated-map preview so the UI never promises terrain that was not built. |
+
+### Final result
+
+passed

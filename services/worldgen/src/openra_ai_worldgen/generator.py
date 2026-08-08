@@ -112,15 +112,15 @@ class MissionGenerator:
         analysis = self._fallback_analysis(selection, features)
         if self.allow_network and not self.fixture:
             try:
-                report(2, "Capturing the terrain view used by the AI")
+                report(2, f"Capturing the {selection.imagery_style} view used by the AI")
                 terrain_view = fetch_terrain_view(selection, output_directory)
-                source_status += "+terrain-view"
+                source_status += f"+{selection.imagery_style}-view"
             except (OSError, TimeoutError, ValueError) as exc:
                 source_status += "+terrain-view-unavailable"
                 analysis = self._fallback_analysis(selection, features, str(exc))
         if terrain_view and self.terrain_analyzer:
             try:
-                report(3, "AI is interpreting terrain character and visual context")
+                report(3, f"AI is interpreting the {selection.imagery_style} image and map geometry")
                 analysis = self.terrain_analyzer.analyze(selection, features, terrain_view)
                 source_status += "+ai-vision"
             except RuntimeError as exc:

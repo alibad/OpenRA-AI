@@ -97,8 +97,9 @@ From the OpenRA main menu:
 - choose **AI Companion** to open the native AI settings tab, configure routes,
   control notification and voice priorities, test the full path, and inspect a
   live session cost estimate;
-- choose **World Tools → Earth Mission Studio** to select a point on Earth
-  inside OpenRA, then generate, validate, install, play, or edit a `.oramap`;
+- choose **World Tools → Earth Mission Studio** to search or pin a point on
+  satellite imagery inside OpenRA, inspect the detected terrain, then generate,
+  validate, install, play, or edit a `.oramap`;
 - choose **World Tools → Native Map Editor** to refine installed maps with
   OpenRA's editor.
 
@@ -123,7 +124,7 @@ On Windows, install the local dependencies and build the pinned engine fork:
 Generate and validate a playable Earth map:
 
 ```powershell
-./.venv/Scripts/openra-ai-worldgen.exe generate --lat 24.7136 --lon 46.6753 --title "Riyadh Crossing" --seed 42
+./.venv/Scripts/openra-ai-worldgen.exe generate --lat 24.7136 --lon 46.6753 --title "Riyadh Crossing" --imagery satellite --mode playability-first --seed 42
 ./apps/launcher/Start-OpenRAAI.ps1 -Map ./generated/missions/riyadh-crossing-42.oramap
 ```
 

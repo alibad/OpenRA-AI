@@ -25,8 +25,9 @@ def _parser() -> argparse.ArgumentParser:
     generate.add_argument(
         "--mode",
         choices=("reality-first", "playability-first", "creative-remix"),
-        default="reality-first",
+        default="playability-first",
     )
+    generate.add_argument("--imagery", choices=("satellite", "terrain"), default="satellite")
     generate.add_argument("--output", type=Path, default=Path("generated/missions"))
     generate.add_argument("--fixture", type=Path)
     generate.add_argument("--offline", action="store_true")
@@ -53,6 +54,7 @@ def main(argv: list[str] | None = None) -> int:
             source="offline" if args.offline else "openstreetmap",
             story_seed=args.story,
             generation_mode=args.mode,
+            imagery_style=args.imagery,
         )
         result = MissionGenerator(args.fixture, allow_network=not args.offline).generate(selection, args.output)
         print(json.dumps(result.as_dict(), indent=2))
