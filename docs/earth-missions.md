@@ -36,9 +36,9 @@ The player chooses:
 Adapters retrieve appropriately licensed data such as:
 
 - roads, waterways, coastlines, land use, and vegetation from OpenStreetMap;
-- radius-matched Sentinel-2 Cloudless satellite imagery by default, with a
-  detailed OpenTopoMap view available when streets and building footprints are
-  more useful;
+- adaptive Earth imagery: clear OpenTopoMap streets and building footprints for
+  1-2 km tactical views, then Sentinel-2 Cloudless satellite context from 4 km
+  upward; satellite, map, and hybrid modes remain manually selectable;
 - elevation and slope;
 - land cover and biome;
 - place names and public geographic context;

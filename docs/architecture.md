@@ -83,7 +83,8 @@ inputs. Every output records:
 - validation results.
 
 The current native flow captures radius-matched Sentinel-2 Cloudless satellite
-imagery by default (or an optional OpenTopoMap terrain PNG) and sends that exact
+imagery at regional scale and OpenTopoMap street/building detail at tactical
+scale (with explicit satellite, map, and hybrid overrides) and sends that exact
 displayed image as a multimodal request through the same provider-neutral AI
 layer as the companion. The model returns constrained biome/relief/density guidance;
 deterministic code combines that guidance with OSM evidence to select OpenRA

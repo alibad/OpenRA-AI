@@ -75,9 +75,9 @@ class WorldgenTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             GeoSelection(24.638916, 46.71601, imagery_style="street").validated()
 
-    def test_defaults_favor_satellite_evidence_and_playability(self) -> None:
+    def test_defaults_favor_adaptive_evidence_and_playability(self) -> None:
         selection = GeoSelection(24.638916, 46.71601)
-        self.assertEqual(selection.imagery_style, "satellite")
+        self.assertEqual(selection.imagery_style, "auto")
         self.assertEqual(selection.generation_mode, "playability-first")
         self.assertEqual(selection.radius_m, 500)
 
@@ -106,6 +106,81 @@ class WorldgenTests(unittest.TestCase):
         self.assertEqual(view.style, "satellite")
         self.assertIn("Sentinel-2", view.provider)
         self.assertIn("s2cloudless-2025_3857", urlopen.call_args.args[0].full_url)
+
+    def test_hybrid_view_adds_map_detail_to_satellite(self) -> None:
+        import io
+        from PIL import Image
+
+        satellite = Image.new("RGB", (256, 256), (150, 120, 90))
+        satellite_bytes = io.BytesIO()
+        satellite.save(satellite_bytes, format="JPEG")
+        mapped = Image.new("RGB", (256, 256), (255, 255, 255))
+        for x in range(96, 160):
+            for y in range(96, 160):
+                mapped.putpixel((x, y), (40, 40, 40))
+        map_bytes = io.BytesIO()
+        mapped.save(map_bytes, format="PNG")
+
+        def response_for(request, timeout=15):
+            del timeout
+            response = mock.MagicMock()
+            response.__enter__.return_value.read.return_value = (
+                satellite_bytes.getvalue() if request.full_url.endswith(".jpg") else map_bytes.getvalue()
+            )
+            return response
+
+        with tempfile.TemporaryDirectory() as directory:
+            with mock.patch("openra_ai_worldgen.terrain.urlopen", side_effect=response_for) as urlopen:
+                view = fetch_terrain_view(
+                    GeoSelection(24.638916, 46.71601, radius_m=500, imagery_style="hybrid"),
+                    Path(directory),
+                    output_size=128,
+                )
+
+        self.assertEqual(view.style, "hybrid")
+        self.assertIn("OpenTopoMap", view.provider)
+        self.assertTrue(any(call.args[0].full_url.endswith(".jpg") for call in urlopen.call_args_list))
+        self.assertTrue(any(call.args[0].full_url.endswith(".png") for call in urlopen.call_args_list))
+
+    def test_auto_view_uses_clear_map_at_tactical_scale(self) -> None:
+        import io
+        from PIL import Image
+
+        mapped = Image.new("RGB", (256, 256), (245, 245, 245))
+        encoded = io.BytesIO()
+        mapped.save(encoded, format="PNG")
+        response = mock.MagicMock()
+        response.__enter__.return_value.read.return_value = encoded.getvalue()
+        with tempfile.TemporaryDirectory() as directory:
+            with mock.patch("openra_ai_worldgen.terrain.urlopen", return_value=response) as urlopen:
+                view = fetch_terrain_view(
+                    GeoSelection(24.638916, 46.71601, radius_m=500, imagery_style="auto"),
+                    Path(directory),
+                    output_size=128,
+                )
+
+        self.assertEqual(view.style, "terrain")
+        self.assertEqual(view.provider, "OpenTopoMap")
+        self.assertTrue(all(call.args[0].full_url.endswith(".png") for call in urlopen.call_args_list))
+
+    def test_auto_view_uses_unmodified_satellite_for_regional_scale(self) -> None:
+        import io
+        from PIL import Image
+
+        image = Image.new("RGB", (256, 256), (137, 108, 68))
+        encoded = io.BytesIO()
+        image.save(encoded, format="JPEG")
+        response = mock.MagicMock()
+        response.__enter__.return_value.read.return_value = encoded.getvalue()
+        with tempfile.TemporaryDirectory() as directory:
+            with mock.patch("openra_ai_worldgen.terrain.urlopen", return_value=response):
+                view = fetch_terrain_view(
+                    GeoSelection(24.638916, 46.71601, radius_m=2000, imagery_style="auto"),
+                    Path(directory),
+                    output_size=128,
+                )
+
+        self.assertEqual(view.style, "satellite")
 
     def test_offline_generation_does_not_invent_water(self) -> None:
         plan = build_terrain(

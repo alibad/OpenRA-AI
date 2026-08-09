@@ -198,3 +198,48 @@ Iteration history:
 ### Final result
 
 passed
+
+## Adaptive tactical imagery iteration (2026-08-09)
+
+Source visual truth:
+
+- `C:/Users/Admin/AppData/Local/Temp/codex-clipboard-6445276c-7bdb-4710-8241-e50f452ec0c7.png` - reported blurred 1 km Sentinel-2 state
+- `C:/Users/Admin/AppData/Local/Temp/codex-clipboard-b1bb5850-d240-4c53-abc9-b794521e2200.png` - reported marginal 2 km Sentinel-2 state
+- `C:/Users/Admin/AppData/Local/Temp/codex-clipboard-59fd30da-9635-48ce-aed7-256fc54404a6.png` - acceptable 4 km Sentinel-2 state and transition threshold
+
+Rendered implementation:
+
+- `artifacts/qa/earth-workbench-auto-detail-native.png` - native OpenRA 3840x2160 renderer capture, 1 km footprint, Auto detail selected
+- `artifacts/qa/earth-workbench-auto-detail-focus.png` - 580x543 focused tactical pane crop, normalized to 583x544 for comparison
+- `artifacts/qa/earth-workbench-tactical-before-after.png` - same 1 km state focused before/after comparison
+- `artifacts/qa/earth-workbench-adaptive-full-comparison.png` - full-workbench comparison; the reference is 1600x870 at 2 km and the implementation is normalized from 3840x2160 at 1 km, so it is used for composition rather than imagery fidelity
+- `artifacts/qa/riyadh-auto-1km-final.png`, `riyadh-auto-2km-final.png`, and `riyadh-auto-4km-final.png` - exact adaptive source rasters used to verify all three thresholds
+
+State and normalization:
+
+- Location: Riyadh, Saudi Arabia (`24.638916`, `46.71601`).
+- Main focused comparison: 1 km battlefield/view, initial workbench, no generation started.
+- Source: 583x544 pixels. Native implementation: 3840x2160 pixels. Focus crop: 870x815, downsampled to 580x543, then normalized to the source's 583x544 pixels at 1x comparison density.
+- The 2 km and 4 km source rasters are both 512x512 and compared at their native density.
+
+### Comparison history
+
+1. **P1 - Tactical zoom enlarged unavailable satellite detail.** The 1 km and 2 km views displayed upsampled Sentinel-2 pixels, so the controls implied useful closer reconnaissance without providing it.
+2. A first hybrid treatment added map geometry over satellite texture, but the blend was visually muddy at 1 km. It remained blocked as a P2 image-quality issue and was not shipped as the automatic path.
+3. Auto detail now selects the clear street/building map at 1-2 km and unmodified satellite context from 4 km upward. Satellite, map, and hybrid sources remain explicit manual choices.
+4. Generation fits the reconnaissance view back to the battlefield footprint before analysis, so wider browsing zoom no longer silently describes a different physical area to the multimodal model.
+
+| Fidelity surface | Result | Notes |
+| --- | --- | --- |
+| Fonts and typography | Passed | Native OpenRA typography is unchanged; the compact Auto detail label fits the existing source dropdown. |
+| Spacing and layout rhythm | Passed | The adaptive source changes only the Earth raster and truthful status text; the centered workbench, actions, and pane proportions remain intact. |
+| Colors and visual tokens | Passed | Tactical map colors are the provider's real cartography; native Red Alert chrome and semantic state colors remain unchanged. |
+| Image quality and asset fidelity | Passed | Individual building footprints and local streets are crisp at 1 km, neighborhood structure is legible at 2 km, and the 4 km state retains the accepted satellite image. |
+| Copy and content | Passed | Auto detail, source attribution, scale detail, and generation status state what source is active and stop claiming that magnified satellite pixels contain street detail. |
+| Core interaction | Passed | Closer, Wider, Fit Area, source override, and generation-fit behavior remain functional; the automatic source transition occurs at the user-identified 4 km threshold. |
+
+No actionable P0, P1, or P2 findings remain. The full-view comparison uses different physical viewport/state sizes and is not used to make pixel-level imagery claims; the focused 1 km comparison and native 512x512 threshold rasters provide that evidence.
+
+### Final result
+
+passed

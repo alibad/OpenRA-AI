@@ -27,7 +27,7 @@ def _parser() -> argparse.ArgumentParser:
         choices=("reality-first", "playability-first", "creative-remix"),
         default="playability-first",
     )
-    generate.add_argument("--imagery", choices=("satellite", "terrain"), default="satellite")
+    generate.add_argument("--imagery", choices=("auto", "hybrid", "satellite", "terrain"), default="auto")
     generate.add_argument("--output", type=Path, default=Path("generated/missions"))
     generate.add_argument("--fixture", type=Path)
     generate.add_argument("--offline", action="store_true")

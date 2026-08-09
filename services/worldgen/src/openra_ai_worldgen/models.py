@@ -17,7 +17,7 @@ class GeoSelection:
     source: str = "openstreetmap"
     story_seed: str = ""
     generation_mode: str = "playability-first"
-    imagery_style: str = "satellite"
+    imagery_style: str = "auto"
 
     def validated(self) -> "GeoSelection":
         if not -90 <= self.latitude <= 90:
@@ -32,8 +32,8 @@ class GeoSelection:
             raise ValueError("seed must be between 0 and 2147483647")
         if self.generation_mode not in {"reality-first", "playability-first", "creative-remix"}:
             raise ValueError("generation_mode must be reality-first, playability-first, or creative-remix")
-        if self.imagery_style not in {"satellite", "terrain"}:
-            raise ValueError("imagery_style must be satellite or terrain")
+        if self.imagery_style not in {"auto", "hybrid", "satellite", "terrain"}:
+            raise ValueError("imagery_style must be auto, hybrid, satellite, or terrain")
         return self
 
     def as_dict(self) -> dict[str, Any]:

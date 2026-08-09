@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from urllib.request import Request, urlopen
 
-from PIL import Image
+from PIL import Image, ImageOps
 
 from .models import GeoSelection
 
@@ -75,15 +75,12 @@ def _tile(cache_root: Path, zoom: int, x: int, y: int, style: str) -> bytes:
     return body
 
 
-def fetch_terrain_view(
+def _render_source(
     selection: GeoSelection,
     cache_root: Path,
-    output_size: int = 512,
-    style: str | None = None,
-) -> TerrainView:
-    style = style or selection.imagery_style
-    if style not in {"satellite", "terrain"}:
-        raise ValueError("imagery style must be satellite or terrain")
+    output_size: int,
+    style: str,
+) -> tuple[Image.Image, int]:
     # The EOX WMTS advertises the Google-compatible matrix through zoom 21.
     # Sentinel-2 itself is still a ~10 m source, but requesting zoom 16 keeps
     # the crop faithful to a tactical 500 m radius instead of forcing a broad
@@ -108,14 +105,60 @@ def fetch_terrain_view(
     local_y = center_y - min_tile_y * 256
     crop = canvas.crop((round(local_x - half), round(local_y - half), round(local_x + half), round(local_y + half)))
     crop = crop.resize((output_size, output_size), Image.Resampling.LANCZOS)
+    return crop, zoom
+
+
+def fetch_terrain_view(
+    selection: GeoSelection,
+    cache_root: Path,
+    output_size: int = 512,
+    style: str | None = None,
+) -> TerrainView:
+    requested_style = style or selection.imagery_style
+    if requested_style not in {"auto", "hybrid", "satellite", "terrain"}:
+        raise ValueError("imagery style must be auto, hybrid, satellite, or terrain")
+
+    # Sentinel-2 is useful regional evidence, but its native ~10 m pixels do
+    # not contain enough information for a 1-2 km tactical crop. Auto detail
+    # therefore uses the legible street/building map at those ranges, then
+    # returns to unmodified satellite imagery once the source has enough real
+    # pixels. Hybrid remains available as an explicit visual option.
+    resolved_style = requested_style
+    if requested_style == "auto":
+        resolved_style = "terrain" if selection.radius_m <= 1000 else "satellite"
+
+    if resolved_style == "hybrid":
+        satellite, satellite_zoom = _render_source(selection, cache_root, output_size, "satellite")
+        mapped, map_zoom = _render_source(selection, cache_root, output_size, "terrain")
+        # Use the map's distance from white as an alpha mask. This preserves
+        # the satellite texture instead of washing the whole image with a
+        # second raster, while drawing dark street edges, labels, and building
+        # footprints strongly enough to remain useful at tactical scale.
+        detail_mask = ImageOps.invert(ImageOps.grayscale(mapped)).point(lambda value: min(205, int(value * 0.9)))
+        rendered = Image.composite(mapped, satellite, detail_mask)
+        zoom = max(satellite_zoom, map_zoom)
+    else:
+        rendered, zoom = _render_source(selection, cache_root, output_size, resolved_style)
+
     output = io.BytesIO()
-    crop.save(output, format="PNG", optimize=True)
-    if style == "satellite":
+    rendered.save(output, format="PNG", optimize=True)
+    if resolved_style == "hybrid":
+        return TerrainView(
+            output.getvalue(),
+            zoom,
+            provider="EOX Sentinel-2 + OpenTopoMap",
+            attribution=(
+                "EOxCloudless © EOX IT Services GmbH | modified Copernicus Sentinel data 2025 | "
+                "OpenStreetMap contributors, SRTM | OpenTopoMap CC-BY-SA"
+            ),
+            style=resolved_style,
+        )
+    if resolved_style == "satellite":
         return TerrainView(
             output.getvalue(),
             zoom,
             provider="EOX Sentinel-2 Cloudless 2025",
             attribution="EOxCloudless © EOX IT Services GmbH | Contains modified Copernicus Sentinel data 2025",
-            style=style,
+            style=resolved_style,
         )
-    return TerrainView(output.getvalue(), zoom, style=style)
+    return TerrainView(output.getvalue(), zoom, style=resolved_style)
