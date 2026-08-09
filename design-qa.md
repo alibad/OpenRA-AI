@@ -91,3 +91,37 @@ Iteration history:
 ### Final result
 
 passed
+
+## Centered guided-workbench iteration (2026-08-09)
+
+Sources of truth:
+
+- `C:/Users/Admin/AppData/Local/Temp/codex-clipboard-a0062d2b-8f6c-48a2-8936-5ce4ea73aabd.png` - reported upper-left/clipped state
+- `C:/Users/Admin/.codex/generated_images/019fbcef-7ff1-77d3-bd57-618d3542810f/exec-484fa1ef-4e80-4010-b6c5-8586cdd24c20.png` - full-workbench visual direction
+- `C:/Users/Admin/AppData/Local/Temp/codex-clipboard-06aec082-942e-4aee-a2bc-24ec8681e01c.png` - workflow and builder variations
+
+Verified implementation:
+
+- `artifacts/earth-workbench-centered-guided-v2.png` - 2560x1440 native initial state
+- `artifacts/earth-workbench-next-level-comparison.png` - combined reference, variation, before, and after comparison input
+
+Iteration history:
+
+1. The prior layout mixed physical render dimensions with UI-scaled placement. At 150% Windows scaling this anchored the workbench in the upper-left and could push part of it beyond the usable viewport. This was a P1 defect.
+2. The workbench now reflows its complete widget tree against the effective UI resolution, occupies 94% x 92% of the viewport, and centers with equal margins.
+3. The three reference variations were consolidated into one native journey: a persistent four-stage guide, a large Earth/translation comparison, visible mission-shaping controls, a terrain-intelligence deck, and a live validation pipeline.
+4. The previously preferred generation modes are now direct segmented choices: **Earth + Balance** and **Creative Remix**. Reality-first remains available to backend tooling but is not promoted in this player flow.
+
+| Fidelity surface | Result | Notes |
+| --- | --- | --- |
+| Workflow correctness | Passed | Pin Earth, shape mission, build and validate, then play or edit are explicit and ordered. |
+| Information hierarchy | Passed | Satellite reconnaissance and playable translation dominate; mission choices, Earth evidence, pipeline, and actions follow in task order. |
+| Readability and spacing | Passed | No text, controls, panel borders, or bottom actions are clipped at the tested 2560x1440 viewport and 150% UI scale. |
+| Visual consistency | Passed | The redesign stays inside Red Alert's native chrome, typography, field, dropdown, button, and progress vocabulary. |
+| Interaction and state | Passed | Search, imagery source, mission shape, map scale, translation mode, Advanced, generation, play, and editor affordances retain real native handlers and truthful enabled states. |
+| Comparison fidelity | Passed | The final screen preserves the reference's nearly full-screen workbench and split source/result composition while showing real satellite evidence and a truthful empty translation state before generation. |
+| Defect audit | Passed | No P0, P1, or P2 visual or interaction defects remain in the verified initial state. |
+
+### Final result
+
+passed
