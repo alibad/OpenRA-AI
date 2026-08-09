@@ -92,6 +92,48 @@ Iteration history:
 
 passed
 
+## Vision-grounded blueprint iteration (2026-08-09)
+
+Source visual truth:
+
+- `artifacts/design-variants/variant-2.png` - selected guided-builder direction
+- `artifacts/design-variants/variant-3.png` - selected tactical-workbench direction
+- `C:/Users/Admin/.codex/generated_images/019fbcef-7ff1-77d3-bd57-618d3542810f/exec-484fa1ef-4e80-4010-b6c5-8586cdd24c20.png` - full Earth-to-Battlefield composition
+
+Rendered implementation:
+
+- `artifacts/earth-workbench-blueprint-v2.png` - 2560x1440 native OpenRA capture at 150% Windows UI scale
+- `artifacts/earth-workbench-vision-comparison-v2.png` - normalized full-view comparison containing both selected directions, the prior implementation, and the revision
+- `artifacts/earth-workbench-blueprint-focus-comparison.png` - focused guided-builder/mission-blueprint comparison
+
+State: initial Earth source loaded, mission editable, generation not started. The before and after OpenRA captures use the same 2560x1440 game viewport, map, location, imagery source, and empty-generation state. The 540x540 direction images are visual-concept crops and were contained rather than stretched for comparison.
+
+### Comparison history
+
+1. The prior revision was centered in the captured runtime but remained a dual-pane form with only a thin four-label strip and two renamed buttons. This was a P1 fidelity and product-hierarchy miss: the selected guided-builder and tactical-workbench directions were not visible in the experience.
+2. The workbench was rebuilt around three primary regions: live Earth reconnaissance, a central mission blueprint, and the truthful playable OpenRA translation. Mission shaping moved into the blueprint rather than remaining a detached form row.
+3. Translation checks now expose Earth evidence, route-safety ownership, and design intent. Terrain cards explain how each signal changes play, and the six-stage pipeline is presented as an explicit build board.
+4. The window is reflowed from the effective UI resolution on every open. The post-fix capture shows equal opposing margins with the complete frame, footer, and actions visible.
+
+### Fidelity surfaces
+
+| Surface | Result | Evidence |
+| --- | --- | --- |
+| Fonts and typography | Passed | Native Red Alert fonts remain crisp; the mission headline, field labels, status values, and pipeline stages establish the same dense builder hierarchy as the selected directions. |
+| Spacing and layout rhythm | Passed | The source/blueprint/result three-column body is balanced, the bottom analysis/build board aligns to it, and no panel or persistent action is clipped. |
+| Colors and tokens | Passed | Native chrome is preserved while green, amber, red, white, and muted gray communicate complete, active, failed, ready, and pending states. |
+| Image quality and asset fidelity | Passed | The left pane uses the real satellite raster at native quality; the right pane remains reserved for the real generated OpenRA preview rather than illustrative placeholder art. |
+| Copy and content | Passed | Labels describe the actual journey and ownership: Earth evidence, route safety, design intent, terrain effects, generation stages, and play/editor outcomes. |
+
+### Findings
+
+- No actionable P0, P1, or P2 visual differences remain in the verified initial state.
+- P3 accepted difference: the concept crops use a separate dark visual system and pictographic decoration. The implementation deliberately reuses OpenRA's native Red Alert chrome and does not manufacture substitute icons.
+
+### Final result
+
+passed
+
 ## Centered guided-workbench iteration (2026-08-09)
 
 Sources of truth:
