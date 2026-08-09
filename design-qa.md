@@ -92,6 +92,45 @@ Iteration history:
 
 passed
 
+## Visible generation progress iteration (2026-08-09)
+
+Source visual truth:
+
+- `C:/Users/Admin/AppData/Local/Temp/codex-clipboard-ddbe3d23-7477-48cc-8db1-a0cfd3711745.png` - active-generation state with a low-contrast red fill that is nearly indistinguishable from its track
+
+Rendered implementation:
+
+- `artifacts/qa/earth-progress-amber-native.png` - native OpenRA 3840x2160 renderer capture at generation stage 2 of 6
+- `artifacts/qa/earth-progress-amber-focus.png` - focused active-progress crop
+- `artifacts/qa/earth-progress-before-after.png` - same active status and bar region, normalized side-by-side comparison
+
+State and normalization:
+
+- State: active generation, stage 2 of 6, status `Reading roads, waterways, buildings, and land use`.
+- Source: 919x110 pixels. Native implementation: 3840x2160 pixels. The implementation bar/status region was cropped and downsampled to the source's 919x110 dimensions at 1x comparison density.
+- The full native screenshot verifies the progress color in the complete centered workbench; the focused comparison is used for precise contrast judgment.
+
+### Comparison history
+
+1. **P2 - Active progress was not perceptible.** The bar fill and track shared nearly the same red value, making the amount of completed work effectively invisible.
+2. The native progress widget now accepts an optional semantic fill color. Earth generation uses amber while active, green when complete, red on failure, and neutral gray while idle.
+3. The post-fix focused comparison shows a clearly distinct amber fill without changing the bar's size, status copy, alignment, or surrounding Red Alert chrome.
+
+| Fidelity surface | Result | Notes |
+| --- | --- | --- |
+| Fonts and typography | Passed | Status typography, weight, placement, and wrapping are unchanged. |
+| Spacing and layout rhythm | Passed | Bar dimensions, margins, and the gap above the status label are unchanged. |
+| Colors and visual tokens | Passed | Amber matches the existing active-stage color; green and red reuse the existing success/failure colors already present in the workbench. |
+| Image quality and asset fidelity | Passed | No source imagery or visible raster asset changed; the fill is rendered natively at the current resolution. |
+| Copy and content | Passed | Existing progress status text remains intact and legible. |
+| Core interaction | Passed | Indeterminate motion and determinate percentage width remain owned by `ProgressBarWidget`; only the semantic fill color changes by state. |
+
+No actionable P0, P1, or P2 findings remain.
+
+### Final result
+
+passed
+
 ## Tactical scale and zoom iteration (2026-08-09)
 
 Sources of truth:
