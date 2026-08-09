@@ -8,6 +8,7 @@ import {
   LocateFixed,
   MapPin,
   Search,
+  Shuffle,
   Sparkles,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
@@ -31,6 +32,9 @@ export function MissionStudio({ windowsRelease }: { windowsRelease: WindowsRelea
   const [title, setTitle] = useState("Riyadh Crossing");
   const [seed, setSeed] = useState(42);
   const [story, setStory] = useState("A contested supply corridor cuts across the city edge.");
+  const [size, setSize] = useState<64 | 96 | 128>(96);
+  const [radiusM, setRadiusM] = useState(3500);
+  const [selectedPlace, setSelectedPlace] = useState("Riyadh, Saudi Arabia");
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState<"idle" | "locating" | "acquiring" | "compiling" | "ready" | "error">("idle");
   const [mission, setMission] = useState<(MissionPackage & { downloadUrl: string }) | null>(null);
@@ -89,10 +93,12 @@ export function MissionStudio({ windowsRelease }: { windowsRelease: WindowsRelea
     setLatitude(next.latitude);
     setLongitude(next.longitude);
     setTitle(`${next.label} Crossing`);
+    setSelectedPlace(next.label);
     markerRef.current?.setLngLat([next.longitude, next.latitude]);
     mapRef.current?.flyTo({ center: [next.longitude, next.latitude], zoom: 10.5 });
     setMission(null);
     setStatus("idle");
+    setError("");
   }
 
   async function locate() {
@@ -100,14 +106,15 @@ export function MissionStudio({ windowsRelease }: { windowsRelease: WindowsRelea
     setStatus("locating");
     setError("");
     try {
-      const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&limit=1&q=${encodeURIComponent(search)}`, {
-        headers: { "Accept-Language": "en" },
-      });
+      const response = await fetch(`/api/geocode?q=${encodeURIComponent(search)}`);
       if (!response.ok) throw new Error("Place search is unavailable");
-      const results = (await response.json()) as Array<{ lat: string; lon: string; display_name: string }>;
+      const payload = (await response.json()) as { results?: Array<{ latitude: number; longitude: number; label: string }> };
+      const results = payload.results ?? [];
       if (!results.length) throw new Error("No place matched that search");
       const result = results[0];
-      moveTo({ label: result.display_name.split(",")[0], latitude: Number(result.lat), longitude: Number(result.lon) });
+      moveTo({ label: result.label.split(",")[0], latitude: result.latitude, longitude: result.longitude });
+      setSelectedPlace(result.label);
+      setSearch("");
     } catch (cause) {
       setStatus("error");
       setError(cause instanceof Error ? cause.message : "Could not locate that place");
@@ -124,8 +131,8 @@ export function MissionStudio({ windowsRelease }: { windowsRelease: WindowsRelea
         latitude,
         longitude,
         title,
-        radiusM: 3500,
-        size: 64,
+        radiusM,
+        size,
         seed,
         story,
       });
@@ -139,6 +146,15 @@ export function MissionStudio({ windowsRelease }: { windowsRelease: WindowsRelea
     }
   }
 
+  function surpriseMe() {
+    const next = presets[Math.floor(Math.random() * presets.length)];
+    moveTo(next);
+    setSeed(Math.floor(Math.random() * 999_999));
+    setStory(`A fictional flashpoint forms around the approaches to ${next.label}. Secure the routes and control the resources.`);
+  }
+
+  const pipelineStep = status === "ready" ? 4 : status === "compiling" ? 3 : status === "acquiring" ? 2 : status === "locating" ? 1 : 0;
+
   return (
     <section className="studio-shell" id="mission-studio" aria-labelledby="studio-title">
       <div className="studio-heading">
@@ -146,7 +162,7 @@ export function MissionStudio({ windowsRelease }: { windowsRelease: WindowsRelea
           <span className="eyebrow"><Crosshair size={14} /> Mission studio / alpha</span>
           <h2 id="studio-title">Point anywhere. Leave with a battlefield.</h2>
         </div>
-        <p>Click the map, keep or rewrite the premise, then compile a playable Red Alert map in your browser.</p>
+        <p>Search or click anywhere, tune the battlefield footprint, then compile a validated Red Alert map in your browser.</p>
       </div>
 
       <div className="studio-grid">
@@ -166,14 +182,21 @@ export function MissionStudio({ windowsRelease }: { windowsRelease: WindowsRelea
             <span className="coordinates"><LocateFixed size={14} /> {latitude.toFixed(4)}, {longitude.toFixed(4)}</span>
           </div>
           <div ref={mapNode} className="map-canvas" aria-label="Interactive location map" />
+          <div className="map-scale-overlay" aria-hidden="true"><span />{(radiusM * 2 / 1000).toFixed(0)} km battlefield capture</div>
           <div className="map-presets">
             {presets.map((preset) => <button key={preset.label} onClick={() => moveTo(preset)}>{preset.label}</button>)}
+            <button className="surprise-button" onClick={surpriseMe}><Shuffle size={13} /> Surprise me</button>
           </div>
           <span className="map-attribution">Map data © OpenStreetMap contributors</span>
         </div>
 
         <div className="mission-panel">
           <div className="mission-form">
+            <div className="selection-status">
+              <span>EARTH SELECTION</span>
+              <strong>{selectedPlace}</strong>
+              <small>{(radiusM * 2 / 1000).toFixed(0)} km footprint · {(radiusM * 2 / size).toFixed(0)} m per cell</small>
+            </div>
             <label>
               Mission title
               <input value={title} onChange={(event) => setTitle(event.target.value)} maxLength={80} />
@@ -182,11 +205,23 @@ export function MissionStudio({ windowsRelease }: { windowsRelease: WindowsRelea
               Fictional premise
               <textarea value={story} onChange={(event) => setStory(event.target.value)} rows={3} maxLength={240} />
             </label>
-            <div className="form-pair">
-              <div className="display-label">
+            <div className="form-triple">
+              <label>
                 Map size
-                <span className="fixed-input">64 × 64 <small>2 players</small></span>
-              </div>
+                <select value={size} onChange={(event) => setSize(Number(event.target.value) as 64 | 96 | 128)}>
+                  <option value={64}>64 × 64 · Quick</option>
+                  <option value={96}>96 × 96 · Standard</option>
+                  <option value={128}>128 × 128 · Epic</option>
+                </select>
+              </label>
+              <label>
+                Earth footprint
+                <select value={radiusM} onChange={(event) => setRadiusM(Number(event.target.value))}>
+                  <option value={2000}>4 km · Local</option>
+                  <option value={3500}>7 km · District</option>
+                  <option value={6000}>12 km · Regional</option>
+                </select>
+              </label>
               <label>
                 Seed
                 <input type="number" min={0} max={2147483647} value={seed} onChange={(event) => setSeed(Number(event.target.value) || 0)} />
@@ -197,6 +232,13 @@ export function MissionStudio({ windowsRelease }: { windowsRelease: WindowsRelea
               {status === "acquiring" ? "Reading roads & water…" : status === "compiling" ? "Compiling OpenRA map…" : "Generate mission package"}
             </button>
             {error && <p className="studio-error" role="alert">{error}</p>}
+            <div className="generation-pipeline" aria-live="polite" aria-label="Mission generation pipeline">
+              {["Pin Earth", "Read geometry", "Compile terrain", "Validate map"].map((label, index) => (
+                <span key={label} className={status === "ready" || pipelineStep > index + 1 ? "complete" : pipelineStep === index + 1 ? "active" : ""}>
+                  <i>{status === "ready" || pipelineStep > index + 1 ? <Check size={11} /> : index + 1}</i>{label}
+                </span>
+              ))}
+            </div>
           </div>
 
           {mission ? (
@@ -206,12 +248,13 @@ export function MissionStudio({ windowsRelease }: { windowsRelease: WindowsRelea
               <div className="result-copy">
                 <span className="result-ready"><Check size={15} /> Playability checks passed</span>
                 <h3>{mission.filename}</h3>
-                <p>{mission.sourceStatus === "live-openstreetmap" ? "Road and water structure translated from OpenStreetMap." : "Network data was unavailable, so a labeled deterministic terrain fallback was used."}</p>
+                <p>{mission.sourceStatus === "live-openstreetmap" ? `${mission.sourceFeatureCount} road and water features translated from OpenStreetMap.` : "Earth data timed out, so a deterministic, passable layout was compiled instead."}</p>
                 <div className="result-stats">
-                  <span>{mission.waterCells}<small>water cells</small></span>
-                  <span>{mission.roadCells}<small>route cells</small></span>
-                  <span>4/4<small>checks</small></span>
+                  <span>{size}²<small>battlefield</small></span>
+                  <span>{mission.sourceFeatureCount}<small>earth features</small></span>
+                  <span>{mission.validation.length}/{mission.validation.length}<small>checks</small></span>
                 </div>
+                <ul className="validation-list">{mission.validation.map((check) => <li key={check}><Check size={11} />{check}</li>)}</ul>
                 <a className="download-button" href={mission.downloadUrl} download={mission.filename}><Download size={17} /> Download .oramap</a>
                 <small className="install-note">Already have the Windows alpha? Drag this file onto <b>Play-OpenRAAI.cmd</b>. <a href={windowsRelease.url} data-analytics-event="game-download" data-platform="windows-x64">Get the game bundle.</a></small>
               </div>
@@ -219,7 +262,7 @@ export function MissionStudio({ windowsRelease }: { windowsRelease: WindowsRelea
           ) : (
             <div className="mission-placeholder">
               <MapPin size={20} />
-              <div><strong>Your package appears here.</strong><span>Terrain · spawns · ore · briefing · manifest</span></div>
+              <div><strong>Your playable preview appears here.</strong><span>Earth geometry · routes · spawns · resources · validation</span></div>
             </div>
           )}
         </div>

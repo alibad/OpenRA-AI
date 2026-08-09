@@ -1,13 +1,13 @@
 import {
   ArrowRight,
-  AudioLines,
   BrainCircuit,
+  CalendarDays,
+  CheckCircle2,
   Download,
   FileArchive,
   Github,
   Map,
   Mic2,
-  Pause,
   RadioTower,
   ShieldCheck,
   Sparkles,
@@ -15,6 +15,7 @@ import {
   Zap,
 } from "lucide-react";
 import { MissionStudio } from "./components/MissionStudio";
+import { CompanionDemo } from "./components/CompanionDemo";
 import { getWindowsRelease } from "../lib/release";
 
 const gameSource = "https://github.com/alibad/OpenRA-AI";
@@ -22,6 +23,11 @@ const gameSource = "https://github.com/alibad/OpenRA-AI";
 function formatBytes(bytes: number | null) {
   if (!bytes) return null;
   return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
+}
+
+function formatDate(value: string | null) {
+  if (!value) return "Verified release";
+  return new Intl.DateTimeFormat("en", { day: "numeric", month: "short", year: "numeric" }).format(new Date(value));
 }
 
 export default async function Home() {
@@ -61,33 +67,14 @@ export default async function Home() {
             <span><Zap size={15} /> AI-layer routed</span>
           </div>
         </div>
-        <div className="companion-demo" aria-label="Example AI companion exchange">
-          <div className="demo-topline"><span>COMPANION / LIVE</span><span className="signal-bars"><i /><i /><i /></span></div>
-          <div className="battle-state">
-            <div className="mini-map" aria-hidden="true">
-              <span className="unit friendly a" /><span className="unit friendly b" />
-              <span className="unit hostile c" /><span className="unit hostile d" />
-              <i className="sweep" />
-            </div>
-            <div className="state-readout">
-              <span>POWER<b>130 / 90</b></span>
-              <span>CONTACTS<b className="hostile-text">2 NEW</b></span>
-              <span>SECTOR<b>EAST 48,20</b></span>
-            </div>
-          </div>
-          <div className="spoken-line">
-            <AudioLines size={20} />
-            <p>“Heavy armor is entering from the east. Your northern route is still open.”</p>
-          </div>
-          <div className="demo-controls"><button><Pause size={14} /> Stop</button><button><Mic2 size={14} /> Ask</button><span>1.4s</span></div>
-        </div>
+        <CompanionDemo />
       </header>
 
       <div className="capability-rail" aria-label="Core capabilities">
         <span>01 <b>Notices what matters</b></span>
         <span>02 <b>Answers about this match</b></span>
-        <span>03 <b>Turns Earth into terrain</b></span>
-        <span>04 <b>Ships ordinary .oramap files</b></span>
+        <span>03 <b>Reads real Earth geometry</b></span>
+        <span>04 <b>Validates every .oramap</b></span>
       </div>
 
       <section className="download-section" id="download" aria-labelledby="download-title">
@@ -98,6 +85,10 @@ export default async function Home() {
           <div className="download-actions">
             <a className="primary-action" href={windowsRelease.url} data-analytics-event="game-download" data-platform="windows-x64"><Download size={17} /> Download for Windows x64</a>
             <a className="checksum-link" href={windowsRelease.checksumUrl}>SHA-256 checksum</a>
+          </div>
+          <div className="release-trust" aria-label="Release details">
+            <span><CheckCircle2 size={15} /> Portable, checksum published</span>
+            <span><CalendarDays size={15} /> Released {formatDate(windowsRelease.publishedAt)}</span>
           </div>
         </div>
         <ol className="play-steps">
@@ -153,9 +144,9 @@ export default async function Home() {
           <div><RadioTower size={18} /><span>AI layer<small>named model routes</small></span></div>
           <i />
           <div className="model-routes">
-            <span>gpt-5.5<small>battlefield language</small></span>
-            <span>transcribe<small>voice input</small></span>
-            <span>tts<small>spoken response</small></span>
+            <span>reasoning<small>provider or local model</small></span>
+            <span>transcription<small>voice input route</small></span>
+            <span>speech<small>spoken response route</small></span>
           </div>
         </div>
       </section>

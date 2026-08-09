@@ -22,6 +22,10 @@ test("renders the complete marketing and mission-creation surface", async () => 
   assert.match(html, /Your battlefield/);
   assert.match(html, /Mission studio/);
   assert.match(html, /Point anywhere/);
+  assert.match(html, /Earth footprint/);
+  assert.match(html, /Read geometry/);
+  assert.match(html, /Interactive AI companion preview/);
+  assert.match(html, /Portable, checksum published/);
   assert.match(html, /Download Windows alpha/);
   assert.match(html, /Play-OpenRAAI\.cmd/);
   assert.match(html, /0\.1\.0-alpha\.8/);
@@ -40,4 +44,5 @@ test("ships a real browser-side OpenRA package compiler", async () => {
   assert.match(source, /openra-ai-manifest\.json/);
   assert.match(source, /zipSync/);
   assert.match(source, /spawn/);
+  assert.match(source, /\/api\/earth-features/);
 });
