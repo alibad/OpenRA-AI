@@ -92,6 +92,37 @@ Iteration history:
 
 passed
 
+## Tactical scale and zoom iteration (2026-08-09)
+
+Sources of truth:
+
+- `C:/Users/Admin/AppData/Local/Temp/codex-clipboard-8300c930-515c-4ad6-ae80-efbaad0941cb.png` - reported fixed-scale workbench and physical-scale concern
+- `artifacts/qa/earth-workbench-fixed-internal.png` - native OpenRA renderer capture after the responsive-layout and zoom revision
+- `artifacts/qa/earth-workbench-comparison-final.png` - same-state reference and implementation comparison input
+- `artifacts/qa/riyadh-map-buildings.png` - close-range map-and-buildings source verification
+
+Iteration history:
+
+1. The former 2 km-radius default represented roughly 42 metres per 96x96 cell, which was too coarse for tanks, streets, and individual buildings. The default battlefield is now 1 km across (500 m radius), or approximately 10.4 metres per cell.
+2. Earth reconnaissance now has bounded **Closer**, **Wider**, and **Fit Area** controls plus mouse-wheel zoom. Reconnaissance can move independently from a 500 m tactical view to an 8 km context view without silently changing the battlefield footprint.
+3. The selected battlefield is drawn as a scaled circle inside the current Earth view. The UI reports both the battlefield width/cell scale and the current source-view width so users can distinguish game scale from reconnaissance zoom.
+4. The close-range **Map + buildings** source exposes OpenStreetMap building footprints and street geometry. Real building ways are also included in the geographic feature query used by generation.
+5. The runtime layout now sizes against the DPI-adjusted UI viewport but centers in renderer coordinates, preserving equal opposing margins across the tested high-DPI resolution.
+
+| Fidelity surface | Result | Notes |
+| --- | --- | --- |
+| Responsive centering | Passed | The complete workbench and footer are centered and visible in the native renderer capture at the reported resolution and Windows scaling. |
+| Zoom interaction | Passed | Buttons, mouse wheel, bounded zoom levels, and Fit Area are connected to fresh Earth-preview requests. |
+| Physical scale | Passed | The default 1 km-wide battlefield maps to 10.4 m/cell at 96x96; larger presets are explicitly labelled as compressed. |
+| Building visibility | Passed | Close map view shows individual building footprints and roads; the satellite source remains available for visual texture and land-cover evidence. |
+| Scale honesty | Passed | Battlefield footprint, source-view width, approximate source resolution, and compressed presets are disclosed in the UI. |
+| Visual comparison | Passed | Equal-margin centering, zoom affordances, scale readout, and full action visibility were checked in the combined comparison image. |
+| Defect audit | Passed | No P0, P1, or P2 layout defect remains in the verified initial state. |
+
+### Final result
+
+passed
+
 ## Vision-grounded blueprint iteration (2026-08-09)
 
 Source visual truth:

@@ -8,7 +8,7 @@ WORLD_STUDIO_HTML = r"""<!doctype html>
 <div class="search"><input id="query" placeholder="Search city or landmark"><button id="search">Find</button></div>
 <div class="row"><div><label>Latitude</label><input id="latitude" type="number" step="any" value="24.7136"></div><div><label>Longitude</label><input id="longitude" type="number" step="any" value="46.6753"></div></div>
 <label>Mission title</label><input id="title" value="Earth Skirmish">
-<div class="row"><div><label>Area radius</label><select id="radius_m"><option value="2000">2 km</option><option value="3500" selected>3.5 km</option><option value="6000">6 km</option><option value="10000">10 km</option></select></div><div><label>Map size</label><select id="map_size"><option>64</option><option selected>96</option><option>128</option></select></div></div>
+<div class="row"><div><label>Battlefield radius</label><select id="radius_m"><option value="500" selected>500 m - tactical</option><option value="750">750 m - neighborhood</option><option value="1000">1 km - local</option><option value="2000">2 km - compressed district</option></select></div><div><label>Map size</label><select id="map_size"><option>64</option><option selected>96</option><option>128</option></select></div></div>
 <label>Terrain seed</label><input id="seed" type="number" min="0" value="42">
 <label>Story / scenario direction</label><textarea id="story_seed" placeholder="A tense fictional operation around the river crossings…"></textarea>
 <button class="primary" id="generate">Generate playable .oramap</button><div id="result" class="result">Choose a location to begin.</div>

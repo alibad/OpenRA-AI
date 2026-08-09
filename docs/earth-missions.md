@@ -12,6 +12,13 @@ native generator profiles. It does not claim that every street or coastline is
 reproduced cell-for-cell. The source view and every translation choice remain
 available for comparison.
 
+The in-game workbench defaults to a 500 m radius tactical footprint. On a
+96-by-96 battlefield this is about 10.4 meters per cell, which is close enough
+for a tank-sized cell and recognizable building blocks. Larger footprints are
+explicitly labeled as compressed interpretations. The Earth preview can zoom
+between 500 m and 8 km radius without changing the selected battlefield area;
+**Fit Area** restores the exact generation footprint.
+
 ## Generation pipeline
 
 ### 1. Select
@@ -29,8 +36,9 @@ The player chooses:
 Adapters retrieve appropriately licensed data such as:
 
 - roads, waterways, coastlines, land use, and vegetation from OpenStreetMap;
-- radius-matched Sentinel-2 Cloudless satellite imagery by default, with an
-  OpenTopoMap terrain layer available when explicit relief is more useful;
+- radius-matched Sentinel-2 Cloudless satellite imagery by default, with a
+  detailed OpenTopoMap view available when streets and building footprints are
+  more useful;
 - elevation and slope;
 - land cover and biome;
 - place names and public geographic context;
@@ -103,5 +111,6 @@ The native editor now supports:
 
 When geographic or vision services are unavailable, the manifest explicitly
 labels the degraded path and uses conservative climate/profile fallback.
-Detailed building footprints, exact street tracing, Lua objectives, and
+OpenStreetMap building outlines now contribute to urban evidence and scenery
+placement; exact cell-for-cell street tracing, Lua objectives, and
 source-backed narrative context remain later stages.

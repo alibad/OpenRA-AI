@@ -11,7 +11,7 @@ class GeoSelection:
     longitude: float
     title: str = "Earth Skirmish"
     location_name: str = "Selected Earth location"
-    radius_m: int = 3500
+    radius_m: int = 500
     map_size: int = 64
     seed: int = 1
     source: str = "openstreetmap"

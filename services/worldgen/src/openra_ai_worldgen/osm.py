@@ -92,6 +92,7 @@ def fetch_features(selection: GeoSelection, timeout: float = 18.0) -> list[GeoFe
   way({box})[waterway];
   way({box})[highway~\"motorway|trunk|primary|secondary|tertiary|residential\"];
   way({box})[railway];
+  way({box})[building];
   way({box})[landuse~\"residential|commercial|industrial|retail|construction|forest|meadow|orchard|quarry\"];
   way({box})[natural~\"wood|scrub|grassland|bare_rock|scree|shingle|cliff|sand|beach|dune\"];
   way({box})[leisure~\"park|garden|nature_reserve\"];

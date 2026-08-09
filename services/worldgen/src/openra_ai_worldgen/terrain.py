@@ -84,7 +84,11 @@ def fetch_terrain_view(
     style = style or selection.imagery_style
     if style not in {"satellite", "terrain"}:
         raise ValueError("imagery style must be satellite or terrain")
-    zoom = _zoom_for_radius(selection, output_size, maximum_zoom=14 if style == "satellite" else 16)
+    # The EOX WMTS advertises the Google-compatible matrix through zoom 21.
+    # Sentinel-2 itself is still a ~10 m source, but requesting zoom 16 keeps
+    # the crop faithful to a tactical 500 m radius instead of forcing a broad
+    # district view. The UI reports the source-detail limit honestly.
+    zoom = _zoom_for_radius(selection, output_size, maximum_zoom=16 if style == "satellite" else 17)
     center_x, center_y = _world_pixel(selection.latitude, selection.longitude, zoom)
     meters_per_pixel = 156543.03392 * max(0.15, math.cos(math.radians(selection.latitude))) / (1 << zoom)
     source_span = max(256, min(744, round(selection.radius_m * 2 / meters_per_pixel)))

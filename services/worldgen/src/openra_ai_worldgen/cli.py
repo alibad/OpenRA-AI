@@ -18,7 +18,7 @@ def _parser() -> argparse.ArgumentParser:
     generate.add_argument("--lon", type=float, required=True)
     generate.add_argument("--title", default="Earth Skirmish")
     generate.add_argument("--location", default="Selected Earth location")
-    generate.add_argument("--radius", type=int, default=3500)
+    generate.add_argument("--radius", type=int, default=500)
     generate.add_argument("--size", type=int, choices=(64, 96, 128), default=64)
     generate.add_argument("--seed", type=int, default=1)
     generate.add_argument("--story", default="")

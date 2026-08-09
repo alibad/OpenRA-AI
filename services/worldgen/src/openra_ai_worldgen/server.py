@@ -82,7 +82,7 @@ class WorldgenHandler(BaseHTTPRequestHandler):
             longitude=float(payload["longitude"]),
             title=str(payload.get("title", "Earth Skirmish")),
             location_name=str(payload.get("location_name", "Selected Earth location")),
-            radius_m=int(payload.get("radius_m", 3500)),
+            radius_m=int(payload.get("radius_m", 500)),
             map_size=int(payload.get("map_size", 64)),
             seed=int(payload.get("seed", 1)),
             source=str(payload.get("source", "openstreetmap")),
@@ -232,7 +232,7 @@ class WorldgenHandler(BaseHTTPRequestHandler):
                 selection = GeoSelection(
                     latitude=float(query.get("latitude", [""])[0]),
                     longitude=float(query.get("longitude", [""])[0]),
-                    radius_m=int(query.get("radius_m", ["3500"])[0]),
+                    radius_m=int(query.get("radius_m", ["500"])[0]),
                     imagery_style=str(query.get("style", ["satellite"])[0]),
                 ).validated()
                 view = fetch_terrain_view(selection, Path(self.server.output_directory))  # type: ignore[attr-defined]

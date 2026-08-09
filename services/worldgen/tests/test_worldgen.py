@@ -18,7 +18,7 @@ from openra_ai_worldgen.native import generation_options, terrain_profile
 from openra_ai_worldgen.osm import fetch_features, parse_overpass
 from openra_ai_worldgen.raster import WATER, build_terrain
 from openra_ai_worldgen.server import create_server
-from openra_ai_worldgen.terrain import fetch_terrain_view
+from openra_ai_worldgen.terrain import _zoom_for_radius, fetch_terrain_view
 from openra_ai_worldgen.validator import validate_package
 
 
@@ -79,6 +79,11 @@ class WorldgenTests(unittest.TestCase):
         selection = GeoSelection(24.638916, 46.71601)
         self.assertEqual(selection.imagery_style, "satellite")
         self.assertEqual(selection.generation_mode, "playability-first")
+        self.assertEqual(selection.radius_m, 500)
+
+    def test_tactical_earth_view_uses_close_battlefield_crop(self) -> None:
+        selection = GeoSelection(24.638916, 46.71601, radius_m=500)
+        self.assertEqual(_zoom_for_radius(selection, 512, maximum_zoom=16), 16)
 
     def test_satellite_view_uses_eox_imagery_and_reports_provenance(self) -> None:
         import io
