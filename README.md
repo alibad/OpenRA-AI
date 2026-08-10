@@ -13,7 +13,7 @@ Players can:
 - translate live nearby roads and waterways into a validated Red Alert `.oramap`;
 - share a complete mission setup with a copyable URL and generate new seeded variations;
 - create a Firebase-backed commander profile before generating or downloading a new mission;
-- use privacy-safe product analytics that associate events with a pseudonymous account ID instead of a name or email.
+- use privacy-safe product analytics that associate events with a pseudonymous account ID instead of a name or email;
 - send authenticated, private product feedback with a searchable receipt ID and optional usefulness rating.
 
 The homepage also includes an interactive companion preview so visitors can
@@ -51,12 +51,32 @@ That endpoint verifies the token signature, audience, and issuer against
 Google's published Firebase keys before it requests Earth geometry. The client
 gate is therefore backed by an API authorization boundary.
 
-The global Feedback button uses the same signed-in identity. `/api/feedback`
-validates the Firebase ID token, limits and sanitizes the submitted text, and
-delivers it privately through Resend. Configure the server-only
-`RESEND_API_KEY`, `FEEDBACK_TO_EMAIL`, and `FEEDBACK_FROM_EMAIL` variables from
-`.env.example`. Written feedback never enters Google Analytics; only the
-selected category and optional 1–5 rating are recorded as product events.
+The global Feedback button uses the same signed-in identity. It can attach a
+text description of a selected page element and, only when the player enables
+them, bounded browser, console, and network diagnostics. It never captures
+screenshots, page HTML, form values, request bodies, headers, or URL queries.
+
+`/api/feedback` validates the Firebase ID token and sanitizes the full payload.
+It creates a private issue through an installed GitHub App, then queues an admin
+alert through the existing Firebase `mail` collection and official Trigger
+Email extension. Written feedback and diagnostic content never enter Google
+Analytics.
+
+Copy the server-only feedback variables from `.env.example` into the hosting
+environment:
+
+- `MAIL_FIREBASE_PROJECT_ID` and `MAIL_FIREBASE_API_KEY` identify the existing
+  Firebase mail project. SMTP credentials stay in Firebase Secret Manager.
+- `FEEDBACK_ADMIN_EMAIL` receives the alert, while `MAIL_GROUP` receives the
+  configured audit copy.
+- `GITHUB_APP_ID`, `GITHUB_APP_INSTALLATION_ID`, and
+  `GITHUB_APP_PRIVATE_KEY` authenticate the GitHub App. Its installation needs
+  metadata read access and issue read/write access to `GITHUB_REPO_OWNER` /
+  `GITHUB_REPO_NAME`. Personal access tokens are not supported.
+
+This is deliberately the feedback skill's Core mode: reliable text, selected
+element context, and opt-in diagnostics. Media capture should only be added
+after a private object-storage backend and retention policy are configured.
 
 Validate the production build with:
 
@@ -76,8 +96,8 @@ known-good package when GitHub is temporarily unavailable. Do not commit game
 ZIPs here. Game packages, checksums, source, and GPL obligations remain in the
 public game repository.
 
-Download links carry provider-neutral event attributes so private analytics can
-be connected later without coupling the website to a specific vendor.
+Download links carry provider-neutral event attributes for the configured
+Firebase analytics layer.
 
 ## Deployment
 

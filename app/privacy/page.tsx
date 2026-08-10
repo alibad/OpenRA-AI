@@ -25,7 +25,7 @@ export default function PrivacyPage() {
       </section>
       <section>
         <h2>Product feedback</h2>
-        <p>Feedback you deliberately submit is delivered privately by email with your Firebase account identity so we can reply. The written message is never sent to Google Analytics; analytics receives only its category and optional rating.</p>
+        <p>Feedback you deliberately submit becomes a private GitHub issue with your Firebase account identity so we can investigate and reply. An admin alert is queued through our existing Firebase mail system. You can optionally include bounded browser, console, and network diagnostics; screenshots, page HTML, form values, request bodies, headers, and URL queries are not captured. Written feedback and diagnostics are never sent to Google Analytics.</p>
       </section>
       <section>
         <h2>Your controls</h2>

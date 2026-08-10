@@ -40,9 +40,10 @@ test("feedback requires a signed-in Firebase user", async () => {
       method: "POST",
       headers: { "content-type": "application/json", origin: "https://rtsai.net" },
       body: JSON.stringify({
-        category: "idea",
+        category: "Feature Request",
         rating: 5,
-        message: "A useful piece of feedback.",
+        title: "Add a useful thing",
+        description: "A useful piece of feedback.",
         clientSubmissionId: "7a82cb1e-7d34-4e5a-9b9d-8106391e1cd0",
       }),
     }),

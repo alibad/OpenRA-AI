@@ -73,9 +73,11 @@ test("keeps account identity out of Analytics event parameters", async () => {
   assert.match(accountNav, /Sign in/);
   assert.match(missionStudio, /Account required for AI work/);
   assert.match(privacy, /do not send your name, email/);
-  assert.match(privacy, /written message is never sent to Google Analytics/);
-  assert.match(feedback, /feedback_submitted/);
-  assert.doesNotMatch(feedback, /feedback_submitted[^\n]+message/);
+  assert.match(privacy, /Written feedback and diagnostics are never sent to Google Analytics/);
+  assert.doesNotMatch(feedback, /trackAnalyticsEvent|feedback_submitted/);
+  assert.match(feedback, /Select page element/);
+  assert.match(feedback, /getConsoleLogs/);
+  assert.match(feedback, /getNetworkLogs/);
 });
 
 test("ships crawl, install, and brand assets", async () => {
