@@ -13,7 +13,7 @@ Players can:
 - translate live nearby roads and waterways into a validated Red Alert `.oramap`;
 - share a complete mission setup with a copyable URL and generate new seeded variations;
 - create a Firebase-backed commander profile before generating or downloading a new mission;
-- opt in to privacy-safe product analytics that use a pseudonymous account ID instead of a name or email.
+- use privacy-safe product analytics that associate events with a pseudonymous account ID instead of a name or email.
 
 The homepage also includes an interactive companion preview so visitors can
 understand the pause, ask, and alert-priority experience before downloading the
@@ -42,8 +42,7 @@ variables.
 
 Browsing, map exploration, and public game downloads remain open. Mission
 compilation and companion interactions require a signed-in account. Google
-Analytics is disabled until the visitor explicitly opts in. Analytics uses the
-Firebase UID and deliberately excludes names, email addresses, search text,
+Analytics is enabled automatically. It uses the Firebase UID and deliberately excludes names, email addresses, search text,
 mission text, and exact coordinates.
 
 The mission UI sends the current Firebase ID token to `/api/earth-features`.

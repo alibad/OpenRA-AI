@@ -110,7 +110,7 @@ export function AuthDialog({ reason, onClose }: { reason: string; onClose: () =>
           {mode === "signin" && <button className="auth-reset" type="button" onClick={() => void resetPassword()} disabled={busy}>Forgot password?</button>}
         </form>
 
-        <div className="auth-privacy"><ShieldCheck size={15} /><p>Your name stays in your Firebase account. Analytics receives only a pseudonymous account ID—never your name, email, mission text, or exact location. <a href="/privacy">Privacy details</a></p></div>
+        <div className="auth-privacy"><ShieldCheck size={15} /><p>Your name stays in your Firebase account. Usage analytics is tied to a pseudonymous account ID—never your name, email, mission text, or exact location. <a href="/privacy">Privacy details</a></p></div>
       </section>
     </div>
   );

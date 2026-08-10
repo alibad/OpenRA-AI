@@ -40,12 +40,8 @@ export function getFirebaseAuth() {
   return firebaseAuth;
 }
 
-export function analyticsConsentGranted() {
-  return typeof window !== "undefined" && window.localStorage.getItem("rtsai-analytics-consent") === "granted";
-}
-
 async function getFirebaseAnalytics() {
-  if (!analyticsConsentGranted() || !firebaseConfig.measurementId) return null;
+  if (!firebaseConfig.measurementId) return null;
   if (!analyticsPromise) {
     analyticsPromise = (async () => {
       const app = getFirebaseApp();
@@ -70,8 +66,4 @@ export async function identifyAnalyticsUser(uid: string | null) {
   if (!analytics) return;
   setUserId(analytics, uid);
   if (uid) setUserProperties(analytics, { account_type: "registered" });
-}
-
-export function resetAnalyticsInitialization() {
-  analyticsPromise = null;
 }

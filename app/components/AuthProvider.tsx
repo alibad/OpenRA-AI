@@ -7,7 +7,6 @@ import {
   useEffect,
   useMemo,
   useState,
-  useSyncExternalStore,
   type ReactNode,
 } from "react";
 import { onAuthStateChanged, signOut, type User } from "firebase/auth";
@@ -15,7 +14,6 @@ import {
   getFirebaseAuth,
   firebaseIsConfigured,
   identifyAnalyticsUser,
-  resetAnalyticsInitialization,
   trackAnalyticsEvent,
 } from "../../lib/firebase-client";
 import { AuthDialog } from "./AuthDialog";
@@ -29,38 +27,6 @@ type AuthContextValue = {
 };
 
 const AuthContext = createContext<AuthContextValue | null>(null);
-
-function AnalyticsConsent() {
-  const choice = useSyncExternalStore(
-    (notify) => {
-      window.addEventListener("rtsai:analytics-consent", notify);
-      return () => window.removeEventListener("rtsai:analytics-consent", notify);
-    },
-    () => window.localStorage.getItem("rtsai-analytics-consent") ?? "unknown",
-    () => "unknown",
-  );
-
-  function choose(next: "granted" | "denied") {
-    window.localStorage.setItem("rtsai-analytics-consent", next);
-    resetAnalyticsInitialization();
-    window.dispatchEvent(new CustomEvent("rtsai:analytics-consent"));
-    if (next === "granted") void trackAnalyticsEvent("analytics_consent", { status: "granted" });
-  }
-
-  if (choice !== "unknown") return null;
-  return (
-    <aside className="consent-banner" aria-label="Analytics preference">
-      <div>
-        <strong>Help improve RTS AI</strong>
-        <p>Optional Google Analytics measures feature use with a pseudonymous account ID. We never send your name, email, mission text, or exact map coordinates.</p>
-      </div>
-      <div className="consent-actions">
-        <button type="button" className="consent-decline" onClick={() => choose("denied")}>Not now</button>
-        <button type="button" className="consent-accept" onClick={() => choose("granted")}>Allow analytics</button>
-      </div>
-    </aside>
-  );
-}
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -76,12 +42,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       void identifyAnalyticsUser(nextUser?.uid ?? null);
     });
   }, []);
-
-  useEffect(() => {
-    const syncIdentity = () => void identifyAnalyticsUser(user?.uid ?? null);
-    window.addEventListener("rtsai:analytics-consent", syncIdentity);
-    return () => window.removeEventListener("rtsai:analytics-consent", syncIdentity);
-  }, [user]);
 
   useEffect(() => {
     const trackAttributedClick = (event: MouseEvent) => {
@@ -111,7 +71,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     <AuthContext.Provider value={value}>
       {children}
       {authReason && <AuthDialog reason={authReason} onClose={closeAuth} />}
-      <AnalyticsConsent />
     </AuthContext.Provider>
   );
 }
