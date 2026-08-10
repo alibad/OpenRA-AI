@@ -14,6 +14,7 @@ Players can:
 - share a complete mission setup with a copyable URL and generate new seeded variations;
 - create a Firebase-backed commander profile before generating or downloading a new mission;
 - use privacy-safe product analytics that associate events with a pseudonymous account ID instead of a name or email.
+- send authenticated, private product feedback with a searchable receipt ID and optional usefulness rating.
 
 The homepage also includes an interactive companion preview so visitors can
 understand the pause, ask, and alert-priority experience before downloading the
@@ -49,6 +50,13 @@ The mission UI sends the current Firebase ID token to `/api/earth-features`.
 That endpoint verifies the token signature, audience, and issuer against
 Google's published Firebase keys before it requests Earth geometry. The client
 gate is therefore backed by an API authorization boundary.
+
+The global Feedback button uses the same signed-in identity. `/api/feedback`
+validates the Firebase ID token, limits and sanitizes the submitted text, and
+delivers it privately through Resend. Configure the server-only
+`RESEND_API_KEY`, `FEEDBACK_TO_EMAIL`, and `FEEDBACK_FROM_EMAIL` variables from
+`.env.example`. Written feedback never enters Google Analytics; only the
+selected category and optional 1–5 rating are recorded as product events.
 
 Validate the production build with:
 

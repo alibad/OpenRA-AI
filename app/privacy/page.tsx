@@ -24,6 +24,10 @@ export default function PrivacyPage() {
         <p>Feature events can be associated with your pseudonymous Firebase user ID. We do not send your name, email, free-text mission prompt, search query, or exact latitude and longitude to Google Analytics.</p>
       </section>
       <section>
+        <h2>Product feedback</h2>
+        <p>Feedback you deliberately submit is delivered privately by email with your Firebase account identity so we can reply. The written message is never sent to Google Analytics; analytics receives only its category and optional rating.</p>
+      </section>
+      <section>
         <h2>Your controls</h2>
         <p>You can sign out at any time from the account menu. Account deletion and data-export controls will be added before the service leaves alpha.</p>
       </section>

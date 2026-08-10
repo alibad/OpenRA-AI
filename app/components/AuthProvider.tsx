@@ -17,6 +17,7 @@ import {
   trackAnalyticsEvent,
 } from "../../lib/firebase-client";
 import { AuthDialog } from "./AuthDialog";
+import { FeedbackPanel } from "./FeedbackPanel";
 
 type AuthContextValue = {
   user: User | null;
@@ -70,6 +71,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   return (
     <AuthContext.Provider value={value}>
       {children}
+      <FeedbackPanel user={user} openAuth={openAuth} />
       {authReason && <AuthDialog reason={authReason} onClose={closeAuth} />}
     </AuthContext.Provider>
   );

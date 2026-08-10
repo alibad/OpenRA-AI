@@ -49,6 +49,7 @@ test("renders the complete marketing and mission-creation surface", async () => 
   assert.match(html, /OpenStreetMap contributors/);
   assert.match(html, /EA has not endorsed and does not support this product/);
   assert.match(html, /data-analytics-event="game-download"/);
+  assert.match(html, />Feedback</);
   assert.match(html, /windows-x64-setup\.exe/);
   assert.doesNotMatch(html, /codex-preview|SkeletonPreview|react-loading-skeleton/);
 });
@@ -60,6 +61,7 @@ test("keeps account identity out of Analytics event parameters", async () => {
   const accountNav = await readFile(new URL("../app/components/AccountNav.tsx", import.meta.url), "utf8");
   const missionStudio = await readFile(new URL("../app/components/MissionStudio.tsx", import.meta.url), "utf8");
   const privacy = await readFile(new URL("../app/privacy/page.tsx", import.meta.url), "utf8");
+  const feedback = await readFile(new URL("../app/components/FeedbackPanel.tsx", import.meta.url), "utf8");
 
   assert.match(analytics, /setUserId\(analytics, uid\)/);
   assert.doesNotMatch(analytics, /setUserId\(analytics,.*displayName/);
@@ -71,6 +73,9 @@ test("keeps account identity out of Analytics event parameters", async () => {
   assert.match(accountNav, /Sign in/);
   assert.match(missionStudio, /Account required for AI work/);
   assert.match(privacy, /do not send your name, email/);
+  assert.match(privacy, /written message is never sent to Google Analytics/);
+  assert.match(feedback, /feedback_submitted/);
+  assert.doesNotMatch(feedback, /feedback_submitted[^\n]+message/);
 });
 
 test("ships crawl, install, and brand assets", async () => {
