@@ -19,6 +19,14 @@ test("renders the complete marketing and mission-creation surface", async () => 
   assert.match(response.headers.get("content-type") ?? "", /^text\/html\b/i);
   const html = await response.text();
   assert.match(html, /<title>RTS AI/);
+  assert.match(html, /rel="canonical" href="https:\/\/rtsai\.net\/?"/);
+  assert.match(html, /name="robots" content="index, follow/);
+  assert.match(html, /property="og:image" content="https:\/\/rtsai\.net\/social-card\.png"/);
+  assert.match(html, /href="\/manifest\.webmanifest"/);
+  assert.match(html, /\/brand\/rtsai-mark-64\.png/);
+  assert.match(html, /application\/ld\+json/);
+  assert.match(html, /"SoftwareApplication"/);
+  assert.match(html, /"VideoGame"/);
   assert.match(html, /Your battlefield/);
   assert.match(html, /Mission studio/);
   assert.match(html, /Point anywhere/);
@@ -38,6 +46,21 @@ test("renders the complete marketing and mission-creation surface", async () => 
   assert.match(html, /EA has not endorsed and does not support this product/);
   assert.match(html, /data-analytics-event="game-download"/);
   assert.doesNotMatch(html, /codex-preview|SkeletonPreview|react-loading-skeleton/);
+});
+
+test("ships crawl, install, and brand assets", async () => {
+  const robots = await readFile(new URL("../app/robots.ts", import.meta.url), "utf8");
+  const sitemap = await readFile(new URL("../app/sitemap.ts", import.meta.url), "utf8");
+  const manifest = await readFile(new URL("../app/manifest.ts", import.meta.url), "utf8");
+  const favicon = await readFile(new URL("../public/favicon.ico", import.meta.url));
+  const socialCard = await readFile(new URL("../public/social-card.png", import.meta.url));
+
+  assert.match(robots, /sitemap: "https:\/\/rtsai\.net\/sitemap\.xml"/);
+  assert.match(sitemap, /url: "https:\/\/rtsai\.net\/"/);
+  assert.match(manifest, /short_name: "RTS AI"/);
+  assert.match(manifest, /purpose: "maskable"/);
+  assert.ok(favicon.byteLength > 1000);
+  assert.ok(socialCard.byteLength > 10_000);
 });
 
 test("ships a real browser-side OpenRA package compiler", async () => {

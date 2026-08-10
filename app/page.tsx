@@ -14,11 +14,22 @@ import {
   VolumeX,
   Zap,
 } from "lucide-react";
+import Image from "next/image";
 import { MissionStudio } from "./components/MissionStudio";
 import { CompanionDemo } from "./components/CompanionDemo";
 import { getWindowsRelease } from "../lib/release";
 
 const gameSource = "https://github.com/alibad/OpenRA-AI";
+const canonicalUrl = "https://rtsai.net";
+
+function Brand({ footer = false }: { footer?: boolean }) {
+  return (
+    <a className="brand" href="#top" aria-label="RTS AI home">
+      <Image className="brand-symbol" src="/brand/rtsai-mark-64.png" alt="" width={34} height={34} priority={!footer} />
+      <span className="brand-wordmark">RTS <b>AI</b>{!footer && <small>Playable intelligence</small>}</span>
+    </a>
+  );
+}
 
 function formatBytes(bytes: number | null) {
   if (!bytes) return null;
@@ -33,13 +44,45 @@ function formatDate(value: string | null) {
 export default async function Home() {
   const windowsRelease = await getWindowsRelease();
   const releaseSize = formatBytes(windowsRelease.sizeBytes);
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "@id": `${canonicalUrl}/#website`,
+        url: canonicalUrl,
+        name: "RTS AI",
+        description: "An AI companion and Earth mission generator for OpenRA.",
+        inLanguage: "en",
+      },
+      {
+        "@type": ["SoftwareApplication", "VideoGame"],
+        "@id": `${canonicalUrl}/#openra-ai`,
+        name: "OpenRA AI",
+        url: canonicalUrl,
+        description: "A playable OpenRA build with an interruptible AI companion and real-world mission generation.",
+        applicationCategory: "GameApplication",
+        operatingSystem: "Windows 10, Windows 11",
+        softwareVersion: windowsRelease.version,
+        downloadUrl: windowsRelease.url,
+        isAccessibleForFree: true,
+        image: `${canonicalUrl}/social-card.png`,
+        sameAs: [gameSource],
+        offers: {
+          "@type": "Offer",
+          price: "0",
+          priceCurrency: "USD",
+          url: windowsRelease.url,
+        },
+      },
+    ],
+  };
+
   return (
-    <main>
+    <>
+      <a className="skip-link" href="#main-content">Skip to main content</a>
       <nav className="site-nav" aria-label="Primary navigation">
-        <a className="brand" href="#top" aria-label="RTS AI home">
-          <span className="brand-mark">RTS</span>
-          <span>RTS <b>AI</b></span>
-        </a>
+        <Brand />
         <div className="nav-links">
           <a href="#companion">Companion</a>
           <a href="#mission-studio">Mission studio</a>
@@ -51,6 +94,7 @@ export default async function Home() {
 
       <p className="legal-strip">Independent project. EA has not endorsed and does not support this product.</p>
 
+      <main id="main-content">
       <header className="hero" id="top">
         <div className="hero-radar" aria-hidden="true"><i /><i /><i /><span /></div>
         <div className="hero-copy">
@@ -164,12 +208,17 @@ export default async function Home() {
           </div>
         </div>
       </section>
+      </main>
 
       <footer>
-        <a className="brand" href="#top"><span className="brand-mark">RTS</span><span>RTS <b>AI</b></span></a>
+        <Brand footer />
         <p>EA has not endorsed and does not support this product. OpenRA AI is an independent GPL-3.0 project.</p>
         <div><a href={gameSource}>Game source</a><a href={`${gameSource}/blob/main/LICENSE`}>License</a><a href="https://www.openstreetmap.org/copyright">Map attribution</a></div>
       </footer>
-    </main>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData).replace(/</g, "\\u003c") }}
+      />
+    </>
   );
 }
