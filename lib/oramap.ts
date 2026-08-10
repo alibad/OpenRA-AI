@@ -48,10 +48,10 @@ function random(seed: number) {
   };
 }
 
-async function acquireFeatures(selection: GeoSelection, signal?: AbortSignal): Promise<EarthFeature[]> {
+async function acquireFeatures(selection: GeoSelection, signal?: AbortSignal, authToken?: string): Promise<EarthFeature[]> {
   const response = await fetch("/api/earth-features", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}) },
     body: JSON.stringify({
       latitude: selection.latitude,
       longitude: selection.longitude,
@@ -59,6 +59,7 @@ async function acquireFeatures(selection: GeoSelection, signal?: AbortSignal): P
     }),
     signal,
   });
+  if (response.status === 401) throw new Error("Authentication required");
   if (!response.ok) throw new Error("Earth data is temporarily unavailable");
   const payload = (await response.json()) as { features?: EarthFeature[] };
   return payload.features ?? [];
@@ -285,16 +286,17 @@ function dataUrlBytes(url: string) {
 
 export async function generateEarthMission(
   selection: GeoSelection,
-  options: { signal?: AbortSignal; onStage?: (stage: "acquiring" | "compiling") => void } = {},
+  options: { signal?: AbortSignal; authToken?: string; onStage?: (stage: "acquiring" | "compiling") => void } = {},
 ): Promise<MissionPackage> {
   let features: EarthFeature[] = [];
   let sourceStatus: MissionPackage["sourceStatus"] = "live-openstreetmap";
   options.onStage?.("acquiring");
   try {
-    features = await acquireFeatures(selection, options.signal);
+    features = await acquireFeatures(selection, options.signal, options.authToken);
     if (!features.length) sourceStatus = "deterministic-fallback";
   } catch (cause) {
     if (options.signal?.aborted) throw cause;
+    if (cause instanceof Error && cause.message === "Authentication required") throw cause;
     sourceStatus = "deterministic-fallback";
   }
   options.onStage?.("compiling");

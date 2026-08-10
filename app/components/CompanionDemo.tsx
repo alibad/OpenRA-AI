@@ -2,6 +2,8 @@
 
 import { AudioLines, Mic2, Pause, Play, Radio, Volume2 } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useAuth } from "./AuthProvider";
+import { trackAnalyticsEvent } from "../../lib/firebase-client";
 
 const situations = [
   {
@@ -28,6 +30,7 @@ const situations = [
 ] as const;
 
 export function CompanionDemo() {
+  const { user, openAuth } = useAuth();
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
   const [listening, setListening] = useState(false);
@@ -40,6 +43,12 @@ export function CompanionDemo() {
   }, [listening, paused]);
 
   function ask() {
+    if (!user) {
+      void trackAnalyticsEvent("auth_gate_view", { feature: "companion_ask" });
+      openAuth("Create an account to ask the AI companion");
+      return;
+    }
+    void trackAnalyticsEvent("companion_ask", { surface: "homepage_demo" });
     setListening(true);
     window.setTimeout(() => {
       setIndex((current) => (current + 1) % situations.length);

@@ -1,4 +1,5 @@
 import type { EarthFeature } from "../../../lib/oramap";
+import { verifyFirebaseRequest } from "../../../lib/firebase-token";
 
 const overpassEndpoints = [
   "https://overpass-api.de/api/interpreter",
@@ -21,6 +22,9 @@ export async function POST(request: Request) {
   const radiusM = Math.round(Number(input.radiusM));
   if (!Number.isFinite(latitude) || latitude < -90 || latitude > 90 || !Number.isFinite(longitude) || longitude < -180 || longitude > 180 || !Number.isFinite(radiusM) || radiusM < 500 || radiusM > 12000)
     return Response.json({ error: "Invalid Earth selection" }, { status: 400 });
+
+  const userId = await verifyFirebaseRequest(request);
+  if (!userId) return Response.json({ error: "Sign in required" }, { status: 401 });
 
   const query = `[out:json][timeout:10];(
 way(around:${radiusM},${latitude},${longitude})[natural~"water|coastline|bay"];
@@ -66,7 +70,7 @@ way(around:${radiusM},${latitude},${longitude})[highway~"motorway|trunk|primary|
     });
     return Response.json(
       { features, provider: "OpenStreetMap / Overpass", featureCount: features.length },
-      { headers: { "Cache-Control": "public, max-age=900, s-maxage=86400" } },
+      { headers: { "Cache-Control": "private, max-age=900" } },
     );
   } catch {
     return Response.json({ error: "Earth data is temporarily unavailable" }, { status: 503 });

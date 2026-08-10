@@ -19,6 +19,8 @@ import type { Map as MapLibreMap, Marker } from "maplibre-gl";
 import { generateEarthMission, type MissionPackage } from "../../lib/oramap";
 import { decodeMissionBlueprint, encodeMissionBlueprint } from "../../lib/mission-blueprint";
 import type { WindowsRelease } from "../../lib/release";
+import { useAuth } from "./AuthProvider";
+import { trackAnalyticsEvent } from "../../lib/firebase-client";
 
 type LocationResult = { latitude: number; longitude: number; label: string; kind?: string };
 
@@ -36,6 +38,7 @@ function randomInteger(max: number) {
 }
 
 export function MissionStudio({ windowsRelease }: { windowsRelease: WindowsRelease }) {
+  const { user, loading: authLoading, openAuth } = useAuth();
   const mapNode = useRef<HTMLDivElement>(null);
   const mapRef = useRef<MapLibreMap | null>(null);
   const markerRef = useRef<Marker | null>(null);
@@ -149,6 +152,7 @@ export function MissionStudio({ windowsRelease }: { windowsRelease: WindowsRelea
       if (!response.ok) throw new Error("Place search is unavailable");
       const payload = (await response.json()) as { results?: LocationResult[] };
       const results = payload.results ?? [];
+      void trackAnalyticsEvent("place_search", { result_count: results.length });
       if (!results.length) throw new Error("No place matched that search");
       setSearchResults(results);
       setStatus("idle");
@@ -165,6 +169,11 @@ export function MissionStudio({ windowsRelease }: { windowsRelease: WindowsRelea
   }
 
   async function generate(nextSeed = seed) {
+    if (!user) {
+      void trackAnalyticsEvent("auth_gate_view", { feature: "mission_generation" });
+      openAuth("Create an account to generate and validate this battlefield");
+      return;
+    }
     generationControllerRef.current?.abort();
     const controller = new AbortController();
     generationControllerRef.current = controller;
@@ -173,7 +182,9 @@ export function MissionStudio({ windowsRelease }: { windowsRelease: WindowsRelea
     setError("");
     setMission(null);
     setGenerationMs(0);
+    void trackAnalyticsEvent("mission_generation_started", { map_size: size, footprint_km: Math.round(radiusM * 2 / 1000) });
     try {
+      const authToken = await user.getIdToken();
       const result = await generateEarthMission({
         latitude,
         longitude,
@@ -184,12 +195,19 @@ export function MissionStudio({ windowsRelease }: { windowsRelease: WindowsRelea
         story,
       }, {
         signal: controller.signal,
+        authToken,
         onStage: setStatus,
       });
       const downloadUrl = URL.createObjectURL(result.blob);
       setMission({ ...result, downloadUrl });
       setGenerationMs(Math.round(performance.now() - startedAt));
       setStatus("ready");
+      void trackAnalyticsEvent("mission_generation_completed", {
+        map_size: size,
+        footprint_km: Math.round(radiusM * 2 / 1000),
+        source: result.sourceStatus,
+        duration_band: performance.now() - startedAt < 5000 ? "under_5s" : "5s_or_more",
+      });
     } catch (cause) {
       if (controller.signal.aborted) {
         setStatus("idle");
@@ -197,7 +215,8 @@ export function MissionStudio({ windowsRelease }: { windowsRelease: WindowsRelea
         return;
       }
       setStatus("error");
-      setError(cause instanceof Error ? cause.message : "Mission compilation failed");
+      setError(cause instanceof Error && cause.message === "Authentication required" ? "Your session expired. Sign in again to generate this mission." : cause instanceof Error ? cause.message : "Mission compilation failed");
+      void trackAnalyticsEvent("mission_generation_failed", { stage: status });
     } finally {
       if (generationControllerRef.current === controller) generationControllerRef.current = null;
     }
@@ -214,6 +233,7 @@ export function MissionStudio({ windowsRelease }: { windowsRelease: WindowsRelea
       url.hash = "mission-studio";
       await navigator.clipboard.writeText(url.toString());
       setShareStatus("copied");
+      void trackAnalyticsEvent("mission_blueprint_shared");
       window.setTimeout(() => setShareStatus("idle"), 2200);
     } catch {
       setShareStatus("error");
@@ -223,6 +243,7 @@ export function MissionStudio({ windowsRelease }: { windowsRelease: WindowsRelea
   function generateVariation() {
     const nextSeed = (seed + 7919) % 2_147_483_647;
     setSeed(nextSeed);
+    void trackAnalyticsEvent("mission_variation_requested", { map_size: size });
     void generate(nextSeed);
   }
 
@@ -343,12 +364,13 @@ export function MissionStudio({ windowsRelease }: { windowsRelease: WindowsRelea
               <button type="button" className="reroll-button" onClick={rerollSeed}><Shuffle size={14} /> Reroll</button>
             </div>
             <div className="generation-actions">
-              <button className="generate-button" onClick={() => void generate()} disabled={status === "acquiring" || status === "compiling"}>
+              <button className="generate-button" onClick={() => void generate()} disabled={authLoading || status === "acquiring" || status === "compiling"}>
                 {status === "acquiring" || status === "compiling" ? <LoaderCircle className="spin" size={18} /> : <Sparkles size={18} />}
                 {status === "acquiring" ? "Reading roads & water…" : status === "compiling" ? "Compiling OpenRA map…" : "Generate mission package"}
               </button>
               {(status === "acquiring" || status === "compiling") && <button className="cancel-generation" onClick={cancelGeneration}><X size={15} /> Cancel</button>}
             </div>
+            {!authLoading && !user && <button type="button" className="generation-auth-note" onClick={() => openAuth("Create an account to generate and validate this battlefield")}><span>Account required for AI work</span><b>Sign in or create a free profile →</b></button>}
             {error && <p className="studio-error" role="alert">{error}</p>}
             <div className="generation-pipeline" aria-live="polite" aria-label="Mission generation pipeline">
               {["Pin Earth", "Read geometry", "Build terrain", "Validate map"].map((label, index) => (
@@ -374,7 +396,7 @@ export function MissionStudio({ windowsRelease }: { windowsRelease: WindowsRelea
                 </div>
                 <ul className="validation-list">{mission.validation.map((check) => <li key={check}><Check size={11} />{check}</li>)}</ul>
                 <div className="result-actions">
-                  <a className="download-button" href={mission.downloadUrl} download={mission.filename}><Download size={17} /> Download .oramap</a>
+                  <a className="download-button" href={mission.downloadUrl} download={mission.filename} onClick={() => void trackAnalyticsEvent("mission_download", { map_size: size, source: mission.sourceStatus })}><Download size={17} /> Download .oramap</a>
                   <button onClick={() => void copyBlueprint()}><Share2 size={14} />{shareStatus === "copied" ? "Link copied" : shareStatus === "error" ? "Copy failed" : "Share setup"}</button>
                   <button onClick={generateVariation}><RefreshCw size={14} />New variation</button>
                 </div>

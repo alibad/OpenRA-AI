@@ -44,11 +44,29 @@ test("renders the complete marketing and mission-creation surface", async () => 
   assert.match(html, /Install or extract/);
   assert.match(html, /0\.1\.0-alpha\.8/);
   assert.match(html, /AI layer/);
+  assert.match(html, /Help improve RTS AI/);
+  assert.match(html, /href="\/privacy"/);
   assert.match(html, /OpenStreetMap contributors/);
   assert.match(html, /EA has not endorsed and does not support this product/);
   assert.match(html, /data-analytics-event="game-download"/);
   assert.match(html, /windows-x64-setup\.exe/);
   assert.doesNotMatch(html, /codex-preview|SkeletonPreview|react-loading-skeleton/);
+});
+
+test("keeps account identity out of Analytics event parameters", async () => {
+  const analytics = await readFile(new URL("../lib/firebase-client.ts", import.meta.url), "utf8");
+  const auth = await readFile(new URL("../app/components/AuthProvider.tsx", import.meta.url), "utf8");
+  const accountNav = await readFile(new URL("../app/components/AccountNav.tsx", import.meta.url), "utf8");
+  const missionStudio = await readFile(new URL("../app/components/MissionStudio.tsx", import.meta.url), "utf8");
+  const privacy = await readFile(new URL("../app/privacy/page.tsx", import.meta.url), "utf8");
+
+  assert.match(analytics, /setUserId\(analytics, uid\)/);
+  assert.doesNotMatch(analytics, /setUserId\(analytics,.*displayName/);
+  assert.doesNotMatch(analytics, /setUserId\(analytics,.*email/);
+  assert.match(auth, /rtsai-analytics-consent/);
+  assert.match(accountNav, /Sign in/);
+  assert.match(missionStudio, /Account required for AI work/);
+  assert.match(privacy, /do not send your name, email/);
 });
 
 test("ships crawl, install, and brand assets", async () => {

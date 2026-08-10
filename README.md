@@ -12,7 +12,8 @@ Players can:
 - choose the Earth footprint and OpenRA battlefield size;
 - translate live nearby roads and waterways into a validated Red Alert `.oramap`;
 - share a complete mission setup with a copyable URL and generate new seeded variations;
-- download the generated map without creating an account.
+- create a Firebase-backed commander profile before generating or downloading a new mission;
+- opt in to privacy-safe product analytics that use a pseudonymous account ID instead of a name or email.
 
 The homepage also includes an interactive companion preview so visitors can
 understand the pause, ask, and alert-priority experience before downloading the
@@ -31,6 +32,24 @@ Open `http://localhost:3000`. Location search and Earth feature acquisition are
 proxied through the site's `/api/geocode` and `/api/earth-features` routes, so
 the browser never needs to call public map services directly. No API key is
 required for the website's map generator.
+
+Copy `.env.example` to `.env.local` and fill in the public Firebase web-app
+configuration. Email/password authentication must be enabled in Firebase and
+`localhost`, `127.0.0.1`, `rtsai.net`, and any preview hostname must be listed as
+authorized domains. Firebase's web configuration is public routing metadata;
+never put Admin SDK credentials or service-account keys in `NEXT_PUBLIC_*`
+variables.
+
+Browsing, map exploration, and public game downloads remain open. Mission
+compilation and companion interactions require a signed-in account. Google
+Analytics is disabled until the visitor explicitly opts in. Analytics uses the
+Firebase UID and deliberately excludes names, email addresses, search text,
+mission text, and exact coordinates.
+
+The mission UI sends the current Firebase ID token to `/api/earth-features`.
+That endpoint verifies the token signature, audience, and issuer against
+Google's published Firebase keys before it requests Earth geometry. The client
+gate is therefore backed by an API authorization boundary.
 
 Validate the production build with:
 

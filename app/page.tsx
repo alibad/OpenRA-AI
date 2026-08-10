@@ -19,6 +19,7 @@ import {
 import Image from "next/image";
 import { MissionStudio } from "./components/MissionStudio";
 import { CompanionDemo } from "./components/CompanionDemo";
+import { AccountNav } from "./components/AccountNav";
 import { getGameRelease } from "../lib/release";
 
 const gameSource = "https://github.com/alibad/OpenRA-AI";
@@ -95,7 +96,7 @@ export default async function Home() {
           <a href="#download">Download</a>
           <a href="#architecture">How it works</a>
         </div>
-        <a className="nav-source" href={gameSource} target="_blank" rel="noreferrer"><Github size={15} /> Game source</a>
+        <div className="nav-actions"><a className="nav-source" href={gameSource} target="_blank" rel="noreferrer"><Github size={15} /> Game source</a><AccountNav /></div>
       </nav>
 
       <p className="legal-strip">Independent project. EA has not endorsed and does not support this product.</p>
@@ -262,7 +263,7 @@ export default async function Home() {
       <footer>
         <Brand footer />
         <p>EA has not endorsed and does not support this product. OpenRA AI is an independent GPL-3.0 project.</p>
-        <div><a href={gameSource}>Game source</a><a href={`${gameSource}/blob/main/LICENSE`}>License</a><a href="https://www.openstreetmap.org/copyright">Map attribution</a></div>
+        <div><a href={gameSource}>Game source</a><a href={`${gameSource}/blob/main/LICENSE`}>License</a><a href="/privacy">Privacy</a><a href="https://www.openstreetmap.org/copyright">Map attribution</a></div>
       </footer>
       <script
         type="application/ld+json"

@@ -20,3 +20,15 @@ test("earth feature proxy rejects invalid selections before contacting Overpass"
   assert.equal(response.status, 400);
   assert.deepEqual(await response.json(), { error: "Invalid Earth selection" });
 });
+
+test("earth feature proxy requires a signed-in Firebase user", async () => {
+  const response = await earthFeatures(
+    new Request("https://rtsai.net/api/earth-features", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ latitude: 24.7, longitude: 46.7, radiusM: 3500 }),
+    }),
+  );
+  assert.equal(response.status, 401);
+  assert.deepEqual(await response.json(), { error: "Sign in required" });
+});
