@@ -136,7 +136,7 @@ export function AuthDialog({ reason, onClose }: { reason: string; onClose: () =>
 
         <form className="auth-form" onSubmit={submit}>
           <button className="auth-google" type="button" onClick={() => void continueWithGoogle()} disabled={busy || !firebaseIsConfigured}>
-            <span className="auth-google-mark" aria-hidden="true">G</span>
+            <span className="auth-google-mark" aria-hidden="true" />
             {busyAction === "google" ? "Opening Google…" : mode === "signup" ? "Sign up with Google" : "Sign in with Google"}
           </button>
           <div className="auth-divider" aria-hidden="true"><span>or use email</span></div>

@@ -79,6 +79,7 @@ test("ships crawl, install, and brand assets", async () => {
   const manifest = await readFile(new URL("../app/manifest.ts", import.meta.url), "utf8");
   const favicon = await readFile(new URL("../public/favicon.ico", import.meta.url));
   const socialCard = await readFile(new URL("../public/social-card.png", import.meta.url));
+  const googleLogo = await readFile(new URL("../public/brand/google-g.png", import.meta.url));
 
   assert.match(robots, /sitemap: "https:\/\/rtsai\.net\/sitemap\.xml"/);
   assert.match(sitemap, /url: "https:\/\/rtsai\.net\/"/);
@@ -86,6 +87,7 @@ test("ships crawl, install, and brand assets", async () => {
   assert.match(manifest, /purpose: "maskable"/);
   assert.ok(favicon.byteLength > 1000);
   assert.ok(socialCard.byteLength > 10_000);
+  assert.ok(googleLogo.byteLength > 500);
 });
 
 test("ships a real browser-side OpenRA package compiler", async () => {
