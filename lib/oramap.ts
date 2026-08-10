@@ -16,6 +16,8 @@ export type MissionPackage = {
   previewUrl: string;
   sourceStatus: "live-openstreetmap" | "deterministic-fallback";
   sourceFeatureCount: number;
+  roadFeatureCount: number;
+  waterFeatureCount: number;
   waterCells: number;
   roadCells: number;
   validation: string[];
@@ -46,7 +48,7 @@ function random(seed: number) {
   };
 }
 
-async function acquireFeatures(selection: GeoSelection): Promise<EarthFeature[]> {
+async function acquireFeatures(selection: GeoSelection, signal?: AbortSignal): Promise<EarthFeature[]> {
   const response = await fetch("/api/earth-features", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -55,6 +57,7 @@ async function acquireFeatures(selection: GeoSelection): Promise<EarthFeature[]>
       longitude: selection.longitude,
       radiusM: selection.radiusM,
     }),
+    signal,
   });
   if (!response.ok) throw new Error("Earth data is temporarily unavailable");
   const payload = (await response.json()) as { features?: EarthFeature[] };
@@ -280,15 +283,21 @@ function dataUrlBytes(url: string) {
   return Uint8Array.from(binary, (character) => character.charCodeAt(0));
 }
 
-export async function generateEarthMission(selection: GeoSelection): Promise<MissionPackage> {
-  let features: Feature[] = [];
+export async function generateEarthMission(
+  selection: GeoSelection,
+  options: { signal?: AbortSignal; onStage?: (stage: "acquiring" | "compiling") => void } = {},
+): Promise<MissionPackage> {
+  let features: EarthFeature[] = [];
   let sourceStatus: MissionPackage["sourceStatus"] = "live-openstreetmap";
+  options.onStage?.("acquiring");
   try {
-    features = await acquireFeatures(selection);
+    features = await acquireFeatures(selection, options.signal);
     if (!features.length) sourceStatus = "deterministic-fallback";
-  } catch {
+  } catch (cause) {
+    if (options.signal?.aborted) throw cause;
     sourceStatus = "deterministic-fallback";
   }
+  options.onStage?.("compiling");
   const { cells, spawns, mines, yaml, binary } = compileMissionCore(selection, features);
   const previewUrl = renderPreview(cells, spawns, mines);
   const validation = [
@@ -328,6 +337,8 @@ export async function generateEarthMission(selection: GeoSelection): Promise<Mis
     previewUrl,
     sourceStatus,
     sourceFeatureCount: features.length,
+    roadFeatureCount: features.filter((feature) => feature.kind === "road").length,
+    waterFeatureCount: features.filter((feature) => feature.kind === "water").length,
     waterCells: cells.flat().filter((cell) => cell === WATER).length,
     roadCells: cells.flat().filter((cell) => cell === ROAD).length,
     validation,

@@ -9,7 +9,8 @@
     "dev": "vinext dev",
     "build": "vinext build",
     "start": "vinext start",
-    "test": "npm run build && node --import tsx --test tests/*.test.*",
+    "typecheck": "tsc --noEmit",
+    "test": "npm run typecheck && npm run build && node --import tsx --test tests/*.test.*",
     "lint": "eslint . --ignore-pattern dist --ignore-pattern .next"
   },
   "dependencies": {

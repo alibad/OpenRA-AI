@@ -11,6 +11,7 @@ Players can:
 - search or select a point on an OpenStreetMap basemap;
 - choose the Earth footprint and OpenRA battlefield size;
 - translate live nearby roads and waterways into a validated Red Alert `.oramap`;
+- share a complete mission setup with a copyable URL and generate new seeded variations;
 - download the generated map without creating an account.
 
 The homepage also includes an interactive companion preview so visitors can
@@ -38,9 +39,9 @@ npm run lint
 npm test
 ```
 
-`npm test` builds the production worker, verifies the rendered product surface,
-checks the API validation boundary, and compiles a deterministic OpenRA map
-fixture.
+`npm test` type-checks the full project, builds the production worker, verifies
+the rendered product surface and share-link parser, checks the API validation
+boundary, and compiles a deterministic OpenRA map fixture.
 
 ## Release boundary
 
