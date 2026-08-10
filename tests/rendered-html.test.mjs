@@ -37,14 +37,17 @@ test("renders the complete marketing and mission-creation surface", async () => 
   assert.match(html, /Read geometry/);
   assert.match(html, /Build terrain/);
   assert.match(html, /Interactive AI companion preview/);
-  assert.match(html, /Portable, checksum published/);
-  assert.match(html, /Download Windows alpha/);
-  assert.match(html, /Play-OpenRAAI\.cmd/);
+  assert.match(html, /Locally built and smoke-tested/);
+  assert.match(html, /Download Windows setup/);
+  assert.match(html, /Portable ZIP/);
+  assert.match(html, /Signed macOS download pending|Apple silicon/);
+  assert.match(html, /Install or extract/);
   assert.match(html, /0\.1\.0-alpha\.8/);
   assert.match(html, /AI layer/);
   assert.match(html, /OpenStreetMap contributors/);
   assert.match(html, /EA has not endorsed and does not support this product/);
   assert.match(html, /data-analytics-event="game-download"/);
+  assert.match(html, /windows-x64-setup\.exe/);
   assert.doesNotMatch(html, /codex-preview|SkeletonPreview|react-loading-skeleton/);
 });
 
@@ -72,4 +75,13 @@ test("ships a real browser-side OpenRA package compiler", async () => {
   assert.match(source, /zipSync/);
   assert.match(source, /spawn/);
   assert.match(source, /\/api\/earth-features/);
+});
+
+test("discovers native Windows and macOS release assets", async () => {
+  const source = await readFile(new URL("../lib/release.ts", import.meta.url), "utf8");
+  const page = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
+  assert.match(source, /windows-x64-setup\\\.exe/);
+  assert.match(source, /macos-\(arm64\|x64\)\\\.dmg/);
+  assert.match(source, /installerChecksumUrl/);
+  assert.match(page, /No placeholder download/);
 });

@@ -1,4 +1,5 @@
 import {
+  Apple,
   ArrowRight,
   BrainCircuit,
   CalendarDays,
@@ -8,6 +9,7 @@ import {
   Github,
   Map,
   Mic2,
+  MonitorDown,
   RadioTower,
   ShieldCheck,
   Sparkles,
@@ -17,7 +19,7 @@ import {
 import Image from "next/image";
 import { MissionStudio } from "./components/MissionStudio";
 import { CompanionDemo } from "./components/CompanionDemo";
-import { getWindowsRelease } from "../lib/release";
+import { getGameRelease } from "../lib/release";
 
 const gameSource = "https://github.com/alibad/OpenRA-AI";
 const canonicalUrl = "https://rtsai.net";
@@ -42,8 +44,12 @@ function formatDate(value: string | null) {
 }
 
 export default async function Home() {
-  const windowsRelease = await getWindowsRelease();
-  const releaseSize = formatBytes(windowsRelease.sizeBytes);
+  const gameRelease = await getGameRelease();
+  const windowsRelease = gameRelease.windows;
+  const primaryWindowsUrl = windowsRelease.installerUrl ?? windowsRelease.url;
+  const primaryWindowsSize = formatBytes(windowsRelease.installerSizeBytes ?? windowsRelease.sizeBytes);
+  const appleSiliconRelease = gameRelease.macos?.assets.find((asset) => asset.architecture === "arm64");
+  const intelMacRelease = gameRelease.macos?.assets.find((asset) => asset.architecture === "x64");
   const structuredData = {
     "@context": "https://schema.org",
     "@graph": [
@@ -62,9 +68,9 @@ export default async function Home() {
         url: canonicalUrl,
         description: "A playable OpenRA build with an interruptible AI companion and real-world mission generation.",
         applicationCategory: "GameApplication",
-        operatingSystem: "Windows 10, Windows 11",
+        operatingSystem: gameRelease.macos ? "Windows 10, Windows 11, macOS" : "Windows 10, Windows 11",
         softwareVersion: windowsRelease.version,
-        downloadUrl: windowsRelease.url,
+        downloadUrl: primaryWindowsUrl,
         isAccessibleForFree: true,
         image: `${canonicalUrl}/social-card.png`,
         sameAs: [gameSource],
@@ -72,7 +78,7 @@ export default async function Home() {
           "@type": "Offer",
           price: "0",
           priceCurrency: "USD",
-          url: windowsRelease.url,
+          url: primaryWindowsUrl,
         },
       },
     ],
@@ -102,7 +108,7 @@ export default async function Home() {
           <h1>Your battlefield.<br /><em>Now it talks back.</em></h1>
           <p className="hero-lede">A quiet AI companion for OpenRA—and a map generator that turns any place on Earth into a fictional, playable skirmish.</p>
           <div className="hero-actions">
-            <a className="primary-action" href="#download"><Download size={17} /> Download Windows alpha</a>
+            <a className="primary-action" href="#download"><Download size={17} /> Download the game</a>
             <a className="text-action" href="#mission-studio">Build a mission <ArrowRight size={17} /></a>
           </div>
           <div className="hero-proof">
@@ -124,23 +130,66 @@ export default async function Home() {
       <section className="download-section" id="download" aria-labelledby="download-title">
         <div className="download-intro">
           <span className="section-number">PLAYABLE BUILD / {windowsRelease.version}</span>
-          <h2 id="download-title">From a ZIP to a live match.</h2>
-          <p>The Windows alpha bundles the pinned engine, AI companion, launcher, and a generated Riyadh skirmish. No installer and no hosted workflow.</p>
-          <div className="download-actions">
-            <a className="primary-action" href={windowsRelease.url} data-analytics-event="game-download" data-platform="windows-x64"><Download size={17} /> Download for Windows x64</a>
-            <a className="checksum-link" href={windowsRelease.checksumUrl}>SHA-256 checksum</a>
-          </div>
+          <h2 id="download-title">Install. Launch. Command.</h2>
+          <p>Every build carries the game engine, AI companion, launcher, and a playable Earth-derived skirmish. Choose a native setup or keep the portable package.</p>
           <div className="release-trust" aria-label="Release details">
-            <span><CheckCircle2 size={15} /> Portable, checksum published</span>
+            <span><CheckCircle2 size={15} /> Locally built and smoke-tested</span>
             <span><CalendarDays size={15} /> Released {formatDate(windowsRelease.publishedAt)}</span>
           </div>
         </div>
+
+        <div className="platform-downloads" aria-label="Platform downloads">
+          <article className="platform-card is-ready">
+            <div className="platform-card-heading">
+              <span className="platform-icon"><MonitorDown size={23} /></span>
+              <div><span className="platform-kicker">Windows 10 / 11</span><h3>Windows x64</h3></div>
+              <span className="release-status is-ready">Ready</span>
+            </div>
+            <p>A normal per-user setup with the RTS AI app icon, Start menu entry, desktop shortcut, and uninstaller.</p>
+            <a className="primary-action platform-primary" href={primaryWindowsUrl} data-analytics-event="game-download" data-platform="windows-x64-setup"><Download size={17} /> Download Windows setup</a>
+            <div className="platform-meta">
+              <span>{primaryWindowsSize ?? "Setup executable"}</span>
+              {windowsRelease.installerChecksumUrl && <a href={windowsRelease.installerChecksumUrl}>Setup checksum</a>}
+              <a href={windowsRelease.url} data-analytics-event="game-download" data-platform="windows-x64-portable">Portable ZIP</a>
+              <a href={windowsRelease.checksumUrl}>ZIP checksum</a>
+            </div>
+          </article>
+
+          <article className={`platform-card ${gameRelease.macos ? "is-ready" : "is-pending"}`}>
+            <div className="platform-card-heading">
+              <span className="platform-icon"><Apple size={23} /></span>
+              <div><span className="platform-kicker">Apple desktop</span><h3>macOS</h3></div>
+              <span className={`release-status ${gameRelease.macos ? "is-ready" : "is-pending"}`}>{gameRelease.macos ? "Ready" : "Signing"}</span>
+            </div>
+            {gameRelease.macos ? (
+              <>
+                <p>A native signed disk image. Choose the build that matches your Mac.</p>
+                <div className="mac-download-actions">
+                  {appleSiliconRelease && <a className="primary-action platform-primary" href={appleSiliconRelease.url} data-analytics-event="game-download" data-platform="macos-arm64"><Download size={17} /> Apple silicon</a>}
+                  {intelMacRelease && <a className="secondary-download" href={intelMacRelease.url} data-analytics-event="game-download" data-platform="macos-x64">Intel Mac</a>}
+                </div>
+                <div className="platform-meta">
+                  <span>Version {gameRelease.macos.version}</span>
+                  {appleSiliconRelease?.checksumUrl && <a href={appleSiliconRelease.checksumUrl}>Apple silicon checksum</a>}
+                  {intelMacRelease?.checksumUrl && <a href={intelMacRelease.checksumUrl}>Intel checksum</a>}
+                </div>
+              </>
+            ) : (
+              <>
+                <p>The native app and DMG packaging path is complete. Its public download stays locked until the artifact is built, signed, and notarized on a Mac.</p>
+                <span className="pending-download" aria-disabled="true">Signed macOS download pending</span>
+                <div className="platform-meta"><span>Apple silicon + Intel pipeline</span><span>No placeholder download</span></div>
+              </>
+            )}
+          </article>
+        </div>
+
         <ol className="play-steps">
-          <li><span>01</span><div><b>Extract the ZIP</b><p>Keep the included folders together. The package is portable.</p></div></li>
-          <li><span>02</span><div><b>Run Play-OpenRAAI.cmd</b><p>The first run verifies and downloads OpenRA&apos;s supported Red Alert content, then starts the generated map.</p></div></li>
+          <li><span>01</span><div><b>Install or extract</b><p>Use Windows setup for shortcuts and uninstall support, or keep the ZIP fully portable.</p></div></li>
+          <li><span>02</span><div><b>Launch OpenRA AI</b><p>The first run verifies and downloads OpenRA&apos;s supported Red Alert content, then starts the generated map.</p></div></li>
           <li><span>03</span><div><b>Hold Ctrl+Space to ask</b><p>Release to hear the answer. Ctrl+Shift+M mutes; Ctrl+Shift+A disables or enables the companion.</p></div></li>
         </ol>
-        <div className="download-footnote"><FileArchive size={15} /><span>Windows 10/11 x64 alpha{releaseSize ? ` · ${releaseSize}` : ""}. The model-backed companion expects your private AI layer on this machine; the game itself still runs if that layer is offline.</span></div>
+        <div className="download-footnote"><FileArchive size={15} /><span>Checksums are published beside every downloadable artifact. The model-backed companion expects your private AI layer on this machine; the game itself still runs if that layer is offline.</span></div>
       </section>
 
       <section className="companion-section" id="companion">
@@ -201,9 +250,9 @@ export default async function Home() {
           <h2>Pick a place.<br />Start a story.</h2>
         </div>
         <div>
-          <p>Generate a mission now or download the tested Windows alpha. macOS packaging follows once a real signed artifact is ready.</p>
+          <p>Generate a mission now or install the tested Windows alpha. The same download surface will expose macOS automatically when its signed DMG is released.</p>
           <div className="hero-actions">
-            <a className="primary-action" href={windowsRelease.url} data-analytics-event="game-download" data-platform="windows-x64"><Download size={17} /> Download Windows alpha</a>
+            <a className="primary-action" href={primaryWindowsUrl} data-analytics-event="game-download" data-platform="windows-x64-setup"><Download size={17} /> Download Windows setup</a>
             <a className="text-action" href="#mission-studio">Open mission studio <ArrowRight size={17} /></a>
           </div>
         </div>
