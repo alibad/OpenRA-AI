@@ -226,6 +226,20 @@ export function MissionStudio({ windowsRelease }: { windowsRelease: WindowsRelea
     void generate(nextSeed);
   }
 
+  function clearGeneratedMission() {
+    generationControllerRef.current?.abort();
+    setMission(null);
+    setStatus("idle");
+    setError("");
+    setGenerationMs(0);
+    setShareStatus("idle");
+  }
+
+  function rerollSeed() {
+    setSeed(randomInteger(2_147_483_647));
+    clearGeneratedMission();
+  }
+
   function surpriseMe() {
     const next = presets[randomInteger(presets.length)];
     moveTo(next);
@@ -302,10 +316,10 @@ export function MissionStudio({ windowsRelease }: { windowsRelease: WindowsRelea
               Fictional premise
               <textarea value={story} onChange={(event) => setStory(event.target.value)} rows={3} maxLength={240} />
             </label>
-            <div className="form-triple">
+            <div className="mission-selectors">
               <label>
                 Map size
-                <select value={size} onChange={(event) => setSize(Number(event.target.value) as 64 | 96 | 128)}>
+                <select value={size} onChange={(event) => { setSize(Number(event.target.value) as 64 | 96 | 128); clearGeneratedMission(); }}>
                   <option value={64}>64 × 64 · Quick</option>
                   <option value={96}>96 × 96 · Standard</option>
                   <option value={128}>128 × 128 · Epic</option>
@@ -313,16 +327,20 @@ export function MissionStudio({ windowsRelease }: { windowsRelease: WindowsRelea
               </label>
               <label>
                 Earth footprint
-                <select value={radiusM} onChange={(event) => setRadiusM(Number(event.target.value))}>
+                <select value={radiusM} onChange={(event) => { setRadiusM(Number(event.target.value)); clearGeneratedMission(); }}>
                   <option value={2000}>4 km · Local</option>
                   <option value={3500}>7 km · District</option>
                   <option value={6000}>12 km · Regional</option>
                 </select>
               </label>
-              <label>
-                Seed
-                <input type="number" min={0} max={2147483647} value={seed} onChange={(event) => setSeed(Number(event.target.value) || 0)} />
+            </div>
+            <div className="variation-control">
+              <label className="variation-copy" htmlFor="mission-seed">
+                <span>Variation seed</span>
+                <small>Same seed reproduces the same terrain</small>
               </label>
+              <input id="mission-seed" type="number" min={0} max={2147483647} value={seed} onChange={(event) => { setSeed(Number(event.target.value) || 0); clearGeneratedMission(); }} />
+              <button type="button" className="reroll-button" onClick={rerollSeed}><Shuffle size={14} /> Reroll</button>
             </div>
             <div className="generation-actions">
               <button className="generate-button" onClick={() => void generate()} disabled={status === "acquiring" || status === "compiling"}>
@@ -333,9 +351,9 @@ export function MissionStudio({ windowsRelease }: { windowsRelease: WindowsRelea
             </div>
             {error && <p className="studio-error" role="alert">{error}</p>}
             <div className="generation-pipeline" aria-live="polite" aria-label="Mission generation pipeline">
-              {["Pin Earth", "Read geometry", "Compile terrain", "Validate map"].map((label, index) => (
+              {["Pin Earth", "Read geometry", "Build terrain", "Validate map"].map((label, index) => (
                 <span key={label} className={status === "ready" || pipelineStep > index + 1 ? "complete" : pipelineStep === index + 1 ? "active" : ""}>
-                  <i>{status === "ready" || pipelineStep > index + 1 ? <Check size={11} /> : index + 1}</i>{label}
+                  <i>{status === "ready" || pipelineStep > index + 1 ? <Check size={12} /> : index + 1}</i><b>{label}</b>
                 </span>
               ))}
             </div>

@@ -23,7 +23,11 @@ test("renders the complete marketing and mission-creation surface", async () => 
   assert.match(html, /Mission studio/);
   assert.match(html, /Point anywhere/);
   assert.match(html, /Earth footprint/);
+  assert.match(html, /Variation seed/);
+  assert.match(html, /Same seed reproduces the same terrain/);
+  assert.match(html, /Reroll/);
   assert.match(html, /Read geometry/);
+  assert.match(html, /Build terrain/);
   assert.match(html, /Interactive AI companion preview/);
   assert.match(html, /Portable, checksum published/);
   assert.match(html, /Download Windows alpha/);
