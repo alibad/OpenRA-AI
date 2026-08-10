@@ -56,6 +56,7 @@ test("renders the complete marketing and mission-creation surface", async () => 
 test("keeps account identity out of Analytics event parameters", async () => {
   const analytics = await readFile(new URL("../lib/firebase-client.ts", import.meta.url), "utf8");
   const auth = await readFile(new URL("../app/components/AuthProvider.tsx", import.meta.url), "utf8");
+  const authDialog = await readFile(new URL("../app/components/AuthDialog.tsx", import.meta.url), "utf8");
   const accountNav = await readFile(new URL("../app/components/AccountNav.tsx", import.meta.url), "utf8");
   const missionStudio = await readFile(new URL("../app/components/MissionStudio.tsx", import.meta.url), "utf8");
   const privacy = await readFile(new URL("../app/privacy/page.tsx", import.meta.url), "utf8");
@@ -64,6 +65,9 @@ test("keeps account identity out of Analytics event parameters", async () => {
   assert.doesNotMatch(analytics, /setUserId\(analytics,.*displayName/);
   assert.doesNotMatch(analytics, /setUserId\(analytics,.*email/);
   assert.doesNotMatch(auth, /rtsai-analytics-consent/);
+  assert.match(authDialog, /GoogleAuthProvider/);
+  assert.match(authDialog, /signInWithPopup/);
+  assert.match(authDialog, /Sign up with Google/);
   assert.match(accountNav, /Sign in/);
   assert.match(missionStudio, /Account required for AI work/);
   assert.match(privacy, /do not send your name, email/);
