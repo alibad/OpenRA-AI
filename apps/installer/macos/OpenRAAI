@@ -1,0 +1,108 @@
+#!/bin/bash
+set -euo pipefail
+
+macos_dir="$(cd "$(dirname "$0")" && pwd)"
+contents_dir="$(cd "$macos_dir/.." && pwd)"
+resources_dir="$contents_dir/Resources"
+support_root="$HOME/Library/Application Support/OpenRA"
+content_root="$support_root/Content/ra/v2"
+map_version="$(tr -d '\r\n' < "$resources_dir/VERSION")"
+map_directory="$support_root/maps/ra/$map_version"
+runtime_root="$support_root/OpenRA-AI"
+mission_output="$runtime_root/generated/missions"
+log_directory="$support_root/Logs/OpenRA-AI"
+companion="$resources_dir/bin/openra-ai-companion"
+bundled_map="$resources_dir/generated/missions/riyadh-crossing-42.oramap"
+map_argument=""
+
+install_content() {
+  if [ -f "$content_root/allies.mix" ]; then
+    return
+  fi
+
+  echo "Installing OpenRA's checksum-verified Red Alert freeware content..."
+  local mirror_list="https://www.openra.net/packages/ra-quickinstall-mirrors.txt"
+  local expected_sha1="44241f68e69db9511db82cf83c174737ccda300b"
+  local archive="$TMPDIR/openra-ai-ra-quickinstall.zip"
+  local downloaded=""
+
+  while IFS= read -r mirror; do
+    case "$mirror" in
+      https://*)
+        if curl --fail --location --silent --show-error "$mirror" --output "$archive"; then
+          actual_sha1="$(shasum -a 1 "$archive" | awk '{print $1}')"
+          if [ "$actual_sha1" = "$expected_sha1" ]; then
+            downloaded="yes"
+            break
+          fi
+        fi
+        ;;
+    esac
+  done < <(curl --fail --location --silent --show-error "$mirror_list")
+
+  if [ -z "$downloaded" ]; then
+    echo >&2 "Unable to download checksum-valid Red Alert content."
+    exit 1
+  fi
+
+  mkdir -p "$content_root"
+  ditto -x -k "$archive" "$content_root"
+  rm -f "$archive"
+}
+
+install_content
+mkdir -p "$map_directory" "$mission_output" "$log_directory"
+
+selected_map="$bundled_map"
+if [ "${1:-}" != "" ] && [[ "${1}" == *.oramap ]]; then
+  selected_map="$1"
+  shift
+fi
+if [ -f "$selected_map" ]; then
+  installed_map="$map_directory/$(basename "$selected_map")"
+  cp "$selected_map" "$installed_map"
+  map_argument="Launch.Map=$(basename "$installed_map")"
+fi
+
+export DOTNET_ROLL_FORWARD=Major
+export OPENRA_AI_COMPANION=1
+export OPENRA_AI_GRPC_PORT=9998
+export OPENRA_AI_CONSOLE_URL=http://127.0.0.1:8787/
+export OPENRA_AI_WORLD_STUDIO_URL=http://127.0.0.1:8788/
+export OPENRA_AI_ENGINE_DIR="$resources_dir"
+export OPENRA_AI_APP_LANGUAGE="${OPENRA_AI_APP_LANGUAGE:-en}"
+export PYTHONUNBUFFERED=1
+export PYTHONUTF8=1
+export PYTHONIOENCODING=utf-8
+
+game_args=("$@")
+if [ -n "$map_argument" ]; then
+  game_args+=("$map_argument")
+fi
+
+"$macos_dir/GameLauncher" "${game_args[@]}" >>"$log_directory/game.out.log" 2>>"$log_directory/game.err.log" &
+game_pid=$!
+
+cleanup() {
+  if [ -n "${watcher_pid:-}" ] && kill -0 "$watcher_pid" 2>/dev/null; then
+    kill "$watcher_pid" 2>/dev/null || true
+    wait "$watcher_pid" 2>/dev/null || true
+  fi
+  if kill -0 "$game_pid" 2>/dev/null; then
+    kill "$game_pid" 2>/dev/null || true
+  fi
+}
+trap cleanup EXIT INT TERM
+
+"$companion" watch \
+  --bridge 127.0.0.1:9998 \
+  --game-pid "$game_pid" \
+  --control-port 8787 \
+  --worldgen-port 8788 \
+  --mission-output "$mission_output" \
+  --mission-install "$map_directory" \
+  --speak --voice-hotkeys \
+  >>"$log_directory/companion.out.log" 2>>"$log_directory/companion.err.log" &
+watcher_pid=$!
+
+wait "$game_pid"

@@ -1,0 +1,2 @@
+*.sh text eol=lf
+apps/installer/macos/OpenRAAI text eol=lf

@@ -1,5 +1,8 @@
 [CmdletBinding()]
-param([string]$Version = "0.1.0-alpha.1")
+param(
+    [string]$Version = "0.1.0-alpha.1",
+    [switch]$SkipInstaller
+)
 
 $ErrorActionPreference = "Stop"
 $repositoryRoot = Split-Path -Parent $PSScriptRoot
@@ -12,9 +15,12 @@ $releaseArchive = Join-Path $releaseRoot "$releaseName.zip"
 $python = Join-Path $repositoryRoot ".venv\Scripts\python.exe"
 $engineRoot = Join-Path $repositoryRoot "engine\openra"
 $dotnetRoot = Join-Path $env:USERPROFILE ".dotnet"
+$brandIcon = Join-Path $repositoryRoot "assets\brand\rtsai.ico"
 
-if (-not (Test-Path -LiteralPath $python)) {
-    throw "Python environment is missing. Run scripts\setup.ps1 first."
+foreach ($required in @($python, $brandIcon)) {
+    if (-not (Test-Path -LiteralPath $required)) {
+        throw "Packaging input is missing: $required"
+    }
 }
 
 New-Item -ItemType Directory -Path $artifactRoot -Force | Out-Null
@@ -48,6 +54,7 @@ $pyinstallerWork = Join-Path $artifactRoot "package\pyinstaller-work"
 $pyinstallerSpec = Join-Path $artifactRoot "package\pyinstaller-spec"
 & $python -m PyInstaller --noconfirm --clean --onefile `
     --name openra-ai-companion `
+    --icon $brandIcon `
     --paths (Join-Path $repositoryRoot "services\companion\src") `
     --collect-all sounddevice `
     --distpath (Join-Path $stageRoot "bin") `
@@ -69,6 +76,9 @@ Copy-Item -LiteralPath (Join-Path $repositoryRoot "generated\missions\riyadh-cro
 Copy-Item -LiteralPath (Join-Path $repositoryRoot ".env.example") -Destination $stageRoot
 Copy-Item -LiteralPath (Join-Path $repositoryRoot "README.md") -Destination $stageRoot
 Copy-Item -LiteralPath (Join-Path $repositoryRoot "LICENSE") -Destination $stageRoot
+$brandTarget = Join-Path $stageRoot "assets\brand"
+New-Item -ItemType Directory -Path $brandTarget -Force | Out-Null
+Copy-Item -LiteralPath $brandIcon -Destination (Join-Path $brandTarget "rtsai.ico")
 
 $manifest = [ordered]@{
     product = "OpenRA AI"
@@ -90,8 +100,16 @@ Add-Type -AssemblyName System.IO.Compression.FileSystem
 $hash = (Get-FileHash -LiteralPath $releaseArchive -Algorithm SHA256).Hash.ToLowerInvariant()
 $hash | Set-Content -LiteralPath "$releaseArchive.sha256" -Encoding ASCII
 
+$installerResult = $null
+if (-not $SkipInstaller) {
+    $installerResult = & (Join-Path $PSScriptRoot "package-windows-installer.ps1") -Version $Version -StageRoot $stageRoot
+}
+
 [pscustomobject]@{
     Archive = $releaseArchive
     Bytes = (Get-Item -LiteralPath $releaseArchive).Length
     SHA256 = $hash
+    Installer = $installerResult.Installer
+    InstallerBytes = $installerResult.Bytes
+    InstallerSHA256 = $installerResult.SHA256
 }

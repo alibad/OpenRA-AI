@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "https://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>CFBundleDevelopmentRegion</key>
+  <string>English</string>
+  <key>CFBundleDisplayName</key>
+  <string>OpenRA AI</string>
+  <key>CFBundleExecutable</key>
+  <string>OpenRAAI</string>
+  <key>CFBundleIconFile</key>
+  <string>rtsai.icns</string>
+  <key>CFBundleIdentifier</key>
+  <string>net.rtsai.openraai</string>
+  <key>CFBundleInfoDictionaryVersion</key>
+  <string>6.0</string>
+  <key>CFBundleName</key>
+  <string>OpenRA AI</string>
+  <key>CFBundlePackageType</key>
+  <string>APPL</string>
+  <key>CFBundleShortVersionString</key>
+  <string>{BUILD_VERSION}</string>
+  <key>CFBundleVersion</key>
+  <string>{BUILD_VERSION}</string>
+  <key>RTSAIVersion</key>
+  <string>{VERSION}</string>
+  <key>LSMinimumSystemVersion</key>
+  <string>10.15</string>
+  <key>LSApplicationCategoryType</key>
+  <string>public.app-category.games</string>
+  <key>NSHighResolutionCapable</key>
+  <true/>
+  <key>NSMicrophoneUsageDescription</key>
+  <string>OpenRA AI uses the microphone only while push-to-talk is active.</string>
+  <key>ModId</key>
+  <string>ra</string>
+  <key>FaqUrl</key>
+  <string>https://rtsai.net/</string>
+  <key>JoinServerUrlScheme</key>
+  <string>openra-ai-{BUILD_VERSION}</string>
+</dict>
+</plist>
