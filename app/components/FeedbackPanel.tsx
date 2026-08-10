@@ -95,7 +95,7 @@ export function FeedbackPanel({ user, openAuth }: { user: User | null; openAuth:
   const store = useFeedbackStore();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState<{ receipt: string; issueUrl: string; notificationQueued: boolean } | null>(null);
+  const [success, setSuccess] = useState<{ receipt: string; issueUrl?: string; notificationQueued: boolean } | null>(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [company, setCompany] = useState("");
   const awaitingAuth = useRef(false);
@@ -169,7 +169,7 @@ export function FeedbackPanel({ user, openAuth }: { user: User | null; openAuth:
         }),
       });
       const payload = await response.json() as { success?: boolean; receipt?: string; issueUrl?: string; notificationQueued?: boolean; error?: string };
-      if (!response.ok || !payload.success || !payload.receipt || !payload.issueUrl) throw new Error(payload.error || "Could not save feedback");
+      if (!response.ok || !payload.success || !payload.receipt) throw new Error(payload.error || "Could not save feedback");
       setSuccess({ receipt: payload.receipt, issueUrl: payload.issueUrl, notificationQueued: Boolean(payload.notificationQueued) });
       toast.success("Feedback saved privately");
     } catch (cause) {
@@ -209,8 +209,8 @@ export function FeedbackPanel({ user, openAuth }: { user: User | null; openAuth:
                 <span><CheckCircle2 size={28} /></span>
                 <p className="eyebrow">Saved privately</p>
                 <h2 id="feedback-title">Your feedback is in the builder’s inbox.</h2>
-                <p>Receipt <strong>{success.receipt}</strong>. {success.notificationQueued ? "A Firebase mail alert was queued." : "The issue is saved; the mail alert will be retried separately."}</p>
-                <div><a href={success.issueUrl} target="_blank" rel="noreferrer">Open private issue</a><button type="button" onClick={close}>Done</button></div>
+                <p>Receipt <strong>{success.receipt}</strong>. {success.notificationQueued ? "A Firebase mail alert was queued." : "The private issue is saved; its mail alert will be retried separately."}</p>
+                <div>{success.issueUrl && <a href={success.issueUrl} target="_blank" rel="noreferrer">Open private issue</a>}<button type="button" onClick={close}>Done</button></div>
               </div>
             ) : (
               <form onSubmit={submit}>

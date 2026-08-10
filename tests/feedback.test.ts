@@ -48,6 +48,22 @@ test("escapes feedback before rendering the Firebase mail alert", () => {
   assert.match(email.html, /Player &lt;One&gt;/);
 });
 
+test("creates a complete Firebase mail fallback without a GitHub issue", () => {
+  const result = validateFeedbackPayload(valid);
+  assert.equal(result.ok, true);
+  if (!result.ok) return;
+  const email = createFeedbackEmail({
+    receipt: "RTS-ABC12345",
+    receivedAt: "2026-08-10T10:00:00.000Z",
+    submission: result.value,
+    identity: { uid: "firebase-user", email: "player@example.com", name: "Player" },
+  });
+  assert.match(email.html, /Delivered directly through Firebase mail/);
+  assert.match(email.text, /Private issue: pending synchronization/);
+  assert.match(email.text, /button\.generate/);
+  assert.match(email.text, /Firebase UID: firebase-user/);
+});
+
 test("creates a private issue body with bounded context and labels", () => {
   const result = validateFeedbackPayload(valid);
   assert.equal(result.ok, true);

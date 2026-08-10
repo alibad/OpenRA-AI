@@ -57,10 +57,12 @@ them, bounded browser, console, and network diagnostics. It never captures
 screenshots, page HTML, form values, request bodies, headers, or URL queries.
 
 `/api/feedback` validates the Firebase ID token and sanitizes the full payload.
-It creates a private issue through an installed GitHub App, then queues an admin
-alert through the existing Firebase `mail` collection and official Trigger
-Email extension. Written feedback and diagnostic content never enter Google
-Analytics.
+It creates a private issue through an installed GitHub App and queues a complete
+admin alert through the existing Firebase `mail` collection and official Trigger
+Email extension. Firebase mail is the durable fallback: feedback is still
+delivered when GitHub is temporarily unavailable, and the private issue link is
+included whenever synchronization succeeds. Written feedback and diagnostic
+content never enter Google Analytics.
 
 Copy the server-only feedback variables from `.env.example` into the hosting
 environment:

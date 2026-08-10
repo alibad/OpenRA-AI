@@ -252,8 +252,8 @@ export function createFeedbackIssueBody(input: {
 
 export function createFeedbackEmail(input: {
   receipt: string;
-  issueNumber: number;
-  issueUrl: string;
+  issueNumber?: number;
+  issueUrl?: string;
   receivedAt: string;
   submission: FeedbackSubmission;
   identity: { uid: string; email: string | null; name: string | null };
@@ -261,9 +261,19 @@ export function createFeedbackEmail(input: {
   const { receipt, issueNumber, issueUrl, receivedAt, submission, identity } = input;
   const safeDescription = escapeHtml(submission.description).replace(/\n/g, "<br />");
   const safeTitle = escapeHtml(submission.title);
-  const safeIssueUrl = escapeHtml(issueUrl);
   const sender = escapeHtml(identity.name || identity.email || "Signed-in player");
-  const html = `<!doctype html><html><body style="margin:0;background:#111411;color:#f0eee6;font-family:Arial,sans-serif"><div style="max-width:680px;margin:0 auto;padding:40px 24px"><p style="margin:0 0 8px;color:#ef5b3f;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase">RTS AI feedback · ${escapeHtml(submission.category)}</p><h1 style="margin:0 0 10px;font-size:30px;line-height:1.15">${safeTitle}</h1><p style="margin:0 0 26px;color:#b5b5aa;font-size:13px">${sender} · ${escapeHtml(receivedAt)} · ${escapeHtml(receipt)}</p><div style="padding:22px;background:#f0eee6;color:#111411;border-left:4px solid #ef5b3f;font-size:16px;line-height:1.6">${safeDescription}</div><p style="margin:28px 0 0"><a href="${safeIssueUrl}" style="display:inline-block;padding:13px 18px;background:#ef5b3f;color:#fff;text-decoration:none;font-weight:700">Open private issue #${issueNumber}</a></p></div></body></html>`;
-  const text = `RTS AI feedback: ${submission.title}\n\n${submission.description}\n\nCategory: ${submission.category}\nRating: ${submission.rating ?? "Not provided"}\nUser: ${identity.name || identity.email || "Signed-in player"}\nReceipt: ${receipt}\nPrivate issue: ${issueUrl}`;
+  const captures = submission.captures.length
+    ? submission.captures.map((capture) => `${capture.elementInfo} @ ${capture.position.x},${capture.position.y}`).join("\n")
+    : "None";
+  const diagnostics = Object.keys(submission.diagnostics).length
+    ? JSON.stringify(submission.diagnostics, null, 2)
+    : "Not included";
+  const context = `Category: ${submission.category}\nRating: ${submission.rating ?? "Not provided"}\nPage: ${submission.pagePath || "/"}\nUser: ${identity.name || identity.email || "Signed-in player"}\nFirebase UID: ${identity.uid}\nReceipt: ${receipt}\n\nSelected elements:\n${captures}\n\nDiagnostics:\n${diagnostics}`;
+  const issueAction = issueNumber && issueUrl
+    ? `<p style="margin:28px 0 0"><a href="${escapeHtml(issueUrl)}" style="display:inline-block;padding:13px 18px;background:#ef5b3f;color:#fff;text-decoration:none;font-weight:700">Open private issue #${issueNumber}</a></p>`
+    : `<p style="margin:28px 0 0;color:#b5b5aa;font-size:13px">Delivered directly through Firebase mail. GitHub issue synchronization is pending.</p>`;
+  const html = `<!doctype html><html><body style="margin:0;background:#111411;color:#f0eee6;font-family:Arial,sans-serif"><div style="max-width:680px;margin:0 auto;padding:40px 24px"><p style="margin:0 0 8px;color:#ef5b3f;font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase">RTS AI feedback · ${escapeHtml(submission.category)}</p><h1 style="margin:0 0 10px;font-size:30px;line-height:1.15">${safeTitle}</h1><p style="margin:0 0 26px;color:#b5b5aa;font-size:13px">${sender} · ${escapeHtml(receivedAt)} · ${escapeHtml(receipt)}</p><div style="padding:22px;background:#f0eee6;color:#111411;border-left:4px solid #ef5b3f;font-size:16px;line-height:1.6">${safeDescription}</div><pre style="margin:24px 0 0;padding:18px;overflow:auto;background:#090b09;color:#d5d7cf;border:1px solid #343a34;font:12px/1.5 ui-monospace,SFMono-Regular,Consolas,monospace;white-space:pre-wrap">${escapeHtml(context)}</pre>${issueAction}</div></body></html>`;
+  const issueLine = issueUrl ? `\nPrivate issue: ${issueUrl}` : "\nPrivate issue: pending synchronization";
+  const text = `RTS AI feedback: ${submission.title}\n\n${submission.description}\n\n${context}${issueLine}`;
   return { html, text };
 }
