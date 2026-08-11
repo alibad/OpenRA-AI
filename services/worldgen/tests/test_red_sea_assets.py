@@ -24,6 +24,8 @@ MISSION_SOURCE = ROOT / "missions" / "red-sea-2026" / "jizan-corridor"
 MISSION_PACKAGE = ROOT / "generated" / "missions" / "jizan-corridor-2026.oramap"
 HODEIDAH_SOURCE = ROOT / "missions" / "red-sea-2026" / "hodeidah-lifeline"
 HODEIDAH_PACKAGE = ROOT / "generated" / "missions" / "hodeidah-lifeline-2026.oramap"
+MANDAB_SOURCE = ROOT / "missions" / "red-sea-2026" / "bab-al-mandab-passage"
+MANDAB_PACKAGE = ROOT / "generated" / "missions" / "bab-al-mandab-passage-2026.oramap"
 ENGINE_ROOT = ROOT / "engine" / "openra"
 UTILITY = ENGINE_ROOT / "bin" / "OpenRA.Utility.exe"
 
@@ -375,11 +377,24 @@ class RedSeaAssetTests(unittest.TestCase):
         for filename in hodeidah_references:
             self.assertTrue((BITS / filename).is_file(), filename)
 
+        mandab_script = (MANDAB_SOURCE / "bab-al-mandab-passage.lua").read_text(encoding="utf-8")
+        mandab_references = set(re.findall(r'"(redsea-mandab-[a-z-]+\.wav)"', mandab_script))
+        self.assertEqual(len(mandab_references), 10)
+        for filename in mandab_references:
+            self.assertTrue((BITS / filename).is_file(), filename)
+
     def test_voice_provenance_is_bilingual_and_disclosed(self) -> None:
         provenance = json.loads((ROOT / "assets" / "red-sea-2026" / "voice-provenance.json").read_text(encoding="utf-8"))
         languages = {line["language"] for line in provenance["lines"]}
         self.assertTrue({"en-US", "ar-SA", "ar-YE"}.issubset(languages))
         self.assertTrue(all(line["synthetic_voice_disclosed"] for line in provenance["lines"]))
+
+        mandab = json.loads((ROOT / "assets" / "red-sea-2026" / "mandab-voice-provenance.json").read_text(encoding="utf-8"))
+        self.assertEqual(mandab["mission"], "bab-al-mandab-passage-2026")
+        self.assertEqual(len(mandab["lines"]), 10)
+        self.assertEqual({line["language"] for line in mandab["lines"]}, {"ar-SA", "en-US"})
+        self.assertTrue(all(line["synthetic_voice_disclosed"] for line in mandab["lines"]))
+        self.assertTrue(all(not line["real_person_imitation"] for line in mandab["lines"]))
 
     def test_mission_package_is_deterministic_and_scripted(self) -> None:
         required = {"map.yaml", "map.bin", "map.png", "rules.yaml", "map.ftl", "jizan-corridor.lua", "red-sea-mission-manifest.json"}
@@ -449,9 +464,84 @@ class RedSeaAssetTests(unittest.TestCase):
                 break
             campaign.append(line)
         self.assertEqual(
-            ["jizan-corridor-2026", "hodeidah-lifeline-2026", "straits-shield-2026", "haitan-network-2026"],
+            [
+                "jizan-corridor-2026",
+                "hodeidah-lifeline-2026",
+                "straits-shield-2026",
+                "haitan-network-2026",
+                "bab-al-mandab-passage-2026",
+            ],
             [line.strip() for line in campaign if line.strip()],
         )
+
+    def test_mandab_is_a_deterministic_registered_playable_mission(self) -> None:
+        required = {
+            "map.yaml", "map.bin", "map.png", "rules.yaml", "map.ftl",
+            "bab-al-mandab-passage.lua", "briefing.md", "red-sea-mission-manifest.json",
+        }
+        with zipfile.ZipFile(MANDAB_PACKAGE) as mission:
+            self.assertTrue(required.issubset(mission.namelist()))
+            self.assertTrue(all(info.date_time == (2026, 8, 11, 0, 0, 0) for info in mission.infolist()))
+            files = {name: mission.read(name) for name in mission.namelist()}
+            manifest = json.loads(files["red-sea-mission-manifest.json"])
+        self.assertEqual(manifest["id"], "bab-al-mandab-passage-2026")
+        self.assertEqual(manifest["factual_cutoff"], "2026-08-11")
+        self.assertEqual(len(manifest["features"]), 7)
+        for name, digest in manifest["files"].items():
+            self.assertEqual(hashlib.sha256(files[name]).hexdigest(), digest, name)
+
+        map_yaml = files["map.yaml"].decode("utf-8")
+        self.assertIn("Title: Red Sea 2026: Bab al-Mandab Passage", map_yaml)
+        self.assertIn("Playable: True", map_yaml)
+        self.assertIn("Faction: saudi", map_yaml)
+        self.assertIn("SaudiConyard: fact", map_yaml)
+        self.assertIn("SaudiRefinery: proc", map_yaml)
+        self.assertIn("SaudiWarFactory: weap", map_yaml)
+        registry = (ENGINE_ROOT / "mods" / "ra" / "missions.yaml").read_text(encoding="utf-8")
+        self.assertIn("\tbab-al-mandab-passage-2026", registry)
+
+    def test_mandab_has_five_linked_objectives_and_every_failure_path(self) -> None:
+        script = (MANDAB_SOURCE / "bab-al-mandab-passage.lua").read_text(encoding="utf-8")
+        for mechanic in (
+            "ReadinessObjective", "ReconObjective", "ThreatObjective", "ShippingObjective", "HoldObjective",
+            "ActivateRecon", "ActivateThreatPhase", "StartCivilianShipping", "StartFinalEscalation",
+            "FailReadiness", "FailRecon", "FailThreats", "FailShipping", "FailPassage",
+        ):
+            self.assertIn(mechanic, script)
+        self.assertIn('Saudi.HasPrerequisites({ "atek" })', script)
+        self.assertIn("SaudiRosterCount() >= 3", script)
+        self.assertIn("ReplacementShipsRemaining", script)
+        self.assertIn("state.actor.Teleport(state.path[state.step])", script)
+        self.assertIn("leadStep - state.step >= 2", script)
+        self.assertIn("MANDAB_TEST_PATH = \"live\"", script)
+        for path in ("fail-readiness", "fail-recon", "fail-threats", "fail-shipping", "fail-passage"):
+            self.assertIn(f'MANDAB_TEST_PATH == "{path}"', script)
+
+    def test_mandab_convoy_waypoints_are_distinct_navigable_water_cells(self) -> None:
+        map_yaml = (MANDAB_SOURCE / "map.yaml").read_text(encoding="utf-8")
+        names = re.findall(r"\t(Ship(?:Entry|West|Inner|East)[A-Za-z]+): waypoint\n\t\tLocation: (\d+),(\d+)", map_yaml)
+        self.assertEqual(len(names), 24)
+        locations = [(int(x), int(y)) for _, x, y in names]
+        self.assertEqual(len(locations), len(set(locations)))
+
+        binary = (MANDAB_SOURCE / "map.bin").read_bytes()
+        _, width, height, tiles_offset, _, _ = struct.unpack("<BHHIII", binary[:17])
+        self.assertEqual((width, height), (96, 96))
+        for x, y in locations:
+            offset = tiles_offset + 3 * (x * height + y)
+            template = struct.unpack("<H", binary[offset:offset + 2])[0]
+            self.assertEqual(template, 256, f"ship waypoint {x},{y} must be open water")
+
+    def test_mandab_source_boundary_and_unicode_subtitles_are_explicit(self) -> None:
+        briefing = (MANDAB_SOURCE / "briefing.md").read_text(encoding="utf-8")
+        fluent = (MANDAB_SOURCE / "map.ftl").read_text(encoding="utf-8")
+        self.assertIn("Factual cutoff: **11 August 2026**", briefing)
+        self.assertIn("## Sourced background", briefing)
+        self.assertIn("## Fictional mission situation", briefing)
+        for authority in ("International Maritime Organization", "Energy Information Administration", "UNCTAD"):
+            self.assertIn(authority, briefing)
+        for text in ("قيادة الممر", "العبور المدني", "اكتمل العبور"):
+            self.assertIn(text, fluent)
 
 
 if __name__ == "__main__":

@@ -1,7 +1,7 @@
 # Red Sea 2026 vertical slice
 
 The polished vertical slice adds **Saudi Arabia** and **Yemen** to Red Alert and
-ships two authored campaign missions over deterministic Red Sea terrain. It proves
+ships three authored campaign missions over deterministic Red Sea terrain. It proves
 country-gated units, original directional sprites, native bot production,
 bilingual radio, a playable construction/harvesting economy, scripted
 objectives, source-dated Earth content, and a reproducible audiovisual pipeline.
@@ -15,11 +15,17 @@ Play-Red-Sea-2026.cmd
 ```
 
 Double-clicking launches `Jizan Corridor` with **Saudi Arabia** as the player.
-Both packages are rebuilt, validated, and installed. Launch the playable Yemen
+All packages are rebuilt, validated, and installed. Launch the playable Yemen
 mission directly with:
 
 ```powershell
 .\scripts\play-red-sea-2026.ps1 -Mission hodeidah-lifeline-2026
+```
+
+Launch the third Saudi maritime mission with:
+
+```powershell
+.\scripts\play-red-sea-2026.ps1 -Mission bab-al-mandab-passage-2026
 ```
 
 Pass `-Regenerate` to rebuild the Earth terrain before repackaging the mission.
@@ -98,16 +104,33 @@ supplies inland, disperse mobile assets before a surveillance sweep, and cover
 the evacuation convoy on its return. Saudi combined-arms waves, the sweep
 deadline, exposure tolerance, and required convoy survivors scale by difficulty.
 
+## Bab al-Mandab Passage
+
+The third mission returns to Saudi Arabia with a maritime flow. Build a Radar
+Dome and Tech Center, produce an additional M1A2S or SADS, reconnoiter three
+coastal sectors, neutralize patrolling mobile launchers, then protect four
+civilian merchant vessels through separate water lanes around a stylized
+Mayyun island. A final combined-arms hold tests the safe passage while an
+optional objective rewards preserving both navigation beacons with
+reinforcements.
+
+Every vessel has an independent lane plus deterministic recovery for blocked,
+destroyed, or separated actors. Required survivors, replacements, deadlines,
+enemy composition, drone count, and final hold time all scale by difficulty.
+Mission-specific radio uses its own disclosed-synthetic voice generator and
+provenance file, isolated from the Air Warfare session's source list.
+
 ## Scenario boundary
 
 Each scenario stores a factual cutoff, sources, country profiles, authored
 objectives, and an editorial boundary. The background is source-dated; force
 composition, routes, timing, positions, and outcomes are gameplay abstractions.
 
-The two playable contracts are:
+The three playable contracts are:
 
 - `jizan-corridor-2026`;
-- `hodeidah-lifeline-2026`.
+- `hodeidah-lifeline-2026`;
+- `bab-al-mandab-passage-2026`.
 
 The mission packages are reproducible via `scripts/build-red-sea-mission.py` and
 are listed in order under **OpenRA AI** in the mission browser. Remaining release
@@ -120,13 +143,15 @@ network-backed disclosed synthetic voice sources should be regenerated.
 
 ## Validation
 
-- OpenRA map YAML and missing-sprite checks for both installed packages;
-- a full real-engine headless Hodeidah run to victory with all four objectives
-  completed, plus a Jizan game/world load with zero Lua or engine errors;
-- 186 automated companion, AI, world-generation, SHP frame-count, bilingual
-  provenance, WAV layout/headroom, scripted-reference, and deterministic-package
-  checks;
+- OpenRA map YAML and missing-sprite checks for all installed packages;
+- full real-engine headless runs, including Bab al-Mandab construction,
+  production, harvesting, mobile reconnaissance, ship pathing, victory, and all
+  five primary failure paths;
+- automated companion, AI, world-generation, SHP frame-count, bilingual
+  provenance, WAV layout/headroom, scripted-reference, water-waypoint, and
+  deterministic-package checks;
 - rendered live-app inspection of the populated production tree, Arabic
-  subtitles, convoy script, and custom vehicles changing facings while moving;
+  subtitles, convoy script, fleet cameras, and custom vehicles changing facings
+  while moving at 1280×720, 1920×1080, and 3840×2160 fullscreen;
 - the playtest matrix in `docs/red-sea-2026-playtest.md` for the final human
   feel and mix pass.

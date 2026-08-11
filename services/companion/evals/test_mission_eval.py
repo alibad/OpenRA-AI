@@ -9,9 +9,9 @@ class MissionCorpusEvalTests(unittest.TestCase):
     def test_every_declared_red_alert_mission_is_inventoried(self) -> None:
         missions = inventory_missions()
 
-        self.assertEqual(len(missions), 65)
+        self.assertEqual(len(missions), 66)
         self.assertTrue(all(mission.available for mission in missions))
-        self.assertEqual(len({mission.map_name for mission in missions}), 65)
+        self.assertEqual(len({mission.map_name for mission in missions}), 66)
 
     def test_required_human_slots_are_detected_from_each_map(self) -> None:
         missions = {mission.map_name: mission for mission in inventory_missions()}
@@ -31,6 +31,8 @@ class MissionCorpusEvalTests(unittest.TestCase):
         self.assertEqual(missions["hodeidah-lifeline-2026"].player_slot, "Yemen")
         self.assertEqual(missions["haitan-network-2026"].request_name, "haitan-network-2026.oramap")
         self.assertEqual(missions["haitan-network-2026"].player_slot, "China")
+        self.assertEqual(missions["bab-al-mandab-passage-2026"].request_name, "bab-al-mandab-passage-2026.oramap")
+        self.assertEqual(missions["bab-al-mandab-passage-2026"].player_slot, "Saudi Arabia")
 
 
 if __name__ == "__main__":

@@ -1,0 +1,86 @@
+Player:
+	PlayerResources:
+		DefaultCash: 8500
+
+World:
+	LuaScript:
+		Scripts: campaign.lua, utils.lua, bab-al-mandab-passage.lua
+	MissionData:
+		Briefing: briefing
+	ScriptLobbyDropdown@difficulty:
+		ID: difficulty
+		Label: dropdown-difficulty.label
+		Description: dropdown-difficulty.description
+		Values:
+			easy: options-difficulty.easy
+			normal: options-difficulty.normal
+			hard: options-difficulty.hard
+		Default: normal
+
+# Keep the Saudi vehicle queue on the established Red Sea roster. Harvesters,
+# MCVs, infantry, construction, radar, and Tech Center progression stay intact.
+1TNK:
+	Buildable:
+		Prerequisites: ~disabled
+
+2TNK:
+	Buildable:
+		Prerequisites: ~disabled
+
+ARTY:
+	Buildable:
+		Prerequisites: ~disabled
+
+JEEP:
+	Buildable:
+		Prerequisites: ~disabled
+
+MRJ:
+	Buildable:
+		Prerequisites: ~disabled
+
+MNLY:
+	Buildable:
+		Prerequisites: ~disabled
+
+E7:
+	Buildable:
+		Prerequisites: ~disabled
+
+E7.noautotarget:
+	-Buildable:
+
+SPY:
+	Buildable:
+		Prerequisites: ~disabled
+
+E1:
+	Tooltip:
+		Name: actor-mandab-rifle.name
+
+E3:
+	Tooltip:
+		Name: actor-mandab-at-team.name
+
+E6:
+	Tooltip:
+		Name: actor-mandab-engineer.name
+
+LST:
+	-Buildable:
+	RejectsOrders:
+	Tooltip:
+		Name: actor-civilian-merchant.name
+	Health:
+		HP: 50000
+	Mobile:
+		Locomotor: lcraft
+		Speed: 96
+
+FCOM:
+	Tooltip:
+		Name: actor-passage-control.name
+
+HOSP:
+	Tooltip:
+		Name: actor-navigation-beacon.name

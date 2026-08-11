@@ -85,7 +85,11 @@ if ($LASTEXITCODE -ne 0) { throw "Red Sea mission packaging failed." }
 
 Push-Location $engineRoot
 try {
-    foreach ($missionName in @("jizan-corridor-2026.oramap", "hodeidah-lifeline-2026.oramap")) {
+    foreach ($missionName in @(
+        "jizan-corridor-2026.oramap",
+        "hodeidah-lifeline-2026.oramap",
+        "bab-al-mandab-passage-2026.oramap"
+    )) {
         $mission = Join-Path $repositoryRoot "generated\missions\$missionName"
         & $utility ra --check-yaml $mission
         if ($LASTEXITCODE -ne 0) { throw "Red Sea mission validation failed for $missionName." }
