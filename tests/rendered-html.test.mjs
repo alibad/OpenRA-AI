@@ -28,6 +28,14 @@ test("renders the complete marketing and mission-creation surface", async () => 
   assert.match(html, /"SoftwareApplication"/);
   assert.match(html, /"VideoGame"/);
   assert.match(html, /Your battlefield/);
+  assert.match(html, /THE OPENRA AI PLAN/);
+  assert.match(html, /Two core experiences/);
+  assert.match(html, /Companion \+ command/);
+  assert.match(html, /Earth to battlefield/);
+  assert.match(html, /Discover \+ launch/);
+  assert.match(html, /New theatres \+ mods/);
+  assert.match(html, /Agents that play \+ learn/);
+  assert.match(html, /Current playable proof/);
   assert.match(html, /Mission studio/);
   assert.match(html, /Point anywhere/);
   assert.match(html, /Earth footprint/);
@@ -130,4 +138,18 @@ test("discovers native Windows and macOS release assets", async () => {
   assert.match(source, /AI-Pack-/);
   assert.match(source, /aiPackChecksumUrl/);
   assert.match(page, /No placeholder download/);
+});
+
+test("keeps the platform plan durable and current showcases replaceable", async () => {
+  const layout = await readFile(new URL("../app/layout.tsx", import.meta.url), "utf8");
+  const page = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
+  const plan = await readFile(new URL("../lib/product-plan.ts", import.meta.url), "utf8");
+
+  assert.match(layout, /AI-Native RTS Platform/);
+  assert.doesNotMatch(layout, /Red Sea 2026/);
+  assert.match(plan, /export const productLayers/);
+  assert.match(plan, /export const currentShowcase/);
+  assert.match(page, /productLayers\.map/);
+  assert.match(page, /currentShowcase\.title/);
+  assert.doesNotMatch(page, /Saudi Arabia and Yemen join/);
 });

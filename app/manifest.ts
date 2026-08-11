@@ -4,7 +4,7 @@ export default function manifest(): MetadataRoute.Manifest {
   return {
     name: "RTS AI — OpenRA AI Companion",
     short_name: "RTS AI",
-    description: "An interruptible OpenRA AI companion with Earth missions, optional AUTO command, and Red Sea 2026.",
+    description: "An AI-native OpenRA platform for intelligent play, Earth-built missions, expandable experiences, and autonomous strategy research.",
     start_url: "/",
     scope: "/",
     display: "standalone",

@@ -8,7 +8,6 @@ repository.
 Players can:
 
 - download the newest published Windows build and its SHA-256 checksum;
-- launch the Alpha.9 Red Sea 2026 prototype with Saudi Arabia, Yemen, and the Jizan Corridor Earth contract;
 - install the optional Qwen3-VL, Whisper, and Kokoro Local AI Pack;
 - ask the companion for advice, confirm safe game actions, or explicitly enable AUTO command;
 - search or select a point on an OpenStreetMap basemap;
@@ -18,6 +17,12 @@ Players can:
 - create a Firebase-backed commander profile before generating or downloading a new mission;
 - use privacy-safe product analytics that associate events with a pseudonymous account ID instead of a name or email;
 - send authenticated, private product feedback with a searchable receipt ID and optional usefulness rating.
+
+The product story is organized around the original plan: companion + command,
+Earth-to-battlefield creation, and the web + launcher surface that makes both
+approachable. New theatre/mod development and autonomous strategy research are
+presented as growth tracks. Individual scenarios such as the current Red Sea
+2026 vertical slice are evolving proof of that platform rather than its identity.
 
 The homepage also includes an interactive companion preview so visitors can
 understand the pause, ask, and alert-priority experience before downloading the

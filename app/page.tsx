@@ -1,11 +1,14 @@
 import {
   Apple,
   ArrowRight,
+  Blocks,
+  Bot,
   BrainCircuit,
   CalendarDays,
   CheckCircle2,
   Download,
   FileArchive,
+  Globe2,
   Github,
   Map,
   Mic2,
@@ -21,10 +24,21 @@ import { MissionStudio } from "./components/MissionStudio";
 import { CompanionDemo } from "./components/CompanionDemo";
 import { AccountNav } from "./components/AccountNav";
 import { getGameRelease } from "../lib/release";
+import { currentShowcase, developmentTracks, productLayers } from "../lib/product-plan";
 
 const gameSource = "https://github.com/alibad/OpenRA-AI";
-const redSeaDocs = `${gameSource}/blob/main/docs/red-sea-2026.md`;
 const canonicalUrl = "https://rtsai.net";
+
+const productLayerIcons = {
+  companion: BrainCircuit,
+  world: Globe2,
+  distribution: MonitorDown,
+};
+
+const developmentTrackIcons = {
+  creation: Blocks,
+  autonomy: Bot,
+};
 
 function Brand({ footer = false }: { footer?: boolean }) {
   return (
@@ -62,7 +76,7 @@ export default async function Home() {
         "@id": `${canonicalUrl}/#website`,
         url: canonicalUrl,
         name: "RTS AI",
-        description: "An AI-powered OpenRA build with delegated play, Earth mission generation, and the Red Sea 2026 prototype.",
+        description: "An AI-native RTS platform for intelligent play, Earth-built missions, new OpenRA experiences, and autonomous strategy research.",
         inLanguage: "en",
       },
       {
@@ -70,7 +84,7 @@ export default async function Home() {
         "@id": `${canonicalUrl}/#openra-ai`,
         name: "OpenRA AI",
         url: canonicalUrl,
-        description: "A playable OpenRA build with an interruptible AI companion, optional AUTO delegation, real-world mission generation, and Red Sea 2026.",
+        description: "A playable OpenRA build with an interruptible AI companion, optional AUTO delegation, real-world mission generation, and an expanding experience layer.",
         applicationCategory: "GameApplication",
         operatingSystem: gameRelease.macos ? "Windows 10, Windows 11, macOS" : "Windows 10, Windows 11",
         softwareVersion: windowsRelease.version,
@@ -95,7 +109,7 @@ export default async function Home() {
         <Brand />
         <div className="nav-links">
           <a href="#companion">Companion</a>
-          <a href="#red-sea-2026">Red Sea 2026</a>
+          <a href="#platform">The platform</a>
           <a href="#mission-studio">Mission studio</a>
           <a href="#download">Download</a>
           <a href="#architecture">How it works</a>
@@ -109,9 +123,9 @@ export default async function Home() {
       <header className="hero" id="top">
         <div className="hero-radar" aria-hidden="true"><i /><i /><i /><span /></div>
         <div className="hero-copy">
-          <a className="eyebrow hero-release-link" href="#red-sea-2026"><span className="live-dot" /> Alpha.9 live / Red Sea 2026 included <ArrowRight size={13} /></a>
+          <a className="eyebrow hero-release-link" href="#platform"><span className="live-dot" /> Playable alpha / built as a platform <ArrowRight size={13} /></a>
           <h1>Your battlefield.<br /><em>Now it talks back.</em></h1>
-          <p className="hero-lede">An interruptible OpenRA companion that can advise, execute confirmed actions, or take optional AUTO command—plus Earth-built missions and the new Red Sea 2026 prototype.</p>
+          <p className="hero-lede">OpenRA rebuilt around human + AI play: an interruptible companion, Earth-built missions, expandable game experiences, and agents that help us improve strategy itself.</p>
           <div className="hero-actions">
             <a className="primary-action" href="#download"><Download size={17} /> Download the game</a>
             <a className="text-action" href="#mission-studio">Build a mission <ArrowRight size={17} /></a>
@@ -126,21 +140,70 @@ export default async function Home() {
       </header>
 
       <div className="capability-rail" aria-label="Core capabilities">
-        <span>01 <b>Notices what matters</b></span>
-        <span>02 <b>Answers about this match</b></span>
-        <span>03 <b>Acts only when authorized</b></span>
-        <span>04 <b>Builds from real Earth</b></span>
+        <span>01 <b>Play with intelligence</b></span>
+        <span>02 <b>Create from Earth</b></span>
+        <span>03 <b>Discover, share, and launch</b></span>
       </div>
+
+      <section className="platform-shell" id="platform" aria-labelledby="platform-title">
+        <div className="platform-vision">
+          <div className="platform-heading">
+            <span className="section-number">THE OPENRA AI PLAN</span>
+            <h2 id="platform-title">Two core experiences.<br />One way in.</h2>
+            <p>The plan has always been an AI game companion, an Earth-to-Mission generator, and a web + launcher surface that makes both approachable. New mods and autonomous agents grow from that foundation; they do not replace it.</p>
+          </div>
+
+          <div className="product-layers" aria-label="OpenRA AI product layers">
+            {productLayers.map((layer) => {
+              const LayerIcon = productLayerIcons[layer.id];
+              return (
+                <article key={layer.id}>
+                  <div className="product-layer-top"><span>{layer.number}</span><i>{layer.status}</i></div>
+                  <LayerIcon size={21} />
+                  <h3>{layer.title}</h3>
+                  <p>{layer.description}</p>
+                  <small>{layer.outcome}</small>
+                </article>
+              );
+            })}
+          </div>
+
+          <div className="development-tracks" aria-label="Platform development tracks">
+            {developmentTracks.map((track) => {
+              const TrackIcon = developmentTrackIcons[track.id];
+              return <article key={track.id}><TrackIcon size={18} /><span>{track.label}</span><div><b>{track.title}</b><p>{track.description}</p></div></article>;
+            })}
+          </div>
+
+          <article className="current-showcase" id={currentShowcase.slug}>
+            <div className="showcase-visual">
+              <Image src={currentShowcase.image} alt="Current OpenRA AI vertical-slice key art showing a coastal battlefield" width={1600} height={900} sizes="(max-width: 1050px) 100vw, 48vw" />
+              <span className="showcase-release-tag"><i /> {currentShowcase.label} · {windowsRelease.version}</span>
+              <div className="showcase-readout"><span>FIRST CONTRACT</span><b>{currentShowcase.mission}</b><small>Earth-derived · validated · playable</small></div>
+            </div>
+            <div className="showcase-copy">
+              <span className="section-number">WHAT THE FOUNDATION ENABLES</span>
+              <h3>{currentShowcase.title}</h3>
+              <p>{currentShowcase.description}</p>
+              <ul>{currentShowcase.highlights.map((highlight) => <li key={highlight}><CheckCircle2 size={14} /> {highlight}</li>)}</ul>
+              <div className="showcase-actions">
+                <a className="primary-action" href={primaryWindowsUrl} data-analytics-event="game-download" data-platform="current-showcase"><Download size={17} /> Play current build</a>
+                <a className="text-action" href={`${gameSource}${currentShowcase.docsPath}`} target="_blank" rel="noreferrer">See the vertical slice <ArrowRight size={16} /></a>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
 
       <section className="download-section" id="download" aria-labelledby="download-title">
         <div className="download-intro">
           <span className="section-number">PLAYABLE BUILD / {windowsRelease.version}</span>
           <h2 id="download-title">Install. Launch. Command.</h2>
-          <p>Alpha.9 carries the engine, companion, AUTO strategy layer, Earth tools, and Red Sea 2026 prototype. Choose a native setup or keep the portable package.</p>
+          <p>The current release carries the engine, companion, AUTO strategy layer, Earth tools, and the latest playable vertical slice. Choose a native setup or keep the portable package.</p>
           <div className="release-trust" aria-label="Release details">
             <span><CheckCircle2 size={15} /> Locally built and smoke-tested</span>
             <span><CalendarDays size={15} /> Released {formatDate(windowsRelease.publishedAt)}</span>
-            <a href="#red-sea-2026"><Sparkles size={15} /> New: Saudi Arabia + Yemen</a>
+            <a href={`#${currentShowcase.slug}`}><Sparkles size={15} /> Latest playable showcase</a>
           </div>
         </div>
 
@@ -151,7 +214,7 @@ export default async function Home() {
               <div><span className="platform-kicker">Windows 10 / 11</span><h3>Windows x64</h3></div>
               <span className="release-status is-ready">Ready</span>
             </div>
-            <p>A normal per-user setup with the RTS AI app icon, Start menu entry, desktop shortcut, uninstaller, and the Red Sea launch script.</p>
+            <p>A normal per-user setup with the RTS AI app icon, Start menu entry, desktop shortcut, uninstaller, and included scenario launchers.</p>
             <a className="primary-action platform-primary" href={primaryWindowsUrl} data-analytics-event="game-download" data-platform="windows-x64-setup"><Download size={17} /> Download Windows setup</a>
             <div className="platform-meta">
               <span>{primaryWindowsSize ?? "Setup executable"}</span>
@@ -202,37 +265,10 @@ export default async function Home() {
 
         <ol className="play-steps">
           <li><span>01</span><div><b>Install or extract</b><p>Use Windows setup for shortcuts and uninstall support, or keep the ZIP fully portable.</p></div></li>
-          <li><span>02</span><div><b>Choose your battlefield</b><p>Launch OpenRA AI normally, or run <code>Play-Red-Sea-2026.cmd</code> to build and open Jizan Corridor.</p></div></li>
+          <li><span>02</span><div><b>Choose your battlefield</b><p>Launch OpenRA AI normally, or run <code>{currentShowcase.launcher}</code> to open the current authored vertical slice.</p></div></li>
           <li><span>03</span><div><b>Hold Ctrl+Space to ask</b><p>Release to hear the answer. Ctrl+Shift+M mutes; Ctrl+Shift+A disables or enables the companion.</p></div></li>
         </ol>
         <div className="download-footnote"><FileArchive size={15} /><span>Checksums are published beside every downloadable artifact. The model-backed companion expects your private AI layer on this machine; the game itself still runs if that layer is offline.</span></div>
-      </section>
-
-      <section className="red-sea-shell" id="red-sea-2026" aria-labelledby="red-sea-title">
-        <div className="red-sea-section">
-          <div className="red-sea-visual">
-            <Image src="/red-sea-2026-key-art.webp" alt="Red Sea coastal battlefield concept featuring armor, air defense, drones, and a relief ship" width={1600} height={900} sizes="(max-width: 1050px) 100vw, 58vw" />
-            <span className="red-sea-release-tag"><i /> Included in Alpha.9</span>
-            <div className="red-sea-readout"><span>FIRST CONTRACT</span><b>Jizan Corridor</b><small>Earth-derived · validated · playable</small></div>
-          </div>
-          <div className="red-sea-copy">
-            <span className="section-number">NEW MOD PROTOTYPE / RED SEA 2026</span>
-            <h2 id="red-sea-title">New countries.<br />A new theatre.</h2>
-            <p>Saudi Arabia and Yemen join the Red Alert country selector with faction-gated units, native bot production priorities, and a source-dated Earth mission contract.</p>
-            <div className="faction-roster" aria-label="Red Sea 2026 faction roster">
-              <article><span>SA</span><div><b>Saudi Arabia</b><p>M1A2S main battle tank<br />Mobile air defense system</p></div></article>
-              <article><span>YE</span><div><b>Yemen</b><p>Armed technical · missile launcher<br />Samad drone</p></div></article>
-            </div>
-            <div className="mission-contract">
-              <Map size={19} />
-              <div><span>PLAYABLE EARTH CONTRACT</span><b>Jizan Corridor</b><p>The dedicated launcher generates, validates, installs, and opens the battlefield. The prototype lives inside Red Alert while the standalone expansion shell is developed.</p></div>
-            </div>
-            <div className="red-sea-actions">
-              <a className="primary-action" href={primaryWindowsUrl} data-analytics-event="game-download" data-platform="red-sea-windows"><Download size={17} /> Play on Windows</a>
-              <a className="text-action" href={redSeaDocs} target="_blank" rel="noreferrer">Read the field brief <ArrowRight size={16} /></a>
-            </div>
-          </div>
-        </div>
       </section>
 
       <section className="companion-section" id="companion">
@@ -293,7 +329,7 @@ export default async function Home() {
           <h2>Pick a place.<br />Start a story.</h2>
         </div>
         <div>
-          <p>Generate a mission, enter Jizan Corridor, or install the tested Windows alpha. The same download surface will expose macOS automatically when its signed DMG is released.</p>
+          <p>Generate a mission, explore the latest vertical slice, or install the tested Windows alpha. The same download surface will expose macOS automatically when its signed DMG is released.</p>
           <div className="hero-actions">
             <a className="primary-action" href={primaryWindowsUrl} data-analytics-event="game-download" data-platform="windows-x64-setup"><Download size={17} /> Download Windows setup</a>
             <a className="text-action" href="#mission-studio">Open mission studio <ArrowRight size={17} /></a>
