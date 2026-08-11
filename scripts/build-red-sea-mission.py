@@ -1,4 +1,4 @@
-"""Package both authored Red Sea missions over deterministic Earth terrain."""
+"""Package the authored Red Sea missions over deterministic terrain."""
 
 from __future__ import annotations
 
@@ -50,6 +50,24 @@ MISSION_SPECS = {
             "player-buildable technicals, mobile launchers, and Samad drones",
             "bilingual Arabic and English radio",
             "difficulty-scaled sweep tolerance and attack waves",
+        ],
+    },
+    "bab-al-mandab-passage-2026": {
+        "source": ROOT / "missions" / "red-sea-2026" / "bab-al-mandab-passage",
+        "output": ROOT / "generated" / "missions" / "bab-al-mandab-passage-2026.oramap",
+        "install": ROOT / "engine" / "openra" / "mods" / "ra" / "maps" / "bab-al-mandab-passage-2026.oramap",
+        "preview": ROOT / "assets" / "red-sea-2026" / "mandab-mission-preview.png",
+        "crop_offset": 0,
+        "route": [(48, 92), (42, 73), (38, 57), (37, 38), (42, 20), (48, 3)],
+        "source_terrain": True,
+        "features": [
+            "playable Saudi construction, harvesting, production, and Tech Center progression",
+            "three-sector coastal reconnaissance",
+            "mobile-launcher hunt",
+            "four-vessel civilian maritime escort around stylized Mayyun",
+            "deadlock-resistant split-lane convoy recovery",
+            "final difficulty-scaled combined-arms hold",
+            "original bilingual Arabic and English synthetic radio",
         ],
     },
 }
@@ -107,13 +125,13 @@ def build_mission_preview(spec: dict[str, object]) -> bytes:
 def build_mission(
     mission_id: str,
     spec: dict[str, object],
-    terrain_package: Path,
+    terrain_package: Path | None,
     output: Path,
     install: Path,
 ) -> None:
     source = Path(spec["source"])
     files = source_files(source)
-    if terrain_package.exists():
+    if terrain_package is not None and terrain_package.is_file():
         with zipfile.ZipFile(terrain_package) as terrain:
             files["map.bin"] = terrain.read("map.bin")
             if "earth-terrain.png" in terrain.namelist():
@@ -164,7 +182,12 @@ def main() -> int:
 
     for mission_id in selected:
         spec = MISSION_SPECS[mission_id]
-        terrain = (args.terrain_package or DEFAULT_TERRAIN).resolve()
+        if args.terrain_package:
+            terrain = args.terrain_package.resolve()
+        elif spec.get("source_terrain"):
+            terrain = None
+        else:
+            terrain = DEFAULT_TERRAIN.resolve()
         output = (args.output or Path(spec["output"])).resolve()
         install = (args.install or Path(spec["install"])).resolve()
         build_mission(mission_id, spec, terrain, output, install)

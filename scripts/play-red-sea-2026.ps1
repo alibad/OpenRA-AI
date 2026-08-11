@@ -2,7 +2,7 @@
 param(
     [switch]$Regenerate,
     [switch]$Headless,
-    [ValidateSet("jizan-corridor-2026", "hodeidah-lifeline-2026")]
+    [ValidateSet("jizan-corridor-2026", "hodeidah-lifeline-2026", "bab-al-mandab-passage-2026")]
     [string]$Mission = "jizan-corridor-2026"
 )
 
@@ -53,7 +53,12 @@ if ($Regenerate -or -not (Test-Path -LiteralPath $terrainMission)) {
     }
 }
 
-& $python $missionBuilder --mission $Mission --terrain-package $terrainMission --output $missionPackage --install $installedMission
+if ($Mission -eq "bab-al-mandab-passage-2026") {
+    & $python $missionBuilder --mission $Mission --output $missionPackage --install $installedMission
+}
+else {
+    & $python $missionBuilder --mission $Mission --terrain-package $terrainMission --output $missionPackage --install $installedMission
+}
 if ($LASTEXITCODE -ne 0) {
     throw "$Mission packaging failed with exit code $LASTEXITCODE."
 }

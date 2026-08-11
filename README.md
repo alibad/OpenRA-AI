@@ -163,10 +163,15 @@ See [Earth mission generation](docs/earth-missions.md).
 The development build includes a scripted modern-country vertical slice:
 Saudi Arabia and Yemen, original directional sprites, Arabic vehicle responses,
 bilingual campaign radio, native bot production weights, and a source-dated
-two-mission campaign slice. After setup, run `Play-Red-Sea-2026.cmd` to generate,
+three-mission campaign slice. After setup, run `Play-Red-Sea-2026.cmd` to generate,
 validate, install, and open Jizan Corridor, or run
 `.\scripts\play-red-sea-2026.ps1 -Mission hodeidah-lifeline-2026` to play the
 Yemen-side Hodeidah Lifeline mission.
+
+The third mission is available with
+`.\scripts\play-red-sea-2026.ps1 -Mission bab-al-mandab-passage-2026` and adds
+Tech Center progression, coastal reconnaissance, actual civilian ship lanes,
+deadlock recovery, and a final combined-arms passage defense.
 
 See [Red Sea 2026 vertical slice](docs/red-sea-2026.md).
 

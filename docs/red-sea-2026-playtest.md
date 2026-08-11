@@ -5,7 +5,7 @@ resolve, audio is valid, and packages are deterministic. They cannot prove that
 combat feels fair or that the mix sounds right on a player's speakers.
 
 Run `Play-Red-Sea-2026.cmd` three times for Jizan, then run the Yemen-side
-mission once and record the following.
+mission and Bab al-Mandab Passage once each and record the following.
 
 ## Run 1: easy, mission comprehension
 
@@ -48,6 +48,29 @@ Launch `.\scripts\play-red-sea-2026.ps1 -Mission hodeidah-lifeline-2026`.
 - Listen to all Arabic and English Hodeidah radio lines and confirm their mixed
   Unicode subtitles remain readable over combat.
 
+## Run 5: Bab al-Mandab Passage, maritime systems
+
+Launch `.\scripts\play-red-sea-2026.ps1 -Mission bab-al-mandab-passage-2026`.
+
+- Confirm the starting refinery harvests, the War Factory produces the Saudi
+  roster, and the Radar Dome → Tech Center construction chain is functional.
+- Check all three reconnaissance reveals and verify objective text wraps at
+  1280×720, 1920×1080, and the fullscreen desktop resolution.
+- Watch all four merchant vessels take distinct water lanes around Mayyun. No
+  pair may deadlock at the island approaches or exits.
+- Block one lane with a controllable unit where possible and verify rerouting;
+  allow one ship to separate and verify catch-up behavior.
+- On normal, destroy one merchant vessel and confirm the replacement launches
+  only when needed and the remaining requirement is still achievable.
+- Verify camera reveals stay inside the playable map, every English/Arabic
+  subtitle is fully visible, and the recovery, loss, final-wave, and victory
+  sound cues remain distinct at the normal effects/speech mix.
+- Confirm easy requires two ships and 45 seconds, normal three and 60 seconds,
+  and hard all four with no replacement plus an 80-second hold.
+- Destroy each required-objective dependency in a separate run and confirm the
+  correct objective fails: base/readiness, recon timer, launcher timer,
+  merchant survival, and Passage Control.
+
 ## Base and production acceptance
 
 - The construction and defense tabs are populated at mission start.
@@ -72,7 +95,29 @@ Launch `.\scripts\play-red-sea-2026.ps1 -Mission hodeidah-lifeline-2026`.
 
 ## Sign-off
 
-Release quality requires all four runs without a blocker, no repeated pathing
+Release quality requires all five runs without a blocker, no repeated pathing
 stall, no inaudible mandatory instruction, and no dominant sound more than one
 volume adjustment away from the stock Red Alert mix. Record difficulty,
 completion time, surviving trucks, restart count, and any unclear instruction.
+
+## Recorded Bab al-Mandab verification (2026-08-11)
+
+- OpenRA YAML and missing-asset checks passed for all three installed missions.
+- The real headless engine completed synchronized Radar Dome and Tech Center
+  construction, M1A2S production, harvesting presence, and all three mobile
+  recon routes; the linked objectives advanced without scripted cameras
+  satisfying recon.
+- The accelerated real-engine passage completed all four private vessel lanes,
+  final combined-arms escalation, optional beacon survival, and victory. All
+  five required-objective failure variants produced engine defeat.
+- Live rendering passed at 1280×720, 1920×1080, and 3840×2160 pseudo-fullscreen.
+  The production sidebar was populated, mission status stayed within its line,
+  the delayed bilingual opening subtitle no longer overlapped objective notices,
+  and the fleet reveal showed all four vessels entering separate water cells.
+- Opening radio played through the real sound device without a runtime asset
+  error. WAV format/headroom and all later cue references passed automated
+  checks.
+
+Remaining human judgments are balance and mix, not functional blockers: final
+normal/hard wave fairness, 60/80-second hold fatigue, Arabic pronunciation, and
+speech/effects/music balance on representative speakers or headphones.
