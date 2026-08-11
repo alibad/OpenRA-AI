@@ -1,0 +1,205 @@
+MapFormat: 12
+
+RequiresMod: ra
+
+Title: Red Sea 2026: Jizan Corridor
+
+Author: OpenRA AI
+
+Tileset: DESERT
+
+MapSize: 96,96
+
+Bounds: 1,1,94,94
+
+Visibility: MissionSelector
+
+Categories: Campaign
+
+LockPreview: True
+
+Players:
+	PlayerReference@Saudi:
+		Name: Saudi Arabia
+		AllowBots: False
+		Playable: True
+		Required: True
+		LockFaction: True
+		Faction: saudi
+		LockColor: True
+		Color: D6B566
+		LockSpawn: True
+		LockTeam: True
+		Allies: Civilians
+		Enemies: Yemen
+	PlayerReference@Yemen:
+		Name: Yemen
+		Bot: campaign
+		Faction: yemen
+		Color: 8F7A45
+		Enemies: Saudi Arabia, Civilians
+	PlayerReference@Civilians:
+		Name: Civilians
+		Bot: campaign
+		Faction: allies
+		Color: 76AFC4
+		Allies: Saudi Arabia
+		Enemies: Yemen
+	PlayerReference@Neutral:
+		Name: Neutral
+		OwnsWorld: True
+		NonCombatant: True
+		Faction: allies
+
+Actors:
+	SaudiConyard: fact
+		Location: 22,76
+		Owner: Saudi Arabia
+	SaudiRefinery: proc
+		Location: 40,77
+		Owner: Saudi Arabia
+	RadarNode: dome
+		Location: 33,67
+		Owner: Neutral
+	PortDepot: fcom
+		Location: 72,20
+		Owner: Saudi Arabia
+	Desalination: hosp
+		Location: 77,23
+		Owner: Saudi Arabia
+	SaudiPower1: apwr
+		Location: 28,75
+		Owner: Saudi Arabia
+	SaudiPower2: powr
+		Location: 31,75
+		Owner: Saudi Arabia
+	SaudiRepair: fix
+		Location: 35,76
+		Owner: Saudi Arabia
+	SaudiBarracks: tent
+		Location: 28,79
+		Owner: Saudi Arabia
+	SaudiTank1: m1a2s
+		Location: 33,72
+		Owner: Saudi Arabia
+		Facing: 128
+	SaudiTank2: m1a2s
+		Location: 35,72
+		Owner: Saudi Arabia
+		Facing: 128
+	SaudiAirDefense1: sads
+		Location: 30,70
+		Owner: Saudi Arabia
+		Facing: 128
+	SaudiAirDefense2: sads
+		Location: 37,70
+		Owner: Saudi Arabia
+		Facing: 128
+	SaudiEngineer: e6
+		Location: 31,72
+		Owner: Saudi Arabia
+		SubCell: 1
+	SaudiRifle1: e1
+		Location: 32,73
+		Owner: Saudi Arabia
+		SubCell: 0
+	SaudiRifle2: e1
+		Location: 32,73
+		Owner: Saudi Arabia
+		SubCell: 2
+	SaudiRifle3: e1
+		Location: 36,73
+		Owner: Saudi Arabia
+		SubCell: 1
+	SaudiRifle4: e1
+		Location: 36,73
+		Owner: Saudi Arabia
+		SubCell: 3
+	LauncherWest: ymlr
+		Location: 18,41
+		Owner: Yemen
+		Facing: 256
+	LauncherEast: ymlr
+		Location: 76,58
+		Owner: Yemen
+		Facing: 768
+	WestGuard1: tech
+		Location: 20,42
+		Owner: Yemen
+		Facing: 256
+	WestGuard2: e2
+		Location: 19,43
+		Owner: Yemen
+		SubCell: 1
+	EastGuard1: tech
+		Location: 74,59
+		Owner: Yemen
+		Facing: 768
+	EastGuard2: e2
+		Location: 75,60
+		Owner: Yemen
+		SubCell: 2
+	SaudiEntry: waypoint
+		Location: 31,74
+		Owner: Neutral
+	RadarCamera: waypoint
+		Location: 34,67
+		Owner: Neutral
+	ConvoyEntry: waypoint
+		Location: 13,86
+		Owner: Neutral
+	ConvoyRally: waypoint
+		Location: 27,74
+		Owner: Neutral
+	CorridorOne: waypoint
+		Location: 40,61
+		Owner: Neutral
+	CorridorTwo: waypoint
+		Location: 52,49
+		Owner: Neutral
+	CorridorThree: waypoint
+		Location: 63,37
+		Owner: Neutral
+	PortGate: waypoint
+		Location: 72,25
+		Owner: Neutral
+	ConvoyExit: waypoint
+		Location: 84,12
+		Owner: Neutral
+	WestEntry: waypoint
+		Location: 2,48
+		Owner: Neutral
+	WestRally: waypoint
+		Location: 20,58
+		Owner: Neutral
+	EastEntry: waypoint
+		Location: 93,47
+		Owner: Neutral
+	EastRally: waypoint
+		Location: 72,48
+		Owner: Neutral
+	SouthEntry: waypoint
+		Location: 52,93
+		Owner: Neutral
+	SouthRally: waypoint
+		Location: 50,70
+		Owner: Neutral
+	DroneEntryNorth: waypoint
+		Location: 91,10
+		Owner: Neutral
+	DroneEntrySouth: waypoint
+		Location: 7,91
+		Owner: Neutral
+	LauncherWestCamera: waypoint
+		Location: 18,41
+		Owner: Neutral
+	LauncherEastCamera: waypoint
+		Location: 76,58
+		Owner: Neutral
+	PortCamera: waypoint
+		Location: 74,22
+		Owner: Neutral
+
+Rules: ra|rules/campaign-rules.yaml, ra|rules/campaign-tooltips.yaml, ra|rules/campaign-palettes.yaml, rules.yaml
+
+FluentMessages: ra|fluent/lua.ftl, ra|fluent/campaign.ftl, map.ftl

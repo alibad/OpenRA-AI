@@ -245,6 +245,8 @@ def review_match(evidence_dir: Path, outcome: dict[str, Any]) -> dict[str, Any]:
         "map": str(outcome.get("map_name", final.get("map", "unknown"))),
         "opponent": str(outcome.get("opponent", "unknown")),
         "model": str(outcome.get("model", "unknown")),
+        "policy_id": str(outcome.get("policy_id", "baseline")),
+        "safety_violations": int(outcome.get("safety_violations", 0)),
         "seed": int(outcome.get("seed", 0)),
         "tick": int(outcome.get("tick", 0)),
         "rounds": int(outcome.get("rounds", len(rounds))),
@@ -292,6 +294,80 @@ class LearningStore:
         self.matches_dir = self.root / "matches"
         self.history_path = self.root / "history.jsonl"
         self.summary_path = self.root / "summary.json"
+        self.policies_path = self.root / "policies.json"
+
+    def policies(self) -> dict[str, Any]:
+        value = _read_json(self.policies_path)
+        return value if value else {"active_policy": "baseline", "candidates": {}}
+
+    def propose_policy(
+        self,
+        candidate_id: str,
+        parameters: dict[str, Any],
+        *,
+        baseline_id: str = "baseline",
+        rationale: str = "",
+    ) -> dict[str, Any]:
+        if not re.fullmatch(r"[A-Za-z0-9._-]{1,80}", candidate_id):
+            raise ValueError("invalid policy candidate id")
+        state = self.policies()
+        candidate = {
+            "candidate_id": candidate_id,
+            "baseline_id": baseline_id,
+            "parameters": dict(parameters),
+            "rationale": rationale[:500],
+            "status": "candidate",
+            "created_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+            "evaluation": {},
+        }
+        state.setdefault("candidates", {})[candidate_id] = candidate
+        with _STORE_LOCK:
+            self.root.mkdir(parents=True, exist_ok=True)
+            self.policies_path.write_text(json.dumps(state, indent=2) + "\n", encoding="utf-8")
+        return candidate
+
+    def evaluate_policy(self, candidate_id: str, *, minimum_games: int = 3) -> dict[str, Any]:
+        state = self.policies()
+        candidate = state.get("candidates", {}).get(candidate_id)
+        if not isinstance(candidate, dict):
+            raise ValueError("unknown policy candidate")
+        records = self.records()
+        candidate_records = [record for record in records if record.get("policy_id") == candidate_id]
+        baseline_id = str(candidate.get("baseline_id", "baseline"))
+        baseline_records = [record for record in records if record.get("policy_id", "baseline") == baseline_id]
+
+        def rate(values: list[dict[str, Any]]) -> float:
+            return sum(bool(value.get("won")) for value in values) / max(1, len(values))
+
+        candidate_rate = rate(candidate_records)
+        baseline_rate = rate(baseline_records)
+        safety_violations = sum(int(record.get("safety_violations", 0)) for record in candidate_records)
+        enough_games = len(candidate_records) >= max(3, minimum_games)
+        materially_better = candidate_rate >= max(2 / 3, baseline_rate + 0.05)
+        passed = enough_games and materially_better and safety_violations == 0
+        evaluation = {
+            "games": len(candidate_records),
+            "wins": sum(bool(record.get("won")) for record in candidate_records),
+            "win_rate": round(candidate_rate * 100, 1),
+            "baseline_games": len(baseline_records),
+            "baseline_win_rate": round(baseline_rate * 100, 1),
+            "safety_violations": safety_violations,
+            "gates": {
+                "minimum_games": enough_games,
+                "material_win_rate_gain": materially_better,
+                "zero_safety_violations": safety_violations == 0,
+            },
+            "passed": passed,
+            "evaluated_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+        }
+        candidate["evaluation"] = evaluation
+        candidate["status"] = "promoted" if passed else "candidate"
+        if passed:
+            state["active_policy"] = candidate_id
+        with _STORE_LOCK:
+            self.root.mkdir(parents=True, exist_ok=True)
+            self.policies_path.write_text(json.dumps(state, indent=2) + "\n", encoding="utf-8")
+        return evaluation
 
     def records(self) -> list[dict[str, Any]]:
         return _json_lines(self.history_path)
@@ -326,7 +402,7 @@ class LearningStore:
 
     def dashboard(self) -> dict[str, Any]:
         self.import_existing()
-        return self._summarize(self.records())
+        return {**self._summarize(self.records()), "policies": self.policies()}
 
     def match(self, attempt_id: str) -> dict[str, Any]:
         if not re.fullmatch(r"[A-Za-z0-9._-]{1,120}", attempt_id):

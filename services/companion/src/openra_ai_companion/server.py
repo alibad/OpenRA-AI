@@ -101,6 +101,7 @@ class CompanionHandler(BaseHTTPRequestHandler):
                 "voice_enabled": not self.companion.muted,
                 "auto_act_enabled": self.companion.auto_act_enabled,
                 "pending_action": self.companion.pending_action(),
+                "brain": self.companion.brain_state(),
                 "config": self.companion.router.settings.as_dict(),
                 "usage": self.companion.router.usage_summary(),
                 "router": self.companion.router.health(),

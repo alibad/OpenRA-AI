@@ -160,11 +160,13 @@ See [Earth mission generation](docs/earth-missions.md).
 
 ## Red Sea 2026 vertical slice
 
-The development build includes the first modern-country gameplay prototype:
-Saudi Arabia and Yemen are selectable Red Alert countries with faction-gated
-signature units, native bot production weights, original sound effects, and a
-source-dated Jizan Earth mission contract. After setup, run
-`Play-Red-Sea-2026.cmd` to generate, validate, install, and open the battlefield.
+The development build includes a scripted modern-country vertical slice:
+Saudi Arabia and Yemen, original directional sprites, Arabic vehicle responses,
+bilingual campaign radio, native bot production weights, and a source-dated
+two-mission campaign slice. After setup, run `Play-Red-Sea-2026.cmd` to generate,
+validate, install, and open Jizan Corridor, or run
+`.\scripts\play-red-sea-2026.ps1 -Mission hodeidah-lifeline-2026` to play the
+Yemen-side Hodeidah Lifeline mission.
 
 See [Red Sea 2026 vertical slice](docs/red-sea-2026.md).
 

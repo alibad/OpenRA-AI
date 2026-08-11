@@ -21,6 +21,7 @@ EXPECTED_ACTIONS = {
     "attack_move",
     "attack",
     "demolish",
+    "capture",
     "infiltrate",
     "disguise",
     "stop",
@@ -39,6 +40,7 @@ EXPECTED_ACTIONS = {
     "unload",
     "power_down",
     "set_primary",
+    "use_support_power",
 }
 
 
@@ -250,6 +252,26 @@ class GameAgentEvalTests(unittest.TestCase):
         self.assertEqual(runtime.bridge.applied_ticks, 50)
         self.assertEqual(result["requested_ticks"], 1500)
         self.assertEqual(result["applied_tick_cap"], 50)
+
+    def test_campaign_advance_is_not_subject_to_skirmish_economy_cap(self) -> None:
+        class FakeBridge:
+            applied_ticks = 0
+
+            def fast_advance(self, ticks: int, **kwargs: object) -> GameSnapshot:
+                self.applied_ticks = ticks
+                return GameSnapshot(tick=100 + ticks, actual_ticks_advanced=ticks, mission_mode=True)
+
+        runtime = object.__new__(GameRuntime)
+        runtime.bridge = FakeBridge()
+        runtime.evidence_log = None
+        runtime._snapshot = GameSnapshot(tick=100, mission_mode=True)
+        runtime._lock = threading.Lock()
+        runtime._last_interrupt_ticks = {}
+
+        result = runtime.advance(1500)
+
+        self.assertEqual(runtime.bridge.applied_ticks, 1500)
+        self.assertEqual(result["applied_tick_cap"], 1500)
 
     def test_autonomous_building_placement_always_uses_optimizer(self) -> None:
         class FakeRuntime:

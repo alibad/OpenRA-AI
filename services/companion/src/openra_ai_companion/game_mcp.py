@@ -196,6 +196,12 @@ def infiltrate(actor_ids: list[int], target_actor_id: int, queued: bool = False)
 
 
 @mcp.tool()
+def capture(actor_ids: list[int], target_actor_id: int, queued: bool = False) -> dict:
+    """Send owned engineers to one legal visible capture target from valid_capture_targets."""
+    return _group("capture", actor_ids, target_actor_id=target_actor_id, queued=queued)
+
+
+@mcp.tool()
 def demolish(actor_ids: list[int], target_actor_id: int, queued: bool = False) -> dict:
     """Send owned C4 units to one legal visible demolition target; use valid_demolition_targets from battlefield."""
     return _group("demolish", actor_ids, target_actor_id=target_actor_id, queued=queued)
@@ -217,6 +223,17 @@ def power_down(building_ids: list[int]) -> dict:
 def set_primary(building_ids: list[int]) -> dict:
     """Set selected owned production buildings as primary producers."""
     return _group("set_primary", building_ids)
+
+
+@mcp.tool()
+def use_support_power(power_key: str, target_x: int, target_y: int) -> dict:
+    """Activate one ready support power at an explored cell; destructive powers enforce a native friendly-fire exclusion zone."""
+    return _submit((ActionCommand(
+        action="use_support_power",
+        item_type=power_key.strip().lower(),
+        target_x=target_x,
+        target_y=target_y,
+    ),))
 
 
 def _parser() -> argparse.ArgumentParser:

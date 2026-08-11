@@ -1,0 +1,86 @@
+Player:
+	PlayerResources:
+		DefaultCash: 7000
+
+World:
+	LuaScript:
+		Scripts: campaign.lua, utils.lua, hodeidah-lifeline.lua
+	MissionData:
+		Briefing: briefing
+	ScriptLobbyDropdown@difficulty:
+		ID: difficulty
+		Label: dropdown-difficulty.label
+		Description: dropdown-difficulty.description
+		Values:
+			easy: options-difficulty.easy
+			normal: options-difficulty.normal
+			hard: options-difficulty.hard
+		Default: normal
+
+# Focus the Yemen production queues on the authored roster while preserving
+# harvesters, MCVs, infantry, engineers, and support construction.
+3TNK:
+	Buildable:
+		Prerequisites: ~disabled
+
+4TNK:
+	Buildable:
+		Prerequisites: ~disabled
+
+V2RL:
+	Buildable:
+		Prerequisites: ~disabled
+
+FTRK:
+	Buildable:
+		Prerequisites: ~disabled
+
+TTNK:
+	Buildable:
+		Prerequisites: ~disabled
+
+YAK:
+	Buildable:
+		Prerequisites: ~disabled
+
+MIG:
+	Buildable:
+		Prerequisites: ~disabled
+
+E7:
+	Buildable:
+		Prerequisites: ~disabled
+
+E7.noautotarget:
+	-Buildable:
+
+SPY:
+	Buildable:
+		Prerequisites: ~disabled
+
+E1:
+	Tooltip:
+		Name: actor-yemen-rifle.name
+
+E3:
+	Tooltip:
+		Name: actor-yemen-at-team.name
+
+E6:
+	Tooltip:
+		Name: actor-yemen-engineer.name
+
+TRUK:
+	RejectsOrders:
+	Tooltip:
+		Name: actor-lifeline-convoy.name
+	Health:
+		HP: 19000
+
+FCOM:
+	Tooltip:
+		Name: actor-aid-distribution.name
+
+HOSP:
+	Tooltip:
+		Name: actor-civilian-infrastructure.name

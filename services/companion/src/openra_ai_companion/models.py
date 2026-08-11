@@ -28,9 +28,11 @@ SAFE_ACTIONS = frozenset({
     "disguise",
     "infiltrate",
     "demolish",
+    "capture",
     "unload",
     "power_down",
     "set_primary",
+    "use_support_power",
 })
 
 ACTOR_ACTIONS = frozenset({
@@ -49,13 +51,14 @@ ACTOR_ACTIONS = frozenset({
     "disguise",
     "infiltrate",
     "demolish",
+    "capture",
     "unload",
     "power_down",
     "set_primary",
 })
-POSITION_ACTIONS = frozenset({"move", "attack_move", "harvest", "place_building", "set_rally_point"})
-ITEM_ACTIONS = frozenset({"build", "train", "place_building", "cancel_production"})
-TARGET_ACTOR_ACTIONS = frozenset({"attack", "guard", "enter_transport", "disguise", "infiltrate", "demolish"})
+POSITION_ACTIONS = frozenset({"move", "attack_move", "harvest", "place_building", "set_rally_point", "use_support_power"})
+ITEM_ACTIONS = frozenset({"build", "train", "place_building", "cancel_production", "use_support_power"})
+TARGET_ACTOR_ACTIONS = frozenset({"attack", "guard", "enter_transport", "disguise", "infiltrate", "demolish", "capture"})
 
 
 @dataclass(frozen=True)
@@ -75,6 +78,20 @@ class Unit:
     stance: int = 0
     speed: int = 0
     attack_range: int = 0
+    minimum_attack_range: int = 0
+    armor_type: str = ""
+    target_types: tuple[str, ...] = ()
+    cost: int = 0
+    reload_remaining_ticks: int = 0
+    reload_total_ticks: int = 0
+    weapon: str = ""
+    burst: int = 0
+    current_target_actor_id: int = 0
+    move_target_x: int = -1
+    move_target_y: int = -1
+    can_target_air: bool = False
+    can_target_ground: bool = False
+    last_seen_tick: int = 0
     passenger_count: int = -1
     is_building: bool = False
     is_producing: bool = False
@@ -96,6 +113,8 @@ class Unit:
     detects_disguise: bool = False
     can_demolish: bool = False
     valid_demolition_targets: tuple[int, ...] = ()
+    can_capture: bool = False
+    valid_capture_targets: tuple[int, ...] = ()
 
     @classmethod
     def from_dict(cls, value: dict[str, Any]) -> "Unit":
@@ -115,6 +134,20 @@ class Unit:
             stance=int(value.get("stance", 0)),
             speed=int(value.get("speed", 0)),
             attack_range=int(value.get("attack_range", 0)),
+            minimum_attack_range=int(value.get("minimum_attack_range", 0)),
+            armor_type=str(value.get("armor_type", "")),
+            target_types=tuple(str(item) for item in value.get("target_types", [])),
+            cost=int(value.get("cost", 0)),
+            reload_remaining_ticks=int(value.get("reload_remaining_ticks", 0)),
+            reload_total_ticks=int(value.get("reload_total_ticks", 0)),
+            weapon=str(value.get("weapon", "")),
+            burst=int(value.get("burst", 0)),
+            current_target_actor_id=int(value.get("current_target_actor_id", 0)),
+            move_target_x=int(value.get("move_target_x", -1)),
+            move_target_y=int(value.get("move_target_y", -1)),
+            can_target_air=bool(value.get("can_target_air", False)),
+            can_target_ground=bool(value.get("can_target_ground", False)),
+            last_seen_tick=int(value.get("last_seen_tick", 0)),
             passenger_count=int(value.get("passenger_count", -1)),
             is_building=bool(value.get("is_building", False)),
             is_producing=bool(value.get("is_producing", False)),
@@ -136,6 +169,8 @@ class Unit:
             detects_disguise=bool(value.get("detects_disguise", False)),
             can_demolish=bool(value.get("can_demolish", False)),
             valid_demolition_targets=tuple(int(item) for item in value.get("valid_demolition_targets", [])),
+            can_capture=bool(value.get("can_capture", False)),
+            valid_capture_targets=tuple(int(item) for item in value.get("valid_capture_targets", [])),
         )
 
 
@@ -211,6 +246,7 @@ class GameSnapshot:
     mission_mode: bool = False
     mission_briefing: str = ""
     objectives: tuple[MissionObjective, ...] = ()
+    support_powers: tuple[dict[str, Any], ...] = ()
 
     @classmethod
     def from_dict(cls, value: dict[str, Any]) -> "GameSnapshot":
@@ -260,6 +296,7 @@ class GameSnapshot:
             mission_mode=bool(value.get("mission_mode", False)),
             mission_briefing=str(value.get("mission_briefing", "")),
             objectives=tuple(MissionObjective.from_dict(item) for item in value.get("objectives", [])),
+            support_powers=tuple(dict(item) for item in value.get("support_powers", [])),
         )
 
     @staticmethod
@@ -325,6 +362,16 @@ class GameSnapshot:
                 {**item, "display_name": production_name(str(item.get("item", "")))}
                 for item in self.production[:6]
             ],
+            "support_powers": [
+                {
+                    "key": str(power.get("key", "")),
+                    "name": str(power.get("name", "")),
+                    "ready": bool(power.get("ready", False)),
+                    "remaining_ticks": int(power.get("remaining_ticks", 0)),
+                }
+                for power in self.support_powers
+                if bool(power.get("active", False))
+            ],
             "done": self.done,
             "reward": round(self.reward, 3),
             "result": self.result,
@@ -377,6 +424,18 @@ class GameSnapshot:
                     "activity": unit.current_activity,
                     "stance": unit.stance,
                     "attack_range": unit.attack_range,
+                    "minimum_attack_range": unit.minimum_attack_range,
+                    "armor_type": unit.armor_type,
+                    "target_types": list(unit.target_types),
+                    "cost": unit.cost,
+                    "reload_remaining_ticks": unit.reload_remaining_ticks,
+                    "reload_total_ticks": unit.reload_total_ticks,
+                    "weapon": unit.weapon,
+                    "burst": unit.burst,
+                    "current_target_actor_id": unit.current_target_actor_id,
+                    "move_target": [unit.move_target_x, unit.move_target_y],
+                    "can_target_air": unit.can_target_air,
+                    "can_target_ground": unit.can_target_ground,
                     "speed": unit.speed,
                     "passengers": unit.passenger_count,
                     "disguised": unit.is_disguised,
@@ -388,6 +447,8 @@ class GameSnapshot:
                     "detects_disguise": unit.detects_disguise,
                     "can_demolish": unit.can_demolish,
                     "valid_demolition_targets": list(unit.valid_demolition_targets),
+                    "can_capture": unit.can_capture,
+                    "valid_capture_targets": list(unit.valid_capture_targets),
                 }
                 for unit in units
             ],
@@ -406,6 +467,16 @@ class GameSnapshot:
                     "production_progress": round(building.production_progress, 3),
                     "rally": [building.rally_x, building.rally_y],
                     "can_produce": list(building.can_produce),
+                    "armor_type": building.armor_type,
+                    "target_types": list(building.target_types),
+                    "cost": building.cost,
+                    "attack_range": building.attack_range,
+                    "minimum_attack_range": building.minimum_attack_range,
+                    "reload_remaining_ticks": building.reload_remaining_ticks,
+                    "reload_total_ticks": building.reload_total_ticks,
+                    "weapon": building.weapon,
+                    "can_target_air": building.can_target_air,
+                    "can_target_ground": building.can_target_ground,
                 }
                 for building in buildings
             ],
@@ -418,6 +489,19 @@ class GameSnapshot:
                     "y": unit.cell_y,
                     "hp": round(unit.hp_percent, 2),
                     "detects_disguise": unit.detects_disguise,
+                    "armor_type": unit.armor_type,
+                    "target_types": list(unit.target_types),
+                    "cost": unit.cost,
+                    "attack_range": unit.attack_range,
+                    "minimum_attack_range": unit.minimum_attack_range,
+                    "reload_remaining_ticks": unit.reload_remaining_ticks,
+                    "reload_total_ticks": unit.reload_total_ticks,
+                    "weapon": unit.weapon,
+                    "burst": unit.burst,
+                    "current_target_actor_id": unit.current_target_actor_id,
+                    "can_target_air": unit.can_target_air,
+                    "can_target_ground": unit.can_target_ground,
+                    "last_seen_tick": unit.last_seen_tick,
                 }
                 for unit in self.visible_enemies[:24]
             ],
@@ -429,6 +513,16 @@ class GameSnapshot:
                     "x": building.cell_x,
                     "y": building.cell_y,
                     "hp": round(building.hp_percent, 2),
+                    "armor_type": building.armor_type,
+                    "cost": building.cost,
+                    "attack_range": building.attack_range,
+                    "minimum_attack_range": building.minimum_attack_range,
+                    "reload_remaining_ticks": building.reload_remaining_ticks,
+                    "reload_total_ticks": building.reload_total_ticks,
+                    "weapon": building.weapon,
+                    "can_target_air": building.can_target_air,
+                    "can_target_ground": building.can_target_ground,
+                    "last_seen_tick": building.last_seen_tick,
                 }
                 for building in self.visible_enemy_buildings[:16]
             ],
@@ -439,6 +533,7 @@ class GameSnapshot:
                     "x": building.cell_x,
                     "y": building.cell_y,
                     "hp_last_seen": round(building.hp_percent, 2),
+                    "last_seen_tick": building.last_seen_tick,
                 }
                 for building in self.remembered_enemy_buildings[:16]
             ],
@@ -451,6 +546,7 @@ class GameSnapshot:
                 {**item, "display_name": production_name(str(item.get("item", "")))}
                 for item in self.production[:12]
             ],
+            "support_powers": [dict(power) for power in self.support_powers],
             "military": {
                 "army_value": self.army_value,
                 "assets_value": self.assets_value,

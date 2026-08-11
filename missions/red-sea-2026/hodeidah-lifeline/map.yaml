@@ -1,0 +1,186 @@
+MapFormat: 12
+
+RequiresMod: ra
+
+Title: Red Sea 2026: Hodeidah Lifeline
+
+Author: OpenRA AI
+
+Tileset: DESERT
+
+MapSize: 96,96
+
+Bounds: 1,1,94,94
+
+Visibility: MissionSelector
+
+Categories: Campaign
+
+LockPreview: True
+
+Players:
+	PlayerReference@Yemen:
+		Name: Yemen
+		AllowBots: False
+		Playable: True
+		Required: True
+		LockFaction: True
+		Faction: yemen
+		LockColor: True
+		Color: 8F7A45
+		LockSpawn: True
+		LockTeam: True
+		Allies: Civilians
+		Enemies: Saudi Arabia
+	PlayerReference@Saudi:
+		Name: Saudi Arabia
+		Bot: campaign
+		Faction: saudi
+		Color: D6B566
+		Enemies: Yemen, Civilians
+	PlayerReference@Civilians:
+		Name: Civilians
+		Bot: campaign
+		Faction: allies
+		Color: 76AFC4
+		Allies: Yemen
+		Enemies: Saudi Arabia
+	PlayerReference@Neutral:
+		Name: Neutral
+		OwnsWorld: True
+		NonCombatant: True
+		Faction: allies
+
+Actors:
+	YemenConyard: fact
+		Location: 22,76
+		Owner: Yemen
+	YemenRefinery: proc
+		Location: 40,77
+		Owner: Yemen
+	YemenPower1: apwr
+		Location: 28,75
+		Owner: Yemen
+	YemenPower2: powr
+		Location: 31,75
+		Owner: Yemen
+	YemenBarracks: barr
+		Location: 28,79
+		Owner: Yemen
+	YemenWarFactory: weap
+		Location: 35,76
+		Owner: Yemen
+	YemenAirfield: afld
+		Location: 42,73
+		Owner: Yemen
+	YemenRadar: dome
+		Location: 33,67
+		Owner: Yemen
+	PortControl: fcom
+		Location: 15,82
+		Owner: Yemen
+	FisheriesDepot: hosp
+		Location: 19,82
+		Owner: Yemen
+	CoastalClinic: hosp
+		Location: 23,84
+		Owner: Civilians
+	InlandDistribution: fcom
+		Location: 79,15
+		Owner: Civilians
+	LauncherOne: ymlr
+		Location: 27,70
+		Owner: Yemen
+		Facing: 128
+	LauncherTwo: ymlr
+		Location: 29,69
+		Owner: Yemen
+		Facing: 128
+	TechnicalOne: tech
+		Location: 31,70
+		Owner: Yemen
+		Facing: 128
+	TechnicalTwo: tech
+		Location: 33,69
+		Owner: Yemen
+		Facing: 128
+	DroneOne: samad
+		Location: 40,70
+		Owner: Yemen
+		Facing: 128
+	DroneTwo: samad
+		Location: 42,69
+		Owner: Yemen
+		Facing: 128
+	YemenRifle1: e1
+		Location: 25,73
+		Owner: Yemen
+		SubCell: 0
+	YemenRifle2: e1
+		Location: 25,73
+		Owner: Yemen
+		SubCell: 2
+	YemenRocket1: e3
+		Location: 27,73
+		Owner: Yemen
+		SubCell: 1
+	SaudiRadar: dome
+		Location: 76,20
+		Owner: Saudi Arabia
+	SaudiAirDefense: sads
+		Location: 73,22
+		Owner: Saudi Arabia
+		Facing: 640
+	SaudiTank: m1a2s
+		Location: 80,23
+		Owner: Saudi Arabia
+		Facing: 640
+	PortEntry: waypoint
+		Location: 13,86
+		Owner: Neutral
+	PortRally: waypoint
+		Location: 27,74
+		Owner: Neutral
+	ReliefOne: waypoint
+		Location: 40,61
+		Owner: Neutral
+	ReliefTwo: waypoint
+		Location: 52,49
+		Owner: Neutral
+	ReliefThree: waypoint
+		Location: 63,37
+		Owner: Neutral
+	DistributionGate: waypoint
+		Location: 72,25
+		Owner: Neutral
+	ReliefExit: waypoint
+		Location: 84,12
+		Owner: Neutral
+	EvacEntry: waypoint
+		Location: 84,12
+		Owner: Neutral
+	EvacExit: waypoint
+		Location: 13,86
+		Owner: Neutral
+	NorthEntry: waypoint
+		Location: 52,2
+		Owner: Neutral
+	EastEntry: waypoint
+		Location: 93,47
+		Owner: Neutral
+	WestEntry: waypoint
+		Location: 2,48
+		Owner: Neutral
+	SweepCameraOne: waypoint
+		Location: 27,68
+		Owner: Neutral
+	SweepCameraTwo: waypoint
+		Location: 36,74
+		Owner: Neutral
+	PortCamera: waypoint
+		Location: 23,76
+		Owner: Neutral
+
+Rules: ra|rules/campaign-rules.yaml, ra|rules/campaign-tooltips.yaml, ra|rules/campaign-palettes.yaml, rules.yaml
+
+FluentMessages: ra|fluent/lua.ftl, ra|fluent/campaign.ftl, map.ftl

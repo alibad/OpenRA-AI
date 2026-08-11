@@ -1,7 +1,9 @@
 [CmdletBinding()]
 param(
     [switch]$Regenerate,
-    [switch]$Headless
+    [switch]$Headless,
+    [ValidateSet("jizan-corridor-2026", "hodeidah-lifeline-2026")]
+    [string]$Mission = "jizan-corridor-2026"
 )
 
 $ErrorActionPreference = "Stop"
@@ -9,16 +11,19 @@ $repositoryRoot = Split-Path -Parent $PSScriptRoot
 $python = Join-Path $repositoryRoot ".venv\Scripts\python.exe"
 $engineRoot = Join-Path $repositoryRoot "engine\openra"
 $missionDirectory = Join-Path $repositoryRoot "generated\missions"
-$mission = Join-Path $missionDirectory "jizan-corridor-20260811.oramap"
+$terrainMission = Join-Path $missionDirectory "jizan-corridor-20260811.oramap"
+$missionPackage = Join-Path $missionDirectory "$Mission.oramap"
+$installedMission = Join-Path $engineRoot "mods\ra\maps\$Mission.oramap"
+$missionBuilder = Join-Path $repositoryRoot "scripts\build-red-sea-mission.py"
 $launcher = Join-Path $repositoryRoot "apps\launcher\Start-OpenRAAI.ps1"
 
-foreach ($required in @($python, $launcher, (Join-Path $engineRoot "bin\OpenRA.exe"))) {
+foreach ($required in @($python, $launcher, $missionBuilder, (Join-Path $engineRoot "bin\OpenRA.exe"))) {
     if (-not (Test-Path -LiteralPath $required)) {
         throw "Missing required build file: $required. Run scripts\setup.ps1 first."
     }
 }
 
-if ($Regenerate -or -not (Test-Path -LiteralPath $mission)) {
+if ($Regenerate -or -not (Test-Path -LiteralPath $terrainMission)) {
     New-Item -ItemType Directory -Path $missionDirectory -Force | Out-Null
     $env:DOTNET_ROLL_FORWARD = "Major"
     $env:OPENRA_AI_ENGINE_DIR = $engineRoot
@@ -48,7 +53,12 @@ if ($Regenerate -or -not (Test-Path -LiteralPath $mission)) {
     }
 }
 
-$launchArguments = @{ Map = $mission }
+& $python $missionBuilder --mission $Mission --terrain-package $terrainMission --output $missionPackage --install $installedMission
+if ($LASTEXITCODE -ne 0) {
+    throw "$Mission packaging failed with exit code $LASTEXITCODE."
+}
+
+$launchArguments = @{ Map = $missionPackage }
 if ($Headless) {
     $launchArguments.Headless = $true
 }
