@@ -18,11 +18,25 @@ $dotnetRoot = Join-Path $env:USERPROFILE ".dotnet"
 $brandIcon = Join-Path $repositoryRoot "assets\brand\rtsai.ico"
 $aiPackLock = Join-Path $repositoryRoot "packaging\ai-pack.lock.json"
 $modelNotices = Join-Path $repositoryRoot "packaging\THIRD_PARTY_MODELS.md"
+$sampleMission = Join-Path $repositoryRoot "generated\missions\riyadh-crossing-42.oramap"
 
 foreach ($required in @($python, $brandIcon, $aiPackLock, $modelNotices)) {
     if (-not (Test-Path -LiteralPath $required)) {
         throw "Packaging input is missing: $required"
     }
+}
+
+if (-not (Test-Path -LiteralPath $sampleMission)) {
+    & $python -m openra_ai_worldgen.cli generate --lat 24.7136 --lon 46.6753 `
+        --title "Riyadh Crossing" --location "Riyadh, Saudi Arabia" `
+        --imagery terrain --mode playability-first --seed 42 --offline
+    if ($LASTEXITCODE -ne 0 -or -not (Test-Path -LiteralPath $sampleMission)) {
+        throw "Sample mission generation failed."
+    }
+}
+& $python -m openra_ai_worldgen.cli validate $sampleMission
+if ($LASTEXITCODE -ne 0) {
+    throw "Sample mission validation failed."
 }
 
 $runningEngine = @(Get-Process -Name "OpenRA" -ErrorAction SilentlyContinue | Where-Object {
@@ -82,7 +96,7 @@ New-Item -ItemType Directory -Path $missionTarget -Force | Out-Null
 Copy-Item -LiteralPath (Join-Path $repositoryRoot "apps\launcher\Start-OpenRAAI.ps1") -Destination $launcherTarget
 Copy-Item -LiteralPath (Join-Path $repositoryRoot "apps\launcher\Install-OpenRAContent.ps1") -Destination $launcherTarget
 Copy-Item -LiteralPath (Join-Path $repositoryRoot "Play-OpenRAAI.cmd") -Destination $stageRoot
-Copy-Item -LiteralPath (Join-Path $repositoryRoot "generated\missions\riyadh-crossing-42.oramap") -Destination $missionTarget
+Copy-Item -LiteralPath $sampleMission -Destination $missionTarget
 Copy-Item -LiteralPath (Join-Path $repositoryRoot ".env.example") -Destination $stageRoot
 Copy-Item -LiteralPath (Join-Path $repositoryRoot "README.md") -Destination $stageRoot
 Copy-Item -LiteralPath (Join-Path $repositoryRoot "LICENSE") -Destination $stageRoot

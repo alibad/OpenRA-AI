@@ -14,6 +14,7 @@ WRAPPER_SOURCE="$REPOSITORY_ROOT/apps/installer/macos/OpenRAAI"
 PYTHON="$REPOSITORY_ROOT/.venv/bin/python"
 AI_PACK_LOCK="$REPOSITORY_ROOT/packaging/ai-pack.lock.json"
 MODEL_NOTICES="$REPOSITORY_ROOT/packaging/THIRD_PARTY_MODELS.md"
+SAMPLE_MISSION="$REPOSITORY_ROOT/generated/missions/riyadh-crossing-42.oramap"
 
 if [[ "${OSTYPE:-}" != darwin* ]]; then
   echo >&2 "macOS packaging requires a macOS host. The game runtime, .app metadata, DMG, signing, and notarization are verified with Apple tooling."
@@ -26,6 +27,14 @@ done
 for required in "$BRAND_SOURCE" "$PLIST_TEMPLATE" "$WRAPPER_SOURCE" "$PYTHON" "$AI_PACK_LOCK" "$MODEL_NOTICES"; do
   [ -f "$required" ] || { echo >&2 "macOS packaging input is missing: $required"; exit 1; }
 done
+
+if [ ! -f "$SAMPLE_MISSION" ]; then
+  "$PYTHON" -m openra_ai_worldgen.cli generate \
+    --lat 24.7136 --lon 46.6753 \
+    --title "Riyadh Crossing" --location "Riyadh, Saudi Arabia" \
+    --imagery terrain --mode playability-first --seed 42 --offline
+fi
+"$PYTHON" -m openra_ai_worldgen.cli validate "$SAMPLE_MISSION"
 
 case "$(uname -m)" in
   arm64)
@@ -99,7 +108,7 @@ rm -rf "$ICONSET"
   --specpath "$PACKAGE_ROOT/pyinstaller-spec-$RELEASE_ARCH" \
   "$REPOSITORY_ROOT/apps/launcher/companion_entry.py"
 
-cp "$REPOSITORY_ROOT/generated/missions/riyadh-crossing-42.oramap" "$RESOURCES/generated/missions/"
+cp "$SAMPLE_MISSION" "$RESOURCES/generated/missions/"
 cp "$REPOSITORY_ROOT/.env.example" "$RESOURCES/"
 cp "$REPOSITORY_ROOT/README.md" "$REPOSITORY_ROOT/LICENSE" "$RESOURCES/"
 mkdir -p "$RESOURCES/packaging"
