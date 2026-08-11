@@ -16,15 +16,19 @@ OpenRA project or Electronic Arts.
 
 | Platform | Status | Download |
 | --- | --- | --- |
-| Windows 10/11 x64 | Playable alpha | [Download `v0.1.0-alpha.8`](https://github.com/alibad/OpenRA-AI/releases/download/v0.1.0-alpha.8/OpenRA-AI-0.1.0-alpha.8-windows-x64.zip) |
+| Windows 10/11 x64 | Playable alpha | [Installer](https://github.com/alibad/OpenRA-AI/releases/download/v0.1.0-alpha.9/OpenRA-AI-0.1.0-alpha.9-windows-x64-setup.exe) · [Portable ZIP](https://github.com/alibad/OpenRA-AI/releases/download/v0.1.0-alpha.9/OpenRA-AI-0.1.0-alpha.9-windows-x64.zip) |
 | macOS | Not packaged yet | Planned after a signed and notarized build is ready |
 
 [See every release and its checksum](https://github.com/alibad/OpenRA-AI/releases).
+The [optional local AI model pack](https://github.com/alibad/OpenRA-AI/releases/download/v0.1.0-alpha.9/OpenRA-AI-AI-Pack-0.1.0-alpha.9.zip)
+contains the pinned model payload; alpha.9 still requires a compatible local AI
+router to serve those models.
 
 ### Start a match on Windows
 
-1. Download the Windows ZIP and extract the entire folder.
-2. Double-click `Play-OpenRAAI.cmd`.
+1. Run the Windows installer, or download and extract the entire portable ZIP.
+2. Launch OpenRA AI from the Start menu, or double-click `Play-OpenRAAI.cmd`
+   inside the portable package.
 3. Allow the first launch to download OpenRA's checksum-verified Red Alert
    quick-install content from OpenRA's official mirror list.
 4. Start or load a match. The AI companion and Earth Mission Studio are built
