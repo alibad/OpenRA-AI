@@ -103,6 +103,7 @@ rm -rf "$ICONSET"
   --name openra-ai-companion \
   --paths "$REPOSITORY_ROOT/services/companion/src" \
   --collect-all sounddevice \
+  --collect-data agents \
   --distpath "$RESOURCES/bin" \
   --workpath "$PACKAGE_ROOT/pyinstaller-work-$RELEASE_ARCH" \
   --specpath "$PACKAGE_ROOT/pyinstaller-spec-$RELEASE_ARCH" \

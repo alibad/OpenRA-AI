@@ -81,6 +81,7 @@ $pyinstallerSpec = Join-Path $artifactRoot "package\pyinstaller-spec"
     --icon $brandIcon `
     --paths (Join-Path $repositoryRoot "services\companion\src") `
     --collect-all sounddevice `
+    --collect-data agents `
     --distpath (Join-Path $stageRoot "bin") `
     --workpath $pyinstallerWork `
     --specpath $pyinstallerSpec `
