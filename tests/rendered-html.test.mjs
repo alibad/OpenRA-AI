@@ -42,7 +42,14 @@ test("renders the complete marketing and mission-creation surface", async () => 
   assert.match(html, /Portable ZIP/);
   assert.match(html, /Signed macOS download pending|Apple silicon/);
   assert.match(html, /Install or extract/);
-  assert.match(html, /0\.1\.0-alpha\.8/);
+  assert.match(html, /0\.1\.0-alpha\.9/);
+  assert.match(html, /Red Sea 2026/);
+  assert.match(html, /Jizan Corridor/);
+  assert.match(html, /Play-Red-Sea-2026\.cmd/);
+  assert.match(html, /Optional Local AI Pack/);
+  assert.match(html, /Qwen3-VL/);
+  assert.match(html, /red-sea-2026-key-art\.webp/);
+  assert.match(html, /AUTO is optional/);
   assert.match(html, /AI layer/);
   assert.doesNotMatch(html, /Help improve RTS AI/);
   assert.match(html, /href="\/privacy"/);
@@ -91,6 +98,7 @@ test("ships crawl, install, and brand assets", async () => {
   const favicon = await readFile(new URL("../public/favicon.ico", import.meta.url));
   const socialCard = await readFile(new URL("../public/social-card.png", import.meta.url));
   const googleLogo = await readFile(new URL("../public/brand/google-g.png", import.meta.url));
+  const redSeaKeyArt = await readFile(new URL("../public/red-sea-2026-key-art.webp", import.meta.url));
 
   assert.match(robots, /sitemap: "https:\/\/rtsai\.net\/sitemap\.xml"/);
   assert.match(sitemap, /url: "https:\/\/rtsai\.net\/"/);
@@ -99,6 +107,7 @@ test("ships crawl, install, and brand assets", async () => {
   assert.ok(favicon.byteLength > 1000);
   assert.ok(socialCard.byteLength > 10_000);
   assert.ok(googleLogo.byteLength > 500);
+  assert.ok(redSeaKeyArt.byteLength > 100_000);
 });
 
 test("ships a real browser-side OpenRA package compiler", async () => {
@@ -118,5 +127,7 @@ test("discovers native Windows and macOS release assets", async () => {
   assert.match(source, /windows-x64-setup\\\.exe/);
   assert.match(source, /macos-\(arm64\|x64\)\\\.dmg/);
   assert.match(source, /installerChecksumUrl/);
+  assert.match(source, /AI-Pack-/);
+  assert.match(source, /aiPackChecksumUrl/);
   assert.match(page, /No placeholder download/);
 });

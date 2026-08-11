@@ -7,6 +7,9 @@ export type WindowsRelease = {
   installerUrl: string | null;
   installerChecksumUrl: string | null;
   installerSizeBytes: number | null;
+  aiPackUrl: string | null;
+  aiPackChecksumUrl: string | null;
+  aiPackSizeBytes: number | null;
 };
 
 export type MacOSReleaseAsset = {
@@ -27,17 +30,20 @@ export type GameRelease = {
   macos: MacOSRelease | null;
 };
 
-const releaseBase = "https://github.com/alibad/OpenRA-AI/releases/download/v0.1.0-alpha.8";
+const releaseBase = "https://github.com/alibad/OpenRA-AI/releases/download/v0.1.0-alpha.9";
 
 export const fallbackWindowsRelease: WindowsRelease = {
-  version: "0.1.0-alpha.8",
-  url: `${releaseBase}/OpenRA-AI-0.1.0-alpha.8-windows-x64.zip`,
-  checksumUrl: `${releaseBase}/OpenRA-AI-0.1.0-alpha.8-windows-x64.zip.sha256`,
-  sizeBytes: 81163709,
-  publishedAt: "2026-08-08T07:38:26Z",
-  installerUrl: `${releaseBase}/OpenRA-AI-0.1.0-alpha.8-windows-x64-setup.exe`,
-  installerChecksumUrl: `${releaseBase}/OpenRA-AI-0.1.0-alpha.8-windows-x64-setup.exe.sha256`,
-  installerSizeBytes: 63647648,
+  version: "0.1.0-alpha.9",
+  url: `${releaseBase}/OpenRA-AI-0.1.0-alpha.9-windows-x64.zip`,
+  checksumUrl: `${releaseBase}/OpenRA-AI-0.1.0-alpha.9-windows-x64.zip.sha256`,
+  sizeBytes: 101805947,
+  publishedAt: "2026-08-11T10:00:18Z",
+  installerUrl: `${releaseBase}/OpenRA-AI-0.1.0-alpha.9-windows-x64-setup.exe`,
+  installerChecksumUrl: `${releaseBase}/OpenRA-AI-0.1.0-alpha.9-windows-x64-setup.exe.sha256`,
+  installerSizeBytes: 84171300,
+  aiPackUrl: `${releaseBase}/OpenRA-AI-AI-Pack-0.1.0-alpha.9.zip`,
+  aiPackChecksumUrl: `${releaseBase}/OpenRA-AI-AI-Pack-0.1.0-alpha.9.zip.sha256`,
+  aiPackSizeBytes: 1821005604,
 };
 
 type GitHubAsset = {
@@ -80,6 +86,7 @@ export async function getGameRelease(): Promise<GameRelease> {
         const archive = release.assets.find((asset) => /windows-x64\.zip$/i.test(asset.name));
         if (archive) {
           const installer = release.assets.find((asset) => /windows-x64-setup\.exe$/i.test(asset.name));
+          const aiPack = release.assets.find((asset) => /AI-Pack-.*\.zip$/i.test(asset.name));
           windows = {
             version: release.tag_name.replace(/^v/, ""),
             url: archive.browser_download_url,
@@ -89,6 +96,9 @@ export async function getGameRelease(): Promise<GameRelease> {
             installerUrl: installer?.browser_download_url ?? null,
             installerChecksumUrl: installer ? checksumFor(installer, release.assets) : null,
             installerSizeBytes: installer?.size ?? null,
+            aiPackUrl: aiPack?.browser_download_url ?? null,
+            aiPackChecksumUrl: aiPack ? checksumFor(aiPack, release.assets) : null,
+            aiPackSizeBytes: aiPack?.size ?? null,
           };
         }
       }

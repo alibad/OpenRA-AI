@@ -274,7 +274,7 @@ export function MissionStudio({ windowsRelease }: { windowsRelease: WindowsRelea
     <section className="studio-shell" id="mission-studio" aria-labelledby="studio-title">
       <div className="studio-heading">
         <div>
-          <span className="eyebrow"><Crosshair size={14} /> Mission studio / alpha</span>
+          <span className="eyebrow"><Crosshair size={14} /> 03 / Mission studio / alpha</span>
           <h2 id="studio-title">Point anywhere. Leave with a battlefield.</h2>
         </div>
         <p>Search or click anywhere, tune the battlefield footprint, then compile a validated Red Alert map in your browser.</p>

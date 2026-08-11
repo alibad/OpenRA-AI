@@ -7,9 +7,9 @@ const geist = Geist({ variable: "--font-geist", subsets: ["latin"] });
 const mono = Geist_Mono({ variable: "--font-mono", subsets: ["latin"] });
 
 const canonicalOrigin = new URL("https://rtsai.net");
-const title = "RTS AI — AI Companion & Earth Mission Generator for OpenRA";
+const title = "RTS AI — OpenRA AI Companion, Earth Missions & Red Sea 2026";
 const description =
-  "Download OpenRA AI, play with an interruptible in-game AI companion, and turn real places into validated strategy maps.";
+  "Download OpenRA AI with an interruptible AI companion, optional AUTO command, Earth-built strategy maps, and the Red Sea 2026 prototype.";
 
 export const metadata: Metadata = {
   metadataBase: canonicalOrigin,
@@ -24,6 +24,9 @@ export const metadata: Metadata = {
     "AI strategy game",
     "Earth mission generator",
     "real world strategy maps",
+    "Red Sea 2026",
+    "OpenRA mod",
+    "Jizan Corridor",
   ],
   alternates: { canonical: "/" },
   manifest: "/manifest.webmanifest",
@@ -63,7 +66,7 @@ export const metadata: Metadata = {
         url: "/social-card.png",
         width: 1200,
         height: 630,
-        alt: "RTS AI — an AI companion and Earth mission generator for OpenRA",
+        alt: "RTS AI — an OpenRA AI companion, Earth mission generator, and Red Sea 2026 prototype",
       },
     ],
     type: "website",

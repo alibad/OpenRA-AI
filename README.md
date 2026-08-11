@@ -8,6 +8,9 @@ repository.
 Players can:
 
 - download the newest published Windows build and its SHA-256 checksum;
+- launch the Alpha.9 Red Sea 2026 prototype with Saudi Arabia, Yemen, and the Jizan Corridor Earth contract;
+- install the optional Qwen3-VL, Whisper, and Kokoro Local AI Pack;
+- ask the companion for advice, confirm safe game actions, or explicitly enable AUTO command;
 - search or select a point on an OpenStreetMap basemap;
 - choose the Earth footprint and OpenRA battlefield size;
 - translate live nearby roads and waterways into a validated Red Alert `.oramap`;
