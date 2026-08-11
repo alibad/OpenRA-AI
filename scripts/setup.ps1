@@ -10,7 +10,7 @@ if (-not (Test-Path -LiteralPath $python)) {
     python -m venv $virtualEnvironment
 }
 
-& $python -m pip install --disable-pip-version-check -e "$repositoryRoot\services\worldgen" -e "$repositoryRoot\services\companion[voice]"
+& $python -m pip install --disable-pip-version-check -e "$repositoryRoot\services\worldgen" -e "$repositoryRoot\services\companion[voice,package]"
 
 Push-Location (Join-Path $repositoryRoot "apps\web")
 try {
