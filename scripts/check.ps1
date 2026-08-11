@@ -33,6 +33,11 @@ if (-not (Test-Path -LiteralPath $python)) {
     throw "Python environment is missing. Run scripts\setup.ps1 first."
 }
 
+& $python -m py_compile (Join-Path $repositoryRoot "scripts\release.py") (Join-Path $repositoryRoot "scripts\ai_pack.py")
+if ($LASTEXITCODE -ne 0) { throw "Release framework compilation failed." }
+& $python (Join-Path $repositoryRoot "scripts\ai_pack.py") validate
+if ($LASTEXITCODE -ne 0) { throw "AI pack lock validation failed." }
+
 Push-Location $repositoryRoot
 try {
     git diff --check HEAD
@@ -42,6 +47,8 @@ try {
     if ($LASTEXITCODE -ne 0) { throw "Worldgen tests failed." }
     & $python -m unittest discover -s services\companion\tests -v
     if ($LASTEXITCODE -ne 0) { throw "Companion tests failed." }
+    & $python -m unittest discover -s services\companion\evals -v
+    if ($LASTEXITCODE -ne 0) { throw "Companion gameplay-agent evals failed." }
     & $python -m compileall -q services\worldgen\src services\companion\src
     if ($LASTEXITCODE -ne 0) { throw "Python compilation failed." }
 

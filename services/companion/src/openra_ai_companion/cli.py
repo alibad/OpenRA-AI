@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import asyncio
 import ctypes
 import json
 import os
@@ -13,9 +14,13 @@ from openra_ai_worldgen.server import create_server as create_worldgen_server
 
 from .bridge import OpenRABridge
 from .core import Companion
-from .hotkeys import VoiceHotkeys
+from .hotkeys import VoiceHotkeys, console_print, response_hud_state
+from .models import CompanionResponse
 from .server import create_server as create_companion_server, serve
-from .voice import AudioPlayer, play_wav, record_question
+from .strategy_contracts import strategy_contract
+from .strategy_director import StrategyDirector
+from .voice import AudioPlayer, playback_hold_seconds, play_wav, record_question
+from .agent_models import default_agent_model, default_agent_provider, default_agent_router_url
 
 
 def _parser() -> argparse.ArgumentParser:
@@ -45,16 +50,44 @@ def _parser() -> argparse.ArgumentParser:
     voice = commands.add_parser("voice", help="record one voice question and answer aloud")
     voice.add_argument("--bridge", default="127.0.0.1:9998")
     voice.add_argument("--seconds", type=float, default=4.0)
+    agent_provider = default_agent_provider()
+    autoplay = commands.add_parser("autoplay", help="run an autonomous AI-controlled headless match")
+    autoplay.add_argument("--provider", default=agent_provider)
+    autoplay.add_argument("--model", default=default_agent_model(agent_provider))
+    autoplay.add_argument("--router-url", default=default_agent_router_url())
+    autoplay.add_argument("--map", dest="map_name", default="singles.oramap")
+    autoplay.add_argument("--opponent", default="beginner")
+    autoplay.add_argument("--seed", type=int, default=20260810)
+    autoplay.add_argument("--port", type=int, default=9997)
+    autoplay.add_argument("--max-rounds", type=int, default=40)
+    autoplay.add_argument("--max-turns", type=int, default=24)
+    autoplay.add_argument("--evidence-dir", type=Path)
+    autoplay.add_argument("--engine", type=Path)
+    autoplay.add_argument("--reuse-engine", action="store_true")
+    learn = commands.add_parser("learn", help="run reviewed autonomous attempts until a verified win")
+    learn.add_argument("--provider", default=agent_provider)
+    learn.add_argument("--model", default=default_agent_model(agent_provider))
+    learn.add_argument("--router-url", default=default_agent_router_url())
+    learn.add_argument("--map", dest="map_name", default="singles.oramap")
+    learn.add_argument("--opponent", default="beginner")
+    learn.add_argument("--seed", type=int, default=20260810)
+    learn.add_argument("--port", type=int, default=9997)
+    learn.add_argument("--attempts", type=int, default=5)
+    learn.add_argument("--max-rounds", type=int, default=40)
+    learn.add_argument("--max-turns", type=int, default=24)
+    learn.add_argument("--evidence-root", type=Path)
+    learn.add_argument("--engine", type=Path)
     return parser
 
 
-def _speak(companion: Companion, text: str, player: AudioPlayer | None = None) -> bool:
+def _speak(companion: Companion, text: str, player: AudioPlayer | None = None) -> float | bool:
     try:
         audio, metadata = companion.speech(text)
         if metadata.get("interrupted"):
             return False
         if player:
-            player.play(audio)
+            duration = player.play(audio)
+            return duration if duration else bool(audio)
         else:
             play_wav(audio)
     except Exception as exc:
@@ -80,11 +113,59 @@ def _pid_alive(pid: int) -> bool:
         return False
 
 
+def _auto_planner_interval(threat_level: str) -> float:
+    return {"critical": 4.0, "high": 10.0}.get(threat_level, 60.0)
+
+
+def _restart_auto_deadlines(now: float, threat_level: str) -> tuple[float, float]:
+    """Restart periodic work after an event-driven planning/execution cycle."""
+    return now + 3.0, now + _auto_planner_interval(threat_level)
+
+
 def main(argv: list[str] | None = None) -> int:
     args = _parser().parse_args(argv)
     if args.command == "serve":
         serve(args.host, args.port)
         return 0
+    if args.command == "autoplay":
+        from dataclasses import asdict
+        from .autonomous import autoplay
+
+        result = asyncio.run(autoplay(
+            provider=args.provider,
+            model=args.model,
+            router_url=args.router_url,
+            map_name=args.map_name,
+            opponent=args.opponent,
+            seed=args.seed,
+            port=args.port,
+            max_rounds=args.max_rounds,
+            max_turns_per_round=args.max_turns,
+            evidence_dir=args.evidence_dir,
+            engine_executable=args.engine,
+            reuse_engine=args.reuse_engine,
+        ))
+        print(json.dumps(asdict(result), indent=2))
+        return 0 if result.won else 2
+    if args.command == "learn":
+        from .autonomous import learn_until_win
+
+        result = asyncio.run(learn_until_win(
+            provider=args.provider,
+            model=args.model,
+            router_url=args.router_url,
+            map_name=args.map_name,
+            opponent=args.opponent,
+            seed=args.seed,
+            port=args.port,
+            max_attempts=args.attempts,
+            max_rounds=args.max_rounds,
+            max_turns_per_round=args.max_turns,
+            evidence_root=args.evidence_root,
+            engine_executable=args.engine,
+        ))
+        print(json.dumps(result, indent=2))
+        return 0 if result["won"] else 2
     companion = Companion()
     if args.command == "ask":
         from pathlib import Path
@@ -99,9 +180,9 @@ def main(argv: list[str] | None = None) -> int:
             companion.latest_snapshot = bridge.observe()
         print("Listening...")
         transcript = companion.transcribe(record_question(args.seconds)).text
-        print(f"You: {transcript}")
+        console_print(f"You: {transcript}")
         answer = companion.ask(transcript).text
-        print(f"Companion: {answer}")
+        console_print(f"Companion: {answer}")
         _speak(companion, answer)
         return 0
 
@@ -123,6 +204,13 @@ def main(argv: list[str] | None = None) -> int:
     print("Native AI settings and diagnostics are ready in OpenRA.")
     print("Native Earth Mission Studio is ready in OpenRA World Tools.")
     with OpenRABridge(args.bridge) as bridge:
+        from .interactive_agent import InteractiveMCPPlanner
+
+        planner = InteractiveMCPPlanner(args.bridge)
+        companion.set_action_planner(planner.plan)
+        companion.set_action_executor(bridge.execute_actions)
+        companion.set_snapshot_provider(bridge.observe)
+        companion.set_frame_provider(bridge.capture_frame)
         def publish_status(state: str, message: str) -> None:
             bridge.update_companion_status(
                 state,
@@ -131,7 +219,29 @@ def main(argv: list[str] | None = None) -> int:
                 muted=companion.muted,
             )
 
+        def switch_native_strategy(profile: str) -> bool:
+            name = strategy_contract(companion.native_strategy)["name"].upper()
+            state = f"auto-active:{profile}" if companion.auto_act_enabled else f"ready:{profile}"
+            mission = companion.latest_snapshot is not None and companion.latest_snapshot.mission_mode
+            message = (
+                "AUTO ASSISTANT ON  •  SCRIPTED MISSION BRAIN"
+                if companion.auto_act_enabled and mission
+                else
+                f"AUTO ASSISTANT ON  •  {name}  •  {profile.upper()} NATIVE BRAIN"
+                if companion.auto_act_enabled
+                else "AI READY  •  HOLD ASK KEY TO SPEAK OR SET STRATEGY"
+            )
+            return bridge.update_companion_status(
+                state,
+                message,
+                enabled=companion.enabled,
+                muted=companion.muted,
+            )
+
         control_server.status_publisher = publish_status
+        companion.set_strategy_controller(switch_native_strategy)
+        publish_status(*companion.idle_status())
+        director = StrategyDirector(companion.router)
 
         hotkeys = (
             VoiceHotkeys(companion, player, lambda text: _speak(companion, text, player), publish_status)
@@ -139,10 +249,19 @@ def main(argv: list[str] | None = None) -> int:
             else None
         )
         if hotkeys:
-            hotkeys.start()
+            # OpenRA owns the remappable bindings and calls the local voice endpoints.
+            hotkeys.start(global_listener=False)
+            control_server.voice_controller = hotkeys
         print("Watching OpenRA. Press Ctrl+C to stop.")
         waiting_reported = False
+        capabilities_announced = False
         insight_expires_at = 0.0
+        last_threat_signature: tuple[int, str, str] | None = None
+        last_auto_act_enabled = companion.auto_act_enabled
+        auto_routine_due_at = 0.0
+        auto_planner_due_at = 0.0
+        last_auto_message_at = -1_000_000.0
+        strategy_review_due_at = 0.0
         try:
             while True:
                 if not _pid_alive(args.game_pid):
@@ -153,40 +272,173 @@ def main(argv: list[str] | None = None) -> int:
                     if waiting_reported:
                         print("Connected to the live match.")
                         waiting_reported = False
+                    if not capabilities_announced:
+                        publish_status(
+                            "capabilities",
+                            "AI  •  MCP TOOLSET ONLINE: 26 GAME TOOLS  •  ASK FOR A SUGGESTION OR ACTION",
+                        )
+                        capabilities_announced = True
+                        time.sleep(0.15)
+                        continue
                 except RuntimeError:
                     if not waiting_reported:
                         print("Waiting for a match with the companion bridge enabled...")
                         waiting_reported = True
                     time.sleep(max(0.25, args.interval))
                     continue
-                if hotkeys and hotkeys.active.is_set():
-                    companion.latest_snapshot = snapshot
+                response = companion.observe(snapshot)
+                threat = companion.current_threat
+                threat_signature = (threat.score, threat.level, threat.reason)
+                if threat_signature != last_threat_signature:
+                    bridge.update_threat_status(threat.score, threat.level, threat.reason)
+                    last_threat_signature = threat_signature
+                now = time.monotonic()
+                user_priority = companion.user_turn_active or bool(hotkeys and hotkeys.active.is_set())
+                if user_priority:
+                    # Keep the freshest event queued until the player's answer is complete.
                     response = None
+                    event_context = None
                 else:
-                    response = companion.observe(snapshot)
+                    event_context = companion.take_event_context()
+                scheduled_planner_due_at = auto_planner_due_at
+                if companion.auto_act_enabled != last_auto_act_enabled:
+                    last_auto_act_enabled = companion.auto_act_enabled
+                    auto_routine_due_at = 0.0
+                    auto_planner_due_at = now + 2.0
+                auto_response = None
+                voice_busy = user_priority
+                strategic_event = bool(event_context) and (
+                    event_context["type"] in {
+                        "enemy_spotted",
+                        "structure_spotted",
+                        "own_building_destroyed",
+                        "enemy_building_destroyed",
+                        "no_harvester",
+                    }
+                    or event_context["threat"]["level"] in {"high", "critical"}
+                )
+                if (
+                    companion.native_brain_available
+                    and companion.auto_act_enabled
+                    and companion.native_strategy == "adaptive"
+                    and not voice_busy
+                    and not snapshot.done
+                    and now >= strategy_review_due_at
+                    and (strategic_event or strategy_review_due_at <= 0)
+                ):
+                    publish_status("thinking", "AI STRATEGY DIRECTOR  •  REVIEWING NATIVE DOCTRINE")
+                    decision = director.choose(snapshot, threat, companion.native_profile, event_context)
+                    chosen = str(decision["profile"])
+                    changed = chosen != companion.native_profile and companion.apply_adaptive_profile(chosen)
+                    strategy_review_due_at = now + (60.0 if threat.heated else 180.0)
+                    if changed:
+                        name = strategy_contract(chosen)["name"]
+                        response = CompanionResponse(
+                            f"Strategy shift: {name}. {decision['reason']}",
+                            "strategy-director",
+                            metadata={"strategy": decision, "native_active": True},
+                        )
+                        last_auto_message_at = now
+                    else:
+                        publish_status(*companion.idle_status())
+
+                if (
+                    companion.auto_act_enabled
+                    and companion.enabled
+                    and not companion.native_brain_available
+                    and not voice_busy
+                    and not snapshot.done
+                ):
+                    planner_event = bool(event_context) and (
+                        event_context["type"] in {"enemy_spotted", "structure_spotted"}
+                        or event_context["threat"]["level"] in {"high", "critical"}
+                    )
+                    if event_context:
+                        # Priority events preempt both calm intervals. Do not let an unrelated,
+                        # older AUTO proposal consume this event cycle.
+                        auto_routine_due_at = now
+                        auto_planner_due_at = now
+                        pending = companion.pending_action()
+                        expected_instruction = f"contextual:{event_context['type']}"
+                        if pending is not None and pending.get("instruction") != expected_instruction:
+                            companion.cancel_action()
+                    if companion.pending_action() is not None:
+                        auto_response = companion.auto_act_once(event_context)
+                        auto_routine_due_at = now + 3.0
+                        if auto_planner_due_at <= 0:
+                            auto_planner_due_at = now + 12.0
+                    elif now >= auto_routine_due_at and not planner_event:
+                        routine = companion.propose_routine_action()
+                        auto_routine_due_at = now + 3.0
+                        if routine is not None:
+                            auto_response = companion.auto_act_once(event_context)
+                            if auto_planner_due_at <= 0:
+                                auto_planner_due_at = now + 12.0
+                    if auto_response is None and now >= auto_planner_due_at:
+                        publish_status("thinking", "AUTO COMMANDER  •  PLANNING WITH 26 GAME TOOLS")
+                        auto_response = companion.auto_act_once(event_context)
+                        auto_planner_due_at = now + _auto_planner_interval(threat.level)
+                    if event_context:
+                        auto_routine_due_at, next_planner_due_at = _restart_auto_deadlines(now, threat.level)
+                        if event_context["type"] == "storage_pressure":
+                            auto_planner_due_at = (
+                                scheduled_planner_due_at
+                                if scheduled_planner_due_at > now
+                                else now + 3.0
+                            )
+                        else:
+                            auto_planner_due_at = next_planner_due_at
+                    if auto_response is not None:
+                        instruction = str(auto_response.metadata.get("action", {}).get("instruction", ""))
+                        user_requested = bool(instruction) and (
+                            not instruction.startswith("contextual:")
+                            and not instruction.startswith("Autonomous commander mode")
+                        )
+                        if (
+                            threat.heated
+                            or user_requested
+                            or response is not None
+                            or now - last_auto_message_at >= 60.0
+                        ):
+                            response = auto_response
+                            last_auto_message_at = now
+                # Recheck at publication time: a question may have started while an
+                # event model call was finishing in this loop iteration.
+                if companion.user_turn_active or bool(hotkeys and hotkeys.active.is_set()):
+                    response = None
                 if response and response.metadata.get("clear"):
                     publish_status(*companion.idle_status())
                     insight_expires_at = 0.0
                 elif response and response.text:
-                    print(f"[{response.insight.key}] {response.text}")
+                    response_key = response.insight.key if response.insight else response.source
+                    print(f"[{response_key}] {response.text}")
                     speak = bool(player and companion.should_speak(response.insight))
-                    importance = response.insight.importance
+                    importance = response.insight.importance if response.insight else "routine"
+                    default_state = f"speaking-{importance}" if speak else importance
                     publish_status(
-                        f"speaking-{importance}" if speak else importance,
+                        response_hud_state(response, default_state),
                         f"AI  •  {response.text}",
                     )
-                    if speak:
-                        _speak(companion, response.text, player)
-                    insight_expires_at = time.monotonic() + 8
+                    playback = _speak(companion, response.text, player) if speak else None
+                    insight_expires_at = time.monotonic() + playback_hold_seconds(playback, 8.0)
                 elif insight_expires_at and time.monotonic() >= insight_expires_at:
                     if not hotkeys or not hotkeys.active.is_set():
-                        publish_status(*companion.idle_status())
-                        insight_expires_at = 0.0
+                        if companion.pending_action() is not None:
+                            insight_expires_at = time.monotonic() + 1
+                        else:
+                            publish_status(*companion.idle_status())
+                            insight_expires_at = 0.0
                 time.sleep(max(0.1, args.interval))
         except KeyboardInterrupt:
             companion.interrupt()
         finally:
+            companion.set_action_planner(None)
+            companion.set_strategy_controller(None)
+            companion.set_action_executor(None)
+            companion.set_snapshot_provider(None)
+            companion.set_frame_provider(None)
             if hotkeys:
+                control_server.voice_controller = None
                 hotkeys.stop()
             elif player:
                 player.stop()

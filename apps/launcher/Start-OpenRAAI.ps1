@@ -72,6 +72,11 @@ $env:OPENRA_AI_GRPC_PORT = "$BridgePort"
 $env:OPENRA_AI_CONSOLE_URL = "http://127.0.0.1:$AIConsolePort/"
 $env:OPENRA_AI_WORLD_STUDIO_URL = "http://127.0.0.1:$WorldStudioPort/"
 $env:OPENRA_AI_ENGINE_DIR = $engineRoot
+# OpenRA currently exposes its UI through the English Fluent bundle. The
+# transcription setting follows this app language unless explicitly overridden.
+if ([string]::IsNullOrWhiteSpace($env:OPENRA_AI_APP_LANGUAGE)) {
+    $env:OPENRA_AI_APP_LANGUAGE = "en"
+}
 $arguments = @("Engine.EngineDir=$engineRoot", "Game.Mod=ra", "Launch.Bots=Multi1:$OpponentBot")
 if ($Headless) {
     $arguments += "Game.Platform=Null"
@@ -86,7 +91,7 @@ if ($mapArgument) {
 }
 
 if (-not $NoSpeech -and -not $NoVoiceHotkeys) {
-    Write-Host "AI companion controls: hold Ctrl+Space to ask, use the in-game VOICE button or Ctrl+Shift+M for spoken audio, Ctrl+Shift+A to disable or enable." -ForegroundColor Cyan
+    Write-Host "AI controls: hold Ctrl+Space to ask, Ctrl+Enter accepts, Ctrl+Backspace rejects, Ctrl+Shift+A toggles AUTO, and Ctrl+Shift+M toggles voice. Remap them in Settings > Hotkeys > AI Assistant." -ForegroundColor Cyan
 }
 
 $gameStart = @{
@@ -126,6 +131,8 @@ else {
 }
 
 $env:PYTHONUNBUFFERED = "1"
+$env:PYTHONUTF8 = "1"
+$env:PYTHONIOENCODING = "utf-8"
 $watcher = $null
 try {
     $watcher = Start-Process -FilePath $watchProgram -ArgumentList $watchArguments `

@@ -24,8 +24,8 @@ OpenRA engine
   <-> OpenRA adapter
        <-> companion service
             <-> private AI layer
-                 <-> OpenAI API initially
-                 <-> local model later
+                 <-> local models by default
+                 <-> hosted OpenAI-compatible routes by explicit opt-in
 
 Native Earth Mission Studio (plus the optional marketing web picker)
   <-> world-generation service
@@ -62,13 +62,71 @@ The companion owns:
 - model-provider routing through the private AI layer;
 - transcripts, latency measurements, and cost measurements.
 
+AUTO authority is implemented as a two-speed assistant. OpenRA's native
+`ModularBot` owns the real-time loop and executes its complete condition-gated
+module stack for the local human slot without changing that slot into a bot.
+The companion owns a persistent strategy contract and can activate the normal,
+rush, turtle, naval, or medium native profile. Exact voice strategy commands
+switch profiles immediately; adaptive selection is event-driven and rate
+limited. Disabling AUTO deactivates the native brain and preserves ordinary
+manual control.
+
+The language model is deliberately outside the tick loop. It receives compact,
+fog-respecting strategic events, chooses only a durable native profile, and
+explains the resulting notable sequence. Routine building placement, harvesters,
+production, repairs, support powers, squad formation, combat responses, and
+micro remain native deterministic algorithms. This makes gameplay latency and
+cost independent from the model response interval.
+
+For action requests, the model produces a typed proposal rather than a game
+order. Python validates it against the latest fog-respecting snapshot and keeps
+it pending until the player separately confirms or cancels it. Confirmation
+submits a stable request id and fresh snapshot tick to the engine. The engine
+then repeats all security-relevant validation on the game thread and returns a
+structured receipt. The initial action surface is single-player only,
+allowlisted, capped at twelve orders, and excludes surrender, hidden state,
+support powers, and match-lifecycle commands.
+
 Routine, important, and critical notification levels are selected before the
 model is called. Routine updates are text-only by default; automatic voice is
 reserved for critical events. The player can change the pace and voice
 threshold from OpenRA's native AI settings tab.
 
-The model never receives raw game frames continuously. Deterministic code
-decides when an event is worth interpreting.
+The deterministic threat detector scores only the fog-respecting snapshot and
+publishes `calm`, `guarded`, `high`, or `critical` plus a 0–100 value to the
+native HUD. Calm and guarded notifications share a 1,500-tick global budget;
+high and critical play shorten this to 250 and 100 ticks, and upward escalation
+can speak immediately. The detector can attach an allowlisted contextual action
+proposal, but it uses the same confirmation and engine-validation boundary as a
+player-requested action.
+
+For explicit questions and action requests, the vision route receives two
+bounded, fog-respecting images: OpenRA's rendered player viewport and a
+deterministic whole-map tactical overview built from the spatial tensor. Heated
+automatic alerts may use the same pair. Frames are captured on demand rather
+than streamed continuously; calm event selection stays deterministic. Hidden
+cells render black, hidden actors are absent, and unexplored resource density is
+removed at serialization. Typed actor ids and coordinates remain the only
+authority for executable proposals.
+
+### Autonomous game agent
+
+The headless evaluation path uses one OpenAI Agents SDK commander and one local
+stdio MCP server bound to an exact multi-session OpenRA match. The server
+publishes fog-respecting battlefield/status reads, interruptible simulation
+advance, and the complete safe gameplay action allowlist. It has no external
+application connectors, arbitrary RPC, shell/filesystem access, surrender, or
+session-destruction tool.
+
+The MCP runtime validates ownership, visibility, capabilities, map bounds, and
+observed production IDs before sending commands. OpenRA repeats the authoritative
+checks on the game thread. Fast advance is confined to the headless test bridge;
+it is not available to the live interactive companion. Every tool call and the
+final engine outcome are persisted as machine-gradable evidence.
+
+The controller reads `OPENAI_API_KEY` from its process environment or nearest
+project `.env` and supplies it only to the Agents SDK process. Neither OpenRA nor
+the MCP gameplay server receives the credential.
 
 ### World generation
 

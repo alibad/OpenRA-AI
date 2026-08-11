@@ -214,22 +214,25 @@ class AIRouter:
         return self._chat(messages, self.settings.text_model)
 
     def vision(self, prompt: str, image: bytes, media_type: str = "image/png") -> RouterResult:
-        if not image:
-            raise ValueError("image must not be empty")
-        encoded = base64.b64encode(image).decode("ascii")
+        return self.vision_many(prompt, [(image, media_type)])
+
+    def vision_many(self, prompt: str, images: list[tuple[bytes, str]]) -> RouterResult:
+        if not images or any(not image for image, _ in images):
+            raise ValueError("at least one non-empty image is required")
+        content: list[dict[str, object]] = [{"type": "text", "text": prompt}]
+        for image, media_type in images[:3]:
+            encoded = base64.b64encode(image).decode("ascii")
+            content.append({
+                "type": "image_url",
+                "image_url": {
+                    "url": f"data:{media_type};base64,{encoded}",
+                    "detail": "high",
+                },
+            })
         return self._chat([
             {
                 "role": "user",
-                "content": [
-                    {"type": "text", "text": prompt},
-                    {
-                        "type": "image_url",
-                        "image_url": {
-                            "url": f"data:{media_type};base64,{encoded}",
-                            "detail": "high",
-                        },
-                    },
-                ],
+                "content": content,
             }
         ], self.settings.vision_model)
 
@@ -237,6 +240,7 @@ class AIRouter:
         boundary = f"----OpenRAAI{uuid.uuid4().hex}"
         chunks = [
             f"--{boundary}\r\nContent-Disposition: form-data; name=\"model\"\r\n\r\n{self.settings.transcribe_model}\r\n".encode(),
+            f"--{boundary}\r\nContent-Disposition: form-data; name=\"language\"\r\n\r\n{self.settings.transcribe_language}\r\n".encode(),
             f"--{boundary}\r\nContent-Disposition: form-data; name=\"file\"; filename=\"{filename}\"\r\nContent-Type: audio/wav\r\n\r\n".encode(),
             audio,
             f"\r\n--{boundary}--\r\n".encode(),
@@ -277,6 +281,8 @@ class AIRouter:
 
     @staticmethod
     def _text_prices(model: str) -> tuple[float, float, str]:
+        if model.lower().startswith("local-"):
+            return 0.0, 0.0, "Local router model: $0 provider cost"
         prices = {
             "gpt-5.5": (5.0, 30.0, "GPT-5.5 public token rates"),
         }
@@ -294,12 +300,15 @@ class AIRouter:
         input_rate, output_rate, text_assumption = self._text_prices(self.settings.text_model)
         text_cost = input_tokens / 1_000_000 * input_rate + output_tokens / 1_000_000 * output_rate
 
-        speech_known = self.settings.speech_model.lower() in {"openai-tts", "tts-1"}
-        speech_rate = 15.0 if speech_known else 0.0
+        local_text = self.settings.text_model.lower().startswith("local-")
+        local_speech = self.settings.speech_model.lower() == "local-kokoro"
+        speech_known = local_speech or self.settings.speech_model.lower() in {"openai-tts", "tts-1"}
+        speech_rate = 0.0 if local_speech else 15.0 if speech_known else 0.0
         speech_cost = speech_characters / 1_000_000 * speech_rate
 
-        transcription_known = self.settings.transcribe_model.lower() in {"openai-transcribe", "whisper-1"}
-        transcription_rate = 0.006 if transcription_known else 0.0
+        local_transcription = self.settings.transcribe_model.lower() == "local-whisper"
+        transcription_known = local_transcription or self.settings.transcribe_model.lower() in {"openai-transcribe", "whisper-1"}
+        transcription_rate = 0.0 if local_transcription else 0.006 if transcription_known else 0.0
         transcription_cost = transcription_seconds / 60 * transcription_rate
 
         total = text_cost + speech_cost + transcription_cost
@@ -316,11 +325,11 @@ class AIRouter:
             "transcription_cost_usd": round(transcription_cost, 6),
             "session_cost_usd": round(total, 6),
             "hourly_cost_usd": round(hourly, 6),
-            "pricing_known": input_rate > 0 and speech_known and transcription_known,
+            "pricing_known": (input_rate > 0 or local_text) and speech_known and transcription_known,
             "assumptions": [
                 text_assumption,
-                "openai-tts estimated at TTS-1: $15 / 1M characters" if speech_known else f"No public price mapping for {self.settings.speech_model}",
-                "openai-transcribe estimated at Whisper: $0.006 / minute" if transcription_known else f"No public price mapping for {self.settings.transcribe_model}",
+                "Local Kokoro route: $0 provider cost" if local_speech else "openai-tts estimated at TTS-1: $15 / 1M characters" if speech_known else f"No public price mapping for {self.settings.speech_model}",
+                "Local Whisper route: $0 provider cost" if local_transcription else "openai-transcribe estimated at Whisper: $0.006 / minute" if transcription_known else f"No public price mapping for {self.settings.transcribe_model}",
             ],
             "estimate_only": True,
         }

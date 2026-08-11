@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "product": "OpenRA AI",
+  "artifact_prefix": "OpenRA-AI",
+  "targets": {
+    "windows-x64": {
+      "hosts": ["windows"],
+      "architectures": ["amd64", "x86_64"],
+      "build": {
+        "program": "powershell.exe",
+        "arguments": [
+          "-NoProfile",
+          "-ExecutionPolicy",
+          "Bypass",
+          "-File",
+          "scripts/package-windows.ps1",
+          "-Version",
+          "{version}"
+        ]
+      },
+      "smoke": [
+        {
+          "program": "powershell.exe",
+          "arguments": [
+            "-NoProfile",
+            "-ExecutionPolicy",
+            "Bypass",
+            "-File",
+            "scripts/smoke-windows-package.ps1",
+            "-Version",
+            "{version}"
+          ]
+        },
+        {
+          "program": "powershell.exe",
+          "arguments": [
+            "-NoProfile",
+            "-ExecutionPolicy",
+            "Bypass",
+            "-File",
+            "scripts/smoke-windows-installer.ps1",
+            "-Version",
+            "{version}"
+          ]
+        }
+      ],
+      "artifacts": [
+        "OpenRA-AI-{version}-windows-x64.zip",
+        "OpenRA-AI-{version}-windows-x64-setup.exe"
+      ]
+    },
+    "macos-arm64": {
+      "hosts": ["darwin"],
+      "architectures": ["arm64", "aarch64"],
+      "build": {
+        "program": "bash",
+        "arguments": ["scripts/package-macos.sh", "{version}"]
+      },
+      "smoke": [
+        {
+          "program": "bash",
+          "arguments": ["scripts/smoke-macos-package.sh", "{version}"]
+        }
+      ],
+      "artifacts": ["OpenRA-AI-{version}-macos-arm64.dmg"]
+    }
+  }
+}

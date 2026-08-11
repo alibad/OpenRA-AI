@@ -1,0 +1,74 @@
+{
+  "schema_version": 1,
+  "pack_version": "2026.08.1",
+  "name": "OpenRA AI Local AI Pack",
+  "description": "Platform-neutral, checksum-pinned model payload used by the local OpenRA AI runtime.",
+  "hardware_requirements": {
+    "minimum": {
+      "cpu": "4-core x64 CPU with AVX2",
+      "ram_gb": 8,
+      "gpu": "Not required",
+      "free_disk_gb": 5,
+      "mode": "Lite mode with speech models loaded on demand"
+    },
+    "recommended": {
+      "cpu": "Recent 6-core x64 CPU",
+      "ram_gb": 16,
+      "gpu": "Optional GPU with 6 GB VRAM",
+      "free_disk_gb": 6,
+      "mode": "Full local text, vision, transcription, and speech"
+    }
+  },
+  "components": [
+    {
+      "id": "qwen3-vl-2b-q4",
+      "capability": "text-and-vision",
+      "license": "Apache-2.0",
+      "source_revision": "52d6c8ffea26cc873ac5ad116f8631268d7eb503",
+      "url": "https://huggingface.co/Qwen/Qwen3-VL-2B-Instruct-GGUF/resolve/52d6c8ffea26cc873ac5ad116f8631268d7eb503/Qwen3VL-2B-Instruct-Q4_K_M.gguf?download=true",
+      "sha256": "089d75c52f4b7ffc56ba998ffc50aae89fcafc755f9e7208aacca281dca6c2ae",
+      "bytes": 1107409952,
+      "destination": "models/llm/Qwen3VL-2B-Instruct-Q4_K_M.gguf"
+    },
+    {
+      "id": "qwen3-vl-2b-mmproj-q8",
+      "capability": "vision-projector",
+      "license": "Apache-2.0",
+      "source_revision": "52d6c8ffea26cc873ac5ad116f8631268d7eb503",
+      "url": "https://huggingface.co/Qwen/Qwen3-VL-2B-Instruct-GGUF/resolve/52d6c8ffea26cc873ac5ad116f8631268d7eb503/mmproj-Qwen3VL-2B-Instruct-Q8_0.gguf?download=true",
+      "sha256": "f9a68fabba69c3b81e153367b2c7521030b0fa8bb0de400c9599c8e6725f9c82",
+      "bytes": 445053216,
+      "destination": "models/llm/mmproj-Qwen3VL-2B-Instruct-Q8_0.gguf"
+    },
+    {
+      "id": "whisper-base-en",
+      "capability": "speech-to-text",
+      "license": "MIT",
+      "source_revision": "5359861c739e955e79d9a303bcbc70fb988958b1",
+      "url": "https://huggingface.co/ggerganov/whisper.cpp/resolve/5359861c739e955e79d9a303bcbc70fb988958b1/ggml-base.en.bin?download=true",
+      "sha256": "a03779c86df3323075f5e796cb2ce5029f00ec8869eee3fdfb897afe36c6d002",
+      "bytes": 147964211,
+      "destination": "models/stt/ggml-base.en.bin"
+    },
+    {
+      "id": "kokoro-82m-int8",
+      "capability": "text-to-speech",
+      "license": "Apache-2.0",
+      "source_revision": "model-files-v1.0",
+      "url": "https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.0/kokoro-v1.0.int8.onnx",
+      "sha256": "6e742170d309016e5891a994e1ce1559c702a2ccd0075e67ef7157974f6406cb",
+      "bytes": 92361271,
+      "destination": "models/tts/kokoro-v1.0.int8.onnx"
+    },
+    {
+      "id": "kokoro-voices-v1",
+      "capability": "text-to-speech-voices",
+      "license": "Apache-2.0",
+      "source_revision": "model-files-v1.0",
+      "url": "https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.0/voices-v1.0.bin",
+      "sha256": "bca610b8308e8d99f32e6fe4197e7ec01679264efed0cac9140fe9c29f1fbf7d",
+      "bytes": 28214398,
+      "destination": "models/tts/voices-v1.0.bin"
+    }
+  ]
+}

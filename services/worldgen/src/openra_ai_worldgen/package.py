@@ -8,6 +8,7 @@ from zipfile import ZIP_DEFLATED, ZipFile, ZipInfo
 
 from .models import GeoSelection
 from .raster import TerrainPlan
+from .scenarios import mission_blueprint, scenario_manifest
 from .terrain import TerrainView
 
 GENERATOR_VERSION = "0.3.0"
@@ -54,14 +55,31 @@ def finalize_native_package(
         map_binary = archive.read("map.bin")
         preview = archive.read("map.png")
 
-    briefing = (
-        f"# {selection.title}\n\n"
-        f"A two-player skirmish inspired by terrain evidence around {selection.location_name} "
-        f"({selection.latitude:.5f}, {selection.longitude:.5f}).\n\n"
-        f"{selection.story_seed.strip() or 'Secure the approaches, protect your supply line, and control the center.'}\n\n"
-        "OpenRA's native generator converts that terrain character into a mechanically playable battlefield. "
-        "This is a stylized fictional scenario, not a factual simulation of people or events.\n"
-    ).encode("utf-8")
+    blueprint = mission_blueprint(selection.scenario_id)
+    if blueprint:
+        objectives = "\n".join(f"{index}. {objective}" for index, objective in enumerate(blueprint.objectives, 1))
+        sources = "\n".join(
+            f"- {source.publisher}, {source.published}: {source.title} ({source.url})"
+            for source in blueprint.sources
+        )
+        briefing_text = (
+            f"# {blueprint.title}\n\n"
+            f"## Situation\n\n{blueprint.situation}\n\n"
+            f"## Objectives\n\n{objectives}\n\n"
+            f"## Source boundary\n\nFactual cutoff: {blueprint.factual_cutoff}. "
+            "Objectives, force composition, timing, distances, and outcomes are authored gameplay abstractions.\n\n"
+            f"## Sources\n\n{sources}\n"
+        )
+    else:
+        briefing_text = (
+            f"# {selection.title}\n\n"
+            f"A two-player skirmish inspired by terrain evidence around {selection.location_name} "
+            f"({selection.latitude:.5f}, {selection.longitude:.5f}).\n\n"
+            f"{selection.story_seed.strip() or 'Secure the approaches, protect your supply line, and control the center.'}\n\n"
+            "OpenRA's native generator converts that terrain character into a mechanically playable battlefield. "
+            "This is a stylized fictional scenario, not a factual simulation of people or events.\n"
+        )
+    briefing = briefing_text.encode("utf-8")
     checksums = {
         "map.yaml": hashlib.sha256(map_yaml).hexdigest(),
         "map.bin": hashlib.sha256(map_binary).hexdigest(),
@@ -70,6 +88,8 @@ def finalize_native_package(
     if terrain_view:
         checksums["earth-terrain.png"] = hashlib.sha256(terrain_view.image).hexdigest()
 
+    effective_player_faction = blueprint.player_faction if blueprint else selection.player_faction
+    effective_opponent_faction = blueprint.opponent_faction if blueprint else selection.opponent_faction
     manifest = {
         "schema": "openra-ai.mission-package/v1",
         "generator_version": GENERATOR_VERSION,
@@ -99,7 +119,11 @@ def finalize_native_package(
             "mode": selection.generation_mode,
             "terrain_profile": native_options.get("terrain", "Plots"),
             "roads": native_options.get("roads", True),
+            "mission_archetype": selection.mission_archetype,
+            "player_faction": effective_player_faction,
+            "opponent_faction": effective_opponent_faction,
         },
+        "scenario": scenario_manifest(selection.scenario_id),
         "checksums": checksums,
         "validation": validation,
     }

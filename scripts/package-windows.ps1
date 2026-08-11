@@ -16,11 +16,21 @@ $python = Join-Path $repositoryRoot ".venv\Scripts\python.exe"
 $engineRoot = Join-Path $repositoryRoot "engine\openra"
 $dotnetRoot = Join-Path $env:USERPROFILE ".dotnet"
 $brandIcon = Join-Path $repositoryRoot "assets\brand\rtsai.ico"
+$aiPackLock = Join-Path $repositoryRoot "packaging\ai-pack.lock.json"
+$modelNotices = Join-Path $repositoryRoot "packaging\THIRD_PARTY_MODELS.md"
 
-foreach ($required in @($python, $brandIcon)) {
+foreach ($required in @($python, $brandIcon, $aiPackLock, $modelNotices)) {
     if (-not (Test-Path -LiteralPath $required)) {
         throw "Packaging input is missing: $required"
     }
+}
+
+$runningEngine = @(Get-Process -Name "OpenRA" -ErrorAction SilentlyContinue | Where-Object {
+    $_.Path -and $_.Path.StartsWith($engineRoot + [IO.Path]::DirectorySeparatorChar, [StringComparison]::OrdinalIgnoreCase)
+})
+if ($runningEngine.Count -gt 0) {
+    $processIds = ($runningEngine.Id | Sort-Object) -join ", "
+    throw "Close OpenRA processes running from this checkout before packaging (PID: $processIds)."
 }
 
 New-Item -ItemType Directory -Path $artifactRoot -Force | Out-Null
@@ -76,6 +86,10 @@ Copy-Item -LiteralPath (Join-Path $repositoryRoot "generated\missions\riyadh-cro
 Copy-Item -LiteralPath (Join-Path $repositoryRoot ".env.example") -Destination $stageRoot
 Copy-Item -LiteralPath (Join-Path $repositoryRoot "README.md") -Destination $stageRoot
 Copy-Item -LiteralPath (Join-Path $repositoryRoot "LICENSE") -Destination $stageRoot
+$packagingMetadata = Join-Path $stageRoot "packaging"
+New-Item -ItemType Directory -Path $packagingMetadata -Force | Out-Null
+Copy-Item -LiteralPath $aiPackLock -Destination $packagingMetadata
+Copy-Item -LiteralPath $modelNotices -Destination $packagingMetadata
 $brandTarget = Join-Path $stageRoot "assets\brand"
 New-Item -ItemType Directory -Path $brandTarget -Force | Out-Null
 Copy-Item -LiteralPath $brandIcon -Destination (Join-Path $brandTarget "rtsai.ico")
@@ -89,6 +103,11 @@ $manifest = [ordered]@{
     entrypoint = "Play-OpenRAAI.cmd"
     bundled_map = "generated/missions/riyadh-crossing-42.oramap"
     content = "Downloaded on first run from OpenRA's supported Red Alert quick-install mirrors"
+    ai_pack = [ordered]@{
+        manifest = "packaging/ai-pack.lock.json"
+        optional = $true
+        runtime_cost = "No hosted-provider charge"
+    }
 }
 $manifest | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $stageRoot "release.json") -Encoding UTF8
 
