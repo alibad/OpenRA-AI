@@ -2,18 +2,18 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 
-async function render() {
+async function render(pathname = "/") {
   const workerUrl = new URL("../dist/server/index.js", import.meta.url);
   workerUrl.searchParams.set("test", `${process.pid}-${Date.now()}`);
   const { default: worker } = await import(workerUrl.href);
   return worker.fetch(
-    new Request("https://rtsai.net/", { headers: { accept: "text/html", host: "rtsai.net" } }),
+    new Request(`https://rtsai.net${pathname}`, { headers: { accept: "text/html", host: "rtsai.net" } }),
     { ASSETS: { fetch: async () => new Response("Not found", { status: 404 }) } },
     { waitUntil() {}, passThroughOnException() {} },
   );
 }
 
-test("renders the complete marketing and mission-creation surface", async () => {
+test("renders a focused homepage with the product promise, two experiences, playable proof, and download path", async () => {
   const response = await render();
   assert.equal(response.status, 200);
   assert.match(response.headers.get("content-type") ?? "", /^text\/html\b/i);
@@ -28,45 +28,63 @@ test("renders the complete marketing and mission-creation surface", async () => 
   assert.match(html, /"SoftwareApplication"/);
   assert.match(html, /"VideoGame"/);
   assert.match(html, /Your battlefield/);
-  assert.match(html, /THE OPENRA AI PLAN/);
-  assert.match(html, /Two core experiences/);
+  assert.match(html, /TWO CORE EXPERIENCES/);
   assert.match(html, /Companion \+ command/);
   assert.match(html, /Earth to battlefield/);
-  assert.match(html, /Discover \+ launch/);
-  assert.match(html, /New theatres \+ mods/);
-  assert.match(html, /Agents that play \+ learn/);
   assert.match(html, /Current playable proof/);
-  assert.match(html, /Mission studio/);
-  assert.match(html, /Point anywhere/);
-  assert.match(html, /Earth footprint/);
-  assert.match(html, /Variation seed/);
-  assert.match(html, /Same seed reproduces the same terrain/);
-  assert.match(html, /Reroll/);
-  assert.match(html, /Read geometry/);
-  assert.match(html, /Build terrain/);
   assert.match(html, /Interactive AI companion preview/);
-  assert.match(html, /Locally built and smoke-tested/);
-  assert.match(html, /Download Windows setup/);
-  assert.match(html, /Portable ZIP/);
-  assert.match(html, /Signed macOS download pending|Apple silicon/);
-  assert.match(html, /Install or extract/);
   assert.match(html, /0\.1\.0-alpha\.9/);
   assert.match(html, /Red Sea 2026/);
   assert.match(html, /Jizan Corridor/);
-  assert.match(html, /Play-Red-Sea-2026\.cmd/);
-  assert.match(html, /Optional Local AI Pack/);
-  assert.match(html, /Qwen3-VL/);
   assert.match(html, /red-sea-2026-key-art\.webp/);
   assert.match(html, /AUTO is optional/);
-  assert.match(html, /AI layer/);
+  assert.match(html, /href="\/companion"/);
+  assert.match(html, /href="\/studio"/);
+  assert.match(html, /href="\/download"/);
+  assert.doesNotMatch(html, /Same seed reproduces the same terrain/);
+  assert.doesNotMatch(html, /Optional Local AI Pack/);
   assert.doesNotMatch(html, /Help improve RTS AI/);
   assert.match(html, /href="\/privacy"/);
-  assert.match(html, /OpenStreetMap contributors/);
+  assert.match(html, /Map attribution/);
   assert.match(html, /EA has not endorsed and does not support this product/);
   assert.match(html, /data-analytics-event="game-download"/);
   assert.match(html, />Feedback</);
   assert.match(html, /windows-x64-setup\.exe/);
   assert.doesNotMatch(html, /codex-preview|SkeletonPreview|react-loading-skeleton/);
+});
+
+test("renders focused companion, studio, platform, and download routes", async () => {
+  const [companion, studio, platform, download] = await Promise.all([
+    render("/companion").then((response) => response.text()),
+    render("/studio").then((response) => response.text()),
+    render("/platform").then((response) => response.text()),
+    render("/download").then((response) => response.text()),
+  ]);
+
+  assert.match(companion, /AI GAME COMPANION/);
+  assert.match(companion, /Helpful enough to speak/);
+  assert.match(companion, /AI layer/);
+  assert.match(studio, /EARTH TO BATTLEFIELD/);
+  assert.match(studio, /Mission studio/);
+  assert.match(studio, /Point anywhere/);
+  assert.match(studio, /Earth footprint/);
+  assert.match(studio, /Variation seed/);
+  assert.match(studio, /Same seed reproduces the same terrain/);
+  assert.match(studio, /Reroll/);
+  assert.match(studio, /Read geometry/);
+  assert.match(studio, /Build terrain/);
+  assert.match(platform, /THE PRODUCT PLAN/);
+  assert.match(platform, /Discover \+ launch/);
+  assert.match(platform, /New theatres \+ mods/);
+  assert.match(platform, /Agents that play \+ learn/);
+  assert.match(download, /Locally built and smoke-tested/);
+  assert.match(download, /Download Windows setup/);
+  assert.match(download, /Portable ZIP/);
+  assert.match(download, /Signed macOS download pending|Apple silicon/);
+  assert.match(download, /Install or extract/);
+  assert.match(download, /Play-Red-Sea-2026\.cmd/);
+  assert.match(download, /Optional Local AI Pack/);
+  assert.match(download, /Qwen3-VL/);
 });
 
 test("keeps account identity out of Analytics event parameters", async () => {
@@ -131,7 +149,7 @@ test("ships a real browser-side OpenRA package compiler", async () => {
 
 test("discovers native Windows and macOS release assets", async () => {
   const source = await readFile(new URL("../lib/release.ts", import.meta.url), "utf8");
-  const page = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
+  const page = await readFile(new URL("../app/download/page.tsx", import.meta.url), "utf8");
   assert.match(source, /windows-x64-setup\\\.exe/);
   assert.match(source, /macos-\(arm64\|x64\)\\\.dmg/);
   assert.match(source, /installerChecksumUrl/);
@@ -142,7 +160,7 @@ test("discovers native Windows and macOS release assets", async () => {
 
 test("keeps the platform plan durable and current showcases replaceable", async () => {
   const layout = await readFile(new URL("../app/layout.tsx", import.meta.url), "utf8");
-  const page = await readFile(new URL("../app/page.tsx", import.meta.url), "utf8");
+  const page = await readFile(new URL("../app/platform/page.tsx", import.meta.url), "utf8");
   const plan = await readFile(new URL("../lib/product-plan.ts", import.meta.url), "utf8");
 
   assert.match(layout, /AI-Native RTS Platform/);
