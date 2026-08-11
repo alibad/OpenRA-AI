@@ -9,6 +9,7 @@ import json
 import shutil
 import sys
 import urllib.error
+import urllib.parse
 import urllib.request
 import zipfile
 from pathlib import Path, PurePosixPath
@@ -86,6 +87,16 @@ def cache_path(cache_root: Path, component: dict) -> Path:
     return cache_root / f"{component['sha256']}{suffixes}"
 
 
+def hugging_face_reference(url: str) -> tuple[str, str, str] | None:
+    parsed = urllib.parse.urlparse(url)
+    if parsed.hostname not in {"huggingface.co", "www.huggingface.co"}:
+        return None
+    parts = [urllib.parse.unquote(part) for part in parsed.path.strip("/").split("/")]
+    if len(parts) < 5 or parts[2] != "resolve":
+        return None
+    return f"{parts[0]}/{parts[1]}", parts[3], "/".join(parts[4:])
+
+
 def verify_component(path: Path, component: dict) -> None:
     if not path.is_file():
         raise PackError(f"Missing cached component {component['id']}: {path}")
@@ -116,20 +127,31 @@ def download_component(cache_root: Path, component: dict) -> Path:
         headers["Range"] = f"bytes={existing}-"
     request = urllib.request.Request(component["url"], headers=headers)
     print(f"Downloading {component['id']} ({component['bytes'] / 1024 / 1024:.1f} MiB)")
-    try:
-        with urllib.request.urlopen(request, timeout=60) as response:
-            resumed = existing > 0 and response.status == 206
-            mode = "ab" if resumed else "wb"
-            if existing and not resumed:
-                existing = 0
-            with partial.open(mode) as output:
-                while True:
-                    block = response.read(1024 * 1024)
-                    if not block:
-                        break
-                    output.write(block)
-    except (OSError, TimeoutError, urllib.error.URLError) as exc:
-        raise PackError(f"Download failed for {component['id']}: {exc}") from exc
+    hub_reference = hugging_face_reference(component["url"])
+    if hub_reference:
+        try:
+            from huggingface_hub import hf_hub_download
+
+            repo_id, revision, filename = hub_reference
+            downloaded = hf_hub_download(repo_id=repo_id, revision=revision, filename=filename)
+            shutil.copyfile(downloaded, partial)
+        except Exception as exc:
+            raise PackError(f"Hugging Face download failed for {component['id']}: {exc}") from exc
+    else:
+        try:
+            with urllib.request.urlopen(request, timeout=60) as response:
+                resumed = existing > 0 and response.status == 206
+                mode = "ab" if resumed else "wb"
+                if existing and not resumed:
+                    existing = 0
+                with partial.open(mode) as output:
+                    while True:
+                        block = response.read(1024 * 1024)
+                        if not block:
+                            break
+                        output.write(block)
+        except (OSError, TimeoutError, urllib.error.URLError) as exc:
+            raise PackError(f"Download failed for {component['id']}: {exc}") from exc
 
     verify_component(partial, component)
     partial.replace(destination)
