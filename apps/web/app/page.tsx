@@ -85,18 +85,20 @@ export default function Home() {
         <div className="download-intro">
           <span className="section-number">PLAYABLE BUILD / {windowsRelease.version}</span>
           <h2 id="download-title">From a ZIP to a live match.</h2>
-          <p>The Windows alpha bundles the pinned engine, AI companion, launcher, and a generated Riyadh skirmish. No installer and no hosted workflow.</p>
+          <p>The Windows alpha bundles the pinned engine, AI companion, launcher, and a generated Riyadh skirmish. Choose the guided installer or the portable ZIP.</p>
           <div className="download-actions">
-            <a className="primary-action" href={windowsRelease.url}><Download size={17} /> Download for Windows x64</a>
-            <a className="checksum-link" href={windowsRelease.checksumUrl}>SHA-256 checksum</a>
+            <a className="primary-action" href={windowsRelease.installerUrl}><Download size={17} /> Install for Windows x64</a>
+            <a className="checksum-link" href={windowsRelease.portableUrl}>Portable ZIP</a>
+            <a className="checksum-link" href={windowsRelease.aiPackUrl}>Optional AI model pack</a>
+            <a className="checksum-link" href={windowsRelease.releaseIndexUrl}>Checksums</a>
           </div>
         </div>
         <ol className="play-steps">
-          <li><span>01</span><div><b>Extract the ZIP</b><p>Keep the included folders together. The package is portable.</p></div></li>
-          <li><span>02</span><div><b>Run Play-OpenRAAI.cmd</b><p>The first run verifies and downloads OpenRA&apos;s supported Red Alert content, then starts the generated map.</p></div></li>
+          <li><span>01</span><div><b>Install or extract</b><p>Use the guided installer, or keep all portable ZIP folders together.</p></div></li>
+          <li><span>02</span><div><b>Launch OpenRA AI</b><p>Use the Start menu, or run Play-OpenRAAI.cmd from the portable ZIP. First launch downloads verified Red Alert content.</p></div></li>
           <li><span>03</span><div><b>Hold Ctrl+Space to ask</b><p>Release to hear the answer. Ctrl+Enter accepts; Ctrl+Backspace rejects; Ctrl+Shift+A toggles AUTO; Ctrl+Shift+M mutes.</p></div></li>
         </ol>
-        <div className="download-footnote"><FileArchive size={15} /><span>Windows 10/11 x64 alpha. The model-backed companion expects your private AI layer on this machine; the game itself still runs if that layer is offline.</span></div>
+        <div className="download-footnote"><FileArchive size={15} /><span>Windows 10/11 x64 alpha. The optional 1.7 GiB AI pack is a checksum-pinned model payload, not a bundled model server yet. Model-backed replies still expect a compatible local AI router; the game and native AI continue to run when it is offline.</span></div>
       </section>
 
       <section className="companion-section" id="companion">
@@ -159,7 +161,7 @@ export default function Home() {
         <div>
           <p>Generate a mission now or download the tested Windows alpha. macOS packaging follows once a real signed artifact is ready.</p>
           <div className="hero-actions">
-            <a className="primary-action" href={windowsRelease.url}><Download size={17} /> Download Windows alpha</a>
+            <a className="primary-action" href={windowsRelease.installerUrl}><Download size={17} /> Download Windows alpha</a>
             <a className="text-action" href="#mission-studio">Open mission studio <ArrowRight size={17} /></a>
           </div>
         </div>
