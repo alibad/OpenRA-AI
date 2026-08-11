@@ -30,9 +30,11 @@ ACTION_TYPES = {
     "disguise": rl_bridge_pb2.DISGUISE,
     "infiltrate": rl_bridge_pb2.INFILTRATE,
     "demolish": rl_bridge_pb2.DEMOLISH,
+    "capture": rl_bridge_pb2.CAPTURE,
     "unload": rl_bridge_pb2.UNLOAD,
     "power_down": rl_bridge_pb2.POWER_DOWN,
     "set_primary": rl_bridge_pb2.SET_PRIMARY,
+    "use_support_power": rl_bridge_pb2.USE_SUPPORT_POWER,
 }
 
 DEFAULT_INTERRUPTS = (

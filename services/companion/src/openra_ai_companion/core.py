@@ -7,6 +7,8 @@ import time
 import uuid
 from collections.abc import Callable
 
+from .brain import BrainArbiter, BrainOwner, GoalBlackboard, default_blackboard_path
+from .controller import TacticalController, controller_state
 from .insights import InsightEngine
 from .labels import building_name, humanize_text, production_name, unit_name
 from .models import (
@@ -87,20 +89,22 @@ Allowed command objects:
 - {"action":"disguise","actor_id":owned_spy_id,"target_actor_id":valid_disguise_target_id}
 - {"action":"infiltrate","actor_id":owned_spy_id,"target_actor_id":valid_infiltration_target_id,"queued":false}
 - {"action":"demolish","actor_id":owned_demolition_unit_id,"target_actor_id":valid_demolition_target_id}
+- {"action":"capture","actor_id":owned_engineer_id,"target_actor_id":valid_capture_target_id}
 - {"action":"set_rally_point","actor_id":owned_building_id,"target_x":int,"target_y":int}
 - {"action":"place_building","item_type":"exact completed production id","target_x":optional_int,"target_y":optional_int}
 - {"action":"cancel_production","item_type":"exact queued production id"}
+- {"action":"use_support_power","item_type":"exact ready support_powers key","target_x":int,"target_y":int}
 
 Use only actor ids and facts supplied in the snapshot. Coordinates must be inside the map. Never target remembered or hidden enemies.
 Create one command per actor or production item, with at most 12 commands. Never sell, surrender, cancel production, power down,
-attack a specific actor, use support powers, spend resources speculatively, or invent an actor or item id.
+attack a specific actor, spend resources speculatively, or invent an actor or item id. Use support powers only when explicitly requested by the player.
 An action is only a proposal; never say it already happened. Never expose internal type IDs in the answer or summary.
 Use player-facing `display_name` values. If the requested target or units are unclear, ask one concise question."""
 
 CONFIRM_WORDS = frozenset({"confirm", "confirmed", "yes", "do it", "execute", "go ahead", "proceed"})
 CANCEL_WORDS = frozenset({"cancel", "never mind", "nevermind", "stop", "discard"})
 ACTION_EXPIRY_SECONDS = 300.0
-AUTO_ACTION_INSTRUCTION = """Autonomous commander mode is enabled. Inspect the battlefield with MCP tools and issue one immediately useful batch of legal orders toward winning. In scripted missions, follow mission_plan and the live objectives before skirmish economy logic; preserve required heroes, avoid dog detectors, and restrict disguise, infiltration, and C4 to listed valid targets. Otherwise prioritize completed building placement, economy, production, scouting, defense, then concentrated attacks. Act instead of merely advising; return no commands only when no useful legal order exists."""
+AUTO_ACTION_INSTRUCTION = """Autonomous commander mode is enabled. Inspect the battlefield with MCP tools and issue one immediately useful batch of legal orders toward winning. In scripted missions, follow mission_plan and the live objectives before skirmish economy logic; preserve required heroes, avoid dog detectors, and restrict disguise, infiltration, capture, and C4 to listed valid targets. Otherwise prioritize completed building placement, economy, production, scouting, defense, then concentrated attacks. Act instead of merely advising; return no commands only when no useful legal order exists."""
 
 
 def _normalized_action_intent(text: str) -> str:
@@ -210,6 +214,10 @@ class Companion:
         self._opening_scout_ids: set[int] = set()
         self._opening_scout_targets: set[tuple[int, int]] = set()
         self._opening_scouts_committed = 0
+        self.brain_arbiter = BrainArbiter()
+        self.goal_blackboard = GoalBlackboard(journal_path=default_blackboard_path())
+        self.tactical_controller = TacticalController()
+        self._goal_updates: list[dict] = []
 
     def _begin(self) -> int:
         with self._lock:
@@ -337,18 +345,40 @@ class Companion:
 
     def update_snapshot(self, snapshot: GameSnapshot) -> ThreatAssessment:
         previous = self.latest_snapshot
-        if previous is not None and (
+        match_changed = previous is not None and (
             snapshot.tick < previous.tick
             or snapshot.map_name != previous.map_name
             or snapshot.map_width != previous.map_width
             or snapshot.map_height != previous.map_height
-        ):
+        )
+        if match_changed:
             self._opening_scout_ids.clear()
             self._opening_scout_targets.clear()
             self._opening_scouts_committed = 0
+            self.brain_arbiter = BrainArbiter()
         self.latest_snapshot = snapshot
+        updates = self.goal_blackboard.reconcile(snapshot)
+        self._goal_updates = [goal.as_dict() for goal in updates]
+        for goal in updates:
+            if goal.status.value in {"succeeded", "failed", "cancelled", "superseded"}:
+                self.brain_arbiter.release(goal.scope, goal.owner)
         self.current_threat = assess_threat(snapshot)
         return self.current_threat
+
+    def brain_state(self) -> dict:
+        snapshot = self.latest_snapshot
+        tick = snapshot.tick if snapshot is not None else 0
+        return {
+            "owner": (
+                "mission" if snapshot is not None and snapshot.mission_mode and self.auto_act_enabled
+                else "native" if self.auto_act_enabled and self.native_brain_available
+                else "user"
+            ),
+            "goals": self.goal_blackboard.state(snapshot),
+            "leases": self.brain_arbiter.state(tick),
+            "latest_goal_updates": self._goal_updates,
+            "controller": controller_state(snapshot, self.native_profile) if snapshot is not None else None,
+        }
 
     def threat_status(self) -> dict:
         return self.current_threat.as_dict()
@@ -489,6 +519,7 @@ class Companion:
             },
             "force_plan": hybrid_force_plan(snapshot),
             "tactical_plan": tactical_plan(snapshot),
+            "controller": controller_state(snapshot, self.native_profile),
             "planner_instruction": "Re-read the live battlefield through MCP immediately before issuing orders.",
             **({
                 "storage": {
@@ -629,6 +660,11 @@ class Companion:
         visible_enemies.update(building.actor_id for building in snapshot.visible_enemy_buildings)
         available = {item.lower() for item in snapshot.available_production}
         in_production = {str(item.get("item", "")).lower() for item in snapshot.production}
+        support_powers = {
+            str(power.get("key", "")).lower(): power
+            for power in snapshot.support_powers
+            if str(power.get("key", "")).strip()
+        }
         queued_harvesters = sum(
             str(item.get("item", "")).lower().split(".", 1)[0] == "harv"
             for item in snapshot.production
@@ -655,6 +691,7 @@ class Companion:
                 "disguise",
                 "infiltrate",
                 "demolish",
+                "capture",
                 "unload",
             } and command.actor_id not in owned_units:
                 raise ValueError(f"actor {command.actor_id} is not a controllable unit")
@@ -672,7 +709,11 @@ class Companion:
                 raise ValueError(f"target {command.target_actor_id} is not an owned actor")
             if command.action == "enter_transport":
                 transport = owned_units.get(command.target_actor_id)
-                if transport is None or transport.passenger_count < 0:
+                transport_kind = transport.kind.lower().split("@", 1)[0].split(".", 1)[0] if transport else ""
+                if transport is None or (
+                    transport.passenger_count < 0
+                    and transport_kind not in {"tran", "lst", "apc", "hind"}
+                ):
                     raise ValueError(f"target {command.target_actor_id} is not an owned transport")
             if command.action == "disguise" and command.target_actor_id not in owned_units[command.actor_id].valid_disguise_targets:
                 raise ValueError(f"target {command.target_actor_id} is not a valid visible disguise target")
@@ -680,11 +721,13 @@ class Companion:
                 raise ValueError(f"target {command.target_actor_id} is not a valid visible infiltration target")
             if command.action == "demolish" and command.target_actor_id not in owned_units[command.actor_id].valid_demolition_targets:
                 raise ValueError(f"target {command.target_actor_id} is not a valid visible demolition target")
+            if command.action == "capture" and command.target_actor_id not in owned_units[command.actor_id].valid_capture_targets:
+                raise ValueError(f"target {command.target_actor_id} is not a valid visible capture target")
             if command.action == "unload" and owned_units[command.actor_id].passenger_count <= 0:
                 raise ValueError(f"transport {command.actor_id} has no passengers")
             if command.action == "set_stance" and not 0 <= command.target_x <= 3:
                 raise ValueError("stance must be between 0 and 3")
-            position_required = command.action in {"move", "attack_move", "set_rally_point"}
+            position_required = command.action in {"move", "attack_move", "set_rally_point", "use_support_power"}
             position_supplied = command.target_x != 0 or command.target_y != 0
             if command.action in POSITION_ACTIONS and (position_required or position_supplied):
                 if snapshot.map_width <= 0 or snapshot.map_height <= 0:
@@ -712,6 +755,27 @@ class Companion:
                 raise ValueError(f"'{command.item_type}' is not in a production queue")
             if command.action == "cancel_production" and command.item_type not in in_production:
                 raise ValueError(f"'{command.item_type}' is not in a production queue")
+            if command.action == "use_support_power":
+                power = support_powers.get(command.item_type.lower())
+                if power is None or not bool(power.get("active", False)) or not bool(power.get("ready", False)):
+                    raise ValueError(f"support power '{command.item_type}' is not ready")
+                power_text = " ".join((
+                    command.item_type,
+                    str(power.get("name", "")),
+                    str(power.get("description", "")),
+                )).lower()
+                if any(term in power_text for term in ("nuke", "atomic", "parabomb")):
+                    friendlies = (*snapshot.units, *snapshot.buildings)
+                    if any(
+                        (actor.cell_x - command.target_x) ** 2 + (actor.cell_y - command.target_y) ** 2 <= 15 ** 2
+                        for actor in friendlies
+                    ):
+                        raise ValueError("destructive support power target violates the 15-cell friendly-fire exclusion zone")
+                    if not any(
+                        (actor.cell_x - command.target_x) ** 2 + (actor.cell_y - command.target_y) ** 2 <= 6 ** 2
+                        for actor in (*snapshot.visible_enemies, *snapshot.visible_enemy_buildings)
+                    ):
+                        raise ValueError("destructive support powers require a currently visible enemy concentration")
             commands.append(command)
 
         return tuple(commands)
@@ -1101,7 +1165,56 @@ class Companion:
         if self.latest_snapshot is None or self.latest_snapshot.done:
             return None
         if self.pending_action() is None:
-            if self.latest_snapshot.mission_mode:
+            retry = self.goal_blackboard.next_retry()
+            if retry is not None:
+                try:
+                    commands = self._validate_action_commands(
+                        self.latest_snapshot,
+                        [command.as_dict() for command in retry.commands],
+                    )
+                except ValueError as exc:
+                    self.goal_blackboard.fail(retry.proposal_id, self.latest_snapshot.tick, str(exc))
+                    return None
+                proposal = ActionProposal(
+                    proposal_id=str(uuid.uuid4()),
+                    instruction=retry.instruction,
+                    summary=retry.summary,
+                    expected_tick=self.latest_snapshot.tick,
+                    commands=commands,
+                    created_at=time.monotonic(),
+                )
+                if self.goal_blackboard.bind_retry(retry.goal_id, proposal, self.latest_snapshot) is not None:
+                    with self._action_lock:
+                        self._pending_action = proposal
+                    retried = self.confirm_action()
+                    retried.metadata["auto_act"] = True
+                    if retried.metadata.get("action", {}).get("state") == "executed":
+                        retried.text = f"Auto commander: {retried.text}"
+                    return retried
+            fast_decision = self.tactical_controller.decide(self.latest_snapshot, self.native_profile)
+            if fast_decision is not None and (
+                fast_decision.owner == "safety"
+                or self.latest_snapshot.mission_mode
+                or not self.native_brain_available
+            ):
+                values = [command.as_dict() for command in fast_decision.commands]
+                try:
+                    commands = self._validate_action_commands(self.latest_snapshot, values)
+                except ValueError:
+                    commands = ()
+                if commands and not self.goal_blackboard.has_active_commands(commands):
+                    proposal = ActionProposal(
+                        proposal_id=str(uuid.uuid4()),
+                        instruction=f"{fast_decision.owner}:{fast_decision.key}",
+                        summary=fast_decision.summary,
+                        expected_tick=self.latest_snapshot.tick,
+                        commands=commands,
+                        created_at=time.monotonic(),
+                    )
+                    with self._action_lock:
+                        if self._pending_action is None:
+                            self._pending_action = proposal
+            if self.pending_action() is None and self.latest_snapshot.mission_mode:
                 # Scripted mission micro is a deterministic, event-driven control
                 # loop. Do not wait for (or charge for) a general LLM/MCP planning
                 # round between short stealth moves.
@@ -1112,6 +1225,8 @@ class Companion:
                 try:
                     commands = self._validate_action_commands(self.latest_snapshot, values)
                 except ValueError:
+                    return None
+                if self.goal_blackboard.has_active_commands(commands):
                     return None
                 proposal = ActionProposal(
                     proposal_id=str(uuid.uuid4()),
@@ -1126,7 +1241,7 @@ class Companion:
                         self._pending_action = proposal
                     else:
                         return None
-            else:
+            elif self.pending_action() is None:
                 instruction = AUTO_ACTION_INSTRUCTION
                 if event_context:
                     instruction += (
@@ -1643,20 +1758,58 @@ class Companion:
                 metadata={"action": {"state": "unavailable", **proposal.as_dict()}},
             )
 
+        owner = self.brain_arbiter.owner_for(
+            proposal.instruction,
+            snapshot,
+            auto_act=self.auto_act_enabled,
+            native_brain_available=self.native_brain_available,
+            commands=commands,
+        )
+        automatic = self.auto_act_enabled and owner != BrainOwner.USER
+        goal = self.goal_blackboard.register(
+            proposal,
+            snapshot,
+            owner,
+            automatic=automatic,
+        )
+        if not self.brain_arbiter.claim(
+            goal.scope,
+            owner,
+            snapshot.tick,
+            ttl_ticks=self.goal_blackboard.verify_timeout_ticks * self.goal_blackboard.max_attempts,
+            reason=proposal.summary,
+        ):
+            self.goal_blackboard.fail(proposal.proposal_id, snapshot.tick, "a higher-priority brain owns this control scope")
+            with self._action_lock:
+                if self._pending_action == proposal:
+                    self._pending_action = None
+            return CompanionResponse(
+                "A higher-priority command currently owns those units; nothing was sent.",
+                "action-rejected",
+                utterance_id=generation,
+                metadata={"action": {"state": "rejected", "reason": "brain ownership conflict", **proposal.as_dict()}},
+            )
+
         # Clear before the call: the proposal id remains the idempotency key if the response is lost.
         with self._action_lock:
             if self._pending_action == proposal:
                 self._pending_action = None
+        self.goal_blackboard.mark_dispatched(proposal.proposal_id, snapshot.tick)
         try:
             receipt = executor(proposal.proposal_id, snapshot.tick, commands)
         except RuntimeError as exc:
+            self.goal_blackboard.fail(proposal.proposal_id, snapshot.tick, str(exc))
             return CompanionResponse(
-                "The engine action bridge was unavailable; nothing new will be retried automatically.",
+                (
+                    "The engine action bridge was unavailable; AUTO will retry this verified goal."
+                    if automatic else "The engine action bridge was unavailable; nothing was sent."
+                ),
                 "action-rejected",
                 utterance_id=generation,
                 metadata={"action": {"state": "failed", "reason": str(exc), **proposal.as_dict()}},
             )
 
+        self.goal_blackboard.apply_receipt(receipt)
         state = "executed" if receipt.accepted else "rejected"
         if receipt.accepted and "Rifle Infantry scout" in proposal.summary:
             trained = [
@@ -1688,6 +1841,11 @@ class Companion:
                 proposal = None
             if proposal is not None:
                 self._pending_action = None
+        if proposal is not None:
+            self.goal_blackboard.cancel(
+                proposal.proposal_id,
+                self.latest_snapshot.tick if self.latest_snapshot is not None else 0,
+            )
         if proposal is None:
             text = "There is no matching action waiting to be cancelled."
             state = "missing"

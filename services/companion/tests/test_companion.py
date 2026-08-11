@@ -13,7 +13,7 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from unittest import mock
 
-from openra_ai_companion.cli import _restart_auto_deadlines, _speak
+from openra_ai_companion.cli import _companion_action_loop_enabled, _restart_auto_deadlines, _speak
 from openra_ai_companion.core import Companion
 from openra_ai_companion import game_mcp
 from openra_ai_companion.game_runtime import GameRuntime
@@ -179,6 +179,82 @@ class CompanionTests(unittest.TestCase):
         self.assertTrue(context["mission"]["active"])
         self.assertEqual(context["mission"]["objectives"][0]["description"], "Infiltrate the weapons factory")
         self.assertEqual(context["own_units"][0]["valid_infiltration_targets"], [31])
+
+    def test_mission_plan_captures_legal_objective_with_engineer(self) -> None:
+        current = snapshot(
+            mission_mode=True,
+            objectives=[{"id": 0, "description": "Capture Radar Node Seven with an engineer."}],
+            units=[{
+                "actor_id": 19,
+                "type": "e6",
+                "is_idle": True,
+                "can_capture": True,
+                "valid_capture_targets": [8],
+            }],
+        )
+
+        plan = mission_plan(current)
+
+        self.assertEqual(plan["phase"], "capture-mission-objective")
+        self.assertEqual(plan["recommended_commands"], [{
+            "action": "capture",
+            "actor_id": 19,
+            "target_actor_id": 8,
+        }])
+
+    def test_mission_plan_places_completed_structure_before_objective_micro(self) -> None:
+        current = snapshot(
+            mission_mode=True,
+            objectives=[{"id": 0, "description": "Capture Radar Node Seven with an engineer."}],
+            production=[{
+                "queue_type": "Building",
+                "item": "silo",
+                "progress": 1.0,
+            }],
+            units=[{
+                "actor_id": 19,
+                "type": "e6",
+                "is_idle": True,
+                "can_capture": True,
+                "valid_capture_targets": [8],
+            }],
+        )
+
+        plan = mission_plan(current)
+
+        self.assertEqual(plan["phase"], "place-completed-structure")
+        self.assertEqual(plan["recommended_commands"], [{
+            "action": "place_building",
+            "item_type": "silo",
+        }])
+
+    def test_mission_auto_executes_completed_structure_placement(self) -> None:
+        executions = []
+        companion = Companion(
+            router=FakeRouter(),
+            action_executor=lambda request_id, tick, commands: (
+                executions.append(commands)
+                or ActionReceipt(request_id, True, tick, "Completed structure placed.")
+            ),
+        )
+        companion.latest_snapshot = snapshot(
+            tick=1010,
+            mission_mode=True,
+            objectives=[{"id": 0, "description": "Capture Radar Node Seven with an engineer."}],
+            production=[{
+                "queue_type": "Building",
+                "item": "silo",
+                "progress": 1.0,
+            }],
+        )
+        companion.configure(auto_act=True)
+
+        response = companion.auto_act_once({"type": "production_complete", "item": "silo"})
+
+        self.assertEqual(response.metadata["action"]["state"], "executed")
+        self.assertTrue(response.metadata["auto_act"])
+        self.assertEqual(executions[0][0].action, "place_building")
+        self.assertEqual(executions[0][0].item_type, "silo")
 
     def test_mission_plan_disguises_spy_before_infiltration(self) -> None:
         current = snapshot(
@@ -823,6 +899,16 @@ class CompanionTests(unittest.TestCase):
 
         _, heated_planner_due = _restart_auto_deadlines(10.0, "critical")
         self.assertEqual(heated_planner_due, 14.0)
+
+    def test_mission_auto_uses_companion_loop_even_when_native_brain_exists(self) -> None:
+        self.assertTrue(_companion_action_loop_enabled(
+            mission_mode=True,
+            native_brain_available=True,
+        ))
+        self.assertFalse(_companion_action_loop_enabled(
+            mission_mode=False,
+            native_brain_available=True,
+        ))
 
     def test_auto_routine_does_not_stack_the_building_queue(self) -> None:
         companion = Companion(router=FakeRouter())

@@ -242,9 +242,16 @@ def _workspace_root() -> Path:
 def _default_engine() -> Path:
     root = _workspace_root() / "engine" / "openra" / "bin"
     packaged = root / "win-x64" / "OpenRA.exe"
+    fallback = root / ("OpenRA.exe" if os.name == "nt" else "OpenRA")
+    # Development builds are written directly to bin. Prefer them when they are
+    # newer than the last self-contained package so gameplay/evaluation never
+    # silently runs stale bridge code.
+    if fallback.is_file() and (
+        not packaged.is_file() or fallback.stat().st_mtime >= packaged.stat().st_mtime
+    ):
+        return fallback
     if packaged.is_file():
         return packaged
-    fallback = root / ("OpenRA.exe" if os.name == "nt" else "OpenRA")
     if fallback.is_file():
         return fallback
     raise RuntimeError("A built OpenRA executable was not found under engine/openra/bin")

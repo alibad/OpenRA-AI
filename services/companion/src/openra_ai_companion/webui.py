@@ -22,7 +22,7 @@ AI_CONSOLE_HTML = r"""<!doctype html>
     button:hover,a.button:hover { border-color:var(--green); } button.primary { background:var(--green); color:#10150e; border-color:var(--green); }
     .actions { display:flex; flex-wrap:wrap; gap:9px; margin-top:18px; } .tests { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:18px; }
     pre { min-height:190px; max-height:330px; overflow:auto; white-space:pre-wrap; border:1px solid #273027; background:#090b09; border-radius:8px; padding:14px; color:#cbd6c6; font:12px/1.55 ui-monospace,monospace; }
-    .learning { grid-column:1/-1; } .metrics { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin:17px 0; }
+    .learning,.brain { grid-column:1/-1; } .metrics { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin:17px 0; }
     .metric { border:1px solid #273027; background:#0d100d; border-radius:8px; padding:13px; } .metric b { display:block; color:var(--green); font-size:24px; } .metric span { color:var(--muted); font-size:11px; text-transform:uppercase; letter-spacing:.08em; }
     .note { border-left:2px solid var(--gold); padding-left:12px; margin-top:18px; font-size:13px; }
     @media(max-width:760px){.grid{grid-template-columns:1fr}.row{grid-template-columns:1fr}header{display:block}.status{margin-top:18px;width:max-content}.tests{grid-template-columns:1fr}.metrics{grid-template-columns:1fr 1fr}}
@@ -51,17 +51,23 @@ AI_CONSOLE_HTML = r"""<!doctype html>
       <div class="actions"><button id="learning_reload">Refresh learning history</button></div>
       <label>Latest assessment and recent matches</label><pre id="learning_log">No autonomous match reviews recorded yet.</pre>
     </section>
+    <section class="panel brain"><h2>Brain blackboard</h2><p class="sub">Live ownership, bounded strategy parameters, action receipts, and snapshot-verified goals.</p>
+      <div class="actions"><button id="brain_reload">Refresh brain state</button></div>
+      <label>Runtime control and verification</label><pre id="brain_log">No live match snapshot yet.</pre>
+    </section>
   </div>
 </main><script>
 const fields=['router_url','text_model','transcribe_model','transcribe_language','speech_model','speech_voice','timeout_seconds','native_strategy'];
-const log=document.querySelector('#log'), status=document.querySelector('#status'), learningLog=document.querySelector('#learning_log');
+const log=document.querySelector('#log'), status=document.querySelector('#status'), learningLog=document.querySelector('#learning_log'), brainLog=document.querySelector('#brain_log');
 function write(value){log.textContent=typeof value==='string'?value:JSON.stringify(value,null,2)}
 async function request(path,options={}){const response=await fetch(path,{headers:{'Content-Type':'application/json'},...options});const data=await response.json();if(!response.ok)throw new Error(data.detail||data.error||`HTTP ${response.status}`);return data}
 async function load(){try{const cfg=await request('/v1/config');fields.forEach(k=>document.querySelector('#'+k).value=cfg[k]);const health=await request('/health');const reachable=!!health.router?.reachable;status.className='status '+(reachable?'ok':'bad');status.querySelector('span').textContent=reachable?'AI layer online':'AI layer unavailable'}catch(error){status.className='status bad';status.querySelector('span').textContent='Control plane unavailable';write(error.message)}}
-async function loadLearning(){try{const data=await request('/v1/learning');document.querySelector('#attempts').textContent=data.attempts||0;document.querySelector('#wins').textContent=data.wins||0;document.querySelector('#win_rate').textContent=(data.win_rate||0)+'%';document.querySelector('#latest_result').textContent=data.latest_attempt?(data.latest_attempt.won?'WIN':(data.latest_attempt.result||'INCOMPLETE').toUpperCase()):'-';let latest={};if(data.latest_attempt)latest=await request('/v1/learning/latest');learningLog.textContent=JSON.stringify({by_difficulty:data.by_difficulty||{},latest_lessons:data.latest_lessons||{},latest_attempt:data.latest_attempt||null,recent_decisions:(latest.timeline||[]).slice(-20),recent_attempts:data.recent_attempts||[]},null,2)}catch(error){learningLog.textContent='Learning history unavailable: '+error.message}}
+async function loadLearning(){try{const data=await request('/v1/learning');document.querySelector('#attempts').textContent=data.attempts||0;document.querySelector('#wins').textContent=data.wins||0;document.querySelector('#win_rate').textContent=(data.win_rate||0)+'%';document.querySelector('#latest_result').textContent=data.latest_attempt?(data.latest_attempt.won?'WIN':(data.latest_attempt.result||'INCOMPLETE').toUpperCase()):'-';let latest={};if(data.latest_attempt)latest=await request('/v1/learning/latest');learningLog.textContent=JSON.stringify({policies:data.policies||{},by_difficulty:data.by_difficulty||{},latest_lessons:data.latest_lessons||{},latest_attempt:data.latest_attempt||null,recent_decisions:(latest.timeline||[]).slice(-20),recent_attempts:data.recent_attempts||[]},null,2)}catch(error){learningLog.textContent='Learning history unavailable: '+error.message}}
+async function loadBrain(){try{const data=await request('/v1/state');const brain=data.brain||{};brainLog.textContent=JSON.stringify({owner:brain.owner,leases:brain.leases||[],strategy_program:brain.controller?.strategy_program||null,next_fast_decision:brain.controller?.next_fast_decision||null,active_goals:brain.goals?.active||[],recent_goals:brain.goals?.recent?.slice(-10)||[],latest_goal_updates:brain.latest_goal_updates||[]},null,2)}catch(error){brainLog.textContent='Brain state unavailable: '+error.message}}
 document.querySelector('#save').onclick=async()=>{try{const body=Object.fromEntries(fields.map(k=>[k,document.querySelector('#'+k).value]));write(await request('/v1/config',{method:'POST',body:JSON.stringify(body)}));await load()}catch(error){write('Save failed: '+error.message)}};
 document.querySelector('#reload').onclick=load;
 document.querySelector('#learning_reload').onclick=loadLearning;
+document.querySelector('#brain_reload').onclick=loadBrain;
 document.querySelectorAll('[data-test]').forEach(button=>button.onclick=async()=>{const test=button.dataset.test;button.disabled=true;write(test==='microphone'?'Listening for 3 seconds — speak now…':`Running ${test} test…`);try{write(await request('/v1/test/'+test,{method:'POST',body:'{}'}));await load()}catch(error){write(`${test} failed: ${error.message}`)}finally{button.disabled=false}});
-load();loadLearning();
+load();loadLearning();loadBrain();
 </script></body></html>"""

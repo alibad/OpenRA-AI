@@ -1,9 +1,85 @@
 from __future__ import annotations
 
 import re
+from dataclasses import asdict, dataclass, replace
 from typing import Any
 
 from .models import GameSnapshot
+
+
+@dataclass(frozen=True)
+class StrategyProgram:
+    """Bounded strategic knobs consumed by deterministic planners.
+
+    The LLM may select a doctrine, but never emits free-form real-time policy.
+    Every selection is compiled into this stable, inspectable contract.
+    """
+
+    profile: str = "normal"
+    target_harvesters: int = 3
+    attack_squad_size: int = 8
+    defense_reserve: int = 3
+    retreat_hp: float = 0.35
+    siege_standoff_cells: int = 5
+    scout_count: int = 3
+    aggression: float = 0.55
+    expansion_bias: float = 0.5
+    defense_bias: float = 0.5
+    support_power_risk: float = 0.0
+    force_weights: tuple[tuple[str, int], ...] = ()
+
+    def as_dict(self) -> dict[str, Any]:
+        value = asdict(self)
+        value["force_weights"] = dict(self.force_weights)
+        return value
+
+
+PROFILE_PROGRAMS: dict[str, StrategyProgram] = {
+    "normal": StrategyProgram(
+        profile="normal", aggression=0.55, expansion_bias=0.6, defense_bias=0.5,
+        force_weights=(("infantry", 30), ("armor", 45), ("siege", 15), ("air", 10)),
+    ),
+    "medium": StrategyProgram(
+        profile="medium", attack_squad_size=7, aggression=0.65, expansion_bias=0.5,
+        force_weights=(("infantry", 30), ("armor", 50), ("siege", 15), ("air", 5)),
+    ),
+    "rush": StrategyProgram(
+        profile="rush", target_harvesters=2, attack_squad_size=5, defense_reserve=2,
+        aggression=0.9, expansion_bias=0.2, defense_bias=0.2,
+        force_weights=(("infantry", 35), ("armor", 50), ("siege", 10), ("air", 5)),
+    ),
+    "turtle": StrategyProgram(
+        profile="turtle", target_harvesters=4, attack_squad_size=11, defense_reserve=5,
+        retreat_hp=0.45, aggression=0.25, expansion_bias=0.45, defense_bias=0.95,
+        force_weights=(("infantry", 30), ("armor", 40), ("siege", 20), ("air", 10)),
+    ),
+    "naval": StrategyProgram(
+        profile="naval", attack_squad_size=8, defense_reserve=3, aggression=0.6,
+        expansion_bias=0.55, defense_bias=0.4,
+        force_weights=(("infantry", 15), ("armor", 20), ("siege", 5), ("air", 20), ("naval", 40)),
+    ),
+}
+
+
+def compile_strategy_program(profile: str, snapshot: GameSnapshot) -> StrategyProgram:
+    """Compile a named doctrine into map-scaled, bounded execution parameters."""
+    normalized = strategy_contract(profile)["native_profile"]
+    base = PROFILE_PROGRAMS.get(normalized, PROFILE_PROGRAMS["normal"])
+    area = max(1, snapshot.map_width * snapshot.map_height)
+    scale_bonus = 0 if area <= 4_096 else 1 if area <= 9_216 else 2 if area <= 16_384 else 3
+    return replace(
+        base,
+        target_harvesters=max(2, min(6, base.target_harvesters + scale_bonus)),
+        attack_squad_size=max(4, min(16, base.attack_squad_size + scale_bonus * 2)),
+        defense_reserve=max(2, min(7, base.defense_reserve + scale_bonus)),
+        scout_count=max(2, min(4, 2 + scale_bonus)),
+        retreat_hp=max(0.2, min(0.6, base.retreat_hp)),
+        siege_standoff_cells=max(4, min(8, base.siege_standoff_cells)),
+        aggression=max(0.0, min(1.0, base.aggression)),
+        expansion_bias=max(0.0, min(1.0, base.expansion_bias)),
+        defense_bias=max(0.0, min(1.0, base.defense_bias)),
+        support_power_risk=0.0,
+    )
 
 
 STRATEGY_CONTRACTS: dict[str, dict[str, Any]] = {
@@ -132,8 +208,10 @@ def strategy_phase(snapshot: GameSnapshot) -> str:
 
 def strategy_state(snapshot: GameSnapshot, profile: str, *, native_active: bool) -> dict[str, Any]:
     contract = strategy_contract(profile)
+    program = compile_strategy_program(profile, snapshot)
     return {
         **contract,
+        "program": program.as_dict(),
         "phase": strategy_phase(snapshot),
         "native_brain_active": native_active,
         "execution": (

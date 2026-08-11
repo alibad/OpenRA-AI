@@ -77,6 +77,16 @@ def _parser() -> argparse.ArgumentParser:
     learn.add_argument("--max-turns", type=int, default=24)
     learn.add_argument("--evidence-root", type=Path)
     learn.add_argument("--engine", type=Path)
+    mission_eval = commands.add_parser("mission-eval", help="evaluate the assistant against the Red Alert mission corpus")
+    mission_eval.add_argument("--campaign", default="", help="optional case-insensitive campaign-name filter")
+    mission_eval.add_argument("--mission", dest="missions", action="append", default=[], help="evaluate one mission id; repeat to select several")
+    mission_eval.add_argument("--seed", type=int, default=20260811)
+    mission_eval.add_argument("--port", type=int, default=9997)
+    mission_eval.add_argument("--max-ticks", type=int, default=30_000)
+    mission_eval.add_argument("--stall-ticks", type=int, default=1_000)
+    mission_eval.add_argument("--advance-ticks", type=int, default=125)
+    mission_eval.add_argument("--evidence-root", type=Path)
+    mission_eval.add_argument("--engine", type=Path)
     return parser
 
 
@@ -120,6 +130,11 @@ def _auto_planner_interval(threat_level: str) -> float:
 def _restart_auto_deadlines(now: float, threat_level: str) -> tuple[float, float]:
     """Restart periodic work after an event-driven planning/execution cycle."""
     return now + 3.0, now + _auto_planner_interval(threat_level)
+
+
+def _companion_action_loop_enabled(*, mission_mode: bool, native_brain_available: bool) -> bool:
+    """Use scripted companion control in missions and native control in skirmishes."""
+    return mission_mode or not native_brain_available
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -166,6 +181,22 @@ def main(argv: list[str] | None = None) -> int:
         ))
         print(json.dumps(result, indent=2))
         return 0 if result["won"] else 2
+    if args.command == "mission-eval":
+        from .mission_eval import evaluate_all_missions
+
+        result = evaluate_all_missions(
+            evidence_root=args.evidence_root,
+            engine_executable=args.engine,
+            port=args.port,
+            seed=args.seed,
+            max_ticks=args.max_ticks,
+            stall_ticks=args.stall_ticks,
+            advance_ticks=args.advance_ticks,
+            campaign=args.campaign,
+            mission_names=tuple(args.missions),
+        )
+        print(json.dumps({key: value for key, value in result.items() if key != "results"}, indent=2))
+        return 0
     companion = Companion()
     if args.command == "ask":
         from pathlib import Path
@@ -321,6 +352,7 @@ def main(argv: list[str] | None = None) -> int:
                     companion.native_brain_available
                     and companion.auto_act_enabled
                     and companion.native_strategy == "adaptive"
+                    and not snapshot.mission_mode
                     and not voice_busy
                     and not snapshot.done
                     and now >= strategy_review_due_at
@@ -345,7 +377,10 @@ def main(argv: list[str] | None = None) -> int:
                 if (
                     companion.auto_act_enabled
                     and companion.enabled
-                    and not companion.native_brain_available
+                    and _companion_action_loop_enabled(
+                        mission_mode=snapshot.mission_mode,
+                        native_brain_available=companion.native_brain_available,
+                    )
                     and not voice_busy
                     and not snapshot.done
                 ):

@@ -115,6 +115,11 @@ class GameRuntime:
             self._refresh_silo_episode(self._snapshot)
             return self._snapshot
 
+    def capture_tactical_evidence(self, reason: str = "periodic", *, force: bool = False) -> dict[str, Any] | None:
+        """Capture a fog-respecting frame for evaluators and other non-MCP callers."""
+        snapshot = self._snapshot or self.observe()
+        return self._capture_tactical_evidence(snapshot, reason, force=force)
+
     def _refresh_silo_episode(self, snapshot: GameSnapshot) -> None:
         if not self._silo_episode_active:
             return
@@ -385,6 +390,11 @@ class GameRuntime:
         visible_enemies.update(building.actor_id for building in snapshot.visible_enemy_buildings)
         available = {item.lower() for item in snapshot.available_production}
         queued = {str(item.get("item", "")).lower() for item in snapshot.production}
+        support_powers = {
+            str(power.get("key", "")).lower(): power
+            for power in snapshot.support_powers
+            if str(power.get("key", "")).strip()
+        }
         queued_buildings = {
             str(item.get("item", "")).lower()
             for item in snapshot.production
@@ -408,6 +418,7 @@ class GameRuntime:
             "disguise",
             "infiltrate",
             "demolish",
+            "capture",
             "unload",
         }
         building_actions = {"sell", "repair", "set_rally_point", "power_down", "set_primary"}
@@ -428,7 +439,11 @@ class GameRuntime:
                 raise ValueError(f"target {command.target_actor_id} is not owned")
             if command.action == "enter_transport":
                 transport = units.get(command.target_actor_id)
-                if transport is None or transport.passenger_count < 0:
+                transport_kind = transport.kind.lower().split("@", 1)[0].split(".", 1)[0] if transport else ""
+                if transport is None or (
+                    transport.passenger_count < 0
+                    and transport_kind not in {"tran", "lst", "apc", "hind"}
+                ):
                     raise ValueError(f"target {command.target_actor_id} is not an owned transport")
             if command.action == "disguise" and command.target_actor_id not in units[command.actor_id].valid_disguise_targets:
                 raise ValueError(f"target {command.target_actor_id} is not a valid visible disguise target")
@@ -436,6 +451,8 @@ class GameRuntime:
                 raise ValueError(f"target {command.target_actor_id} is not a valid visible infiltration target")
             if command.action == "demolish" and command.target_actor_id not in units[command.actor_id].valid_demolition_targets:
                 raise ValueError(f"target {command.target_actor_id} is not a valid visible demolition target")
+            if command.action == "capture" and command.target_actor_id not in units[command.actor_id].valid_capture_targets:
+                raise ValueError(f"target {command.target_actor_id} is not a valid visible capture target")
             if command.action == "unload" and units[command.actor_id].passenger_count <= 0:
                 raise ValueError(f"transport {command.actor_id} has no passengers")
             if command.action == "repair" and buildings[command.actor_id].hp_percent >= 0.999:
@@ -459,7 +476,7 @@ class GameRuntime:
             if command.action == "set_stance" and not 0 <= command.target_x <= 3:
                 raise ValueError("stance must be between 0 and 3")
 
-            required_position = command.action in {"move", "attack_move", "set_rally_point"}
+            required_position = command.action in {"move", "attack_move", "set_rally_point", "use_support_power"}
             supplied_position = command.target_x != 0 or command.target_y != 0
             if required_position or (command.action in {"harvest", "place_building"} and supplied_position):
                 if not snapshot.contains_cell(command.target_x, command.target_y):
@@ -506,6 +523,22 @@ class GameRuntime:
                 )
                 if not complete:
                     raise ValueError(f"'{command.item_type}' has not completed production")
+            if command.action == "use_support_power":
+                power = support_powers.get(command.item_type.lower())
+                if power is None or not bool(power.get("active", False)) or not bool(power.get("ready", False)):
+                    raise ValueError(f"support power '{command.item_type}' is not ready")
+                descriptor = " ".join((command.item_type, str(power.get("name", "")), str(power.get("description", "")))).lower()
+                if any(term in descriptor for term in ("nuke", "atomic", "parabomb")):
+                    if any(
+                        (actor.cell_x - command.target_x) ** 2 + (actor.cell_y - command.target_y) ** 2 <= 15 ** 2
+                        for actor in (*snapshot.units, *snapshot.buildings)
+                    ):
+                        raise ValueError("destructive support power target violates the 15-cell friendly-fire exclusion zone")
+                    if not any(
+                        (actor.cell_x - command.target_x) ** 2 + (actor.cell_y - command.target_y) ** 2 <= 6 ** 2
+                        for actor in (*snapshot.visible_enemies, *snapshot.visible_enemy_buildings)
+                    ):
+                        raise ValueError("destructive support powers require a currently visible enemy concentration")
 
     def issue(self, commands: tuple[ActionCommand, ...], *, ticks: int = 1) -> dict[str, Any]:
         with self._lock:
@@ -588,7 +621,12 @@ class GameRuntime:
         with self._lock:
             previous = self._snapshot
             requested_ticks = ticks
-            if previous is not None and not previous.done and previous.harvester_count == 0:
+            if (
+                previous is not None
+                and not previous.done
+                and not previous.mission_mode
+                and previous.harvester_count == 0
+            ):
                 building_types = {
                     building.kind.lower().split(".", 1)[0]
                     for building in previous.buildings

@@ -8,6 +8,7 @@ from typing import Any
 
 from .models import GameSnapshot, Unit
 from .labels import building_name, unit_name
+from .mission_goals import compile_mission_goal_graph
 
 
 FACTION_DOCTRINES: dict[str, dict[str, Any]] = {
@@ -491,6 +492,10 @@ def _actor_type(actor: Unit) -> str:
     return actor.kind.lower().split("@", 1)[0].split(".", 1)[0]
 
 
+def _is_wall(actor: Unit) -> bool:
+    return _actor_type(actor) in {"barb", "brik", "cycl", "fenc", "sbag", "wood"}
+
+
 def _live(actors: tuple[Unit, ...]) -> list[Unit]:
     return [actor for actor in actors if ".husk" not in actor.kind.lower() and actor.hp_percent > 0]
 
@@ -869,6 +874,18 @@ def mission_plan(snapshot: GameSnapshot) -> dict[str, Any]:
         actor.actor_id: actor
         for actor in (*snapshot.visible_enemies, *snapshot.visible_enemy_buildings, *snapshot.units, *snapshot.buildings)
     }
+    goal_graph = compile_mission_goal_graph(snapshot)
+    mission_preserve_ids = {
+        actor_id
+        for node in goal_graph.get("nodes", [])
+        if node.get("status") == "incomplete"
+        for actor_id in node.get("preserve_actor_ids", [])
+    }
+    mission_preserve_ids.update(
+        actor_id
+        for directive in goal_graph.get("briefing_directives", [])
+        for actor_id in directive.get("preserve_actor_ids", [])
+    )
     result: dict[str, Any] = {
         "active": True,
         "briefing": snapshot.mission_briefing,
@@ -882,7 +899,56 @@ def mission_plan(snapshot: GameSnapshot) -> dict[str, Any]:
             "rule": "Keep spies outside visible dog detection zones; ordinary enemy units are safe only while disguise remains intact.",
         },
         "recommended_commands": [],
+        "goal_graph": goal_graph,
     }
+
+    # Campaign maps can expose the normal construction queues alongside their
+    # scripted objectives. A completed structure blocks that queue until it is
+    # placed, so this is an urgent economy action in mission mode too. Placement
+    # coordinates are deliberately omitted: ActionHandler's native optimizer
+    # chooses a legal explored cell with resource, spacing, and exit-lane scoring.
+    completed_structure = next((
+        item for item in snapshot.production
+        if str(item.get("queue_type", "")).lower() in {"building", "defense"}
+        and str(item.get("item", "")).strip()
+        and (
+            float(item.get("progress", 0)) >= 0.999
+            or int(item.get("remaining_ticks", 1)) <= 0
+        )
+    ), None)
+    if completed_structure is not None:
+        item = str(completed_structure["item"]).strip().lower()
+        name = building_name(item)
+        result["phase"] = "place-completed-structure"
+        result["next_step"] = f"Place the completed {name} now so construction can continue."
+        result["recommended_commands"] = [{
+            "action": "place_building",
+            "item_type": item,
+        }]
+        return result
+
+    incomplete_text = " ".join(objective.description.lower() for objective in incomplete)
+    objective_text = " ".join((
+        incomplete_text,
+        snapshot.mission_briefing.lower(),
+    ))
+    engineers = [unit for unit in _live(snapshot.units) if unit.can_capture]
+    if "capture" in objective_text:
+        for engineer in engineers:
+            if not engineer.valid_capture_targets:
+                continue
+            if not engineer.idle:
+                result["phase"] = "mission-order-in-progress"
+                result["next_step"] = "Let the engineer finish the current capture approach, then re-check the objective."
+                return result
+            result["phase"] = "capture-mission-objective"
+            result["next_step"] = "Capture the nearest currently legal objective with the engineer."
+            result["recommended_commands"] = [{
+                "action": "capture",
+                "actor_id": engineer.actor_id,
+                "target_actor_id": engineer.valid_capture_targets[0],
+            }]
+            return result
 
     for spy in spies:
         legal_disguises = [actor_lookup[target] for target in spy.valid_disguise_targets if target in actor_lookup]
@@ -972,7 +1038,6 @@ def mission_plan(snapshot: GameSnapshot) -> dict[str, Any]:
             result["recommended_commands"] = commands
             return result
 
-    objective_text = " ".join(objective.description.lower() for objective in incomplete)
     demolitionists = [unit for unit in _live(snapshot.units) if unit.can_demolish]
     if "sam" in objective_text and "destroy" in objective_text:
         for demolitionist in demolitionists:
@@ -1000,14 +1065,86 @@ def mission_plan(snapshot: GameSnapshot) -> dict[str, Any]:
             }]
             return result
 
+    if demolitionists and any(term in objective_text for term in ("destroy", "offline", "demolish", "power plant")):
+        mentioned_priorities = []
+        if any(term in objective_text for term in ("power plant", "power plants", "offline")):
+            mentioned_priorities.extend(("powr", "apwr"))
+        if "tesla" in objective_text:
+            mentioned_priorities.append("tsla")
+        if "sam" in objective_text:
+            mentioned_priorities.append("sam")
+        priority = {kind: index for index, kind in enumerate(mentioned_priorities)}
+        one_western_target_completed = "westmost" in objective_text and snapshot.buildings_killed >= 1
+        for demolitionist in demolitionists:
+            legal_targets = [
+                actor_lookup[target_id]
+                for target_id in demolitionist.valid_demolition_targets
+                if target_id in actor_lookup
+            ]
+            preferred = [target for target in legal_targets if _actor_type(target) in priority]
+            if "westmost" in objective_text and preferred:
+                west_x = min(target.cell_x for target in preferred)
+                preferred = [target for target in preferred if target.cell_x == west_x]
+            if one_western_target_completed:
+                preferred = []
+            if not preferred:
+                continue
+            if not demolitionist.idle:
+                result["phase"] = "mission-order-in-progress"
+                result["next_step"] = "Let the demolition specialist finish the current charge, then re-evaluate the mission blocker."
+                return result
+            target = min(
+                preferred,
+                key=lambda actor: (
+                    priority[_actor_type(actor)],
+                    (actor.cell_x - demolitionist.cell_x) ** 2 + (actor.cell_y - demolitionist.cell_y) ** 2,
+                ),
+            )
+            result["phase"] = "demolish-briefed-blocker"
+            result["next_step"] = f"Use the demolition specialist on the briefed {building_name(target.kind)} target."
+            result["recommended_commands"] = [{
+                "action": "demolish",
+                "actor_id": demolitionist.actor_id,
+                "target_actor_id": target.actor_id,
+            }]
+            return result
+
     heroes = [
         unit for unit in _live(snapshot.units)
         if _actor_type(unit) in {"e7", "e7.noautotarget", "tanya"}
     ]
     transports = [
         unit for unit in _live(snapshot.units)
-        if unit.passenger_count >= 0 and unit.actor_id not in {hero.actor_id for hero in heroes}
+        if (
+            unit.passenger_count >= 0
+            or _actor_type(unit) in {"tran", "lst", "apc", "hind"}
+        )
+        and unit.actor_id not in {hero.actor_id for hero in heroes}
     ]
+    evacuees = [unit for unit in _live(snapshot.units) if _actor_type(unit) in {"einstein", "scientist"}]
+    if any(term in objective_text for term in ("extract", "evacuate")) and evacuees and transports:
+        ready_transports = [unit for unit in transports if unit.idle]
+        if not ready_transports:
+            result["phase"] = "wait-for-extraction-transport"
+            result["next_step"] = "Hold the required evacuee safely until the extraction transport has landed."
+            return result
+        evacuee = evacuees[0]
+        if not evacuee.idle:
+            result["phase"] = "mission-order-in-progress"
+            result["next_step"] = "Let the required evacuee finish moving, then board the extraction transport."
+            return result
+        transport = min(
+            ready_transports,
+            key=lambda unit: (unit.cell_x - evacuee.cell_x) ** 2 + (unit.cell_y - evacuee.cell_y) ** 2,
+        )
+        result["phase"] = "extract-required-evacuee"
+        result["next_step"] = "Board the required evacuee into the extraction transport."
+        result["recommended_commands"] = [{
+            "action": "enter_transport",
+            "actor_id": evacuee.actor_id,
+            "target_actor_id": transport.actor_id,
+        }]
+        return result
     if "rescue tanya" in objective_text and heroes and transports:
         hero = heroes[0]
         if not hero.idle:
@@ -1029,11 +1166,12 @@ def mission_plan(snapshot: GameSnapshot) -> dict[str, Any]:
 
     # Once scripted blockers and hero objectives are resolved, execute the live
     # elimination objective with short group advances and re-plan on each contact.
-    if "eliminate" in objective_text:
+    if any(term in incomplete_text for term in ("eliminate", "destroy", "wipe out", "kill all")):
         contacts = [*_live(snapshot.visible_enemies), *_live(snapshot.visible_enemy_buildings)]
         combat_units = [
             unit for unit in _live(snapshot.units)
             if unit.can_attack and unit.idle and _actor_type(unit) not in {"camera", "tran"}
+            and unit.actor_id not in mission_preserve_ids
         ][:8]
         if contacts and combat_units:
             center_x = round(sum(unit.cell_x for unit in combat_units) / len(combat_units))
@@ -1052,6 +1190,84 @@ def mission_plan(snapshot: GameSnapshot) -> dict[str, Any]:
                     "target_y": target.cell_y,
                 }
                 for unit in combat_units
+            ]
+            return result
+
+    ready_primitives = set(goal_graph.get("ready_primitives", []))
+    preserve_ids = mission_preserve_ids
+    vulnerable = [
+        unit for unit in _live(snapshot.units)
+        if unit.actor_id in preserve_ids and unit.hp_percent < 0.55 and not unit.idle
+    ]
+    if vulnerable and ready_primitives & {"defend", "escort", "extract"}:
+        home = base_center(snapshot)
+        result["phase"] = "preserve-required-actors"
+        result["next_step"] = "Pull the damaged required unit behind the friendly formation before continuing the objective."
+        result["recommended_commands"] = [
+            {"action": "move", "actor_id": unit.actor_id, "target_x": home[0], "target_y": home[1]}
+            for unit in vulnerable[:4]
+        ]
+        return result
+
+    contacts = [*_live(snapshot.visible_enemies), *_live(snapshot.visible_enemy_buildings)]
+    if contacts and ready_primitives & {"explore", "defend", "escort", "scripted-trigger"}:
+        # Static walls frequently remain visible forever and are often not the
+        # route that reveals a scripted trigger.  They must not starve scouting
+        # or repeatedly reset the same units onto an unreachable fence cell.
+        meaningful_contacts = [actor for actor in contacts if not _is_wall(actor)]
+        ready_combat = [
+            unit for unit in _live(snapshot.units)
+            if unit.can_attack and unit.idle and unit.actor_id not in preserve_ids
+        ]
+        if not ready_combat:
+            ready_combat = [
+                unit for unit in _live(snapshot.units)
+                if unit.can_attack and unit.idle and unit.hp_percent >= 0.75
+            ]
+        if ready_combat and meaningful_contacts:
+            center = _mean_cell(ready_combat, base_center(snapshot))
+            target = min(
+                meaningful_contacts,
+                key=lambda actor: (
+                    0 if actor.can_attack else 1,
+                    0 if actor in snapshot.visible_enemies else 1,
+                    (actor.cell_x - center[0]) ** 2 + (actor.cell_y - center[1]) ** 2,
+                ),
+            )
+            result["phase"] = "clear-objective-route"
+            result["next_step"] = f"Clear the visible {unit_name(target.kind)} blocking the objective route with a cohesive group."
+            result["recommended_commands"] = [
+                {
+                    "action": "attack_move",
+                    "actor_id": unit.actor_id,
+                    "target_x": target.cell_x,
+                    "target_y": target.cell_y,
+                }
+                for unit in ready_combat[:8]
+            ]
+            return result
+
+    if ready_primitives & {"explore", "destroy", "scripted-trigger"} and snapshot.explored_percent < 95:
+        scouts = sorted(
+            (
+                unit for unit in snapshot.units
+                if unit.idle and _actor_type(unit) in {"e1", "e2", "dog", "jeep"}
+                and unit.actor_id not in preserve_ids
+            ),
+            key=lambda unit: ({"e1": 0, "jeep": 1, "dog": 2, "e2": 3}[_actor_type(unit)], unit.actor_id),
+        )[:3]
+        targets = scout_targets(snapshot, base_center(snapshot), len(scouts))
+        if targets:
+            result["phase"] = "reveal-scripted-trigger"
+            result["next_step"] = "Reveal separate reachable sectors to find the next scripted contact or trigger."
+            result["recommended_commands"] = [
+                {
+                    "action": "attack_move",
+                    "actor_id": unit.actor_id,
+                    "target_x": target[0],
+                    "target_y": target[1],
+                }
+                for unit, target in zip(scouts, targets)
             ]
             return result
 
