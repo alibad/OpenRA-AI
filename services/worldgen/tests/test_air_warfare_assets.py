@@ -78,14 +78,34 @@ def test_samad_is_one_way_and_has_distinct_dive_sequence() -> None:
     assert "\tWithFacingSpriteBody@DIVE:" in actor
     assert "\tdive:\n\t\tStart: 16" in sequence
 
+    dive_activity = (
+        ENGINE / "OpenRA.Mods.Common" / "Activities" / "Air" / "DiveAttack.cs"
+    ).read_text(encoding="utf-8")
+    assert "desiredAltitude = Math.Min" in dive_activity
+    assert "ReturnToBase" not in dive_activity
+    assert "Rearm" not in dive_activity
+
 
 def test_aircraft_are_rearmable_and_available_to_ai() -> None:
     fighter = RULES.split("\nF15SA:\n", 1)[1].split("\nAH64SA:\n", 1)[0]
     helicopter = RULES.split("\nAH64SA:\n", 1)[1].split("\nSAMAD:\n", 1)[0]
     assert "\tRearmable:" in fighter and "\tAmmoPools: aam, gun" in fighter
+    assert "\tBuildAtProductionType: Helicopter" in fighter
     assert "\tRearmable:" in helicopter and "\tAmmoPools: cannon, rockets" in helicopter
     assert "f15sa:" in RULES and "ah64sa:" in RULES
     assert RULES.count("AirUnitsTypes: mig, yak, heli, hind, mh60, samad, f15sa, ah64sa") == 5
+
+
+def test_observation_serializer_supports_multiple_aircraft_ammo_pools() -> None:
+    serializer = (
+        ENGINE
+        / "OpenRA.Mods.Common"
+        / "Traits"
+        / "Player"
+        / "ObservationSerializer.cs"
+    ).read_text(encoding="utf-8")
+    assert "TraitsImplementing<AmmoPool>().ToArray()" in serializer
+    assert "Sum(pool => pool.CurrentAmmoCount)" in serializer
 
 
 def test_air_audio_is_openra_pcm_and_bounded() -> None:
