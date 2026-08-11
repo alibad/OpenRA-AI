@@ -18,6 +18,10 @@ class GeoSelection:
     story_seed: str = ""
     generation_mode: str = "playability-first"
     imagery_style: str = "auto"
+    scenario_id: str = ""
+    player_faction: str = "random"
+    opponent_faction: str = "random"
+    mission_archetype: str = "balanced-skirmish"
 
     def validated(self) -> "GeoSelection":
         if not -90 <= self.latitude <= 90:
@@ -34,6 +38,29 @@ class GeoSelection:
             raise ValueError("generation_mode must be reality-first, playability-first, or creative-remix")
         if self.imagery_style not in {"auto", "hybrid", "satellite", "terrain"}:
             raise ValueError("imagery_style must be auto, hybrid, satellite, or terrain")
+        if self.mission_archetype not in {
+            "balanced-skirmish",
+            "river-crossing",
+            "urban-siege",
+            "supply-raid",
+            "convoy-defense",
+            "infrastructure-defense",
+        }:
+            raise ValueError("mission_archetype is not supported")
+        if self.scenario_id:
+            from .scenarios import FACTIONS, mission_blueprint
+
+            blueprint = mission_blueprint(self.scenario_id)
+            if blueprint is None:
+                raise ValueError(f"unknown scenario_id: {self.scenario_id}")
+            if self.player_faction not in {"random", *FACTIONS}:
+                raise ValueError(f"unknown player_faction: {self.player_faction}")
+            if self.opponent_faction not in {"random", *FACTIONS}:
+                raise ValueError(f"unknown opponent_faction: {self.opponent_faction}")
+            if self.player_faction not in {"random", blueprint.player_faction}:
+                raise ValueError("player_faction conflicts with the selected scenario")
+            if self.opponent_faction not in {"random", blueprint.opponent_faction}:
+                raise ValueError("opponent_faction conflicts with the selected scenario")
         return self
 
     def as_dict(self) -> dict[str, Any]:

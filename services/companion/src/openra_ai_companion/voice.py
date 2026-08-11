@@ -44,6 +44,18 @@ def _normalize_wav(audio: bytes) -> bytes:
     raise ValueError("speech WAV does not contain a readable data chunk")
 
 
+def playback_hold_seconds(
+    playback: float | bool | None,
+    fallback_seconds: float,
+    *,
+    grace_seconds: float = 0.35,
+) -> float:
+    """Keep the matching HUD message visible through asynchronous speech playback."""
+    if isinstance(playback, (int, float)) and not isinstance(playback, bool) and playback > 0:
+        return max(fallback_seconds, float(playback) + max(0.0, grace_seconds))
+    return fallback_seconds
+
+
 def record_question(seconds: float = 4.0, sample_rate: int = 16_000) -> bytes:
     try:
         import sounddevice as sd
@@ -112,10 +124,12 @@ class AudioPlayer:
             self._path.unlink(missing_ok=True)
             self._path = None
 
-    def play(self, audio: bytes) -> None:
+    def play(self, audio: bytes) -> float:
         if not audio:
-            return
+            return 0.0
         audio = _normalize_wav(audio)
+        with wave.open(io.BytesIO(audio), "rb") as wav:
+            duration = wav.getnframes() / max(1, wav.getframerate())
         with self._lock:
             self._stop_locked()
             with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as handle:
@@ -132,6 +146,7 @@ class AudioPlayer:
             else:
                 command = ["afplay", str(self._path)] if platform.system() == "Darwin" else ["aplay", "-q", str(self._path)]
                 self._process = subprocess.Popen(command)
+        return duration
 
     def stop(self) -> None:
         with self._lock:

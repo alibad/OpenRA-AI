@@ -4,16 +4,23 @@
 
 OpenRA AI talks only to a private OpenAI-compatible AI layer. The application
 `.env` contains route names and a loopback URL, but no provider credential.
-The router owns the provider key and maps capabilities to backends:
+The router maps capabilities to local backends by default:
 
-- `gpt-5.5` writes a single short response from a compact game snapshot;
-- `openai-transcribe` turns a push-to-talk WAV into the player question;
-- `openai-tts` returns interruptible WAV speech.
+- `local-coder` writes text responses and interprets proposed actions with tool calling;
+- `local-whisper` turns a push-to-talk WAV into the player question;
+- `local-kokoro` returns interruptible WAV speech.
+
+The autonomous headless game agent uses the Agents SDK against the same
+BeTenshi router so it can call the local gameplay MCP server. Local mode pins
+the `local-coder` route, disables SDK tracing, and never loads a hosted-provider
+credential or silently falls back to a hosted model.
 
 The text route uses low reasoning effort and a strict one-sentence system
 instruction. Deterministic code—not the model—decides whether an observation
-is salient enough to speak. If the route is unavailable, critical events retain
-a deterministic fallback line and player questions report degraded status.
+is salient enough to speak. Persistent economy, power, production, and damage
+alerts are also worded locally and emit only when the condition begins. If a
+route is unavailable, critical events retain a deterministic fallback line and
+player questions report degraded status.
 
 ## Data boundary
 
@@ -22,10 +29,8 @@ and enemies already visible to the local player. It does not receive hidden
 actors, unrestricted map state, a continuous frame stream, credentials, or a
 game-command tool.
 
-## Moving local
+## Local operation
 
-The public contracts do not name a provider. A future local rollout changes
-AI-layer routes to local text, speech-recognition, and speech-synthesis
-backends, then compares latency and quality against recorded fog-respecting
-snapshots. The engine, companion API, interruption model, and UI remain the
-same.
+The game-facing contracts do not name a provider. The local text,
+speech-recognition, and speech-synthesis routes can be changed in BeTenshi
+without changing the engine, companion API, interruption model, or UI.

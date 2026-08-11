@@ -23,6 +23,18 @@ model later.
 
 ## Releases
 
+The cross-platform release entry point is:
+
+```powershell
+python scripts/release.py build --version 0.1.0-alpha.9 --target windows-x64
+```
+
+On an Apple Silicon Mac, the corresponding command is:
+
+```bash
+python3 scripts/release.py build --version 0.1.0-alpha.9 --target macos-arm64
+```
+
 Release tooling will:
 
 1. verify a clean worktree and pinned submodules;

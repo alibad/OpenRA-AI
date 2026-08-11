@@ -17,6 +17,7 @@ from openra_ai_worldgen.models import TerrainAnalysis
 from openra_ai_worldgen.native import generation_options, terrain_profile
 from openra_ai_worldgen.osm import fetch_features, parse_overpass
 from openra_ai_worldgen.raster import WATER, build_terrain
+from openra_ai_worldgen.scenarios import FACTIONS, scenario_manifest
 from openra_ai_worldgen.server import create_server
 from openra_ai_worldgen.terrain import _zoom_for_radius, fetch_terrain_view
 from openra_ai_worldgen.validator import validate_package
@@ -24,6 +25,38 @@ from openra_ai_worldgen.validator import validate_package
 
 class WorldgenTests(unittest.TestCase):
     fixture = Path(__file__).parent / "fixtures" / "overpass-river.json"
+
+    def test_red_sea_scenario_contract_is_source_dated(self) -> None:
+        selection = GeoSelection(
+            16.8892,
+            42.5511,
+            scenario_id="jizan-corridor-2026",
+            player_faction="saudi",
+            opponent_faction="yemen",
+            mission_archetype="convoy-defense",
+        ).validated()
+        scenario = scenario_manifest(selection.scenario_id)
+
+        self.assertIsNotNone(scenario)
+        self.assertEqual(scenario["factual_cutoff"], "2026-08-11")
+        self.assertEqual(scenario["player_faction"], "saudi")
+        self.assertGreaterEqual(len(scenario["objectives"]), 4)
+        self.assertGreaterEqual(len(scenario["sources"]), 2)
+        self.assertEqual(FACTIONS["saudi"].openra_side, "Allies")
+        self.assertEqual(FACTIONS["yemen"].openra_side, "Soviet")
+
+    def test_unknown_scenario_is_rejected(self) -> None:
+        with self.assertRaisesRegex(ValueError, "unknown scenario_id"):
+            GeoSelection(16.8892, 42.5511, scenario_id="missing").validated()
+
+    def test_scenario_rejects_a_conflicting_country(self) -> None:
+        with self.assertRaisesRegex(ValueError, "player_faction conflicts"):
+            GeoSelection(
+                16.8892,
+                42.5511,
+                scenario_id="jizan-corridor-2026",
+                player_faction="yemen",
+            ).validated()
 
     def test_generates_valid_playable_package(self) -> None:
         with tempfile.TemporaryDirectory() as directory:

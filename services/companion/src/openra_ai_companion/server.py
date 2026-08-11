@@ -6,6 +6,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import parse_qs, urlparse
 
 from .core import Companion
+from .learning import LearningStore, learning_dashboard
 from .models import GameSnapshot
 from .router import RouterError
 from .voice import AudioPlayer, record_question
@@ -42,6 +43,27 @@ class CompanionHandler(BaseHTTPRequestHandler):
         self._headers(HTTPStatus.OK, "text/html; charset=utf-8", len(body))
         self.wfile.write(body)
 
+    def _publish_action_response(self, response: object) -> None:
+        metadata = getattr(response, "metadata", {})
+        action = metadata.get("action", {}) if isinstance(metadata, dict) else {}
+        action_state = action.get("state") if isinstance(action, dict) else None
+        state = {
+            "pending": "action-pending",
+            "executed": "action-executed",
+            "cancelled": "action-cancelled",
+            "rejected": "action-rejected",
+            "failed": "action-rejected",
+            "unavailable": "action-rejected",
+            "expired": "action-rejected",
+            "missing": "action-rejected",
+        }.get(action_state)
+        publisher = getattr(self.server, "status_publisher", None)
+        if state and publisher:
+            try:
+                publisher(state, f"AI  •  {getattr(response, 'text', '')}")
+            except Exception:
+                pass
+
     def _payload(self, limit: int = 256_000) -> bytes:
         size = int(self.headers.get("Content-Length", "0"))
         if size > limit:
@@ -65,10 +87,20 @@ class CompanionHandler(BaseHTTPRequestHandler):
             self._json(HTTPStatus.OK, self.companion.router.settings.as_dict())
         elif path == "/v1/catalog":
             self._json(HTTPStatus.OK, self.companion.router.catalogue())
+        elif path == "/v1/learning":
+            self._json(HTTPStatus.OK, learning_dashboard())
+        elif path == "/v1/learning/latest":
+            self._json(HTTPStatus.OK, LearningStore().latest())
+        elif path.startswith("/v1/learning/matches/"):
+            attempt = path.rsplit("/", 1)[-1]
+            record = LearningStore().match(attempt)
+            self._json(HTTPStatus.OK if record else HTTPStatus.NOT_FOUND, record or {"error": "not_found"})
         elif path in {"/v1/state", "/v1/usage"}:
             state = {
                 "enabled": self.companion.enabled,
                 "voice_enabled": not self.companion.muted,
+                "auto_act_enabled": self.companion.auto_act_enabled,
+                "pending_action": self.companion.pending_action(),
                 "config": self.companion.router.settings.as_dict(),
                 "usage": self.companion.router.usage_summary(),
                 "router": self.companion.router.health(),
@@ -89,8 +121,9 @@ class CompanionHandler(BaseHTTPRequestHandler):
                 payload = json.loads(self._payload() or b"{}")
                 config_values = dict(payload.get("config") or {})
                 for key in (
-                    "router_url", "model_provider", "text_model", "vision_model", "transcribe_model", "speech_model", "speech_voice",
-                    "notification_pace", "voice_priority", "companion_enabled", "voice_enabled",
+                    "router_url", "model_provider", "text_model", "vision_model", "transcribe_model", "transcribe_language",
+                    "speech_model", "speech_voice",
+                    "notification_pace", "voice_priority", "companion_enabled", "voice_enabled", "auto_act_enabled", "native_strategy",
                 ):
                     if key in payload:
                         config_values[key] = payload[key]
@@ -107,6 +140,7 @@ class CompanionHandler(BaseHTTPRequestHandler):
                 self._json(HTTPStatus.OK, {
                     "enabled": self.companion.enabled,
                     "voice_enabled": not self.companion.muted,
+                    "auto_act_enabled": self.companion.auto_act_enabled,
                     "config": self.companion.router.settings.as_dict(),
                     "usage": self.companion.router.usage_summary(),
                     "router": self.companion.router.health(),
@@ -154,7 +188,32 @@ class CompanionHandler(BaseHTTPRequestHandler):
                 self._json(HTTPStatus.OK, {"speak": response is not None, "response": response.as_dict() if response else None})
             elif path == "/v1/ask":
                 payload = json.loads(self._payload() or b"{}")
-                self._json(HTTPStatus.OK, self.companion.ask(str(payload.get("question", ""))).as_dict())
+                self.companion.begin_user_turn()
+                try:
+                    response = self.companion.handle_player_input(str(payload.get("question", "")))
+                finally:
+                    self.companion.end_user_turn()
+                self._publish_action_response(response)
+                self._json(HTTPStatus.OK, response.as_dict())
+            elif path == "/v1/actions/propose":
+                payload = json.loads(self._payload() or b"{}")
+                self.companion.begin_user_turn()
+                try:
+                    response = self.companion.handle_player_input(str(payload.get("instruction", "")))
+                finally:
+                    self.companion.end_user_turn()
+                self._publish_action_response(response)
+                self._json(HTTPStatus.OK, response.as_dict())
+            elif path == "/v1/actions/confirm":
+                payload = json.loads(self._payload() or b"{}")
+                response = self.companion.confirm_action(str(payload.get("proposal_id", "")))
+                self._publish_action_response(response)
+                self._json(HTTPStatus.OK, response.as_dict())
+            elif path == "/v1/actions/cancel":
+                payload = json.loads(self._payload() or b"{}")
+                response = self.companion.cancel_action(str(payload.get("proposal_id", "")))
+                self._publish_action_response(response)
+                self._json(HTTPStatus.OK, response.as_dict())
             elif path == "/v1/design/mission":
                 payload = json.loads(self._payload() or b"{}")
                 self._json(HTTPStatus.OK, self.companion.draft_mission(payload).as_dict())
@@ -171,7 +230,13 @@ class CompanionHandler(BaseHTTPRequestHandler):
                 self._json(HTTPStatus.OK, {"interrupted": True, "generation": self.companion.interrupt()})
             elif path == "/v1/control":
                 payload = json.loads(self._payload() or b"{}")
-                state = self.companion.configure(enabled=payload.get("enabled"), muted=payload.get("muted"), persist=True)
+                state = self.companion.configure(
+                    enabled=payload.get("enabled"),
+                    muted=payload.get("muted"),
+                    auto_act=payload.get("auto_act"),
+                    native_strategy=payload.get("native_strategy"),
+                    persist=True,
+                )
                 if state["muted"]:
                     self.player.stop()
                 publisher = getattr(self.server, "status_publisher", None)
@@ -193,6 +258,14 @@ class CompanionHandler(BaseHTTPRequestHandler):
                 else:
                     self._headers(HTTPStatus.OK, str(metadata.get("content_type", "audio/wav")), len(audio), X_OpenRA_AI_Utterance=str(metadata["utterance_id"]))
                     self.wfile.write(audio)
+            elif path in {"/v1/voice/start", "/v1/voice/stop"}:
+                self._payload()
+                controller = getattr(self.server, "voice_controller", None)
+                if controller is None:
+                    self._json(HTTPStatus.SERVICE_UNAVAILABLE, {"ok": False, "error": "voice_controller_unavailable"})
+                else:
+                    active = controller.start_question() if path.endswith("/start") else controller.stop_question()
+                    self._json(HTTPStatus.OK, {"ok": True, "active": active})
             else:
                 self._json(HTTPStatus.NOT_FOUND, {"error": "not_found"})
         except (ValueError, TypeError, json.JSONDecodeError) as exc:
@@ -216,6 +289,7 @@ def create_server(
     server.companion = companion or Companion()  # type: ignore[attr-defined]
     server.player = player or AudioPlayer()  # type: ignore[attr-defined]
     server.status_publisher = None  # type: ignore[attr-defined]
+    server.voice_controller = None  # type: ignore[attr-defined]
     return server
 
 

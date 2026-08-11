@@ -22,6 +22,21 @@ def _parser() -> argparse.ArgumentParser:
     generate.add_argument("--size", type=int, choices=(64, 96, 128), default=64)
     generate.add_argument("--seed", type=int, default=1)
     generate.add_argument("--story", default="")
+    generate.add_argument("--scenario", default="")
+    generate.add_argument("--player-faction", default="random")
+    generate.add_argument("--opponent-faction", default="random")
+    generate.add_argument(
+        "--archetype",
+        choices=(
+            "balanced-skirmish",
+            "river-crossing",
+            "urban-siege",
+            "supply-raid",
+            "convoy-defense",
+            "infrastructure-defense",
+        ),
+        default="balanced-skirmish",
+    )
     generate.add_argument(
         "--mode",
         choices=("reality-first", "playability-first", "creative-remix"),
@@ -55,6 +70,10 @@ def main(argv: list[str] | None = None) -> int:
             story_seed=args.story,
             generation_mode=args.mode,
             imagery_style=args.imagery,
+            scenario_id=args.scenario,
+            player_faction=args.player_faction,
+            opponent_faction=args.opponent_faction,
+            mission_archetype=args.archetype,
         )
         result = MissionGenerator(args.fixture, allow_network=not args.offline).generate(selection, args.output)
         print(json.dumps(result.as_dict(), indent=2))

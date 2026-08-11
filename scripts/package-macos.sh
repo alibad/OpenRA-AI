@@ -12,6 +12,8 @@ BRAND_SOURCE="$REPOSITORY_ROOT/assets/brand/rtsai-app-icon.png"
 PLIST_TEMPLATE="$REPOSITORY_ROOT/apps/installer/macos/Info.plist.in"
 WRAPPER_SOURCE="$REPOSITORY_ROOT/apps/installer/macos/OpenRAAI"
 PYTHON="$REPOSITORY_ROOT/.venv/bin/python"
+AI_PACK_LOCK="$REPOSITORY_ROOT/packaging/ai-pack.lock.json"
+MODEL_NOTICES="$REPOSITORY_ROOT/packaging/THIRD_PARTY_MODELS.md"
 
 if [[ "${OSTYPE:-}" != darwin* ]]; then
   echo >&2 "macOS packaging requires a macOS host. The game runtime, .app metadata, DMG, signing, and notarization are verified with Apple tooling."
@@ -21,7 +23,7 @@ fi
 for command in clang dotnet hdiutil iconutil sips shasum; do
   command -v "$command" >/dev/null 2>&1 || { echo >&2 "macOS packaging requires $command."; exit 1; }
 done
-for required in "$BRAND_SOURCE" "$PLIST_TEMPLATE" "$WRAPPER_SOURCE" "$PYTHON"; do
+for required in "$BRAND_SOURCE" "$PLIST_TEMPLATE" "$WRAPPER_SOURCE" "$PYTHON" "$AI_PACK_LOCK" "$MODEL_NOTICES"; do
   [ -f "$required" ] || { echo >&2 "macOS packaging input is missing: $required"; exit 1; }
 done
 
@@ -100,6 +102,8 @@ rm -rf "$ICONSET"
 cp "$REPOSITORY_ROOT/generated/missions/riyadh-crossing-42.oramap" "$RESOURCES/generated/missions/"
 cp "$REPOSITORY_ROOT/.env.example" "$RESOURCES/"
 cp "$REPOSITORY_ROOT/README.md" "$REPOSITORY_ROOT/LICENSE" "$RESOURCES/"
+mkdir -p "$RESOURCES/packaging"
+cp "$AI_PACK_LOCK" "$MODEL_NOTICES" "$RESOURCES/packaging/"
 
 SIGNING_IDENTITY="${MACOS_DEVELOPER_IDENTITY:--}"
 if [ "$SIGNING_IDENTITY" = "-" ]; then

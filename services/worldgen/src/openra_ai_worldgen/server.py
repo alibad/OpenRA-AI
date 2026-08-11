@@ -89,6 +89,10 @@ class WorldgenHandler(BaseHTTPRequestHandler):
             story_seed=str(payload.get("story_seed", "")),
             generation_mode=str(payload.get("generation_mode", "playability-first")),
             imagery_style=str(payload.get("imagery_style", "auto")),
+            scenario_id=str(payload.get("scenario_id", "")),
+            player_faction=str(payload.get("player_faction", "random")),
+            opponent_faction=str(payload.get("opponent_faction", "random")),
+            mission_archetype=str(payload.get("mission_archetype", "balanced-skirmish")),
         )
         analyzer = TerrainAnalyzer(self.server.companion_url) if self.server.companion_url else None  # type: ignore[attr-defined]
         result = MissionGenerator(allow_network=True, terrain_analyzer=analyzer).generate(
@@ -112,6 +116,7 @@ class WorldgenHandler(BaseHTTPRequestHandler):
             "tileset": manifest.get("game", {}).get("tileset", "TEMPERAT"),
             "generator": manifest.get("generator", {}),
             "passability": manifest.get("generator", {}).get("passability", {}),
+            "scenario": manifest.get("scenario"),
         }
         return response
 

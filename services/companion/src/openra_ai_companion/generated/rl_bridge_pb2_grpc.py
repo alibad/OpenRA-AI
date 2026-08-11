@@ -57,6 +57,21 @@ class RLBridgeStub:
                 request_serializer=rl__bridge__pb2.CompanionStatus.SerializeToString,
                 response_deserializer=rl__bridge__pb2.CompanionStatusAck.FromString,
                 _registered_method=True)
+        self.UpdateCompanionThreat = channel.unary_unary(
+                '/openra.rl.RLBridge/UpdateCompanionThreat',
+                request_serializer=rl__bridge__pb2.CompanionThreat.SerializeToString,
+                response_deserializer=rl__bridge__pb2.CompanionStatusAck.FromString,
+                _registered_method=True)
+        self.CaptureCompanionFrame = channel.unary_unary(
+                '/openra.rl.RLBridge/CaptureCompanionFrame',
+                request_serializer=rl__bridge__pb2.StateRequest.SerializeToString,
+                response_deserializer=rl__bridge__pb2.CompanionFrame.FromString,
+                _registered_method=True)
+        self.ExecuteCompanionActions = channel.unary_unary(
+                '/openra.rl.RLBridge/ExecuteCompanionActions',
+                request_serializer=rl__bridge__pb2.CompanionActionRequest.SerializeToString,
+                response_deserializer=rl__bridge__pb2.CompanionActionReceipt.FromString,
+                _registered_method=True)
         self.FastAdvance = channel.unary_unary(
                 '/openra.rl.RLBridge/FastAdvance',
                 request_serializer=rl__bridge__pb2.FastAdvanceRequest.SerializeToString,
@@ -110,6 +125,28 @@ class RLBridgeServicer:
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
+    def UpdateCompanionThreat(self, request, context):
+        """Unary: publish the independently refreshed, fog-respecting threat meter.
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def CaptureCompanionFrame(self, request, context):
+        """Unary: capture the player's rendered, fog-respecting viewport on demand.
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def ExecuteCompanionActions(self, request, context):
+        """Unary: queue a small, confirmed set of local-player orders. The engine
+        validates the request again on the game thread before issuing any order.
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
     def FastAdvance(self, request, context):
         """Unary: advance N ticks with optional commands, return observation.
         Bypasses streaming — works reliably on all platforms.
@@ -153,6 +190,21 @@ def add_RLBridgeServicer_to_server(servicer, server):
                     servicer.UpdateCompanionStatus,
                     request_deserializer=rl__bridge__pb2.CompanionStatus.FromString,
                     response_serializer=rl__bridge__pb2.CompanionStatusAck.SerializeToString,
+            ),
+            'UpdateCompanionThreat': grpc.unary_unary_rpc_method_handler(
+                    servicer.UpdateCompanionThreat,
+                    request_deserializer=rl__bridge__pb2.CompanionThreat.FromString,
+                    response_serializer=rl__bridge__pb2.CompanionStatusAck.SerializeToString,
+            ),
+            'CaptureCompanionFrame': grpc.unary_unary_rpc_method_handler(
+                    servicer.CaptureCompanionFrame,
+                    request_deserializer=rl__bridge__pb2.StateRequest.FromString,
+                    response_serializer=rl__bridge__pb2.CompanionFrame.SerializeToString,
+            ),
+            'ExecuteCompanionActions': grpc.unary_unary_rpc_method_handler(
+                    servicer.ExecuteCompanionActions,
+                    request_deserializer=rl__bridge__pb2.CompanionActionRequest.FromString,
+                    response_serializer=rl__bridge__pb2.CompanionActionReceipt.SerializeToString,
             ),
             'FastAdvance': grpc.unary_unary_rpc_method_handler(
                     servicer.FastAdvance,
@@ -281,6 +333,87 @@ class RLBridge:
             '/openra.rl.RLBridge/UpdateCompanionStatus',
             rl__bridge__pb2.CompanionStatus.SerializeToString,
             rl__bridge__pb2.CompanionStatusAck.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def UpdateCompanionThreat(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/openra.rl.RLBridge/UpdateCompanionThreat',
+            rl__bridge__pb2.CompanionThreat.SerializeToString,
+            rl__bridge__pb2.CompanionStatusAck.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def CaptureCompanionFrame(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/openra.rl.RLBridge/CaptureCompanionFrame',
+            rl__bridge__pb2.StateRequest.SerializeToString,
+            rl__bridge__pb2.CompanionFrame.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def ExecuteCompanionActions(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/openra.rl.RLBridge/ExecuteCompanionActions',
+            rl__bridge__pb2.CompanionActionRequest.SerializeToString,
+            rl__bridge__pb2.CompanionActionReceipt.FromString,
             options,
             channel_credentials,
             insecure,
