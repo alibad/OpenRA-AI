@@ -85,12 +85,10 @@ else {
     # Always force the interactive renderer. Headless smoke tests persist their
     # platform choice in settings.yaml, which must not affect the next real game.
     $arguments += "Game.Platform=Default"
-    # Use a deterministic windowed viewport for the prototype launcher. This
-    # avoids stale pseudo-fullscreen/DPI settings opening the camera at a client
-    # edge before the first real mouse event, and keeps live-vision captures at
-    # the resolution used by the visual QA suite.
-    $arguments += "Graphics.Mode=Windowed"
-    $arguments += "Graphics.WindowedSize=1280,720"
+    # OpenRA presents PseudoFullscreen as its modern Fullscreen option. It uses
+    # the desktop resolution without the disruptive display-mode switch of the
+    # legacy exclusive fullscreen mode.
+    $arguments += "Graphics.Mode=PseudoFullscreen"
 }
 if ($mapArgument) {
     $arguments += $mapArgument

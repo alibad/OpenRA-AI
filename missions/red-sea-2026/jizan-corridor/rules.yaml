@@ -1,0 +1,93 @@
+Player:
+	PlayerResources:
+		DefaultCash: 6000
+
+World:
+	LuaScript:
+		Scripts: campaign.lua, utils.lua, jizan-corridor.lua
+	MissionData:
+		Briefing: briefing
+	ScriptLobbyDropdown@difficulty:
+		ID: difficulty
+		Label: dropdown-difficulty.label
+		Description: dropdown-difficulty.description
+		Values:
+			easy: options-difficulty.easy
+			normal: options-difficulty.normal
+			hard: options-difficulty.hard
+		Default: normal
+
+# Keep the Saudi production panel focused on the new faction roster.  Economy
+# support units remain available, but legacy Allied combat vehicles do not leak
+# into this mission's war-factory queue.
+1TNK:
+	Buildable:
+		Prerequisites: ~disabled
+
+2TNK:
+	Buildable:
+		Prerequisites: ~disabled
+
+ARTY:
+	Buildable:
+		Prerequisites: ~disabled
+
+JEEP:
+	Buildable:
+		Prerequisites: ~disabled
+
+MRJ:
+	Buildable:
+		Prerequisites: ~disabled
+
+MNLY:
+	Buildable:
+		Prerequisites: ~disabled
+
+# E7.noautotarget inherits E7 in campaign-rules.yaml.  Without explicit mission
+# gating both actors appear as separate, identical Tanya buttons.
+E7:
+	Buildable:
+		Prerequisites: ~disabled
+
+E7.noautotarget:
+	-Buildable:
+
+SPY:
+	Buildable:
+		Prerequisites: ~disabled
+
+E1:
+	Tooltip:
+		Name: actor-saudi-rifle.name
+
+E3:
+	Tooltip:
+		Name: actor-saudi-at-team.name
+
+E6:
+	Tooltip:
+		Name: actor-saudi-engineer.name
+
+MEDI:
+	Tooltip:
+		Name: actor-saudi-medic.name
+
+MECH:
+	Tooltip:
+		Name: actor-saudi-mechanic.name
+
+TRUK:
+	RejectsOrders:
+	Tooltip:
+		Name: actor-relief-convoy.name
+	Health:
+		HP: 18000
+
+FCOM:
+	Tooltip:
+		Name: actor-port-control.name
+
+HOSP:
+	Tooltip:
+		Name: actor-desalination-plant.name
