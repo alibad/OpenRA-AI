@@ -167,6 +167,14 @@ class RedSeaAssetTests(unittest.TestCase):
             self.assertIn(f"Actor: {actor}.Husk", rules)
             self.assertIn(f"Filename: {husk}.shp", sequences)
 
+    def test_mission_objectives_ui_wraps_long_descriptions(self) -> None:
+        chrome = (ROOT / "engine" / "openra" / "mods" / "common" / "chrome" / "ingame-infoobjectives.yaml").read_text(encoding="utf-8")
+        logic = (ROOT / "engine" / "openra" / "OpenRA.Mods.Common" / "Widgets" / "Logic" / "Ingame" / "GameInfoObjectivesLogic.cs").read_text(encoding="utf-8")
+        self.assertIn("Label@OBJECTIVE_DESCRIPTION:", chrome)
+        self.assertIn("WordWrap: True", chrome)
+        self.assertIn("description.IncreaseHeightToFitCurrentText();", logic)
+        self.assertIn("description.Bounds.Bottom + 2", logic)
+
     def test_custom_units_use_native_sized_dedicated_production_cameos(self) -> None:
         sequences = (ROOT / "engine" / "openra" / "mods" / "ra" / "sequences" / "red-sea.yaml").read_text(encoding="utf-8")
         for name in ("m1a2s", "sads", "tech", "ymlr", "samad"):
