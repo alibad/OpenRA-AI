@@ -21,7 +21,12 @@ SCRIPT_ROOT = Path(__file__).resolve().parent
 if str(SCRIPT_ROOT) not in sys.path:
     sys.path.insert(0, str(SCRIPT_ROOT))
 
-from red_sea_directional_vehicle import render_directional_asset
+from red_sea_directional_vehicle import (
+    render_ah64_rotor_frames,
+    render_air_impact_frames,
+    render_air_muzzle_frames,
+    render_directional_asset,
+)
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -64,6 +69,16 @@ ASSETS = {
         "directional_model": "samad",
         "facings": 16,
     },
+    "f15sa": {
+        "size": 56,
+        "directional_model": "f15sa",
+        "facings": 16,
+    },
+    "ah64sa": {
+        "size": 56,
+        "directional_model": "ah64sa",
+        "facings": 32,
+    },
 }
 
 
@@ -73,6 +88,8 @@ ICONS = {
     "techicon": {"source": "tech-icon-source-v2.png", "label": "TECHNICAL"},
     "ymlricon": {"source": "ymlr-icon-source-v2.png", "label": "MISSILE"},
     "samadicon": {"source": "samad-icon-source-v2.png", "label": "SAMAD"},
+    "f15saicon": {"source": "f15sa-icon-source.png", "label": "F-15SA"},
+    "ah64saicon": {"source": "ah64sa-icon-source.png", "label": "AH-64E"},
 }
 
 
@@ -106,6 +123,15 @@ WRECKS = {
     "sadshusk": {"model": "sads", "size": 40, "facings": 32, "turret": True},
     "techhusk": {"model": "tech", "size": 28, "facings": 32, "turret": True},
     "ymlrhusk": {"model": "ymlr", "size": 40, "facings": 32, "turret": False},
+    "f15sahusk": {"model": "f15sa", "size": 56, "facings": 16, "turret": False},
+    "ah64sahusk": {"model": "ah64sa", "size": 56, "facings": 32, "turret": False},
+}
+
+
+ANIMATIONS = {
+    "ah64sarotor": {"size": 48, "renderer": render_ah64_rotor_frames},
+    "redsea-air-muzzle": {"size": 48, "renderer": render_air_muzzle_frames},
+    "redsea-air-impact": {"size": 64, "renderer": render_air_impact_frames},
 }
 
 
@@ -350,6 +376,23 @@ def save_wreck_frames(name: str, definition: dict[str, object], palette: Image.I
     print(f"{name}: {len(images)} directional wreck frames at {frame_size}x{frame_size}")
 
 
+def save_animation_frames(name: str, definition: dict[str, object], palette: Image.Image) -> None:
+    frame_size = int(definition["size"])
+    renderer = definition["renderer"]
+    images = renderer(frame_size)  # type: ignore[operator]
+    output = FRAME_ROOT / name
+    output.mkdir(parents=True, exist_ok=True)
+    clear_output_frames(output, name)
+    for index, result in enumerate(images):
+        quantize_to_reference(result, palette).save(output / f"{name}-{index:04d}.png", transparency=0)
+
+    sheet = Image.new("RGBA", (4 * frame_size, math.ceil(len(images) / 4) * frame_size), (42, 36, 28, 255))
+    for index, result in enumerate(images):
+        sheet.alpha_composite(result, ((index % 4) * frame_size, (index // 4) * frame_size))
+    sheet.save(FRAME_ROOT / f"{name}-contact-sheet.png")
+    print(f"{name}: {len(images)} dedicated rotor frames at {frame_size}x{frame_size}")
+
+
 def save_icon_frame(name: str, definition: dict[str, object], palette: Image.Image) -> None:
     source = Image.open(ICON_SOURCE_ROOT / str(definition["source"])).convert("RGB")
     target_ratio = 4 / 3
@@ -472,6 +515,8 @@ def main() -> int:
         save_frames(name, definition, palette)
     for name, definition in WRECKS.items():
         save_wreck_frames(name, definition, palette)
+    for name, definition in ANIMATIONS.items():
+        save_animation_frames(name, definition, palette)
     for name, definition in ICONS.items():
         save_icon_frame(name, definition, palette)
     for name, definition in EFFECTS.items():

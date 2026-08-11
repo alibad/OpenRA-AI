@@ -5,6 +5,10 @@ Every prompt used the corresponding checked-in unit sheet as Image 1 and the
 closest native 64x48 Red Alert cameo as Image 2. Text was deliberately excluded
 from generation and is added deterministically by `build-red-sea-sprites.py`.
 
+The air-warfare additions below were generated as original text-free studies
+from their written prompts without image references; their late-1990s RTS
+constraints and deterministic post-processing provide the visual continuity.
+
 ## M1A2S
 
 ```text
@@ -78,4 +82,16 @@ Composition/framing: aircraft fills roughly 82 percent of frame diagonally; full
 Lighting/mood: sun breaking through dusty cloud, strong rim light, urgent but readable.
 Constraints: one unmanned aircraft only; no pilot or people; no text, letters, numbers, UI, border, logo, flag, insignia, watermark, or transparency.
 Avoid: tiny drone, commercial quadcopter, modern stealth drone, top-down blueprint, photographic realism, square composition, cropped wing tips.
+```
+
+## F-15SA Eagle
+
+```text
+Create a text-free source illustration for a 64x48 classic real-time-strategy production cameo: one generic twin-engine, twin-tail desert-camouflage air-superiority fighter inspired by the broad silhouette of an F-15, banking in a front-left three-quarter view over a hazy desert. Late-1990s pre-rendered computer-game portrait, hand-retouched pixel-art sensibility, limited warm palette, hard readable shapes, atmospheric sky, high contrast, full wings and tails visible, aircraft fills about 84 percent of a 4:3 landscape frame. Leave the lower 18 percent dark and visually simple for a title added later. No text, letters, numbers, UI, border, logo, flag, insignia, national markings, people, watermark, or transparency. Avoid photorealism, modern glossy rendering, top-down view, tiny centered aircraft, cropped wings, or copied game art.
+```
+
+## AH-64E Apache
+
+```text
+Create a text-free source illustration for a 64x48 classic real-time-strategy production cameo: one generic tandem-cockpit attack helicopter inspired by the broad silhouette of an AH-64, in sand camouflage, front-left three-quarter view, low over an arid battlefield. Clearly show the main rotor, compact stub wings, sensor nose, tail boom, and landing gear. Late-1990s pre-rendered computer-game portrait, hand-retouched pixel-art sensibility, limited dusty palette, hard silhouette, dramatic desert light and restrained dust, aircraft fills about 84 percent of a 4:3 landscape frame. Leave the lower 18 percent dark and simple for a title added later. No text, letters, numbers, UI, border, logo, flag, insignia, national markings, people, watermark, or transparency. Avoid photorealism, modern glossy rendering, top-down view, tiny centered helicopter, cropped rotor, or copied game art.
 ```

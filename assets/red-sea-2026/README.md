@@ -26,7 +26,10 @@ but no moving runtime unit rotates one of those bitmaps. The production actors
 are deterministic fixed-camera models defined in
 `scripts/red_sea_directional_vehicle.py`. It renders 32 classic Red Alert
 perspectives for every ground body, independent M1A2S/air-defense/technical
-turrets, loaded and empty launcher states, and 16 authored drone views.
+turrets, loaded and empty launcher states, 16 uniform F-15SA perspectives,
+32 classic AH-64E perspectives with a separate rotor animation, and distinct
+16-facing Samad cruise and terminal-dive geometry. Native projected aircraft
+shadows remain separate from the body artwork.
 
 The generated frame pass also creates matching directional scorched wrecks for
 all four ground vehicles. This prevents the M1A2S from falling back to the stock
@@ -43,7 +46,7 @@ animation, a nine-stage tank-shell impact, and an eleven-stage drone impact by
 the same deterministic sprite build. The source prompts requested original,
 isolated late-1990s RTS effects with no vehicles, people, scenery, text, or logos.
 
-`icon-sources/` contains five dedicated 4:3 production-cameo illustrations,
+`icon-sources/` contains dedicated 4:3 production-cameo illustrations,
 generated with the built-in OpenAI image-generation tool and benchmarked
 against the closest native 64x48 Red Alert icon. The exact prompt set is stored
 in `icon-sources/production-icon-prompts.md`. The deterministic builder crops,
@@ -68,3 +71,8 @@ License 1.1. The license text is stored at `licenses/NotoSansArabic-OFL.txt`.
 generic neural voice, duration, format, and synthetic-voice disclosure for
 every generated file. The voices do not imitate a real person. Mission radio is
 mastered separately from short unit acknowledgements.
+
+`air-voice-provenance.json` separately discloses every bilingual Saudi air and
+Yemeni drone acknowledgement, its Arabic/English text and translation, generic
+synthetic voice identifier, and processing. These unit lines do not imitate a
+real person and are not mission dialogue.

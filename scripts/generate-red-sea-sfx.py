@@ -147,6 +147,66 @@ def drone_impact(rng: random.Random) -> list[float]:
     return samples
 
 
+def fighter_missile(rng: random.Random) -> list[float]:
+    duration = 0.86
+    samples: list[float] = []
+    exhaust = 0.0
+    phase = 0.0
+    for index in range(int(duration * SAMPLE_RATE)):
+        t = index / SAMPLE_RATE
+        p = t / duration
+        phase += math.tau * (420 + 2800 * p * p) / SAMPLE_RATE
+        exhaust = exhaust * 0.62 + rng.uniform(-1, 1) * 0.38
+        rail = math.exp(-150 * abs(t - 0.055)) * math.sin(math.tau * 190 * t)
+        motor = math.sin(phase) * min(1.0, t * 32) * (0.68 - 0.28 * p)
+        wind = exhaust * min(1.0, t * 25) * (0.24 + 0.36 * p)
+        samples.append((0.44 * rail + motor + 0.48 * wind) * envelope(p, 0.005, 0.16))
+    return samples
+
+
+def fighter_cannon(rng: random.Random) -> list[float]:
+    duration = 0.46
+    samples: list[float] = []
+    noise = 0.0
+    for index in range(int(duration * SAMPLE_RATE)):
+        t = index / SAMPLE_RATE
+        p = t / duration
+        noise = noise * 0.22 + rng.uniform(-1, 1) * 0.78
+        bursts = sum(math.exp(-120 * abs(t - pulse)) for pulse in (0.03, 0.105, 0.18, 0.255))
+        body = math.sin(math.tau * 96 * t) * math.exp(-5.5 * t)
+        samples.append((0.68 * noise * bursts + 0.38 * body) * envelope(p, 0.002, 0.22))
+    return samples
+
+
+def apache_cannon(rng: random.Random) -> list[float]:
+    duration = 0.62
+    samples: list[float] = []
+    noise = 0.0
+    for index in range(int(duration * SAMPLE_RATE)):
+        t = index / SAMPLE_RATE
+        p = t / duration
+        noise = noise * 0.31 + rng.uniform(-1, 1) * 0.69
+        pulses = sum(math.exp(-105 * abs(t - pulse)) for pulse in (0.04, 0.15, 0.26, 0.37))
+        mechanism = math.sin(math.tau * 72 * t) * math.exp(-3.8 * t)
+        samples.append((0.76 * noise * pulses + 0.42 * mechanism) * envelope(p, 0.002, 0.18))
+    return samples
+
+
+def apache_rocket(rng: random.Random) -> list[float]:
+    duration = 0.74
+    samples: list[float] = []
+    hiss = 0.0
+    for index in range(int(duration * SAMPLE_RATE)):
+        t = index / SAMPLE_RATE
+        p = t / duration
+        hiss = hiss * 0.52 + rng.uniform(-1, 1) * 0.48
+        ignition = math.exp(-95 * abs(t - 0.045)) * math.sin(math.tau * 125 * t)
+        motor = hiss * min(1.0, t * 35) * math.exp(-1.7 * t)
+        whistle = math.sin(math.tau * (530 + 1450 * p) * t) * min(1.0, t * 18)
+        samples.append((0.52 * ignition + 0.66 * motor + 0.22 * whistle) * envelope(p, 0.004, 0.18))
+    return samples
+
+
 def m1_fire(rng: random.Random) -> list[float]:
     duration = 0.92
     samples: list[float] = []
@@ -195,6 +255,7 @@ def main() -> int:
         default=Path("engine/openra/mods/ra/bits"),
         help="OpenRA package directory for generated WAV files",
     )
+    parser.add_argument("--air-only", action="store_true", help="Write only air-warfare sound effects")
     args = parser.parse_args()
     rng = random.Random(SEED)
     outputs = {
@@ -205,7 +266,18 @@ def main() -> int:
         "redsea-drone-impact.wav": (drone_impact(rng), 0.72),
         "redsea-m1-fire.wav": (m1_fire(rng), 0.72),
         "redsea-m1-impact.wav": (m1_impact(rng), 0.72),
+        "redsea-f15-missile.wav": (fighter_missile(rng), 0.70),
+        "redsea-f15-cannon.wav": (fighter_cannon(rng), 0.66),
+        "redsea-ah64-cannon.wav": (apache_cannon(rng), 0.68),
+        "redsea-ah64-rocket.wav": (apache_rocket(rng), 0.68),
     }
+    if args.air_only:
+        air_names = {
+            "redsea-drone-strike.wav", "redsea-drone-loiter.wav", "redsea-drone-impact.wav",
+            "redsea-f15-missile.wav", "redsea-f15-cannon.wav", "redsea-ah64-cannon.wav",
+            "redsea-ah64-rocket.wav",
+        }
+        outputs = {name: value for name, value in outputs.items() if name in air_names}
     for name, (samples, peak_level) in outputs.items():
         path = args.output / name
         write_wav(path, samples, peak_level)

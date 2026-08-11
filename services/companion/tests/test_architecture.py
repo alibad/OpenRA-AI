@@ -82,6 +82,37 @@ class BrainArchitectureTests(unittest.TestCase):
         self.assertEqual(decision.owner, "safety")
         self.assertEqual(decision.commands[0].actor_id, 1)
 
+    def test_fast_controller_does_not_repeat_an_active_retreat(self) -> None:
+        controller = TacticalController()
+        current = snapshot(units=[{
+            "actor_id": 2,
+            "type": "1tnk",
+            "cell_x": 20,
+            "cell_y": 20,
+            "hp_percent": 0.2,
+            "can_attack": True,
+            "idle": True,
+        }])
+
+        first = controller.decide(current)
+        repeated = controller.decide(snapshot(
+            tick=200,
+            units=[{
+                "actor_id": 2,
+                "type": "1tnk",
+                "cell_x": 18,
+                "cell_y": 18,
+                "hp_percent": 0.2,
+                "can_attack": True,
+                "idle": False,
+                "move_target_x": 5,
+                "move_target_y": 5,
+            }],
+        ))
+
+        self.assertEqual(first.key, "retreat-damaged-armor")
+        self.assertIsNone(repeated)
+
     def test_fast_controller_focuses_aircraft_with_real_anti_air(self) -> None:
         current = snapshot(
             units=[{

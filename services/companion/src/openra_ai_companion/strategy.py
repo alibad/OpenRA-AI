@@ -102,6 +102,17 @@ def maximum_silo_count(snapshot: GameSnapshot) -> int:
     return desired_harvester_count(snapshot)
 
 
+INFANTRY_PRODUCTION_TYPES = frozenset({
+    "e1", "e2", "e3", "e4", "e6", "e7", "dog", "spy", "medi", "mech", "shok",
+})
+
+
+def maximum_queued_unit_count(item_type: str) -> int:
+    """Keep production responsive instead of locking resources into one type."""
+    kind = item_type.lower().split("@", 1)[0].split(".", 1)[0]
+    return 4 if kind in INFANTRY_PRODUCTION_TYPES else 2
+
+
 # These are the relative production shares shipped by OpenRA's Red Alert
 # UnitBuilderBotModule (the medium/normal profiles), with the same hard caps for
 # specialist units.  The local commander uses the engine's proven
@@ -126,11 +137,15 @@ OPENRA_COMBAT_WEIGHTS: dict[str, int] = {
     "ttnk": 25,
     "stnk": 5,
     "ctnk": 20,
+    "sads": 35,
+    "tech": 35,
+    "ymlr": 45,
     "yak": 30,
     "mig": 30,
     "heli": 30,
     "mh60": 30,
     "hind": 30,
+    "samad": 20,
     "ss": 10,
     "msub": 10,
     "dd": 10,
@@ -146,16 +161,22 @@ OPENRA_COMBAT_LIMITS: dict[str, int] = {
     "4tnk": 2,
     "arty": 3,
     "v2rl": 3,
+    "sads": 6,
+    "ymlr": 6,
+    "samad": 6,
 }
 
 UNIT_CATEGORIES: dict[str, frozenset[str]] = {
     "infantry": frozenset({"e1", "e2", "e3", "e4", "e7", "dog", "shok"}),
     "vehicle": frozenset({
         "apc", "jeep", "arty", "v2rl", "ftrk", "1tnk", "2tnk", "3tnk", "4tnk", "ttnk", "stnk", "ctnk",
+        "sads", "tech", "ymlr",
     }),
-    "aircraft": frozenset({"yak", "mig", "heli", "mh60", "hind"}),
+    "aircraft": frozenset({"yak", "mig", "heli", "mh60", "hind", "samad"}),
     "naval": frozenset({"ss", "msub", "dd", "ca", "pt"}),
 }
+
+SIEGE_UNITS = frozenset({"arty", "v2rl", "ymlr"})
 
 
 def _unit_category(kind: str) -> str:
@@ -196,16 +217,16 @@ def _counter_weight(kind: str, base_weight: int, enemy: dict[str, int]) -> int:
     """Bias OpenRA's base mix only from current fog-respecting contacts."""
     weight = base_weight
     if enemy["infantry"] > enemy["armor"]:
-        if kind in {"e2", "e4", "jeep", "yak", "arty"}:
+        if kind in {"e2", "e4", "jeep", "tech", "yak", "arty"}:
             weight += 30
     if enemy["armor"] > enemy["infantry"]:
         if kind in {"e3", "shok", "2tnk", "3tnk", "4tnk", "ttnk"}:
             weight += 35
     if enemy["aircraft"]:
-        if kind in {"e3", "ftrk", "4tnk", "mig"}:
+        if kind in {"e3", "ftrk", "sads", "4tnk", "mig"}:
             weight += 60
     if enemy["structures"]:
-        if kind in {"arty", "v2rl"}:
+        if kind in SIEGE_UNITS:
             weight += 25
     return max(1, weight)
 
@@ -311,7 +332,7 @@ def hybrid_force_plan(snapshot: GameSnapshot, batch_size: int = 3) -> dict[str, 
         and _unit_category(_actor_type(unit)) in {"infantry", "vehicle"}
     ]
     role_counts = Counter(
-        "siege" if _actor_type(unit) in {"arty", "v2rl"}
+        "siege" if _actor_type(unit) in SIEGE_UNITS
         else "armor" if _actor_type(unit) in UNIT_CATEGORIES["vehicle"]
         else "screen"
         for unit in idle_ground
@@ -352,25 +373,27 @@ def hybrid_force_plan(snapshot: GameSnapshot, batch_size: int = 3) -> dict[str, 
         armor = sorted(
             (
                 unit for unit in idle_ground
-                if _unit_category(_actor_type(unit)) == "vehicle" and _actor_type(unit) not in {"arty", "v2rl"}
+                if _unit_category(_actor_type(unit)) == "vehicle" and _actor_type(unit) not in SIEGE_UNITS
             ),
             key=lambda unit: (-unit.hp_percent, unit.actor_id),
         )
         siege = sorted(
-            (unit for unit in idle_ground if _actor_type(unit) in {"arty", "v2rl"}),
+            (unit for unit in idle_ground if _actor_type(unit) in SIEGE_UNITS),
             key=lambda unit: (-unit.hp_percent, unit.actor_id),
         )
-        group_limit = min(12, len(idle_ground) - reserve_size)
+        # OpenRA's squad manager concentrates the available force instead of
+        # feeding a fixed-size trickle into a defended base. Keep the map-scaled
+        # reserve, but commit up to 24 combatants as one coherent assault.
+        group_limit = min(24, len(idle_ground) - reserve_size)
         siege_quota = min(2, len(siege), group_limit)
         armor_quota = min(4, len(armor), group_limit - siege_quota)
         screen_quota = min(6, len(screens), group_limit - siege_quota - armor_quota)
         selected_units = [*screens[:screen_quota], *armor[:armor_quota], *siege[:siege_quota]]
-        if len(selected_units) < squad_size:
-            selected_ids = {unit.actor_id for unit in selected_units}
-            selected_units.extend(
-                unit for unit in idle_ground
-                if unit.actor_id not in selected_ids
-            )
+        selected_ids = {unit.actor_id for unit in selected_units}
+        selected_units.extend(
+            unit for unit in idle_ground
+            if unit.actor_id not in selected_ids
+        )
         selected_units = selected_units[:group_limit]
         target = (target_actor.cell_x, target_actor.cell_y)
         assault_target = list(target)
@@ -382,15 +405,25 @@ def hybrid_force_plan(snapshot: GameSnapshot, batch_size: int = 3) -> dict[str, 
             round(target[0] - dx / distance * 9),
             round(target[1] - dy / distance * 9),
         ))
-        assault_commands = [
-            {
-                "action": "attack_move",
-                "actor_id": unit.actor_id,
-                "target_x": siege_staging[0] if _actor_type(unit) in {"arty", "v2rl"} else target[0],
-                "target_y": siege_staging[1] if _actor_type(unit) in {"arty", "v2rl"} else target[1],
-            }
-            for unit in selected_units
-        ]
+        visible_target_ids = {actor.actor_id for actor in snapshot.visible_enemy_buildings}
+        assault_commands = []
+        for unit in selected_units:
+            kind = _actor_type(unit)
+            if target_actor.actor_id in visible_target_ids and _unit_category(kind) == "vehicle":
+                # Armor and siege must not be peeled off by replaceable infantry
+                # while a strategic structure remains targetable.
+                assault_commands.append({
+                    "action": "attack",
+                    "actor_id": unit.actor_id,
+                    "target_actor_id": target_actor.actor_id,
+                })
+            else:
+                assault_commands.append({
+                    "action": "attack_move",
+                    "actor_id": unit.actor_id,
+                    "target_x": siege_staging[0] if kind in SIEGE_UNITS else target[0],
+                    "target_y": siege_staging[1] if kind in SIEGE_UNITS else target[1],
+                })
 
     recon_commands: list[dict[str, Any]] = []
     if target_actor is None and snapshot.explored_percent < 90:

@@ -15,6 +15,7 @@ from .settings import Settings
 from .strategy import (
     desired_harvester_count,
     hybrid_force_plan,
+    maximum_queued_unit_count,
     maximum_silo_count,
     mission_plan,
     strategic_profile,
@@ -389,7 +390,8 @@ class GameRuntime:
         visible_enemies = {unit.actor_id for unit in snapshot.visible_enemies}
         visible_enemies.update(building.actor_id for building in snapshot.visible_enemy_buildings)
         available = {item.lower() for item in snapshot.available_production}
-        queued = {str(item.get("item", "")).lower() for item in snapshot.production}
+        queued_counts = Counter(str(item.get("item", "")).lower() for item in snapshot.production)
+        queued = set(queued_counts)
         support_powers = {
             str(power.get("key", "")).lower(): power
             for power in snapshot.support_powers
@@ -405,6 +407,7 @@ class GameRuntime:
             for item in snapshot.production
         )
         planned_harvesters = 0
+        planned_units: Counter[str] = Counter()
 
         unit_actions = {
             "move",
@@ -492,11 +495,24 @@ class GameRuntime:
                 limit = maximum_silo_count(snapshot)
                 if silo_count >= limit:
                     raise ValueError(f"the map-scaled silo limit of {limit} is already reached")
+                if (
+                    snapshot.resource_capacity > 0
+                    and snapshot.ore * 100 <= snapshot.resource_capacity * 80
+                ):
+                    raise ValueError("a silo is only needed above 80% storage")
             if command.action == "train" and command.item_type.split(".", 1)[0] == "harv":
                 target = desired_harvester_count(snapshot)
                 if snapshot.harvester_count + queued_harvesters + planned_harvesters >= target:
                     raise ValueError(f"the map-scaled harvester target of {target} is already covered")
                 planned_harvesters += 1
+            elif command.action == "train":
+                limit = maximum_queued_unit_count(command.item_type)
+                if queued_counts[command.item_type] + planned_units[command.item_type] >= limit:
+                    raise ValueError(
+                        f"'{command.item_type}' already reaches its rolling queue limit of {limit}; "
+                        "choose a complementary unit or wait for production"
+                    )
+                planned_units[command.item_type] += 1
             if command.action == "build" and command.item_type.endswith("f"):
                 raise ValueError(f"'{command.item_type}' is a decoy building and cannot be built")
             if command.action == "build":

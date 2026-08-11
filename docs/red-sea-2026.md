@@ -110,7 +110,7 @@ The two playable contracts are:
 - `hodeidah-lifeline-2026`.
 
 The mission packages are reproducible via `scripts/build-red-sea-mission.py` and
-are listed under **Red Sea 2026** in the mission browser. Remaining release
+are listed in order under **OpenRA AI** in the mission browser. Remaining release
 gates are hands-on balance/mix playtests and eventual separation into a
 standalone `redsea` mod shell.
 

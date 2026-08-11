@@ -23,10 +23,14 @@ from .agent_models import (
     create_agent_model,
 )
 from .bridge import OpenRABridge
+from .controller import TacticalController
 from .game_runtime import GameRuntime
 from .learning import LearningStore
 from .models import ActionCommand, GameSnapshot
-from .strategy import base_center, opening_scout_count, scout_targets
+from .strategy import SIEGE_UNITS, base_center, hybrid_force_plan, opening_scout_count, scout_targets
+
+
+LOCAL_AUTOPLAY_MAX_TOKENS = 512
 
 
 AGENT_INSTRUCTIONS = """You are the autonomous commander of one local single-player OpenRA match.
@@ -465,6 +469,148 @@ def _bootstrap_opening(address: str, session_id: str, evidence_log: Path) -> dic
         runtime.close()
 
 
+def _priority_production_cancellations(
+    snapshot: GameSnapshot,
+    *,
+    target: str,
+) -> tuple[ActionCommand, ...]:
+    """Refund expendable queues when a critical tech/siege item is starved."""
+    if snapshot.cash + snapshot.ore >= 600:
+        return ()
+
+    candidates: list[tuple[float, str]] = []
+    for item in snapshot.production:
+        raw_kind = str(item.get("item", "")).strip().lower()
+        kind = _kind(raw_kind)
+        queue_type = str(item.get("queue_type", "")).strip().lower()
+        if not raw_kind or kind in {"harv", "dome"} or kind in SIEGE_UNITS:
+            continue
+        if target == "dome" and queue_type == "building":
+            continue
+        progress = float(item.get("progress", 0) or 0)
+        candidates.append((progress, raw_kind))
+
+    # Cancel unstarted items before sunk-cost active production. Three refunds
+    # are enough to unblock a tech structure or siege unit without gutting the
+    # whole defensive queue.
+    candidates.sort(key=lambda item: (item[0] > 0, item[0], item[1]))
+    return tuple(
+        ActionCommand("cancel_production", item_type=item_type)
+        for _, item_type in candidates[:3]
+    )
+
+
+def _native_autoplay_step(
+    runtime: GameRuntime,
+    snapshot: GameSnapshot,
+    tactical_controller: TacticalController,
+) -> dict[str, Any]:
+    """Execute one bounded real-time/native decision before slow LLM strategy.
+
+    The local model remains responsible for doctrine and adaptation. Placement,
+    safety, reconnaissance, mixed production, and force concentration use the
+    deterministic OpenRA-derived controllers so model latency cannot stall the
+    match or split the army into disposable trickles.
+    """
+    # Synchronize the runtime's validation baseline with actors and production
+    # created by the LLM/MCP process since the prior native step.
+    snapshot = runtime.observe()
+    if snapshot.done:
+        return {"phase": "terminal", "tick": snapshot.tick}
+
+    completed = next((
+        item for item in snapshot.production
+        if str(item.get("queue_type", "")).lower() == "building"
+        and (
+            float(item.get("progress", 0)) >= 0.999
+            or int(item.get("remaining_ticks", 1)) <= 0
+        )
+    ), None)
+    if completed is not None:
+        item = str(completed.get("item", "")).strip().lower()
+        if item:
+            runtime.log_decision(
+                f"Place completed {item}",
+                "The construction queue is complete and waiting for placement.",
+                "Resume the build queue immediately without waiting for the strategic model.",
+            )
+            result = runtime.issue((ActionCommand("place_building", item_type=item),), ticks=8)
+            return {"phase": "placement", "item": item, "tick": result["tick"]}
+
+    tactical = tactical_controller.decide(snapshot)
+    if tactical is not None and tactical.priority >= 80:
+        runtime.log_decision(tactical.summary, json.dumps(tactical.evidence, separators=(",", ":"))[:500], "Preserve the force before strategic planning.")
+        result = runtime.issue(tactical.commands, ticks=8)
+        return {"phase": "tactical", "decision": tactical.key, "orders": len(tactical.commands), "tick": result["tick"]}
+
+    enemy_structures = (*snapshot.visible_enemy_buildings, *snapshot.remembered_enemy_buildings)
+    siege_count = sum(_kind(unit.kind) in SIEGE_UNITS for unit in snapshot.units)
+    queued_siege = sum(
+        _kind(str(item.get("item", ""))) in SIEGE_UNITS
+        for item in snapshot.production
+    )
+    if enemy_structures and siege_count + queued_siege < 2:
+        available = {_kind(item): item for item in snapshot.available_production}
+        siege_kind = next((kind for kind in ("ymlr", "v2rl", "arty") if kind in available), None)
+        if siege_kind is not None and not queued_siege:
+            runtime.log_decision(
+                f"Produce protected siege ({siege_kind})",
+                "An enemy base is known but fewer than two long-range siege units are ready or queued.",
+                "Break static defenses from range before committing another infantry and armor wave.",
+            )
+            result = runtime.issue((ActionCommand("train", item_type=available[siege_kind], queued=True),), ticks=8)
+            return {"phase": "siege-production", "item": siege_kind, "tick": result["tick"]}
+
+        dome_queued = any(_kind(str(item.get("item", ""))) == "dome" for item in snapshot.production)
+        dome_built = any(_kind(building.kind) == "dome" for building in snapshot.buildings)
+        if not dome_built and not dome_queued and "dome" in available:
+            runtime.log_decision(
+                "Unlock long-range siege production",
+                "An enemy base is known, no siege is ready, and the radar dome is available.",
+                "Build the faction tech prerequisite for Artillery, V2, or the Yemen launcher.",
+            )
+            result = runtime.issue((ActionCommand("build", item_type=available["dome"], queued=True),), ticks=8)
+            return {"phase": "siege-tech", "item": "dome", "tick": result["tick"]}
+
+        priority_target = "dome" if dome_queued and not dome_built else "siege"
+        cancellations = _priority_production_cancellations(snapshot, target=priority_target)
+        if (dome_queued or queued_siege) and cancellations:
+            runtime.log_decision(
+                f"Fund priority {priority_target} production",
+                "Critical production is queued but the shared resource pool is exhausted by expendable queues.",
+                "Refund low-priority units so the strategy-unlocking item completes without a deadlock.",
+            )
+            result = runtime.issue(cancellations, ticks=8)
+            return {
+                "phase": "priority-funding",
+                "target": priority_target,
+                "cancelled": [command.item_type for command in cancellations],
+                "tick": result["tick"],
+            }
+
+        if dome_queued or queued_siege:
+            return {"phase": "siege-wait", "ready": siege_count, "queued": queued_siege, "tick": snapshot.tick}
+
+    plan = hybrid_force_plan(snapshot, batch_size=2)
+    for phase, commands, evidence in (
+        ("assault", plan["assault"]["commands"], plan["assault"]),
+        ("recon", plan["recon"]["commands"], plan["recon"]),
+        ("production", plan["next_production"], {"types": plan["next_production_types"]}),
+    ):
+        if not commands:
+            continue
+        native_commands = tuple(ActionCommand.from_dict(command) for command in commands)
+        runtime.log_decision(
+            f"Native {phase} step",
+            json.dumps(evidence, separators=(",", ":"))[:500],
+            "Apply the OpenRA-derived bounded action batch, then let the strategic model reassess.",
+        )
+        result = runtime.issue(native_commands, ticks=8)
+        return {"phase": phase, "orders": len(native_commands), "tick": result["tick"]}
+
+    return {"phase": "observe", "tick": snapshot.tick}
+
+
 async def autoplay(
     *,
     provider: str = LOCAL_PROVIDER,
@@ -500,6 +646,7 @@ async def autoplay(
         engine.start()
 
     bridge = OpenRABridge(f"127.0.0.1:{port}", timeout=10)
+    native_runtime: GameRuntime | None = None
     session_id = ""
     rounds = 0
     latest = GameSnapshot(tick=0)
@@ -524,6 +671,8 @@ async def autoplay(
             "two harvesters, separate opening scouts, and a defensive reserve are already established. Do not rebuild "
             "the opening; use current production for counters, armor, exploration, and an eventual concentrated attack."
         )
+        native_runtime = GameRuntime(f"127.0.0.1:{port}", session_id, evidence_log=tool_log)
+        tactical_controller = TacticalController()
         latest = bridge.observe()
         if latest.done:
             state = bridge.state()
@@ -564,7 +713,10 @@ async def autoplay(
                 mcp_servers=[game_server],
                 model_settings=agent_model_settings(
                     local=model_runtime.local,
-                    max_tokens=1000 if model_runtime.local else 1800,
+                    # local-coder has a 32K context. The MCP gameplay schemas
+                    # consume most of it, so reserve a bounded output window
+                    # with enough headroom for the complete prompt.
+                    max_tokens=LOCAL_AUTOPLAY_MAX_TOKENS if model_runtime.local else 1800,
                     reasoning_effort="medium",
                 ),
             )
@@ -574,8 +726,18 @@ async def autoplay(
                 state = bridge.state()
                 if latest.done:
                     break
+                native_step: dict[str, Any]
+                try:
+                    native_step = _native_autoplay_step(native_runtime, latest, tactical_controller)
+                except (RuntimeError, ValueError) as exc:
+                    native_step = {"phase": "deferred", "error": str(exc)[:300], "tick": latest.tick}
+                latest = bridge.observe()
+                if latest.done:
+                    break
                 prompt = (
                     f"Decision round {rounds}/{max_rounds}. Previous commander note: {previous_note[:600]}\n"
+                    f"The native controller just completed this bounded step: {json.dumps(native_step, separators=(',', ':'))}. "
+                    "Do not duplicate it. Choose only the next strategic correction or advance to verify it.\n"
                     "Use MCP gameplay tools now. Make concrete progress, advance enough time to observe results, "
                     "and keep acting through immediate production/combat events. If the game is over, verify the result."
                 )
@@ -608,6 +770,7 @@ async def autoplay(
                     "result": latest.result,
                     "turn_budget_exhausted": turn_budget_exhausted,
                     "error": round_error,
+                    "native_step": native_step,
                     "recovered_text_tools": recovered_text_tools,
                     "note": previous_note[:1000],
                 }
@@ -646,6 +809,8 @@ async def autoplay(
         outcome_path.write_text(json.dumps(outcome_payload, indent=2) + "\n", encoding="utf-8")
         return result
     finally:
+        if native_runtime is not None:
+            native_runtime.close()
         if session_id:
             try:
                 bridge.destroy_session(session_id)

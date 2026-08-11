@@ -40,6 +40,9 @@ def _distance(left: Unit, right: Unit) -> float:
 class TacticalController:
     """Fast, deterministic safety and micro loop above slow strategic planning."""
 
+    def __init__(self) -> None:
+        self._retreat_cooldown_until: dict[int, int] = {}
+
     def decide(self, snapshot: GameSnapshot, profile: str = "normal") -> ControllerDecision | None:
         program = compile_strategy_program(profile, snapshot)
         plan = tactical_plan(snapshot)
@@ -61,10 +64,23 @@ class TacticalController:
                 commands, {"hazards": escapes},
             )
 
-        damaged = [
-            item for item in plan["immediate_safety"]["damaged_armor_retreats"]
-            if float(item["hp_percent"]) / 100 < program.retreat_hp
-        ]
+        unit_by_id = {unit.actor_id: unit for unit in snapshot.units}
+        damaged = []
+        for item in plan["immediate_safety"]["damaged_armor_retreats"]:
+            unit = unit_by_id.get(int(item["actor_id"]))
+            retreat = item["retreat_to"]
+            if (
+                unit is not None
+                and float(item["hp_percent"]) / 100 < program.retreat_hp
+                and math.hypot(unit.cell_x - int(retreat[0]), unit.cell_y - int(retreat[1])) > 2.5
+                and snapshot.tick >= self._retreat_cooldown_until.get(unit.actor_id, 0)
+                and not (
+                    not unit.idle
+                    and unit.move_target_x == int(retreat[0])
+                    and unit.move_target_y == int(retreat[1])
+                )
+            ):
+                damaged.append(item)
         if damaged:
             commands = tuple(
                 ActionCommand(
@@ -75,6 +91,8 @@ class TacticalController:
                 )
                 for item in damaged[:8]
             )
+            for item in damaged[:8]:
+                self._retreat_cooldown_until[int(item["actor_id"])] = snapshot.tick + 750
             return ControllerDecision(
                 "safety", 95, "retreat-damaged-armor",
                 "Withdraw critically damaged armor for repair or preservation",

@@ -616,8 +616,30 @@ class CompanionTests(unittest.TestCase):
 
         self.assertTrue(plan["squad"]["attack_ready"])
         self.assertLessEqual(len(commands), 12)
-        self.assertNotEqual((siege_command["target_x"], siege_command["target_y"]), (50, 50))
-        self.assertTrue(any((command["target_x"], command["target_y"]) == (50, 50) for command in commands))
+        self.assertEqual(siege_command["action"], "attack")
+        self.assertEqual(siege_command["target_actor_id"], 90)
+        self.assertNotEqual((siege_command.get("target_x", 0), siege_command.get("target_y", 0)), (50, 50))
+        self.assertTrue(any((command.get("target_x", 0), command.get("target_y", 0)) == (50, 50) for command in commands))
+
+    def test_hybrid_force_plan_concentrates_the_army_while_retaining_reserve(self) -> None:
+        current = snapshot(
+            map_info={"map_name": "Concentration", "width": 112, "height": 54},
+            units=[
+                *({"actor_id": actor_id, "type": "e1", "is_idle": True, "can_attack": True}
+                  for actor_id in range(1, 25)),
+                *({"actor_id": actor_id, "type": "1tnk", "is_idle": True, "can_attack": True}
+                  for actor_id in range(30, 40)),
+            ],
+            visible_enemy_buildings=[{"actor_id": 90, "type": "fact", "cell_x": 90, "cell_y": 20}],
+        )
+
+        plan = hybrid_force_plan(current)
+
+        self.assertEqual(len(plan["assault"]["commands"]), 24)
+        self.assertGreaterEqual(
+            plan["squad"]["idle_eligible_units"] - len(plan["assault"]["commands"]),
+            plan["squad"]["defense_reserve"],
+        )
 
     def test_hybrid_force_plan_requires_a_rearm_building_per_aircraft(self) -> None:
         current = snapshot(
@@ -633,6 +655,20 @@ class CompanionTests(unittest.TestCase):
         self.assertNotIn("yak", selected)
         self.assertNotIn("mig", selected)
         self.assertEqual(set(selected), {"e1", "e3"})
+
+    def test_hybrid_force_plan_includes_red_sea_faction_specialists(self) -> None:
+        current = snapshot(
+            units=[{"actor_id": 1, "type": "e1", "is_idle": True, "can_attack": True}],
+            buildings=[{"actor_id": 10, "type": "dome"}, {"actor_id": 11, "type": "afld"}],
+            production=[],
+            available_production=["e1", "e3", "sads", "tech", "ymlr", "samad"],
+        )
+
+        plan = hybrid_force_plan(current, batch_size=5)
+
+        self.assertIn("ymlr", plan["adjusted_available_weights"])
+        self.assertIn("tech", plan["adjusted_available_weights"])
+        self.assertTrue({"sads", "tech", "ymlr"} & set(plan["next_production_types"]))
 
     def test_scout_targets_fan_out_in_distinct_directions(self) -> None:
         current = spatial_snapshot(width=20, height=20)
@@ -1074,6 +1110,22 @@ class CompanionTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "silo limit of 3"):
             GameRuntime._validate(state, (command,))
         with self.assertRaisesRegex(ValueError, "silo limit of 3"):
+            Companion._validate_action_commands(state, [command.as_dict()])
+
+    def test_silo_building_is_rejected_without_storage_pressure(self) -> None:
+        state = GameSnapshot(
+            tick=2000,
+            map_width=112,
+            map_height=54,
+            ore=1200,
+            resource_capacity=5000,
+            available_production=("silo",),
+        )
+        command = ActionCommand(action="build", item_type="silo")
+
+        with self.assertRaisesRegex(ValueError, "only needed above 80% storage"):
+            GameRuntime._validate(state, (command,))
+        with self.assertRaisesRegex(ValueError, "only needed above 80% storage"):
             Companion._validate_action_commands(state, [command.as_dict()])
 
     def test_same_building_cannot_be_requeued_while_in_production(self) -> None:

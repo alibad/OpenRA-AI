@@ -134,7 +134,7 @@ class RedSeaAssetTests(unittest.TestCase):
             "sads": 64,
             "tech": 64,
             "ymlr": 64,
-            "samad": 16,
+            "samad": 32,
             "m1a2shusk": 64,
             "sadshusk": 64,
             "techhusk": 64,
@@ -174,6 +174,40 @@ class RedSeaAssetTests(unittest.TestCase):
         self.assertIn("WordWrap: True", chrome)
         self.assertIn("description.IncreaseHeightToFitCurrentText();", logic)
         self.assertIn("description.Bounds.Bottom + 2", logic)
+
+    def test_selectable_red_sea_factions_have_hidpi_flags(self) -> None:
+        chrome = (ROOT / "engine" / "openra" / "mods" / "ra" / "chrome.yaml").read_text(encoding="utf-8")
+        world_rules = (ROOT / "engine" / "openra" / "mods" / "ra" / "rules" / "world.yaml").read_text(encoding="utf-8")
+        self.assertIn("\t\tsaudi: 226, 1, 30, 15", chrome)
+        self.assertIn("\t\tyemen: 226, 17, 30, 15", chrome)
+        self.assertIn("Image: glyphs-redsea.png", chrome)
+
+        flag_block = chrome.split("flags:\n", 1)[1].split("\nmusic:\n", 1)[0]
+        registered_flags = {
+            line.strip().split(":", 1)[0]
+            for line in flag_block.splitlines()
+            if line.startswith("\t\t") and ":" in line
+        }
+        selectable_factions = set()
+        for faction_block in re.findall(r"(?m)^\tFaction@[^:]+:\n((?:\t\t.*\n?)*)", world_rules):
+            if "\n\t\tSelectable: False" in faction_block:
+                continue
+            for line in faction_block.splitlines():
+                if line.startswith("\t\tInternalName:"):
+                    selectable_factions.add(line.split(":", 1)[1].strip())
+        self.assertTrue(selectable_factions)
+        self.assertEqual(set(), selectable_factions - registered_flags)
+
+        for scale, suffix in ((1, ""), (2, "-2x"), (3, "-3x")):
+            path = ROOT / "engine" / "openra" / "mods" / "ra" / "uibits" / f"glyphs-redsea{suffix}.png"
+            source = ROOT / "engine" / "openra" / "mods" / "ra" / "uibits" / f"glyphs{suffix}.png"
+            with Image.open(path) as atlas:
+                with Image.open(source) as original:
+                    self.assertEqual(atlas.size, original.size)
+                saudi = atlas.crop((226 * scale, 1 * scale, 256 * scale, 16 * scale)).convert("RGB")
+                yemen = atlas.crop((226 * scale, 17 * scale, 256 * scale, 32 * scale)).convert("RGB")
+                self.assertIn((0, 108, 53), set(saudi.get_flattened_data()))
+                self.assertIn((206, 17, 38), set(yemen.get_flattened_data()))
 
     def test_custom_units_use_native_sized_dedicated_production_cameos(self) -> None:
         sequences = (ROOT / "engine" / "openra" / "mods" / "ra" / "sequences" / "red-sea.yaml").read_text(encoding="utf-8")
@@ -271,16 +305,20 @@ class RedSeaAssetTests(unittest.TestCase):
 
     def test_samad_is_a_one_way_loitering_munition_not_a_rearming_yak(self) -> None:
         resolved = self._resolved_rules("SAMAD")
+        rules = (ROOT / "engine" / "openra" / "mods" / "ra" / "rules" / "red-sea.yaml").read_text(encoding="utf-8")
         self.assertIn("Weapon: RedSeaDroneStrike", resolved)
         self.assertIn("GrantConditionOnAttack@PAYLOAD:", resolved)
         self.assertIn("Condition: payload-released", resolved)
         self.assertIn("KillsSelf@PAYLOAD:", resolved)
         self.assertIn("RequiresCondition: payload-released", resolved)
-        self.assertIn("AttackType: Hover", resolved)
+        self.assertIn("AttackDive:", resolved)
+        self.assertIn("DivingCondition: diving", resolved)
         self.assertIn("MoveIntoShroud: true", resolved)
         self.assertIn("SoundFiles: redsea-drone-loiter.wav", resolved)
         self.assertNotIn("Rearmable:", resolved)
         self.assertNotIn("Actor: YAK.Husk", resolved)
+        self.assertIn("WithFacingSpriteBody@LOITER:\n\t\tName: loiter", rules)
+        self.assertIn("WithFacingSpriteBody@DIVE:\n\t\tName: dive", rules)
 
     def test_drone_strike_has_dedicated_impact_animation(self) -> None:
         builder = runpy.run_path(str(ROOT / "scripts" / "build-red-sea-sprites.py"))
@@ -346,9 +384,10 @@ class RedSeaAssetTests(unittest.TestCase):
             self.assertTrue(required.issubset(mission.namelist()))
             self.assertTrue(all(info.date_time == (2026, 8, 11, 0, 0, 0) for info in mission.infolist()))
             map_yaml = mission.read("map.yaml").decode("utf-8")
-            rules = mission.read("rules.yaml").decode("utf-8")
+            rules = mission.read("rules.yaml").decode("utf-8").replace("\r\n", "\n")
             script = mission.read("jizan-corridor.lua").decode("utf-8")
         self.assertIn("Visibility: MissionSelector", map_yaml)
+        self.assertIn("Title: 01: Jizan Corridor", map_yaml)
         self.assertIn("Faction: saudi", map_yaml)
         self.assertIn("Faction: yemen", map_yaml)
         self.assertIn("SaudiConyard: fact", map_yaml)
@@ -375,10 +414,10 @@ class RedSeaAssetTests(unittest.TestCase):
             self.assertTrue(required.issubset(mission.namelist()))
             self.assertTrue(all(info.date_time == (2026, 8, 11, 0, 0, 0) for info in mission.infolist()))
             map_yaml = mission.read("map.yaml").decode("utf-8")
-            rules = mission.read("rules.yaml").decode("utf-8")
+            rules = mission.read("rules.yaml").decode("utf-8").replace("\r\n", "\n")
             script = mission.read("hodeidah-lifeline.lua").decode("utf-8")
             manifest = json.loads(mission.read("red-sea-mission-manifest.json"))
-        self.assertIn("Title: Red Sea 2026: Hodeidah Lifeline", map_yaml)
+        self.assertIn("Title: 02: Hodeidah Lifeline", map_yaml)
         self.assertIn("Playable: True", map_yaml)
         self.assertIn("Faction: yemen", map_yaml)
         for actor in ("YemenConyard: fact", "YemenWarFactory: weap", "YemenAirfield: afld", "DroneOne: samad"):
@@ -396,6 +435,20 @@ class RedSeaAssetTests(unittest.TestCase):
             self.assertIn(mechanic, script)
         self.assertEqual(manifest["id"], "hodeidah-lifeline-2026")
         self.assertEqual(len(manifest["features"]), 7)
+
+    def test_red_sea_missions_have_a_dedicated_campaign_group(self) -> None:
+        missions = (ROOT / "engine" / "openra" / "mods" / "ra" / "missions.yaml").read_text(encoding="utf-8")
+        lines = missions.splitlines()
+        campaign_start = lines.index("OpenRA AI:") + 1
+        campaign = []
+        for line in lines[campaign_start:]:
+            if not line.startswith("\t"):
+                break
+            campaign.append(line)
+        self.assertEqual(
+            ["jizan-corridor-2026", "hodeidah-lifeline-2026"],
+            [line.strip() for line in campaign if line.strip()],
+        )
 
 
 if __name__ == "__main__":

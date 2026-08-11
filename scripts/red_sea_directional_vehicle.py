@@ -200,6 +200,9 @@ STEEL = (72, 68, 54)
 GRILLE = (49, 45, 36)
 GLASS = (41, 61, 56)
 LAMP = (235, 206, 112)
+AIRFRAME = (151, 145, 124)
+AIRFRAME_LIGHT = (188, 177, 146)
+AIRFRAME_DARK = (83, 82, 74)
 OLIVE = (116, 112, 70)
 OLIVE_LIGHT = (145, 138, 83)
 OLIVE_DARK = (72, 72, 48)
@@ -398,11 +401,102 @@ def _samad_airframe() -> Mesh:
     return mesh
 
 
+def _f15sa_airframe() -> Mesh:
+    """Original low-poly twin-tail fighter silhouette for the Saudi roster."""
+
+    mesh = Mesh()
+    # Twin engines and a long center fuselage provide front/rear cues at every
+    # authored yaw. The nose is -Y, matching the existing RA aircraft order.
+    mesh.cylinder_y((0, -0.18, 0.56), 4.85, 0.30, AIRFRAME, segments=12)
+    mesh.tapered_box(
+        (-0.30, 0.30, -2.78, -2.24, 0.40),
+        (-0.03, 0.03, -3.28, -2.78, 0.53),
+        AIRFRAME_LIGHT,
+    )
+    for x in (-0.47, 0.47):
+        mesh.cylinder_y((x, 1.12, 0.48), 2.42, 0.29, AIRFRAME_DARK, segments=10)
+        mesh.cylinder_y((x, 2.34, 0.48), 0.18, 0.34, GRILLE, segments=10)
+
+    # Swept wings and stabilators are true horizontal geometry, not rotated
+    # bitmap cards. Small pylons remain visible after palette reduction.
+    mesh.polygon(
+        ((-0.30, -0.85, 0.54), (-2.48, 0.72, 0.50), (-2.06, 1.18, 0.50),
+         (0, 0.40, 0.58), (2.06, 1.18, 0.50), (2.48, 0.72, 0.50), (0.30, -0.85, 0.54)),
+        AIRFRAME,
+    )
+    mesh.polygon(
+        ((-0.24, 1.65, 0.57), (-1.28, 2.46, 0.55), (-1.07, 2.75, 0.55),
+         (0, 2.31, 0.60), (1.07, 2.75, 0.55), (1.28, 2.46, 0.55), (0.24, 1.65, 0.57)),
+        AIRFRAME_DARK,
+    )
+    for x in (-1.15, 1.15):
+        mesh.box(x - 0.08, x + 0.08, 0.15, 0.72, 0.30, 0.46, AIRFRAME_DARK)
+        mesh.cylinder_y((x, 0.00, 0.31), 0.82, 0.07, LAMP, segments=7)
+
+    # Twin vertical tails and dark tandem canopy distinguish the fighter from
+    # YAK/MIG silhouettes and stay asymmetric front-to-back during a turn.
+    for x in (-0.49, 0.49):
+        mesh.polygon(
+            ((x, 1.50, 0.58), (x, 2.55, 0.58), (x, 2.32, 1.46), (x, 1.73, 1.24)),
+            AIRFRAME_DARK,
+        )
+    mesh.tapered_box(
+        (-0.24, 0.24, -1.57, -0.38, 0.69),
+        (-0.16, 0.16, -1.38, -0.45, 1.02),
+        GLASS,
+    )
+    mesh.box(-0.14, 0.14, 2.18, 2.70, 0.57, 0.72, STEEL)
+    return mesh
+
+
+def _ah64sa_airframe() -> Mesh:
+    """Original fixed-camera tandem-seat attack-helicopter geometry."""
+
+    mesh = Mesh()
+    mesh.tapered_box(
+        (-0.62, 0.62, -1.66, 0.92, 0.32),
+        (-0.48, 0.48, -1.42, 0.72, 1.13),
+        SAND,
+    )
+    mesh.tapered_box(
+        (-0.47, 0.47, -1.84, -0.72, 0.42),
+        (-0.35, 0.35, -1.68, -0.84, 1.24),
+        GLASS,
+    )
+    mesh.box(-0.43, 0.43, 0.55, 1.02, 0.66, 1.14, SAND_DARK)
+
+    # Tail boom, tail plane, and baked-in tail-rotor hub provide stable rear
+    # identification while the main rotor remains a separate animation.
+    mesh.slanted_box_y(-0.23, 0.23, 0.74, 3.20, 0.73, 1.19, 0.20, SAND_DARK)
+    mesh.polygon(((-0.22, 2.62, 1.05), (-0.22, 3.32, 1.14), (-0.22, 3.17, 2.00), (-0.22, 2.80, 1.72)), SAND)
+    mesh.polygon(((-0.82, 2.91, 1.18), (0.82, 2.91, 1.18), (0.65, 3.24, 1.19), (-0.65, 3.24, 1.19)), SAND_DARK)
+    mesh.cylinder_x((-0.28, 3.10, 1.47), 0.20, 0.28, STEEL, segments=8)
+
+    # Stub wings, rocket pods, Hellfire rails, sensor turret, and chin gun give
+    # the close-support role a distinct readable profile at native RA scale.
+    mesh.polygon(((-0.37, -0.05, 0.62), (-1.42, 0.38, 0.56), (-1.31, 0.69, 0.56),
+                  (0, 0.38, 0.68), (1.31, 0.69, 0.56), (1.42, 0.38, 0.56), (0.37, -0.05, 0.62)), SAND)
+    for x in (-1.10, 1.10):
+        mesh.cylinder_y((x, 0.36, 0.48), 0.78, 0.18, OLIVE_DARK, segments=8)
+        mesh.box(x - 0.18, x + 0.18, 0.50, 0.98, 0.31, 0.42, STEEL)
+    mesh.cylinder_z((0, -1.73, 0.36), 0.32, 0.27, GRILLE, segments=10)
+    mesh.cylinder_y((0, -2.10, 0.22), 0.78, 0.055, STEEL, segments=8)
+    mesh.cylinder_z((0, -0.02, 1.36), 0.36, 0.13, STEEL, segments=10)
+    return mesh
+
+
 def _rotate(point: Vec3, angle: float) -> Vec3:
     radians = math.radians(angle)
     cosine, sine = math.cos(radians), math.sin(radians)
     x, y, z = point
     return (x * cosine - y * sine, x * sine + y * cosine, z)
+
+
+def _pitch(point: Vec3, angle: float) -> Vec3:
+    radians = math.radians(angle)
+    cosine, sine = math.cos(radians), math.sin(radians)
+    x, y, z = point
+    return (x, y * cosine - z * sine, y * sine + z * cosine)
 
 
 def _dot(a: Vec3, b: Vec3) -> float:
@@ -421,6 +515,7 @@ def _render(
     shadow: bool,
     model_span: float = 5.45,
     center_y_factor: float = 0.63,
+    pitch: float = 0.0,
 ) -> Image.Image:
     supersample = 4
     scale = frame_size * supersample / model_span
@@ -445,8 +540,8 @@ def _render(
 
     visible: list[tuple[float, list[tuple[float, float]], Color, bool]] = []
     for face in mesh.faces:
-        vertices = tuple(_rotate(vertex, angle) for vertex in face.vertices)
-        normal = _rotate(face.normal, angle)
+        vertices = tuple(_rotate(_pitch(vertex, pitch), angle) for vertex in face.vertices)
+        normal = _rotate(_pitch(face.normal, pitch), angle)
         visibility = _dot(normal, camera)
         if visibility <= 0.005:
             continue
@@ -516,10 +611,136 @@ def render_ymlr_frames(frame_size: int = 40, facings: int = 32) -> tuple[list[Im
 
 def render_samad_frames(frame_size: int = 40, facings: int = 16) -> list[Image.Image]:
     angles = _angles(facings, classic=False)
-    return [
+    loiter = [
         _render(_samad_airframe(), angle, frame_size, shadow=False, model_span=4.85, center_y_factor=0.58)
         for angle in angles
     ]
+    dive = [
+        _render(
+            _samad_airframe(), angle, frame_size, shadow=False, model_span=4.85,
+            center_y_factor=0.58, pitch=24,
+        )
+        for angle in angles
+    ]
+    return loiter + dive
+
+
+def render_f15sa_frames(frame_size: int = 56, facings: int = 16) -> list[Image.Image]:
+    angles = _angles(facings, classic=False)
+    return [
+        _render(_f15sa_airframe(), angle, frame_size, shadow=False, model_span=7.25, center_y_factor=0.59)
+        for angle in angles
+    ]
+
+
+def render_ah64sa_frames(frame_size: int = 56, facings: int = 32) -> list[Image.Image]:
+    angles = _angles(facings, classic=True)
+    return [
+        _render(_ah64sa_airframe(), angle, frame_size, shadow=False, model_span=6.30, center_y_factor=0.59)
+        for angle in angles
+    ]
+
+
+def render_ah64_rotor_frames(frame_size: int = 48) -> list[Image.Image]:
+    """Return four fast and eight slow main-rotor overlay frames."""
+
+    supersample = 4
+    images: list[Image.Image] = []
+    for frame, angle in enumerate(tuple(index * 22.5 for index in range(4)) + tuple(index * 11.25 for index in range(8))):
+        canvas = Image.new("RGBA", (frame_size * supersample, frame_size * supersample), (0, 0, 0, 0))
+        draw = ImageDraw.Draw(canvas)
+        center = frame_size * supersample / 2
+        radius = frame_size * supersample * (0.44 if frame < 4 else 0.41)
+        for blade in range(4):
+            radians = math.radians(angle + blade * 90)
+            dx, dy = math.cos(radians) * radius, math.sin(radians) * radius * 0.43
+            draw.line((center - dx, center - dy, center + dx, center + dy), fill=(87, 83, 70, 185), width=3 * supersample)
+            draw.line((center - dx * 0.16, center - dy * 0.16, center + dx * 0.16, center + dy * 0.16), fill=(180, 169, 132, 235), width=2 * supersample)
+        draw.ellipse((center - 4 * supersample, center - 3 * supersample, center + 4 * supersample, center + 3 * supersample), fill=(53, 50, 43, 255))
+        if frame < 4:
+            canvas = canvas.filter(ImageFilter.GaussianBlur(0.45 * supersample))
+        images.append(canvas.resize((frame_size, frame_size), Image.Resampling.LANCZOS))
+    return images
+
+
+def render_air_muzzle_frames(frame_size: int = 48) -> list[Image.Image]:
+    """Return six authored flame phases for each of OpenRA's eight muzzle facings."""
+
+    supersample = 4
+    images: list[Image.Image] = []
+    for facing in range(8):
+        direction = math.radians(facing * 45 - 90)
+        for phase in range(6):
+            canvas = Image.new("RGBA", (frame_size * supersample, frame_size * supersample), (0, 0, 0, 0))
+            draw = ImageDraw.Draw(canvas)
+            center = frame_size * supersample / 2
+            length = (9 - phase * 0.9) * supersample
+            width = (3.3 - phase * 0.35) * supersample
+            dx, dy = math.cos(direction), math.sin(direction)
+            px, py = -dy, dx
+            root_x, root_y = center - dx * 2 * supersample, center - dy * 2 * supersample
+            tip_x, tip_y = root_x + dx * length, root_y + dy * length
+            draw.polygon(
+                [
+                    (root_x + px * width, root_y + py * width),
+                    (tip_x, tip_y),
+                    (root_x - px * width, root_y - py * width),
+                    (root_x - dx * 2 * supersample, root_y - dy * 2 * supersample),
+                ],
+                fill=(255, 139, 34, max(30, 255 - phase * 38)),
+            )
+            core_width = max(1, width * 0.42)
+            draw.polygon(
+                [
+                    (root_x + px * core_width, root_y + py * core_width),
+                    (root_x + dx * length * 0.62, root_y + dy * length * 0.62),
+                    (root_x - px * core_width, root_y - py * core_width),
+                ],
+                fill=(255, 246, 178, max(24, 245 - phase * 40)),
+            )
+            images.append(canvas.resize((frame_size, frame_size), Image.Resampling.LANCZOS))
+    return images
+
+
+def render_air_impact_frames(frame_size: int = 64) -> list[Image.Image]:
+    """Return a compact nine-frame dust-and-fire impact animation."""
+
+    supersample = 4
+    images: list[Image.Image] = []
+    for phase in range(9):
+        canvas = Image.new("RGBA", (frame_size * supersample, frame_size * supersample), (0, 0, 0, 0))
+        draw = ImageDraw.Draw(canvas)
+        center = frame_size * supersample / 2
+        progress = phase / 8
+        radius = (3 + 16 * math.sin(progress * math.pi * 0.82)) * supersample
+        alpha = round(255 * (1 - progress * 0.78))
+        draw.ellipse(
+            (center - radius, center - radius * 0.72, center + radius, center + radius * 0.72),
+            fill=(111, 91, 61, max(12, alpha // 2)),
+        )
+        fire_radius = max(1, radius * (0.72 - progress * 0.35))
+        draw.ellipse(
+            (center - fire_radius, center - fire_radius, center + fire_radius, center + fire_radius),
+            fill=(242, 83 + phase * 9, 24, alpha),
+        )
+        core = max(1, fire_radius * 0.45)
+        draw.ellipse(
+            (center - core, center - core, center + core, center + core),
+            fill=(255, 232, 133, max(18, alpha - phase * 12)),
+        )
+        if phase >= 3:
+            smoke_y = center - phase * 1.4 * supersample
+            smoke = radius * 0.5
+            draw.ellipse(
+                (center - smoke, smoke_y - smoke, center + smoke, smoke_y + smoke),
+                fill=(54, 52, 47, max(10, alpha // 2)),
+            )
+        images.append(
+            canvas.filter(ImageFilter.GaussianBlur(0.35 * supersample)).resize(
+                (frame_size, frame_size), Image.Resampling.LANCZOS
+            )
+        )
+    return images
 
 
 DIRECTIONAL_RENDERERS = {
@@ -528,6 +749,8 @@ DIRECTIONAL_RENDERERS = {
     "tech": render_tech_frames,
     "ymlr": render_ymlr_frames,
     "samad": render_samad_frames,
+    "f15sa": render_f15sa_frames,
+    "ah64sa": render_ah64sa_frames,
 }
 
 

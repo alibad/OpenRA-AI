@@ -13,6 +13,7 @@ LOCAL_PROVIDER = "local"
 LOCAL_MODEL = "local-coder"
 LOCAL_ROUTER_URL = "http://127.0.0.1:4000"
 HOSTED_MODEL = "gpt-5.5"
+LOCAL_PROMPT_TRUNCATION_TOKENS = 31_500
 
 
 @dataclass(frozen=True)
@@ -90,6 +91,10 @@ def agent_model_settings(*, local: bool, max_tokens: int, reasoning_effort: str)
             temperature=0.1,
             parallel_tool_calls=False,
             max_tokens=max_tokens,
+            # The local router otherwise auto-truncates to one token beyond
+            # the model's 32K input allowance. Give MCP tool schemas and the
+            # requested output a deterministic safety margin.
+            extra_body={"truncate_prompt_tokens": LOCAL_PROMPT_TRUNCATION_TOKENS},
         )
     return ModelSettings(
         reasoning=Reasoning(effort=reasoning_effort, summary="concise"),

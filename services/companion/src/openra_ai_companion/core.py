@@ -31,6 +31,7 @@ from .strategy import (
     desired_harvester_count,
     hybrid_force_plan,
     map_scale,
+    maximum_queued_unit_count,
     maximum_silo_count,
     mission_plan,
     opening_scout_count,
@@ -670,6 +671,7 @@ class Companion:
             for item in snapshot.production
         )
         planned_harvesters = 0
+        planned_units: dict[str, int] = {}
         commands: list[ActionCommand] = []
 
         for raw in values:
@@ -746,11 +748,29 @@ class Companion:
                 limit = maximum_silo_count(snapshot)
                 if silo_count >= limit:
                     raise ValueError(f"the map-scaled silo limit of {limit} is already reached")
+                if (
+                    snapshot.resource_capacity > 0
+                    and snapshot.ore * 100 <= snapshot.resource_capacity * 80
+                ):
+                    raise ValueError("a silo is only needed above 80% storage")
             if command.action == "train" and command.item_type.split(".", 1)[0] == "harv":
                 target = desired_harvester_count(snapshot)
                 if snapshot.harvester_count + queued_harvesters + planned_harvesters >= target:
                     raise ValueError(f"the map-scaled harvester target of {target} is already covered")
                 planned_harvesters += 1
+            elif command.action == "train":
+                queued_count = sum(
+                    str(item.get("item", "")).lower() == command.item_type
+                    for item in snapshot.production
+                )
+                planned_count = planned_units.get(command.item_type, 0)
+                limit = maximum_queued_unit_count(command.item_type)
+                if queued_count + planned_count >= limit:
+                    raise ValueError(
+                        f"'{command.item_type}' already reaches its rolling queue limit of {limit}; "
+                        "choose a complementary unit or wait for production"
+                    )
+                planned_units[command.item_type] = planned_count + 1
             if command.action == "place_building" and command.item_type not in in_production:
                 raise ValueError(f"'{command.item_type}' is not in a production queue")
             if command.action == "cancel_production" and command.item_type not in in_production:

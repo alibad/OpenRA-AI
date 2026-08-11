@@ -111,9 +111,9 @@ def build(item_type: str, count: int = 1) -> dict:
 
 @mcp.tool()
 def train(item_type: str, count: int = 1) -> dict:
-    """Queue 1-12 units by exact available production ID."""
-    if not 1 <= count <= 12:
-        raise ValueError("count must be between 1 and 12")
+    """Queue 1-4 units by exact available production ID, subject to rolling composition caps."""
+    if not 1 <= count <= 4:
+        raise ValueError("count must be between 1 and 4")
     item = item_type.strip().lower()
     return _submit(tuple(ActionCommand(action="train", item_type=item, queued=True) for _ in range(count)))
 

@@ -7,7 +7,16 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from unittest.mock import patch
 
-from openra_ai_companion.autonomous import _extract_text_tool_calls, _game_child_environment
+from openra_ai_companion.agent_models import (
+    LOCAL_PROMPT_TRUNCATION_TOKENS,
+    agent_model_settings,
+)
+from openra_ai_companion.autonomous import (
+    LOCAL_AUTOPLAY_MAX_TOKENS,
+    _extract_text_tool_calls,
+    _game_child_environment,
+    _priority_production_cancellations,
+)
 from openra_ai_companion.bridge import ACTION_TYPES
 from openra_ai_companion import game_mcp
 from openra_ai_companion.game_mcp import mcp
@@ -65,6 +74,64 @@ def snapshot(**updates: object) -> GameSnapshot:
 
 
 class GameAgentEvalTests(unittest.TestCase):
+    def test_local_autoplay_reserves_context_headroom_for_mcp_tools(self) -> None:
+        self.assertLessEqual(LOCAL_AUTOPLAY_MAX_TOKENS, 512)
+        settings = agent_model_settings(
+            local=True,
+            max_tokens=LOCAL_AUTOPLAY_MAX_TOKENS,
+            reasoning_effort="medium",
+        )
+        self.assertEqual(
+            settings.extra_body,
+            {"truncate_prompt_tokens": LOCAL_PROMPT_TRUNCATION_TOKENS},
+        )
+        self.assertLess(
+            LOCAL_PROMPT_TRUNCATION_TOKENS + LOCAL_AUTOPLAY_MAX_TOKENS,
+            32_768,
+        )
+
+    def test_priority_tech_refunds_expendable_queues_before_deadlock(self) -> None:
+        current = snapshot(
+            economy={"cash": 0, "ore": 0, "resource_capacity": 2000},
+            production=[
+                {"queue_type": "Building", "item": "dome", "progress": 0.25},
+                {"queue_type": "Vehicle", "item": "1tnk"},
+                {"queue_type": "Infantry", "item": "e1"},
+                {"queue_type": "Vehicle", "item": "harv"},
+            ],
+        )
+
+        commands = _priority_production_cancellations(current, target="dome")
+
+        self.assertEqual(
+            commands,
+            (
+                ActionCommand("cancel_production", item_type="1tnk"),
+                ActionCommand("cancel_production", item_type="e1"),
+            ),
+        )
+
+    def test_rolling_queue_caps_reject_one_type_resource_lockups(self) -> None:
+        vehicle_locked = snapshot(
+            available_production=["1tnk", "e1"],
+            production=[
+                {"queue_type": "Vehicle", "item": "1tnk"},
+                {"queue_type": "Vehicle", "item": "1tnk"},
+            ],
+        )
+        infantry_batch = tuple(
+            ActionCommand("train", item_type="e1", queued=True)
+            for _ in range(5)
+        )
+
+        with self.assertRaisesRegex(ValueError, "rolling queue limit of 2"):
+            GameRuntime._validate(
+                vehicle_locked,
+                (ActionCommand("train", item_type="1tnk", queued=True),),
+            )
+        with self.assertRaisesRegex(ValueError, "rolling queue limit of 4"):
+            GameRuntime._validate(vehicle_locked, infantry_batch)
+
     def test_literal_local_tool_markup_is_recovered(self) -> None:
         output = """<tool_call>
         {"name":"train","arguments":{"item_type":"e1","count":2}}
