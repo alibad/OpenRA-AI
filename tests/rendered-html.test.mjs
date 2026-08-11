@@ -71,6 +71,10 @@ test("keeps account identity out of Analytics event parameters", async () => {
   assert.match(authDialog, /signInWithPopup/);
   assert.match(authDialog, /Sign up with Google/);
   assert.match(accountNav, /Sign in/);
+  assert.match(accountNav, /user\.photoURL/);
+  assert.match(accountNav, /providerData\.find/);
+  assert.match(accountNav, /referrerPolicy="no-referrer"/);
+  assert.match(accountNav, /accountInitials/);
   assert.match(missionStudio, /Account required for AI work/);
   assert.match(privacy, /do not send your name, email/);
   assert.match(privacy, /Written feedback and diagnostics are never sent to Google Analytics/);
