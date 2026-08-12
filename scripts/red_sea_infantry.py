@@ -92,9 +92,9 @@ def _team_colors(palette: Image.Image) -> tuple[tuple[int, int, int], ...]:
 def _weapon_kind(style: InfantryStyle) -> str:
     if style.role in {"atgm", "rpg"}:
         return style.role
-    if style.role in {"jtac", "spotter"}:
+    if style.role in {"jtac", "spotter", "controller"}:
         return "carbine"
-    if style.role in {"commando", "ghost"}:
+    if style.role in {"commando", "ghost", "shadow"}:
         return "suppressed"
     return "rifle"
 
@@ -159,14 +159,14 @@ def _draw_equipment(draw: ImageDraw.ImageDraw, style: InfantryStyle, facing: int
     behind = (tx - fx * 1.8, ty - fy * 1.8)
     outline = _c((27, 28, 24))
 
-    if style.role in {"jtac", "spotter", "atgm"}:
+    if style.role in {"jtac", "spotter", "controller", "atgm"}:
         _polygon(draw, ((behind[0] - 2.0, behind[1] - 3.0), (behind[0] + 2.0, behind[1] - 2.6),
                         (behind[0] + 1.8, behind[1] + 2.4), (behind[0] - 1.8, behind[1] + 2.4)), _c(style.gear), outline)
         antenna_top = (behind[0] - rx * .7, behind[1] - 6.0)
         _line(draw, ((behind[0] - rx * .7, behind[1] - 2.5), antenna_top), _c((32, 34, 31)), .55)
         _ellipse(draw, (antenna_top[0] - .35, antenna_top[1] - .35, antenna_top[0] + .35, antenna_top[1] + .35), _c(style.accent))
 
-    if style.role == "spotter":
+    if style.role in {"spotter", "controller"}:
         hand = (tx + fx * 1.4 + rx * 2.0, ty + fy * 1.4 + ry * 2.0)
         _polygon(draw, ((hand[0] - 1.7, hand[1] - 1.3), (hand[0] + 1.7, hand[1] - 1.3),
                         (hand[0] + 1.5, hand[1] + 1.2), (hand[0] - 1.5, hand[1] + 1.2)), _c((33, 39, 38)), outline)
@@ -175,10 +175,25 @@ def _draw_equipment(draw: ImageDraw.ImageDraw, style: InfantryStyle, facing: int
         optic = (tx + fx * 2.0 + rx * 1.8, ty + fy * 2.0 + ry * 1.8 - 2.0)
         _line(draw, ((optic[0] - rx * 1.0, optic[1] - ry), (optic[0] + rx * 1.0, optic[1] + ry)), _c((25, 29, 28)), 1.35)
         _ellipse(draw, (optic[0] - .55, optic[1] - .55, optic[0] + .55, optic[1] + .55), _c(style.accent), outline)
-    elif style.role in {"commando", "ghost"}:
+    elif style.role in {"commando", "ghost", "shadow"}:
         charge = (tx - fx * .3 - rx * 2.0, ty - fy * .3 - ry * 2.0 + 2.2)
         _polygon(draw, ((charge[0] - 1.1, charge[1] - 1.2), (charge[0] + 1.1, charge[1] - 1.2),
                         (charge[0] + 1.1, charge[1] + 1.2), (charge[0] - 1.1, charge[1] + 1.2)), _c(style.accent), outline)
+
+    if style.role == "shadow":
+        # An asymmetric half-cloak hangs vertically while its exposed edge
+        # shifts with facing. This keeps the commando upright and recognizable
+        # instead of rotating the entire figure like a flat ground sprite.
+        cape_shoulder = (tx - rx * 2.8, ty - ry * 2.8 - 2.4)
+        cape_outer = (tx - rx * 4.7 - fx * .7, ty - ry * 2.0 + 2.4)
+        cape_tip = (tx - rx * 2.6 - fx * 1.2, ty - ry * 1.0 + 9.2)
+        cape_inner = (tx + rx * .5, ty + ry * .5 + 5.4)
+        _polygon(draw, (cape_shoulder, cape_outer, cape_tip, cape_inner), _c(style.cloth_dark), outline)
+        stripe_start = (cape_shoulder[0] + rx * .5, cape_shoulder[1] + ry * .5 + 1.0)
+        stripe_end = (cape_tip[0] + rx * .5, cape_tip[1] + ry * .5 - 1.2)
+        _line(draw, (stripe_start, stripe_end), _c(team[2]), 1.15)
+        shoulder = (tx + rx * 3.2, ty + ry * 3.2 - 2.1)
+        _ellipse(draw, (shoulder[0] - 1.15, shoulder[1] - 1.15, shoulder[0] + 1.15, shoulder[1] + 1.15), _c(team[0]), outline)
 
     # A compact player-remap panel keeps teams readable without swallowing the
     # faction-specific uniform palette.
@@ -242,6 +257,10 @@ def _draw_upright(
         _line(draw, ((head[0] - 2.1, head[1] + 1.0), (head[0] + 2.1, head[1] + 1.0)), _c(style.cloth_dark), 1.05)
     face_point = (head[0] + fx * 2.4, head[1] + fy * 2.0 + .4)
     _ellipse(draw, (face_point[0] - .55, face_point[1] - .45, face_point[0] + .55, face_point[1] + .45), _c((22, 22, 20)))
+    if style.role == "shadow":
+        visor_left = (face_point[0] - rx * 1.45, face_point[1] - ry * 1.45 - .3)
+        visor_right = (face_point[0] + rx * 1.45, face_point[1] + ry * 1.45 - .3)
+        _line(draw, (visor_left, visor_right), _c((79, 224, 184)), .8)
 
     recoil = 0.0
     firing = False
@@ -304,9 +323,17 @@ def _draw_transition(draw: ImageDraw.ImageDraw, style: InfantryStyle, team: tupl
     _draw_weapon(draw, style, (torso[0] + fx, torso[1] + fy), facing, firing=False, recoil=0, prone=progress > .5)
 
 
-def _draw_death(draw: ImageDraw.ImageDraw, style: InfantryStyle, team: tuple[tuple[int, int, int], ...], variant: int, phase: int, length: int) -> None:
+def _draw_death(
+    draw: ImageDraw.ImageDraw,
+    style: InfantryStyle,
+    team: tuple[tuple[int, int, int], ...],
+    variant: int,
+    phase: int,
+    length: int,
+    facing: int | None = None,
+) -> None:
     t = min(1.0, phase / max(1, length - 1))
-    facing = (variant * 2 + 1) % 8
+    facing = (variant * 2 + 1) % 8 if facing is None else facing
     fx, fy, rx, ry = _facing_vector(facing)
     cx, ground = 25.0, 25.0
     outline = _c((25, 24, 21))
@@ -352,6 +379,8 @@ def _frame(style: InfantryStyle, team: tuple[tuple[int, int, int], ...], action:
             _ellipse(draw, (_s(28) / SCALE, _s(8) / SCALE, _s(30) / SCALE, _s(10) / SCALE), _c(style.accent))
     elif action == "die":
         _draw_death(draw, style, team, variant, phase, length)
+    elif action == "directional-die":
+        _draw_death(draw, style, team, variant, phase, length, facing)
     else:
         raise KeyError(action)
 

@@ -1,12 +1,15 @@
 from __future__ import annotations
 
 import hashlib
+import importlib.util
 import json
 from pathlib import Path
 import re
 import sys
+import zipfile
 
 import pytest
+from PIL import Image
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -14,9 +17,27 @@ sys.path.insert(0, str(ROOT / "scripts"))
 
 from iran_directional_assets import render_directional_asset, render_infantry
 
+BUILD_SPEC = importlib.util.spec_from_file_location(
+    "build_iran_sprites", ROOT / "scripts" / "build-iran-sprites.py"
+)
+assert BUILD_SPEC and BUILD_SPEC.loader
+BUILD_MODULE = importlib.util.module_from_spec(BUILD_SPEC)
+BUILD_SPEC.loader.exec_module(BUILD_MODULE)
+quantize = BUILD_MODULE.quantize
+
 
 def digest(image) -> str:
     return hashlib.sha256(image.tobytes()).hexdigest()
+
+
+def remap_share(frames) -> float:
+    opaque = 0
+    remap = 0
+    for frame in frames:
+        values = frame.tobytes()
+        opaque += sum(value != 0 for value in values)
+        remap += sum(80 <= value <= 95 for value in values)
+    return remap / opaque
 
 
 @pytest.mark.parametrize("role", ["basij", "atgm", "controller", "shadow"])
@@ -48,6 +69,30 @@ def test_infantry_has_complete_authored_facing_contract(role: str) -> None:
         assert all(frame.getchannel("A").getbbox() for frame in facing_frames), sequence
 
 
+@pytest.mark.parametrize("role", ["basij", "atgm", "controller", "shadow"])
+def test_infantry_has_native_scale_and_explicit_player_color(role: str) -> None:
+    palette = Image.new("P", (1, 1))
+    palette.putpalette([channel for value in range(256) for channel in (value, value, value)])
+    frames = render_infantry(role)
+    indexed = [quantize(frame, palette) for frame in frames[:128]]
+    assert remap_share(indexed) >= (0.22 if role == "shadow" else 0.38)
+
+    # The old Iran figures averaged only ~34 px of bounding-box area compared
+    # with ~200 px for native E1/E3/E7. Keep the live silhouette substantial.
+    areas = []
+    for frame in frames[:128]:
+        bbox = frame.getchannel("A").getbbox()
+        assert bbox
+        areas.append((bbox[2] - bbox[0]) * (bbox[3] - bbox[1]))
+    assert sum(areas) / len(areas) >= 90
+
+    if role == "shadow":
+        for frame in frames[:8]:
+            bbox = frame.getchannel("A").getbbox()
+            assert bbox
+            assert bbox[3] - bbox[1] > bbox[2] - bbox[0]
+
+
 @pytest.mark.parametrize(
     ("name", "size", "facings", "frame_count"),
     [
@@ -71,6 +116,23 @@ def test_directional_models_have_unique_authored_frames(
     assert len({digest(frame) for frame in frames}) == frame_count
     assert all(frame.size == (size, size) for frame in frames)
     assert all(frame.getchannel("A").getbbox() for frame in frames)
+
+
+@pytest.mark.parametrize(
+    ("name", "size", "facings"),
+    [
+        ("irkarr", 40, 32), ("irraad", 40, 32), ("irfajr", 40, 32),
+        ("ircoast", 40, 32), ("irazar", 56, 16), ("irtoufan", 56, 32),
+        ("irmohajer", 44, 16), ("irloiter", 40, 16),
+        ("irpey", 44, 16), ("irghadir", 44, 16),
+    ],
+)
+def test_every_directional_unit_has_explicit_player_color(name: str, size: int, facings: int) -> None:
+    palette = Image.new("P", (1, 1))
+    palette.putpalette([channel for value in range(256) for channel in (value, value, value)])
+    frames = render_directional_asset(name, size, facings)
+    indexed = [quantize(frame, palette) for frame in frames]
+    assert remap_share(indexed) >= 0.30
 
 
 def test_generated_packages_match_declared_frame_counts() -> None:
@@ -97,6 +159,14 @@ def test_generated_packages_match_declared_frame_counts() -> None:
 def test_faction_selector_and_skirmish_package_are_installed() -> None:
     assert (ROOT / "engine" / "openra" / "mods" / "ra" / "uibits" / "glyphs-redsea.png").is_file()
     assert (ROOT / "engine" / "openra" / "mods" / "ra" / "maps" / "iran-doctrine-range.oramap").is_file()
+
+
+def test_doctrine_range_cannot_end_during_live_fire_sequence() -> None:
+    path = ROOT / "engine" / "openra" / "mods" / "ra" / "maps" / "iran-doctrine-range.oramap"
+    with zipfile.ZipFile(path) as package:
+        rules = package.read("rules.yaml").decode("utf-8")
+    assert "ShortGameCheckboxEnabled: False" in rules
+    assert "ShortGameCheckboxLocked: True" in rules
 
 
 def actor_module(text: str, module: str, personality: str) -> str:
@@ -157,6 +227,7 @@ def test_native_progression_and_build_limit_contracts() -> None:
     shadow = re.search(r"^SHADOWONE:.*?(?=^[A-Z0-9.]+:)", text, re.MULTILINE | re.DOTALL)
     assert shadow
     assert "BuildLimit: 1" in shadow.group(0)
+    assert "CloakedAlpha: 0.72" in shadow.group(0)
     assert "UncloakOn: Attack, Unload, Infiltrate, Demolish, Move" in shadow.group(0)
     assert "IranSabotageCharge" in shadow.group(0)
 

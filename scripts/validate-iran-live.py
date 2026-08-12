@@ -1,8 +1,10 @@
 """Exercise the installed Iran faction through the rendered OpenRA bridge.
 
 Run this against a fresh Iran Doctrine Range match started with
-OPENRA_AI_COMPANION=1.  The script intentionally records renderer captures
-and live actor state instead of treating static YAML checks as gameplay proof.
+OPENRA_AI_COMPANION=1 and Launch.Bots=Multi1:dummy.  The dummy observer keeps
+the deterministic doctrine-range match alive while the script intentionally
+records renderer captures and live actor state instead of treating static YAML
+checks as gameplay proof.
 """
 
 from __future__ import annotations

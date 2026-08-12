@@ -14,6 +14,7 @@ from typing import Callable
 from PIL import Image, ImageDraw, ImageFilter
 
 from red_sea_directional_vehicle import Mesh, _angles, _render
+from red_sea_infantry import InfantryStyle, _frame
 
 
 GREEN = (73, 91, 57)
@@ -28,6 +29,16 @@ GLASS = (31, 55, 59)
 RED = (165, 42, 41)
 WHITE = (218, 220, 207)
 WATER = (74, 129, 148)
+
+# Exact chroma markers used by build-iran-sprites.py. They are deliberately
+# outside the faction art palette and are replaced with RA remap indices before
+# the SHP packages are written. Four luminance levels preserve directional
+# shading and make every Iran unit readable in any chosen player color.
+TEAM_LIGHT = (255, 0, 255)
+TEAM_MID = (255, 0, 223)
+TEAM_DARK = (223, 0, 255)
+TEAM_DEEP = (191, 0, 255)
+TEAM_MARKERS = frozenset((TEAM_LIGHT, TEAM_MID, TEAM_DARK, TEAM_DEEP))
 
 
 def _wheels(mesh: Mesh, *, length: float, width: float, count: int, radius: float = 0.34) -> None:
@@ -44,8 +55,8 @@ def _karrar_hull() -> Mesh:
     for y in (-1.55, -0.84, -0.13, 0.58, 1.29):
         mesh.cylinder_x((0, y, 0.37), 2.62, 0.29, RUBBER)
         mesh.cylinder_x((0, y, 0.37), 2.68, 0.13, SAND_DARK)
-    mesh.tapered_box((-1.04, 1.04, -1.76, 1.55, 0.53), (-0.84, 0.84, -1.30, 1.36, 1.07), GREEN)
-    mesh.polygon(((-0.82, -1.30, 1.07), (0.82, -1.30, 1.07), (0.62, -1.73, 0.70), (-0.62, -1.73, 0.70)), GREEN_LIGHT)
+    mesh.tapered_box((-1.04, 1.04, -1.76, 1.55, 0.53), (-0.84, 0.84, -1.30, 1.36, 1.07), TEAM_MID)
+    mesh.polygon(((-0.82, -1.30, 1.07), (0.82, -1.30, 1.07), (0.62, -1.73, 0.70), (-0.62, -1.73, 0.70)), TEAM_LIGHT)
     for x in (-0.58, -0.22, 0.14, 0.50):
         mesh.box(x, x + 0.15, 0.73, 1.34, 1.05, 1.15, METAL, outline=False)
     mesh.box(-0.75, -0.55, -1.61, -1.45, 0.74, 0.91, WHITE, outline=False)
@@ -55,11 +66,11 @@ def _karrar_hull() -> Mesh:
 
 def _karrar_turret() -> Mesh:
     mesh = Mesh()
-    mesh.cylinder_z((0, -0.02, 1.13), 0.12, 0.73, GREEN_DARK)
-    mesh.tapered_box((-0.78, 0.78, -0.69, 0.66, 1.14), (-0.58, 0.58, -0.84, 0.48, 1.62), GREEN)
-    mesh.box(-0.26, 0.26, -1.58, -0.68, 1.37, 1.51, GREEN_DARK)
+    mesh.cylinder_z((0, -0.02, 1.13), 0.12, 0.73, TEAM_DEEP)
+    mesh.tapered_box((-0.78, 0.78, -0.69, 0.66, 1.14), (-0.58, 0.58, -0.84, 0.48, 1.62), TEAM_MID)
+    mesh.box(-0.26, 0.26, -1.58, -0.68, 1.37, 1.51, TEAM_DARK)
     mesh.cylinder_y((0, -1.92, 1.44), 2.72, 0.095, METAL, segments=10)
-    mesh.box(-0.48, -0.18, -0.30, 0.08, 1.60, 1.76, GREEN_LIGHT)
+    mesh.box(-0.48, -0.18, -0.30, 0.08, 1.60, 1.76, TEAM_LIGHT)
     mesh.box(0.22, 0.47, -0.18, 0.10, 1.61, 1.87, GLASS)
     mesh.cylinder_z((0.38, 0.13, 1.76), 0.33, 0.13, METAL)
     return mesh
@@ -68,10 +79,10 @@ def _karrar_turret() -> Mesh:
 def _truck_hull() -> Mesh:
     mesh = Mesh()
     _wheels(mesh, length=4.05, width=1.72, count=4, radius=0.34)
-    mesh.box(-0.89, 0.89, -1.88, 1.82, 0.42, 0.68, GREEN_DARK)
-    mesh.tapered_box((-0.84, 0.84, -1.89, -0.77, 0.66), (-0.75, 0.75, -1.78, -0.82, 1.45), GREEN)
+    mesh.box(-0.89, 0.89, -1.88, 1.82, 0.42, 0.68, TEAM_DARK)
+    mesh.tapered_box((-0.84, 0.84, -1.89, -0.77, 0.66), (-0.75, 0.75, -1.78, -0.82, 1.45), TEAM_MID)
     mesh.box(-0.63, 0.63, -1.84, -1.70, 1.03, 1.33, GLASS, outline=False)
-    mesh.box(-0.87, 0.87, -0.73, 1.61, 0.69, 0.82, SAND_DARK)
+    mesh.box(-0.87, 0.87, -0.73, 1.61, 0.69, 0.82, TEAM_DEEP)
     mesh.box(-0.76, -0.56, -1.98, -1.86, 0.73, 0.88, WHITE, outline=False)
     mesh.box(0.56, 0.76, -1.98, -1.86, 0.73, 0.88, WHITE, outline=False)
     return mesh
@@ -79,10 +90,10 @@ def _truck_hull() -> Mesh:
 
 def _raad_turret() -> Mesh:
     mesh = Mesh()
-    mesh.cylinder_z((0, 0.28, 0.91), 0.14, 0.62, GREEN_DARK)
-    mesh.box(-0.62, 0.62, -0.26, 0.87, 0.92, 1.29, GREEN)
+    mesh.cylinder_z((0, 0.28, 0.91), 0.14, 0.62, TEAM_DEEP)
+    mesh.box(-0.62, 0.62, -0.26, 0.87, 0.92, 1.29, TEAM_MID)
     for x in (-0.43, 0.08):
-        mesh.slanted_box_y(x, x + 0.34, -0.79, 0.73, 1.22, 1.55, 0.22, SAND)
+        mesh.slanted_box_y(x, x + 0.34, -0.79, 0.73, 1.22, 1.55, 0.22, TEAM_LIGHT)
     mesh.box(-0.14, 0.14, 0.53, 0.86, 1.31, 1.86, METAL)
     mesh.box(-0.33, 0.33, 0.69, 0.83, 1.68, 1.92, GLASS)
     return mesh
@@ -90,11 +101,11 @@ def _raad_turret() -> Mesh:
 
 def _fajr_turret(*, loaded: bool) -> Mesh:
     mesh = Mesh()
-    mesh.cylinder_z((0, 0.27, 0.89), 0.12, 0.60, GREEN_DARK)
-    mesh.box(-0.72, 0.72, -0.05, 0.78, 0.93, 1.17, GREEN)
+    mesh.cylinder_z((0, 0.27, 0.89), 0.12, 0.60, TEAM_DEEP)
+    mesh.box(-0.72, 0.72, -0.05, 0.78, 0.93, 1.17, TEAM_MID)
     if loaded:
         for x in (-0.50, -0.17, 0.16):
-            mesh.slanted_box_y(x, x + 0.25, -1.10, 0.62, 1.22, 1.52, 0.25, GREEN_LIGHT)
+            mesh.slanted_box_y(x, x + 0.25, -1.10, 0.62, 1.22, 1.52, 0.25, TEAM_LIGHT)
             mesh.box(x + 0.03, x + 0.22, -1.24, -1.07, 1.44, 1.64, RED, outline=False)
     else:
         for x in (-0.50, -0.17, 0.16):
@@ -104,11 +115,11 @@ def _fajr_turret(*, loaded: bool) -> Mesh:
 
 def _coast_turret() -> Mesh:
     mesh = Mesh()
-    mesh.cylinder_z((0, 0.34, 0.91), 0.12, 0.59, GREEN_DARK)
-    mesh.box(-0.73, 0.73, 0.04, 0.86, 0.94, 1.19, GREEN)
+    mesh.cylinder_z((0, 0.34, 0.91), 0.12, 0.59, TEAM_DEEP)
+    mesh.box(-0.73, 0.73, 0.04, 0.86, 0.94, 1.19, TEAM_MID)
     for x in (-0.51, 0.13):
-        mesh.slanted_box_y(x, x + 0.38, -1.16, 0.67, 1.20, 1.42, 0.33, SAND)
-        mesh.box(x + 0.04, x + 0.34, -1.34, -1.13, 1.39, 1.70, GREEN_DARK)
+        mesh.slanted_box_y(x, x + 0.38, -1.16, 0.67, 1.20, 1.42, 0.33, TEAM_LIGHT)
+        mesh.box(x + 0.04, x + 0.34, -1.34, -1.13, 1.39, 1.70, TEAM_DARK)
     mesh.box(-0.16, 0.16, 0.63, 0.85, 1.38, 1.93, METAL)
     mesh.box(-0.37, 0.37, 0.71, 0.83, 1.77, 1.98, GLASS)
     return mesh
@@ -116,9 +127,9 @@ def _coast_turret() -> Mesh:
 
 def _azar_airframe() -> Mesh:
     mesh = Mesh()
-    mesh.polygon(((0, -3.00, 0.18), (0.30, -1.20, 0.26), (0.38, 1.91, 0.15), (0, 2.40, 0.08), (-0.38, 1.91, 0.15), (-0.30, -1.20, 0.26)), GREEN_LIGHT)
-    mesh.polygon(((-0.25, -0.89, 0.19), (-2.15, 0.83, 0.04), (-0.79, 1.28, 0.11), (0, 0.74, 0.29), (0.79, 1.28, 0.11), (2.15, 0.83, 0.04), (0.25, -0.89, 0.19)), GREEN)
-    mesh.polygon(((0, 1.04, 0.15), (-1.03, 2.02, 0.06), (-0.36, 2.15, 0.09), (0, 1.78, 0.22), (0.36, 2.15, 0.09), (1.03, 2.02, 0.06)), GREEN_DARK)
+    mesh.polygon(((0, -3.00, 0.18), (0.30, -1.20, 0.26), (0.38, 1.91, 0.15), (0, 2.40, 0.08), (-0.38, 1.91, 0.15), (-0.30, -1.20, 0.26)), TEAM_LIGHT)
+    mesh.polygon(((-0.25, -0.89, 0.19), (-2.15, 0.83, 0.04), (-0.79, 1.28, 0.11), (0, 0.74, 0.29), (0.79, 1.28, 0.11), (2.15, 0.83, 0.04), (0.25, -0.89, 0.19)), TEAM_MID)
+    mesh.polygon(((0, 1.04, 0.15), (-1.03, 2.02, 0.06), (-0.36, 2.15, 0.09), (0, 1.78, 0.22), (0.36, 2.15, 0.09), (1.03, 2.02, 0.06)), TEAM_DARK)
     mesh.polygon(((-0.14, -0.62, 0.27), (0.14, -0.62, 0.27), (0.26, 0.24, 0.47), (-0.26, 0.24, 0.47)), GLASS)
     mesh.polygon(((0, 1.25, 0.24), (0.08, 1.91, 1.06), (-0.08, 1.91, 1.06)), GREEN_DARK)
     mesh.box(-0.15, 0.15, 1.86, 2.24, 0.04, 0.22, METAL)
@@ -127,13 +138,13 @@ def _azar_airframe() -> Mesh:
 
 def _toufan_airframe() -> Mesh:
     mesh = Mesh()
-    mesh.tapered_box((-0.63, 0.63, -1.50, 1.25, 0.24), (-0.39, 0.39, -1.60, 1.07, 0.93), GREEN)
+    mesh.tapered_box((-0.63, 0.63, -1.50, 1.25, 0.24), (-0.39, 0.39, -1.60, 1.07, 0.93), TEAM_MID)
     mesh.polygon(((-0.37, -1.58, 0.46), (0.37, -1.58, 0.46), (0.27, -0.71, 0.88), (-0.27, -0.71, 0.88)), GLASS)
-    mesh.slanted_box_y(-0.11, 0.11, 0.74, 3.05, 0.50, 0.83, 0.18, GREEN_DARK)
-    mesh.polygon(((0, 2.42, 0.73), (-0.83, 2.99, 0.65), (0, 2.85, 0.82), (0.83, 2.99, 0.65)), GREEN)
-    mesh.polygon(((0, 2.40, 0.69), (0, 3.03, 1.50), (0, 3.03, 0.62)), GREEN_DARK)
-    mesh.box(-1.31, -0.56, -0.18, 0.49, 0.31, 0.48, SAND)
-    mesh.box(0.56, 1.31, -0.18, 0.49, 0.31, 0.48, SAND)
+    mesh.slanted_box_y(-0.11, 0.11, 0.74, 3.05, 0.50, 0.83, 0.18, TEAM_DARK)
+    mesh.polygon(((0, 2.42, 0.73), (-0.83, 2.99, 0.65), (0, 2.85, 0.82), (0.83, 2.99, 0.65)), TEAM_MID)
+    mesh.polygon(((0, 2.40, 0.69), (0, 3.03, 1.50), (0, 3.03, 0.62)), TEAM_DARK)
+    mesh.box(-1.31, -0.56, -0.18, 0.49, 0.31, 0.48, TEAM_LIGHT)
+    mesh.box(0.56, 1.31, -0.18, 0.49, 0.31, 0.48, TEAM_LIGHT)
     for x in (-1.13, 0.87):
         mesh.cylinder_y((x, -0.22, 0.38), 0.65, 0.10, METAL)
     mesh.cylinder_z((0, -0.04, 1.03), 0.20, 0.15, METAL)
@@ -142,9 +153,9 @@ def _toufan_airframe() -> Mesh:
 
 def _mohajer_airframe() -> Mesh:
     mesh = Mesh()
-    mesh.tapered_box((-0.24, 0.24, -2.06, 1.62, 0.12), (-0.16, 0.16, -1.77, 1.46, 0.38), SAND)
-    mesh.polygon(((-0.16, -0.58, 0.20), (-2.20, 0.32, 0.05), (-0.55, 0.69, 0.14), (0, 0.45, 0.31), (0.55, 0.69, 0.14), (2.20, 0.32, 0.05), (0.16, -0.58, 0.20)), GREEN_LIGHT)
-    mesh.polygon(((0, 1.10, 0.19), (-0.86, 1.71, 0.08), (-0.28, 1.75, 0.13), (0.28, 1.75, 0.13), (0.86, 1.71, 0.08)), GREEN)
+    mesh.tapered_box((-0.24, 0.24, -2.06, 1.62, 0.12), (-0.16, 0.16, -1.77, 1.46, 0.38), TEAM_MID)
+    mesh.polygon(((-0.16, -0.58, 0.20), (-2.20, 0.32, 0.05), (-0.55, 0.69, 0.14), (0, 0.45, 0.31), (0.55, 0.69, 0.14), (2.20, 0.32, 0.05), (0.16, -0.58, 0.20)), TEAM_LIGHT)
+    mesh.polygon(((0, 1.10, 0.19), (-0.86, 1.71, 0.08), (-0.28, 1.75, 0.13), (0.28, 1.75, 0.13), (0.86, 1.71, 0.08)), TEAM_DARK)
     mesh.cylinder_y((0, 1.72, 0.24), 0.33, 0.18, METAL)
     mesh.box(-0.18, 0.18, -1.94, -1.68, 0.25, 0.44, GLASS)
     return mesh
@@ -152,18 +163,18 @@ def _mohajer_airframe() -> Mesh:
 
 def _loiter_airframe() -> Mesh:
     mesh = Mesh()
-    mesh.tapered_box((-0.16, 0.16, -1.77, 1.20, 0.11), (-0.09, 0.09, -1.58, 1.08, 0.28), GREEN_DARK)
-    mesh.polygon(((0, -0.48, 0.18), (-1.52, 0.53, 0.04), (-0.28, 0.72, 0.13), (0.28, 0.72, 0.13), (1.52, 0.53, 0.04)), SAND)
-    mesh.polygon(((0, 0.84, 0.15), (-0.62, 1.35, 0.06), (0, 1.18, 0.19), (0.62, 1.35, 0.06)), GREEN)
+    mesh.tapered_box((-0.16, 0.16, -1.77, 1.20, 0.11), (-0.09, 0.09, -1.58, 1.08, 0.28), TEAM_DARK)
+    mesh.polygon(((0, -0.48, 0.18), (-1.52, 0.53, 0.04), (-0.28, 0.72, 0.13), (0.28, 0.72, 0.13), (1.52, 0.53, 0.04)), TEAM_LIGHT)
+    mesh.polygon(((0, 0.84, 0.15), (-0.62, 1.35, 0.06), (0, 1.18, 0.19), (0.62, 1.35, 0.06)), TEAM_MID)
     mesh.box(-0.13, 0.13, -1.73, -1.49, 0.15, 0.35, RED, outline=False)
     return mesh
 
 
 def _peykaap_hull() -> Mesh:
     mesh = Mesh()
-    mesh.polygon(((0, -2.67, 0.18), (0.77, -1.69, 0.12), (0.91, 1.72, 0.15), (0.57, 2.20, 0.20), (-0.57, 2.20, 0.20), (-0.91, 1.72, 0.15), (-0.77, -1.69, 0.12)), GREEN_DARK)
-    mesh.polygon(((0, -2.50, 0.20), (0.72, -1.57, 0.22), (0.72, 1.72, 0.28), (-0.72, 1.72, 0.28), (-0.72, -1.57, 0.22)), SAND)
-    mesh.tapered_box((-0.50, 0.50, -0.55, 0.75, 0.27), (-0.39, 0.39, -0.44, 0.63, 0.90), GREEN)
+    mesh.polygon(((0, -2.67, 0.18), (0.77, -1.69, 0.12), (0.91, 1.72, 0.15), (0.57, 2.20, 0.20), (-0.57, 2.20, 0.20), (-0.91, 1.72, 0.15), (-0.77, -1.69, 0.12)), TEAM_DEEP)
+    mesh.polygon(((0, -2.50, 0.20), (0.72, -1.57, 0.22), (0.72, 1.72, 0.28), (-0.72, 1.72, 0.28), (-0.72, -1.57, 0.22)), TEAM_LIGHT)
+    mesh.tapered_box((-0.50, 0.50, -0.55, 0.75, 0.27), (-0.39, 0.39, -0.44, 0.63, 0.90), TEAM_MID)
     mesh.box(-0.29, 0.29, -0.49, -0.38, 0.57, 0.79, GLASS, outline=False)
     mesh.box(-0.38, 0.38, 1.18, 1.50, 0.28, 0.47, METAL)
     return mesh
@@ -171,30 +182,30 @@ def _peykaap_hull() -> Mesh:
 
 def _peykaap_turret() -> Mesh:
     mesh = Mesh()
-    mesh.cylinder_z((0, -1.16, 0.31), 0.09, 0.28, GREEN_DARK)
-    mesh.box(-0.26, 0.26, -1.42, -0.91, 0.33, 0.60, GREEN)
+    mesh.cylinder_z((0, -1.16, 0.31), 0.09, 0.28, TEAM_DEEP)
+    mesh.box(-0.26, 0.26, -1.42, -0.91, 0.33, 0.60, TEAM_MID)
     mesh.cylinder_y((0, -1.70, 0.49), 0.83, 0.055, METAL, segments=8)
     for x in (-0.53, 0.25):
-        mesh.slanted_box_y(x, x + 0.28, 0.42, 1.38, 0.42, 0.55, 0.20, SAND_LIGHT)
+        mesh.slanted_box_y(x, x + 0.28, 0.42, 1.38, 0.42, 0.55, 0.20, TEAM_LIGHT)
     return mesh
 
 
 def _ghadir_hull() -> Mesh:
     mesh = Mesh()
-    mesh.cylinder_y((0, 0, 0.34), 4.56, 0.55, GREEN_DARK, segments=12)
-    mesh.polygon(((0, -2.65, 0.34), (-0.43, -2.25, 0.13), (0.43, -2.25, 0.13)), GREEN_DARK)
-    mesh.polygon(((0, 2.55, 0.34), (-0.38, 2.22, 0.16), (0.38, 2.22, 0.16)), GREEN_DARK)
-    mesh.box(-0.15, 0.15, -0.18, 0.51, 0.78, 1.17, GREEN)
+    mesh.cylinder_y((0, 0, 0.34), 4.56, 0.55, TEAM_DARK, segments=12)
+    mesh.polygon(((0, -2.65, 0.34), (-0.43, -2.25, 0.13), (0.43, -2.25, 0.13)), TEAM_DARK)
+    mesh.polygon(((0, 2.55, 0.34), (-0.38, 2.22, 0.16), (0.38, 2.22, 0.16)), TEAM_DARK)
+    mesh.box(-0.15, 0.15, -0.18, 0.51, 0.78, 1.17, TEAM_MID)
     mesh.box(-0.05, 0.05, -0.21, -0.03, 1.12, 1.48, METAL)
-    mesh.polygon(((-0.12, 1.75, 0.36), (-0.98, 2.30, 0.26), (0, 2.07, 0.45), (0.98, 2.30, 0.26), (0.12, 1.75, 0.36)), GREEN)
+    mesh.polygon(((-0.12, 1.75, 0.36), (-0.98, 2.30, 0.26), (0, 2.07, 0.45), (0.98, 2.30, 0.26), (0.12, 1.75, 0.36)), TEAM_LIGHT)
     return mesh
 
 
 def _classic_pair(hull: Mesh, turret: Mesh, frame_size: int, span: float) -> tuple[list[Image.Image], list[Image.Image]]:
     angles = _angles(32, classic=True)
     return (
-        [_render(hull, angle, frame_size, shadow=True, model_span=span) for angle in angles],
-        [_render(turret, angle, frame_size, shadow=False, model_span=span) for angle in angles],
+        [_render(hull, angle, frame_size, shadow=True, model_span=span, flat_colors=TEAM_MARKERS) for angle in angles],
+        [_render(turret, angle, frame_size, shadow=False, model_span=span, flat_colors=TEAM_MARKERS) for angle in angles],
     )
 
 
@@ -212,9 +223,9 @@ def render_fajr(frame_size: int = 40, facings: int = 32) -> tuple[list[Image.Ima
     assert facings == 32
     angles = _angles(32, classic=True)
     return (
-        [_render(_truck_hull(), angle, frame_size, shadow=True, model_span=5.85) for angle in angles],
-        [_render(_fajr_turret(loaded=True), angle, frame_size, shadow=False, model_span=5.85) for angle in angles],
-        [_render(_fajr_turret(loaded=False), angle, frame_size, shadow=False, model_span=5.85) for angle in angles],
+        [_render(_truck_hull(), angle, frame_size, shadow=True, model_span=5.85, flat_colors=TEAM_MARKERS) for angle in angles],
+        [_render(_fajr_turret(loaded=True), angle, frame_size, shadow=False, model_span=5.85, flat_colors=TEAM_MARKERS) for angle in angles],
+        [_render(_fajr_turret(loaded=False), angle, frame_size, shadow=False, model_span=5.85, flat_colors=TEAM_MARKERS) for angle in angles],
     )
 
 
@@ -224,7 +235,7 @@ def render_coast(frame_size: int = 40, facings: int = 32) -> tuple[list[Image.Im
 
 
 def _air_frames(mesh: Mesh, frame_size: int, facings: int, span: float, *, pitch: float = 0) -> list[Image.Image]:
-    return [_render(mesh, angle, frame_size, shadow=False, model_span=span, center_y_factor=0.59, pitch=pitch) for angle in _angles(facings, classic=facings == 32)]
+    return [_render(mesh, angle, frame_size, shadow=False, model_span=span, center_y_factor=0.59, pitch=pitch, flat_colors=TEAM_MARKERS) for angle in _angles(facings, classic=facings == 32)]
 
 
 def render_azar(frame_size: int = 56, facings: int = 16) -> list[Image.Image]:
@@ -249,14 +260,14 @@ def render_loiter(frame_size: int = 40, facings: int = 16) -> list[Image.Image]:
 
 def render_peykaap(frame_size: int = 44, facings: int = 16) -> tuple[list[Image.Image], list[Image.Image]]:
     assert facings == 16
-    hull = [_render(_peykaap_hull(), angle, frame_size, shadow=False, model_span=6.1, center_y_factor=0.62) for angle in _angles(16, classic=False)]
-    turret = [_render(_peykaap_turret(), angle, frame_size, shadow=False, model_span=6.1, center_y_factor=0.62) for angle in _angles(32, classic=True)]
+    hull = [_render(_peykaap_hull(), angle, frame_size, shadow=False, model_span=6.1, center_y_factor=0.62, flat_colors=TEAM_MARKERS) for angle in _angles(16, classic=False)]
+    turret = [_render(_peykaap_turret(), angle, frame_size, shadow=False, model_span=6.1, center_y_factor=0.62, flat_colors=TEAM_MARKERS) for angle in _angles(32, classic=True)]
     return hull, turret
 
 
 def render_ghadir(frame_size: int = 44, facings: int = 16) -> list[Image.Image]:
     assert facings == 16
-    return [_render(_ghadir_hull(), angle, frame_size, shadow=False, model_span=6.0, center_y_factor=0.62) for angle in _angles(16, classic=False)]
+    return [_render(_ghadir_hull(), angle, frame_size, shadow=False, model_span=6.0, center_y_factor=0.62, flat_colors=TEAM_MARKERS) for angle in _angles(16, classic=False)]
 
 
 DIRECTIONAL_RENDERERS: dict[str, Callable[..., object]] = {
@@ -327,70 +338,51 @@ def _infantry_pose(action: str, phase: int, length: int) -> dict[str, float]:
     return pose
 
 
-def render_infantry(role: str, frame_size: int = 32) -> list[Image.Image]:
-    """Return a full facing-major E1/E3/E7-compatible animation sheet."""
+IRAN_INFANTRY_STYLES = {
+    "basij": InfantryStyle("rifle", TEAM_MID, TEAM_DEEP, TEAM_LIGHT, (137, 91, 61), GREEN_DARK, SAND_LIGHT, 1.04),
+    "atgm": InfantryStyle("atgm", TEAM_MID, TEAM_DEEP, TEAM_DARK, (137, 91, 61), METAL, SAND_LIGHT, 1.16),
+    "controller": InfantryStyle("controller", TEAM_LIGHT, TEAM_DEEP, TEAM_MID, (137, 91, 61), GLASS, (74, 194, 166), 1.02),
+    "shadow": InfantryStyle("shadow", TEAM_DEEP, (31, 38, 36), (76, 84, 79), (127, 84, 58), (21, 26, 25), (79, 224, 184), 1.13, hood=True),
+}
 
-    layout = (
-        ("stand", 1, True), ("stand2", 1, True), ("run", 6, True), ("shoot", 8, True),
-        ("prone-stand", 1, True), ("prone-run", 4, True), ("liedown", 2, True),
-        ("standup", 2, True), ("prone-shoot", 8, True), ("idle1", 8, False),
-        ("idle2", 8, False), ("die1", 8, True), ("die2", 8, True),
-        ("die3", 8, True), ("die4", 12, True), ("die5", 18, True),
-        ("parachute", 1, False),
-    )
-    colors = {
-        "basij": (GREEN, SAND, GREEN_DARK),
-        "atgm": (SAND, GREEN, METAL),
-        "controller": (GREEN_LIGHT, SAND_DARK, GLASS),
-        "shadow": ((33, 38, 37), (55, 65, 61), (18, 22, 22)),
-    }
-    uniform, vest, gear = colors[role]
+
+def render_infantry(role: str, frame_size: int | None = None) -> list[Image.Image]:
+    """Return the complete facing-major E1/E3/E7-compatible Iran sheet.
+
+    Every pose is rebuilt from the articulated figure. Upright poses keep a
+    vertical spine at all headings while legs, weapon, backpack, cloak, and
+    facing cues are independently projected. No finished bitmap is rotated.
+    """
+
+    del frame_size  # Native Red Sea infantry canvases are a stable 50x39.
+    style = IRAN_INFANTRY_STYLES[role]
+    team = (TEAM_LIGHT, TEAM_MID, TEAM_DARK, TEAM_DEEP)
     frames: list[Image.Image] = []
-    for action, length, directional in layout:
-        facings = range(8) if directional else range(1)
-        for facing in facings:
-            for phase in range(length):
-                pose = _infantry_pose(action, phase, length)
-                image = Image.new("RGBA", (frame_size * 4, frame_size * 4), (0, 0, 0, 0))
-                draw = ImageDraw.Draw(image)
-                center = (frame_size * 2, frame_size * 2 + 16)
-                prone = "prone" in action or pose["crouch"] > 0.55
-                fall = pose["fall"]
-                if action.startswith("die"):
-                    facing = (facing + int(4 * fall)) % 8
-                scale = 4
-                ground = (center[0], center[1] + 28 * scale / 4)
-                draw.ellipse((ground[0] - 16, ground[1] - 5, ground[0] + 16, ground[1] + 6), fill=(0, 0, 0, 80))
-                body_y = center[1] + pose["bob"] * scale + (12 if prone else 0) + fall * 21
-                body = _point((center[0], body_y), facing, pose["lean"] * 2, 0)
-                head = _point(body, facing, -7 if prone else -11 + fall * 7, 0)
-                hip = _point(body, facing, 5 if prone else 9, 0)
-                leg_a = _point(hip, facing, 7 if prone else 8, pose["leg"])
-                leg_b = _point(hip, facing, 7 if prone else 8, -pose["leg"])
-                width = 5 * scale // 2
-                draw.line((hip, leg_a), fill=(*uniform, 255), width=width)
-                draw.line((hip, leg_b), fill=(*uniform, 255), width=width)
-                draw.line((body, hip), fill=(*vest, 255), width=7 * scale // 2)
-                draw.ellipse((head[0] - 6, head[1] - 6, head[0] + 6, head[1] + 6), fill=(157, 119, 84, 255))
-                draw.arc((head[0] - 7, head[1] - 8, head[0] + 7, head[1] + 5), 180, 360, fill=(*gear, 255), width=4)
-                shoulder = _point(body, facing, -2, 0)
-                hand = _point(shoulder, facing, 8 + pose["arm"], 3)
-                draw.line((shoulder, hand), fill=(*uniform, 255), width=4)
-                weapon_tip = _point(hand, facing, 10 if role != "atgm" else 15, 0)
-                draw.line((hand, weapon_tip), fill=(*gear, 255), width=3 if role != "atgm" else 6)
-                if role == "controller":
-                    pack = _point(body, facing, 2, -4)
-                    draw.rectangle((pack[0] - 5, pack[1] - 5, pack[0] + 5, pack[1] + 6), fill=(*gear, 255))
-                    draw.line((pack[0], pack[1] - 4, pack[0] + 2, pack[1] - 14), fill=(*METAL, 255), width=2)
-                if role == "shadow":
-                    cloak = _point(body, facing, 2, -2)
-                    draw.polygon((cloak, (hip[0] - 8, hip[1] + 2), (hip[0] + 8, hip[1] + 2)), fill=(20, 27, 26, 210))
-                    visor = _point(head, facing, 1, 0)
-                    draw.ellipse((visor[0] - 3, visor[1] - 2, visor[0] + 3, visor[1] + 2), fill=(61, 167, 137, 255))
-                if action in {"shoot", "prone-shoot"} and phase in {1, 2}:
-                    muzzle = _point(weapon_tip, facing, 2, 0)
-                    draw.ellipse((muzzle[0] - 4, muzzle[1] - 4, muzzle[0] + 4, muzzle[1] + 4), fill=(255, 187, 58, 235))
-                frames.append(image.resize((frame_size, frame_size), Image.Resampling.LANCZOS))
+
+    frames.extend(_frame(style, team, "stand", facing, 0) for facing in range(8))
+    frames.extend(_frame(style, team, "stand", facing, 7) for facing in range(8))
+    for facing in range(8):
+        frames.extend(_frame(style, team, "run", facing, phase, 6) for phase in range(6))
+    for facing in range(8):
+        frames.extend(_frame(style, team, "shoot", facing, phase, 8) for phase in range(8))
+    frames.extend(_frame(style, team, "prone", facing, 0, 4) for facing in range(8))
+    for facing in range(8):
+        frames.extend(_frame(style, team, "prone", facing, phase, 4) for phase in range(4))
+    for facing in range(8):
+        frames.extend(_frame(style, team, "transition", facing, phase, 2) for phase in range(2))
+    for facing in range(8):
+        frames.extend(_frame(style, team, "transition", facing, 1 - phase, 2) for phase in range(2))
+    for facing in range(8):
+        frames.extend(_frame(style, team, "prone-shoot", facing, phase, 8) for phase in range(8))
+    frames.extend(_frame(style, team, "idle", 0, phase, 8, 0) for phase in range(8))
+    frames.extend(_frame(style, team, "idle", 0, phase, 8, 1) for phase in range(8))
+    for variant, length in enumerate((8, 8, 8, 12, 18)):
+        for facing in range(8):
+            frames.extend(_frame(style, team, "directional-die", facing, phase, length, variant) for phase in range(length))
+    frames.append(_frame(style, team, "stand", 0, 0))
+
+    if len(frames) != 713:
+        raise AssertionError(f"{role}: expected 713 Iran infantry frames, got {len(frames)}")
     return frames
 
 

@@ -89,6 +89,14 @@ SHOWCASE_ACTORS = """\
 """
 
 SHOWCASE_RULES = """\
+World:
+	# The range deliberately destroys its only target building while continuing
+	# into drone and naval trials, so short-game victory must never end the run.
+	MapOptions:
+		ShortGameCheckboxEnabled: False
+		ShortGameCheckboxLocked: True
+		ShortGameCheckboxVisible: False
+
 Player:
 \t# Doctrine-range telemetry is symmetric: every player can inspect the full
 \t# build tree and bot force composition without hidden-information inference.

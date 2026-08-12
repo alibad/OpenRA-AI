@@ -516,6 +516,7 @@ def _render(
     model_span: float = 5.45,
     center_y_factor: float = 0.63,
     pitch: float = 0.0,
+    flat_colors: frozenset[Color] = frozenset(),
 ) -> Image.Image:
     supersample = 4
     scale = frame_size * supersample / model_span
@@ -548,7 +549,10 @@ def _render(
         points = [(center_x + x * scale, center_y + (y * 0.57 - z * 0.82) * scale) for x, y, z in vertices]
         depth = sum(_dot(vertex, camera) for vertex in vertices) / len(vertices)
         diffuse = max(0.0, _dot(normal, light))
-        color = _shade(face.color, 0.62 + 0.48 * diffuse)
+        # Some asset families reserve exact source colors as palette markers.
+        # Keep these stable so the indexed PNG builder can translate them into
+        # native player-remap ramps after the per-facing geometry is rendered.
+        color = face.color if face.color in flat_colors else _shade(face.color, 0.62 + 0.48 * diffuse)
         visible.append((depth, points, color, face.outline))
 
     draw = ImageDraw.Draw(canvas)

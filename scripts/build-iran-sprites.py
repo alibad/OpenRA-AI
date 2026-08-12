@@ -14,11 +14,34 @@ if str(SCRIPT_ROOT) not in sys.path:
     sys.path.insert(0, str(SCRIPT_ROOT))
 
 from iran_directional_assets import (
+    TEAM_DARK,
+    TEAM_DEEP,
+    TEAM_LIGHT,
+    TEAM_MID,
     render_directional_asset,
     render_effect,
     render_infantry,
     render_rotor,
 )
+
+
+REMAP_MARKERS = {
+    TEAM_LIGHT: 82,
+    TEAM_MID: 85,
+    TEAM_DARK: 89,
+    TEAM_DEEP: 93,
+}
+
+
+def remap_marker_index(rgb: bytes) -> int | None:
+    red, green, blue = rgb
+    # LANCZOS downsampling softens marker edges. Recognize the isolated magenta
+    # chroma family, then preserve the closest authored luminance step.
+    if red < 135 or blue < 135 or green > 72 or green * 3 > min(red, blue):
+        return None
+    color = (red, green, blue)
+    marker = min(REMAP_MARKERS, key=lambda candidate: sum((a - b) ** 2 for a, b in zip(color, candidate)))
+    return REMAP_MARKERS[marker]
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -80,15 +103,25 @@ ICONS = {
 def quantize(image: Image.Image, palette: Image.Image, *, opaque: bool = False) -> Image.Image:
     indexed = image.convert("RGB").quantize(palette=palette.copy(), dither=Image.Dither.NONE)
     data = bytearray(indexed.tobytes())
+    source = image.convert("RGB").tobytes()
     if opaque:
         for index, value in enumerate(data):
-            if value == 0:
+            rgb = source[index * 3:index * 3 + 3]
+            remap = remap_marker_index(rgb)
+            if remap is not None:
+                data[index] = remap
+            elif value == 0:
                 data[index] = 16
     else:
         alpha = image.getchannel("A").tobytes()
         for index, value in enumerate(alpha):
             if value < 96:
                 data[index] = 0
+            else:
+                rgb = source[index * 3:index * 3 + 3]
+                remap = remap_marker_index(rgb)
+                if remap is not None:
+                    data[index] = remap
     indexed.frombytes(bytes(data))
     if not opaque:
         indexed.info["transparency"] = 0
