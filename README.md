@@ -158,9 +158,10 @@ OpenRA map package that remains editable by hand.
 
 See [Earth mission generation](docs/earth-missions.md).
 
-## Red Sea 2026 vertical slice
+## OpenRA: World War III
 
-The development build includes a scripted modern-country vertical slice:
+**World War III** is the modern global-conflict mod being built on this fork.
+Its first playable theater is the scripted Red Sea 2026 vertical slice:
 Saudi Arabia and Yemen, original directional sprites, Arabic vehicle responses,
 bilingual campaign radio, native bot production weights, and a source-dated
 two-mission campaign slice. After setup, run `Play-Red-Sea-2026.cmd` to generate,
@@ -168,7 +169,7 @@ validate, install, and open Jizan Corridor, or run
 `.\scripts\play-red-sea-2026.ps1 -Mission hodeidah-lifeline-2026` to play the
 Yemen-side Hodeidah Lifeline mission.
 
-See [Red Sea 2026 vertical slice](docs/red-sea-2026.md).
+See the [Red Sea 2026 theater](docs/red-sea-2026.md).
 
 ## Build from source
 

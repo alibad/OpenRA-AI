@@ -36,6 +36,31 @@ def terrain_profile(analysis: TerrainAnalysis) -> str:
     return "Plains"
 
 
+def _seeded_choice(selection: GeoSelection, salt: int, choices: tuple[str, ...]) -> str:
+    """Pick a stable recipe component without coupling it to Python's hash seed."""
+    return choices[(selection.seed + salt) % len(choices)]
+
+
+def _creative_terrain_choices(base: str, selection: GeoSelection, analysis: TerrainAnalysis) -> tuple[str, ...]:
+    if selection.mission_archetype == "river-crossing":
+        return ("NarrowWetlands", "Wetlands", "MountainLakes" if analysis.relief == "mountainous" else "Puddles")
+    if selection.mission_archetype == "urban-siege":
+        return ("Plots", "Gardens", "Rocky")
+    if selection.mission_archetype == "supply-raid":
+        return (base, "Plots", "Rocky")
+    if selection.mission_archetype == "convoy-defense":
+        return (base, "Rocky", "Plots")
+    if selection.mission_archetype == "infrastructure-defense":
+        return (base, "Plots", "Gardens")
+    if analysis.water_confidence >= 0.25:
+        return (base, "Wetlands", "Puddles")
+    if analysis.relief == "mountainous":
+        return (base, "Rocky", "MountainLakes")
+    if analysis.vegetation_density >= 0.28:
+        return (base, "Gardens", "Overgrown")
+    return (base, "Plots", "Rocky")
+
+
 def generation_options(selection: GeoSelection, analysis: TerrainAnalysis) -> dict[str, str | int | bool]:
     if analysis.urban_density >= 0.55:
         civilian_density = "High"
@@ -46,11 +71,12 @@ def generation_options(selection: GeoSelection, analysis: TerrainAnalysis) -> di
     else:
         civilian_density = "None"
 
-    return {
+    base_terrain = terrain_profile(analysis)
+    options: dict[str, str | int | bool] = {
         "tileset": {"desert": "DESERT", "snow": "SNOW"}.get(analysis.biome, "TEMPERAT"),
         "size": selection.map_size,
         "seed": selection.seed,
-        "terrain": terrain_profile(analysis),
+        "terrain": base_terrain,
         "shape": "Square",
         "players": 2,
         # Reality-first keeps natural asymmetry. The other modes use rotational
@@ -64,6 +90,55 @@ def generation_options(selection: GeoSelection, analysis: TerrainAnalysis) -> di
         "deny-walled-areas": True,
         "attempts": 8,
     }
+
+    # Mission archetypes are gameplay recipes built from the native Random Map
+    # controls. Reality-first preserves the observed terrain family; the other
+    # modes are allowed to strengthen the requested tactical structure.
+    if selection.mission_archetype == "river-crossing":
+        if selection.generation_mode != "reality-first":
+            options["terrain"] = "MountainLakes" if analysis.relief == "mountainous" else "NarrowWetlands"
+        options["density"] = "AreaAndPlayers"
+    elif selection.mission_archetype == "urban-siege":
+        if selection.generation_mode != "reality-first":
+            options["terrain"] = "Gardens" if analysis.vegetation_density >= 0.45 else "Plots"
+        options["buildings"] = "Extra"
+        options["density"] = "AreaHigh"
+        options["civilian-density"] = "High"
+    elif selection.mission_archetype == "supply-raid":
+        options["resources"] = "VeryHigh"
+        options["buildings"] = "OilRush"
+        options["density"] = "AreaAndPlayers"
+    elif selection.mission_archetype == "convoy-defense":
+        options["resources"] = "High"
+        options["buildings"] = "OilOnly"
+        options["density"] = "AreaAndPlayers"
+    elif selection.mission_archetype == "infrastructure-defense":
+        if selection.generation_mode != "reality-first":
+            options["terrain"] = "Plots"
+        options["resources"] = "High"
+        options["buildings"] = "Extra"
+        options["density"] = "AreaAndPlayers"
+
+    if selection.generation_mode == "creative-remix":
+        options["terrain"] = _seeded_choice(
+            selection,
+            0,
+            _creative_terrain_choices(base_terrain, selection, analysis),
+        )
+        shapes = ("Square",) if selection.mission_archetype in {"river-crossing", "urban-siege"} else (
+            "Square",
+            "CircleMountain",
+            "CircleWater",
+        )
+        options["shape"] = _seeded_choice(selection, 11, shapes)
+        options["symmetry"] = _seeded_choice(
+            selection,
+            23,
+            ("2Rotations", "LeftMatchesRight", "TopMatchesBottom", "TopLeftMatchesBottomRight", "TopRightMatchesBottomLeft"),
+        )
+        options["attempts"] = 12
+
+    return options
 
 
 class NativeMapGenerator:

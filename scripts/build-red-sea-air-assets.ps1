@@ -11,7 +11,7 @@ $staging = Join-Path $repositoryRoot "generated\red-sea-sprites"
 $paletteDirectory = Join-Path $staging "palette"
 $bits = Join-Path $engineRoot "mods\ra\bits"
 $airAssets = @(
-    "samad", "f15sa", "ah64sa", "f15sahusk", "ah64sahusk", "ah64sarotor",
+    "samad", "f15sa", "ah64sa", "samadhusk", "f15sahusk", "ah64sahusk", "ah64sarotor",
     "redsea-air-muzzle", "redsea-air-impact", "samadicon", "f15saicon", "ah64saicon",
     "redsea-drone-impact"
 )

@@ -76,6 +76,9 @@ Actors:
 	YemenRadar: dome
 		Location: 33,67
 		Owner: Yemen
+	YemenTechCenter: stek
+		Location: 20,69
+		Owner: Yemen
 	PortControl: fcom
 		Location: 15,82
 		Owner: Yemen
@@ -112,18 +115,22 @@ Actors:
 		Location: 42,69
 		Owner: Yemen
 		Facing: 128
-	YemenRifle1: e1
+	YemenRifle1: ymr
 		Location: 25,73
 		Owner: Yemen
 		SubCell: 0
-	YemenRifle2: e1
+	YemenRifle2: ymr
 		Location: 25,73
 		Owner: Yemen
 		SubCell: 2
-	YemenRocket1: e3
+	YemenRocket1: yrpg
 		Location: 27,73
 		Owner: Yemen
 		SubCell: 1
+	YemenDroneSpotter: yspot
+		Location: 26,72
+		Owner: Yemen
+		SubCell: 3
 	SaudiRadar: dome
 		Location: 76,20
 		Owner: Saudi Arabia

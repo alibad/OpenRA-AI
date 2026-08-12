@@ -46,10 +46,13 @@ if ($LASTEXITCODE -ne 0) { throw "Red Sea faction UI build failed." }
 if ($LASTEXITCODE -ne 0) { throw "Red Sea sprite frame build failed." }
 
 foreach ($asset in @(
-    "m1a2s", "sads", "tech", "ymlr", "samad",
-    "m1a2shusk", "sadshusk", "techhusk", "ymlrhusk",
-    "m1a2sicon", "sadsicon", "techicon", "ymlricon", "samadicon",
-    "redsea-m1-impact", "redsea-m1-muzzle", "redsea-drone-impact"
+    "m1a2s", "sads", "tech", "ymlr", "samad", "f15sa", "ah64sa",
+    "sang", "sajtac", "saat", "falcon1", "ymr", "yrpg", "yspot", "wadighost",
+    "m1a2shusk", "sadshusk", "techhusk", "ymlrhusk", "samadhusk", "f15sahusk", "ah64sahusk",
+    "m1a2sicon", "sadsicon", "techicon", "ymlricon", "samadicon", "f15saicon", "ah64saicon",
+    "sangicon", "sajtacicon", "saaticon", "falcon1icon", "ymricon", "yrpgicon", "yspoticon", "wadighosticon",
+    "ah64sarotor", "redsea-m1-impact", "redsea-m1-muzzle", "redsea-drone-impact",
+    "redsea-air-muzzle", "redsea-air-impact"
 )) {
     $assetDirectory = Join-Path $staging $asset
     Push-Location $assetDirectory

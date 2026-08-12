@@ -1,0 +1,96 @@
+{
+  "schema_version": 1,
+  "generated_from_date": "2026-08-12",
+  "projects": [
+    {
+      "id": "openra-mod-sdk",
+      "name": "OpenRA Mod SDK",
+      "repository": "https://github.com/OpenRA/OpenRAModSDK",
+      "checkout": "OpenRAModSDK",
+      "commit": "df103939c7e472e715b9fce7cbaf7e35b54dc037",
+      "code_license": "GPL-3.0-or-later",
+      "content_policy": "example content; verify each asset before reuse",
+      "reuse_role": "canonical SDK layout, packaging, linting, and minimal mod examples"
+    },
+    {
+      "id": "combined-arms",
+      "name": "Combined Arms",
+      "repository": "https://github.com/Inq8/CAmod",
+      "checkout": "CAmod",
+      "commit": "ab9e477c3db818e91946d4cfdc86e71012966141",
+      "code_license": "GPL-3.0-or-later",
+      "content_policy": "mixed provenance; quarantine all binary assets pending credits review",
+      "reuse_role": "broad faction, unit, support-power, AI, naval, air, and campaign reference"
+    },
+    {
+      "id": "generals-alpha",
+      "name": "Generals Alpha",
+      "repository": "https://github.com/MustaphaTR/Generals-Alpha",
+      "checkout": "Generals-Alpha",
+      "commit": "21217baad7579abcba5dbcccd7935a57050d686e",
+      "code_license": "GPL-3.0-or-later",
+      "content_policy": "uses Red Alert and Tiberian Dawn artwork; do not import binary assets without separate clearance",
+      "reuse_role": "modern asymmetric factions, generals points, upgrades, powers, aircraft, and strategy AI"
+    },
+    {
+      "id": "ra-plus",
+      "name": "RA+",
+      "repository": "https://github.com/MlemandPurrs/raplusmod",
+      "checkout": "raplusmod",
+      "commit": "3188783037c9d74dcf61f23e3cf7e49a32b6cd36",
+      "code_license": "GPL-3.0-or-later",
+      "content_policy": "contains Westwood artwork and sounds; mechanics only until per-asset clearance",
+      "reuse_role": "country and subfaction architecture, national bonuses, rosters, and build-tree variants"
+    },
+    {
+      "id": "shattered-paradise",
+      "name": "Shattered Paradise",
+      "repository": "https://github.com/ABrandau/Shattered-Paradise-SDK",
+      "checkout": "Shattered-Paradise-SDK",
+      "commit": "124b7054a636a9c51d8edc87b3171bf63b92556f",
+      "code_license": "GPL-3.0-compatible",
+      "content_policy": "non-code assets are CC-BY-NC-4.0; reference-only for a distributable commercial-capable build",
+      "reuse_role": "complete new factions, Tiberian Sun systems, mutation mechanics, effects, and advanced traits"
+    },
+    {
+      "id": "romanovs-vengeance",
+      "name": "Romanov's Vengeance",
+      "repository": "https://github.com/MustaphaTR/Romanovs-Vengeance",
+      "checkout": "Romanovs-Vengeance",
+      "commit": "231059963663dcb07d07b56f607b41d173795da9",
+      "code_license": "GPL-3.0-or-later",
+      "content_policy": "requires owned Red Alert 2/Yuri's Revenge content and contains mixed placeholders; mechanics only by default",
+      "reuse_role": "RA2 factions, garrisons, mind control, upgrades, amphibious systems, and production logic"
+    },
+    {
+      "id": "openra-ra2",
+      "name": "OpenRA Red Alert 2",
+      "repository": "https://github.com/OpenRA/ra2",
+      "checkout": "ra2",
+      "commit": "61e24e3c1d7b586aa55a86096d29e1559aa9b994",
+      "code_license": "GPL-3.0-or-later",
+      "content_policy": "original game content is not covered by the code license; mechanics only by default",
+      "reuse_role": "cleaner upstream RA2 architecture and baseline behavior"
+    },
+    {
+      "id": "cameo",
+      "name": "Cameo",
+      "repository": "https://github.com/cameo-mod/Cameo-mod",
+      "checkout": "Cameo-mod",
+      "commit": "729db68e12f2aaf0feb3fdf0d97b98526fbe65fc",
+      "code_license": "GPL-3.0-compatible",
+      "content_policy": "mixed non-free content; original developer art is CC-BY-NC-4.0; no binary import by default",
+      "reuse_role": "experimental mechanic library: commander trees, status systems, weather, upgrades, factions, and naval options"
+    },
+    {
+      "id": "openhv",
+      "name": "OpenHV",
+      "repository": "https://github.com/OpenHV/OpenHV",
+      "checkout": "OpenHV",
+      "commit": "d507035349b05a774baedbdebd2e60abb6c57895",
+      "code_license": "GPL-3.0-or-later",
+      "content_policy": "per-folder Creative Commons licenses; import only after resolving and recording the exact asset license",
+      "reuse_role": "open-content units, art and sound pipeline, bots, maps, missions, and standalone game patterns"
+    }
+  ]
+}

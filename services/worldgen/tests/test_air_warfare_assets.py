@@ -12,6 +12,7 @@ ENGINE = ROOT / "engine" / "openra"
 BITS = ENGINE / "mods" / "ra" / "bits"
 RULES = (ENGINE / "mods" / "ra" / "rules" / "red-sea.yaml").read_text(encoding="utf-8")
 SEQUENCES = (ENGINE / "mods" / "ra" / "sequences" / "red-sea.yaml").read_text(encoding="utf-8")
+WEAPONS = (ENGINE / "mods" / "ra" / "weapons" / "red-sea.yaml").read_text(encoding="utf-8")
 
 
 def load_renderer():
@@ -54,7 +55,7 @@ def test_airframes_have_native_facing_contracts_and_stable_scale() -> None:
     helicopter_sizes = [dimensions(frame) for frame in helicopter]
     assert all(29 <= width <= 36 and 12 <= height <= 32 for width, height in samad_sizes)
     assert all(26 <= width <= 52 and 17 <= height <= 35 for width, height in fighter_sizes)
-    assert all(28 <= width <= 53 and 22 <= height <= 47 for width, height in helicopter_sizes)
+    assert all(22 <= width <= 46 and 17 <= height <= 38 for width, height in helicopter_sizes)
 
 
 def test_rotor_muzzle_and_impact_are_dedicated_animations() -> None:
@@ -67,33 +68,54 @@ def test_rotor_muzzle_and_impact_are_dedicated_animations() -> None:
     assert len(impact) == 9 and len({digest(frame) for frame in impact}) == 9
 
 
-def test_samad_is_one_way_and_has_distinct_dive_sequence() -> None:
+def test_samad_uses_native_aircraft_and_projectile_behavior() -> None:
     actor = RULES.split("\nSAMAD:\n", 1)[1].split("\nM1A2S.Husk:\n", 1)[0]
     sequence = SEQUENCES.split("\nsamad:\n", 1)[1].split("\nf15sa:\n", 1)[0]
-    assert "\t-AttackAircraft:" in actor
-    assert "\tAttackDive:" in actor
-    assert "\t-Rearmable:" in actor
+    weapon = WEAPONS.split("\nRedSeaDroneStrike:\n", 1)[1].split("\nRedSeaF15AAM:\n", 1)[0]
+    assert "\tInherits: ^Plane" in actor
+    assert "\tAttackAircraft:" in actor
+    assert "\tAttackDive:" not in actor
+    assert "\tRearmable:" not in actor
     assert "\t-KillsSelf" not in actor
     assert "\tKillsSelf@PAYLOAD:" in actor
-    assert "\tWithFacingSpriteBody@DIVE:" in actor
+    assert "\tActor: SAMAD.Husk" in actor
+    assert "\t\tRequiresCondition: airborne && !payload-released" in actor
+    assert "\tWithFacingSpriteBody@DIVE:" not in actor
     assert "\tdive:\n\t\tStart: 16" in sequence
-
-    dive_activity = (
-        ENGINE / "OpenRA.Mods.Common" / "Activities" / "Air" / "DiveAttack.cs"
-    ).read_text(encoding="utf-8")
-    assert "desiredAltitude = Math.Min" in dive_activity
-    assert "ReturnToBase" not in dive_activity
-    assert "Rearm" not in dive_activity
+    assert "\tProjectile: Missile" in weapon
+    assert "\t\tImage: samad" in weapon
+    assert "\t\tSequences: dive" in weapon
+    assert "\t\tIsPlayerPalette: True" in weapon
+    assert not (ENGINE / "OpenRA.Mods.Common" / "Traits" / "Air" / "AttackDive.cs").exists()
+    assert not (ENGINE / "OpenRA.Mods.Common" / "Activities" / "Air" / "DiveAttack.cs").exists()
 
 
 def test_aircraft_are_rearmable_and_available_to_ai() -> None:
     fighter = RULES.split("\nF15SA:\n", 1)[1].split("\nAH64SA:\n", 1)[0]
     helicopter = RULES.split("\nAH64SA:\n", 1)[1].split("\nSAMAD:\n", 1)[0]
+    airfield = RULES.split("\nSAFLD:\n", 1)[1].split("\nTENT:\n", 1)[0]
     assert "\tRearmable:" in fighter and "\tAmmoPools: aam, gun" in fighter
-    assert "\tBuildAtProductionType: Helicopter" in fighter
+    assert "\tBuildAtProductionType: Plane" in fighter
+    assert "\tRearmActors: safld, afld, afld.ukraine" in fighter
     assert "\tRearmable:" in helicopter and "\tAmmoPools: cannon, rockets" in helicopter
+    assert "\tInherits: AFLD" in airfield and "\t\tImage: afld" in airfield
+    assert RULES.count("TechTypes: ") >= 5 and RULES.count("safld") >= 10
     assert "f15sa:" in RULES and "ah64sa:" in RULES
     assert RULES.count("AirUnitsTypes: mig, yak, heli, hind, mh60, samad, f15sa, ah64sa") == 5
+
+
+def test_combat_aircraft_follow_native_order_and_veterancy_conventions() -> None:
+    fighter = RULES.split("\nF15SA:\n", 1)[1].split("\nAH64SA:\n", 1)[0]
+    helicopter = RULES.split("\nAH64SA:\n", 1)[1].split("\nSAMAD:\n", 1)[0]
+    samad = RULES.split("\nSAMAD:\n", 1)[1].split("\nM1A2S.Husk:\n", 1)[0]
+    for actor in (fighter, helicopter, samad):
+        assert "\tAttackAircraft:" in actor
+        assert "\t\tFacingTolerance: 80" in actor
+        assert "\t\tOpportunityFire: False" in actor
+        assert "\t\tInitialStance: HoldFire" in actor
+        assert "\t\tInitialStanceAI: HoldFire" in actor
+        assert "\tProducibleWithLevel:" in actor
+        assert "\tWithProductionIconOverlay:" in actor
 
 
 def test_observation_serializer_supports_multiple_aircraft_ammo_pools() -> None:

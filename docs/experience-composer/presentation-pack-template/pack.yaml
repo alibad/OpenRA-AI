@@ -1,0 +1,9 @@
+PresentationPack:
+	Id: my-presentation-pack
+	Title: My Presentation Pack
+	Version: 1.0.0
+	Author: Your name
+	License: State the exact asset license here
+	Description: Replaces the standard mouse cursor sheet with a custom compatible sheet.
+	Assets: assets
+	Replaces: mouse.shp

@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://openra.ai/schemas/presentation-pack.schema.json",
+  "title": "OpenRA AI Presentation Pack",
+  "type": "object",
+  "required": ["Id", "Title", "Version", "Author", "License", "Replaces"],
+  "properties": {
+    "Id": { "type": "string", "pattern": "^[A-Za-z0-9_-]+$" },
+    "Title": { "type": "string", "minLength": 1 },
+    "Version": { "type": "string", "minLength": 1 },
+    "Author": { "type": "string", "minLength": 1 },
+    "License": { "type": "string", "minLength": 1 },
+    "Description": { "type": "string" },
+    "Assets": { "type": "string", "default": "assets" },
+    "Replaces": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Comma-separated virtual asset paths, matching the MiniYaml pack manifest format."
+    }
+  },
+  "additionalProperties": false
+}
