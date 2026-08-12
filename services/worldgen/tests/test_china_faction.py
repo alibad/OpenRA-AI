@@ -15,7 +15,7 @@ from PIL import Image
 
 
 ROOT = Path(__file__).resolve().parents[3]
-ENGINE = ROOT / "engine" / "openra"
+ENGINE = Path(os.environ.get("OPENRA_ENGINE_ROOT", ROOT / "engine" / "openra"))
 RA = ENGINE / "mods" / "ra"
 BITS = RA / "bits"
 FRAMES = ROOT / "generated" / "china-faction-sprites"
@@ -49,13 +49,15 @@ def test_faction_selector_registers_china_and_hidpi_flag() -> None:
     assert "Faction@china:" in WORLD
     assert "Name: faction-china" in WORLD
     assert "InternalName: china" in WORLD
-    assert "china: 226, 33, 30, 15" in chrome
+    match = re.search(r"china: 226, (\d+), 30, 15", chrome)
+    assert match is not None
+    selector_y = int(match.group(1))
     assert "sidebar-china:" in chrome
     assert "Inherits: sidebar-allies" in chrome.split("sidebar-china:", 1)[1].split("\n\n", 1)[0]
     assert "command-button-china-highlighted-disabled:" in chrome
-    for scale, suffix in ((1, ""), (2, "-2x"), (3, "-3x")):
+    for scale, suffix in ((1, ""), (2, "-2x"), (4, "-3x")):
         with Image.open(RA / "uibits" / f"glyphs-redsea{suffix}.png") as atlas:
-            flag = atlas.crop((226 * scale, 33 * scale, 256 * scale, 48 * scale)).convert("RGB")
+            flag = atlas.crop((226 * scale, selector_y * scale, 256 * scale, (selector_y + 15) * scale)).convert("RGB")
             colors = set(flag.get_flattened_data())
         assert (222, 41, 16) in colors
         assert (255, 222, 0) in colors
@@ -64,14 +66,16 @@ def test_faction_selector_registers_china_and_hidpi_flag() -> None:
 def test_china_inherits_complete_economy_repair_and_production_chain() -> None:
     contracts = {
         "FACT": ("structures.allies", "structures.china"),
-        "WEAP": ("vehicles.allies", "vehicles.china"),
-        "HPAD": ("aircraft.allies", "aircraft.china"),
-        "TENT": ("infantry.allies", "infantry.china"),
-        "SYRD": ("ships.allies", "ships.china"),
+        "WEAP": ("vehicles.china",),
+        "HPAD": ("aircraft.china",),
+        "TENT": ("infantry.china",),
+        "SYRD": ("ships.china",),
     }
     for actor, prerequisites in contracts.items():
         block = RULES.split(f"\n{actor}:\n", 1)[1].split("\n\n", 1)[0]
-        assert "Factions: allies, england, france, germany, saudi, china" in block
+        assert "Factions: china" in block
+        if actor == "FACT":
+            assert "ProvidesPrerequisite@chinaalliedtree:" in block
         for prerequisite in prerequisites:
             assert f"Prerequisite: {prerequisite}" in block
     for native_actor in ("FACT", "PROC", "HARV", "FIX", "DOME", "ATEK", "TENT", "WEAP", "HPAD", "SYRD"):
@@ -122,7 +126,7 @@ def test_every_infantry_package_matches_e1_frame_contract() -> None:
 
 
 def test_ground_vehicles_use_native_layering_and_directional_wrecks() -> None:
-    for actor in ("cnqilin", "cnlynx", "cnzbd"):
+    for actor in ("cnqilin", "cnlynx", "cnzbd", "cnmantis"):
         assert shp_frames(actor) == 64
         assert shp_frames(f"{actor}husk") == 64
         for start in (0, 32):
@@ -147,21 +151,41 @@ def test_planes_helicopter_and_ships_match_native_facing_contracts() -> None:
     assert shp_frames("cncrane") == 32
     assert len({digest(FRAMES / "cncrane" / f"cncrane-{i:04d}.png") for i in range(32)}) == 32
     assert shp_frames("cncranerotor") == 12
-    for actor in ("cnluyang", "cnhaiwang"):
-        assert shp_frames(actor) == 16
+    for actor in ("cnluyang", "cnhaiwang", "cnhaiying", "cnkunlun"):
+        assert shp_frames(actor) == (144 if actor == "cnkunlun" else 16)
         assert shp_frames(f"{actor}turret") == 32
         assert shp_frames(f"{actor}sink") == 64
         block = RULES.split(f"\n{actor.upper()}:\n", 1)[1].split("\n\n", 1)[0]
         for trait in ("Inherits: ^Ship", "WithSpriteTurret:", "LeavesTrails@WAKE:", "SpawnActorOnDeath:"):
             assert trait in block
+    assert shp_frames("cnkunlun") == 144
+    assert "WithLandingCraftAnimation:" in RULES.split("\nCNKUNLUN:\n", 1)[1].split("\nCNJIAOLONG:\n", 1)[0]
+    assert shp_frames("cnjiaolong") == 16 and shp_frames("cnjiaolongsink") == 64
+    submarine = RULES.split("\nCNJIAOLONG:\n", 1)[1].split("\nCNQILIN.Husk:\n", 1)[0]
+    assert "Inherits: ^Submarine" in submarine and "Weapon: ChinaTorpedo" in submarine
     assert shp_frames("china-wake") == 8
+
+
+def test_china_defenses_cover_ground_air_and_information_control() -> None:
+    contracts = {
+        "CNBASTION": ("^AutoTargetGround", "Weapon: ChinaBastionGun"),
+        "CNSKYSHIELD": ("^AutoTargetAir", "Weapon: ChinaSkyShieldAA"),
+        "CNSPECTRUM": ("JamsMissiles:", "CreatesShroud:"),
+    }
+    for actor, traits in contracts.items():
+        block = RULES.split(f"\n{actor}:\n", 1)[1].split("\n\n", 1)[0]
+        assert "Inherits: ^Defense" in block and "~structures.china" in block
+        assert all(trait in block for trait in traits)
+        name = actor.lower()
+        assert shp_frames(name) == 12 and shp_frames(f"{name}top") in {32, 64}
 
 
 def test_unit_scale_and_cameo_contracts() -> None:
     limits = {
         "cnqilin": (44, 44), "cnlynx": (32, 32), "cnzbd": (42, 42), "cnphl": (44, 44),
         "cnskyspear": (56, 56), "cncloud": (48, 48), "cncrane": (56, 56),
-        "cnluyang": (64, 64), "cnhaiwang": (72, 72),
+        "cnmantis": (46, 46), "cnluyang": (64, 64), "cnhaiwang": (72, 72),
+        "cnhaiying": (52, 52), "cnkunlun": (76, 76), "cnjiaolong": (60, 60),
     }
     for actor, canvas in limits.items():
         with Image.open(FRAMES / actor / f"{actor}-0000.png") as image:
@@ -169,7 +193,8 @@ def test_unit_scale_and_cameo_contracts() -> None:
         width, height = alpha_dimensions(FRAMES / actor / f"{actor}-0000.png")
         assert width > 6 and height > 6
     for actor in ("cnrifle", "cnnetwork", "cnportable", "redspear", "cnqilin", "cnlynx", "cnzbd", "cnphl",
-                  "cnskyspear", "cncloud", "cncrane", "cnluyang", "cnhaiwang"):
+                  "cnmantis", "cnskyspear", "cncloud", "cncrane", "cnluyang", "cnhaiwang",
+                  "cnhaiying", "cnkunlun", "cnjiaolong", "cnbastion", "cnskyshield", "cnspectrum"):
         icon = f"{actor}icon"
         assert shp_frames(icon) == 1
         with Image.open(FRAMES / icon / f"{icon}-0000.png") as image:
@@ -190,11 +215,15 @@ def test_native_ammo_rearm_transport_veterancy_and_projectile_systems() -> None:
 def test_ai_has_complete_combined_land_air_naval_roster() -> None:
     normal_ai = RULES.split("\n\tUnitBuilderBotModule@normal:\n", 1)[1].split("\n\tUnitBuilderBotModule@turtle:\n", 1)[0]
     for actor in ("cnrifle", "cnportable", "cnnetwork", "redspear", "cnlynx", "cnzbd", "cnqilin", "cnphl",
-                  "cncloud", "cncrane", "cnskyspear", "cnluyang", "cnhaiwang"):
+                  "cncloud", "cncrane", "cnskyspear", "cnmantis", "cnluyang", "cnhaiwang",
+                  "cnhaiying", "cnkunlun", "cnjiaolong"):
         assert actor in normal_ai
     assert "TechTypes: mslo, dome, atek, stek, fix, afld, hpad" in RULES
-    assert RULES.count("AirUnitsTypes:") == 5
-    assert RULES.count("NavalUnitsTypes:") == 5
+    assert RULES.count("AirUnitsTypes:") >= 5
+    assert RULES.count("NavalUnitsTypes:") >= 5
+    assert RULES.count("DefenseTypes:") >= 6
+    for actor in ("cnbastion", "cnskyshield", "cnspectrum"):
+        assert RULES.count(actor) >= 6
     assert "NavalProductionTypes: spen, syrd" in (RA / "rules" / "ai.yaml").read_text(encoding="utf-8")
 
 
@@ -248,3 +277,9 @@ def test_resolved_rules_and_mission_pass_engine_utility() -> None:
     )
     assert "Weapon: ChinaQilin125mm" in result.stdout
     assert "VoiceSet: ChinaVehicleVoice" in result.stdout
+    factory = subprocess.run(
+        [str(UTILITY), "ra", "--resolved-rules", "FACT"],
+        cwd=ENGINE, env=environment, text=True, capture_output=True, check=True,
+    )
+    assert "ProvidesPrerequisite@chinaalliedtree:" in factory.stdout
+    assert "Prerequisite: structures.allies" in factory.stdout

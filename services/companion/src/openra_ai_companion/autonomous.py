@@ -189,6 +189,8 @@ class EngineProcess:
 
     def start(self) -> None:
         self.log_dir.mkdir(parents=True, exist_ok=True)
+        support_dir = self.log_dir / "openra-support"
+        support_dir.mkdir(parents=True, exist_ok=True)
         self._stdout = (self.log_dir / "engine.stdout.log").open("wb")
         self._stderr = (self.log_dir / "engine.stderr.log").open("wb")
         environment = _game_child_environment()
@@ -196,6 +198,7 @@ class EngineProcess:
         arguments = [
             str(self.executable),
             "Engine.EngineDir=../.." if self.executable.parent.name == "win-x64" else "Engine.EngineDir=..",
+            f"Engine.SupportDir={support_dir}",
             "Game.Mod=ra",
             "Game.Platform=Null",
             f"Launch.MultiSession={self.port}",

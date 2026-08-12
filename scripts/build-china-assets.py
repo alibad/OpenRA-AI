@@ -16,12 +16,13 @@ from pathlib import Path
 
 from PIL import Image, ImageChops, ImageDraw, ImageEnhance, ImageFilter, ImageFont
 
-from china_directional_assets import render_air, render_ground, render_rotor, render_ship
+from china_directional_assets import render_air, render_defense, render_ground, render_rotor, render_ship
 
 
 ROOT = Path(__file__).resolve().parents[1]
 FRAME_ROOT = ROOT / "generated" / "china-faction-sprites"
 ATLAS = ROOT / "assets" / "china-faction" / "icon-sources" / "china-unit-cameo-atlas-v1.png"
+GAP_ATLAS = ROOT / "assets" / "china-faction" / "icon-sources" / "china-gap-cameo-atlas-v2.png"
 
 INFANTRY = ("cnrifle", "cnnetwork", "cnportable", "redspear")
 GROUND = {
@@ -29,6 +30,7 @@ GROUND = {
     "cnlynx": 32,
     "cnzbd": 42,
     "cnphl": 44,
+    "cnmantis": 46,
 }
 AIR = {
     "cnskyspear": 56,
@@ -38,6 +40,14 @@ AIR = {
 SHIPS = {
     "cnluyang": (64, 64),
     "cnhaiwang": (72, 72),
+    "cnhaiying": (52, 52),
+    "cnkunlun": (76, 76),
+    "cnjiaolong": (60, 60),
+}
+DEFENSES = {
+    "cnbastion": 48,
+    "cnskyshield": 52,
+    "cnspectrum": 52,
 }
 ICONS = {
     "cnrifleicon": (0, "RIFLEMAN"),
@@ -53,6 +63,15 @@ ICONS = {
     "cncraneicon": (10, "CRANE"),
     "cnluyangicon": (11, "LUYANG"),
     "cnhaiwangicon": (12, "HAIWANG"),
+}
+GAP_ICONS = {
+    "cnmantisicon": (0, "MANTIS"),
+    "cnhaiyingicon": (1, "HAIYING"),
+    "cnkunlunicon": (2, "KUNLUN"),
+    "cnjiaolongicon": (3, "JIAOLONG"),
+    "cnbastionicon": (4, "BASTION"),
+    "cnskyshieldicon": (5, "SKY SHIELD"),
+    "cnspectrumicon": (6, "SPECTRUM"),
 }
 
 
@@ -274,6 +293,45 @@ def sinking(body: list[Image.Image]) -> list[Image.Image]:
     return result
 
 
+def structure_package(base: Image.Image) -> list[Image.Image]:
+    """Native-style idle, damaged, then ten authored construction stages."""
+    damaged = ImageEnhance.Brightness(ImageEnhance.Color(base).enhance(0.22)).enhance(0.62)
+    construction: list[Image.Image] = []
+    for phase in range(10):
+        progress = (phase + 1) / 10
+        frame = Image.new("RGBA", base.size, (0, 0, 0, 0))
+        reveal_y = round(base.height * (1 - progress))
+        crop = base.crop((0, reveal_y, base.width, base.height))
+        frame.alpha_composite(crop, (0, reveal_y))
+        draw = ImageDraw.Draw(frame)
+        draw.line((3, reveal_y, base.width - 4, reveal_y), fill=(104, 176, 153, 220), width=1)
+        construction.append(frame)
+    return [base, damaged] + construction
+
+
+def landing_animation(body: list[Image.Image]) -> list[Image.Image]:
+    """Four facing-major stern-ramp stages followed by their closing reverse."""
+    opening: list[Image.Image] = []
+    for facing, source in enumerate(body):
+        angle = math.radians(facing * 22.5 + 90)
+        for phase in range(4):
+            frame = source.copy()
+            draw = ImageDraw.Draw(frame)
+            reach = 4 + phase * 3
+            cx, cy = frame.width / 2, frame.height * 0.62
+            dx, dy = math.cos(angle) * reach, math.sin(angle) * reach * 0.48
+            px, py = -math.sin(angle) * 4.2, math.cos(angle) * 2.0
+            draw.polygon(((cx + px, cy + py), (cx - px, cy - py),
+                          (cx + dx - px, cy + dy - py), (cx + dx + px, cy + dy + py)),
+                         fill=(69, 77, 72, 255), outline=(31, 37, 36, 255))
+            opening.append(frame)
+    closing: list[Image.Image] = []
+    for facing in range(16):
+        start = facing * 4
+        closing.extend(reversed(opening[start:start + 4]))
+    return opening + closing
+
+
 def projectile_frames(kind: str, size: int = 32) -> list[Image.Image]:
     images: list[Image.Image] = []
     for facing in range(16):
@@ -356,12 +414,15 @@ def rotor_and_misc(palette: Image.Image) -> None:
 
 
 def icon_frames(palette: Image.Image) -> None:
-    atlas = Image.open(ATLAS).convert("RGB")
     font_path = ROOT / "engine" / "openra" / "mods" / "common" / "FreeSansBold.ttf"
-    for name, (cell, label) in ICONS.items():
+    for name, (atlas_path, rows, cell, label) in {
+        **{name: (ATLAS, 4, cell, label) for name, (cell, label) in ICONS.items()},
+        **{name: (GAP_ATLAS, 2, cell, label) for name, (cell, label) in GAP_ICONS.items()},
+    }.items():
+        atlas = Image.open(atlas_path).convert("RGB")
         row, column = divmod(cell, 4)
         left, right = round(column * atlas.width / 4), round((column + 1) * atlas.width / 4)
-        top, bottom = round(row * atlas.height / 4), round((row + 1) * atlas.height / 4)
+        top, bottom = round(row * atlas.height / rows), round((row + 1) * atlas.height / rows)
         source = atlas.crop((left + 5, top + 5, right - 5, bottom - 5))
         target_ratio = 4 / 3
         if source.width / source.height > target_ratio:
@@ -413,9 +474,14 @@ def main() -> int:
         output_frames(f"{name}husk", wreck(live, 32 if name == "cncrane" else 16, turret=False), palette)
     for name, (body_size, turret_size) in SHIPS.items():
         body, turret = render_ship(name, body_size, turret_size)
-        output_frames(name, body, palette)
-        output_frames(f"{name}turret", turret, palette)
+        output_frames(name, body + (landing_animation(body) if name == "cnkunlun" else []), palette)
+        if turret:
+            output_frames(f"{name}turret", turret, palette)
         output_frames(f"{name}sink", sinking(body), palette)
+    for name, size in DEFENSES.items():
+        base, top = render_defense(name, size)
+        output_frames(name, structure_package(base), palette)
+        output_frames(f"{name}top", top + wreck(top, len(top), turret=False), palette)
     rotor_and_misc(palette)
     icon_frames(palette)
     hashes = {}

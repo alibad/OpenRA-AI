@@ -36,6 +36,17 @@ leader, or portray a real person as its hero.
   frigates, helicopters, radar troops, and a joint logistics/training center.
   Source: [China Military Online, "China-Cambodia 'Golden Dragon 2025' joint
   exercise kicks off"](https://eng.chinamil.com.cn/CHINA_209163/Exercises/News_209184/16387206.html).
+- **2025-10-09 and 2025-12-11 — layered ground air defense.** Ministry of
+  National Defense releases describe live-fire air-defense missile training and
+  full-element air-force training that integrated aviation, surface-to-air
+  missiles, and radar units. Sources: ["Air defense missile systems fire at
+  mock targets"](https://eng.mod.gov.cn/xb/Home/Focus/16414218.html) and
+  ["PLAAF organizes full-element systematic training"](https://eng.mod.gov.cn/2025xb/D/V/16426589.html).
+- **2025-12-24 and 2026-03-16 — submarine sea training.** China Military Online
+  published dated imagery and descriptions of conventional submarine units
+  conducting maritime training. Sources: [December 2025 submarine
+  training](https://eng.chinamil.com.cn/2025xb/B/16428891.html) and [March 2026
+  submarine training](https://eng.chinamil.com.cn/2025xb/H_251454/F_251457/16449188.html).
 - **2025-12-23 — current authoritative capability overview.** The U.S.
   Department of Defense's 2025 annual report describes continued combined-arms
   modernization with modern armor, artillery, and rocket systems; air and
@@ -60,6 +71,17 @@ leader, or portray a real person as its hero.
   LCAC well-dock operations, emergency response, and damage control. Source:
   [China Military Online, "PLAN Amphibious Assault Ship in All-Element Combat
   Training"](https://eng.chinamil.com.cn/2025xb/C_251453/TE/16475458.html).
+- **2026-06-14 — mobile anti-air artillery.** The Ministry of National Defense
+  published a training release showing self-propelled anti-aircraft guns during
+  a live-fire exercise. Source: ["Self-propelled anti-aircraft guns fire at
+  simulated targets"](https://eng.mod.gov.cn/2025xb/D/V/16467118.html).
+- **2026-06-16 and 2026-07-17 — dock landing and ship-to-shore lift.** China
+  Military Online documented the Kunlunshan amphibious dock landing ship at sea
+  and Type 726A air-cushion landing craft carrying amphibious armored vehicles
+  into a well deck. Sources: [Kunlunshan maritime
+  training](https://eng.chinamil.com.cn/2025xb/H_251454/L_251456/16467771.html)
+  and [LCAC ship-to-shore
+  training](https://eng.chinamil.com.cn/2025xb/H_251454/F_251457/16474325.html).
 
 ## RTS translation
 
@@ -76,6 +98,10 @@ names and intentionally compressed ranges, payloads, costs, and survivability.
 | Air assault and tactical command | J-20S-inspired Sky Spear fighter and Z-20T-inspired Crane helicopter | Limited ammunition, pad rearming, and role-specific weapons prevent persistent map control |
 | Amphibious integration | Amphibious IFV plus a conventional landing craft and mission-scripted beachhead | Water speed is lower than road speed; the IFV is weaker than the main battle tank |
 | Networked frigate and UAV-capable assault ship | Luyang network frigate and fictional Haiwang drone assault ship | Frigate is an escort rather than a battleship; the assault ship is expensive, slow, and needs escorts |
+| Layered radar and surface-to-air defense | Mantis tracked air-defense vehicle and fixed Sky Shield battery | Both are dedicated anti-air assets with no ground attack; the mobile system trades range and durability for mobility |
+| Littoral security and undersea operations | Haiying fast patrol craft and Jiaolong conventional attack submarine | Patrol craft is fragile; submarine has narrow target selection and is vulnerable to escorts and detection |
+| Well-deck and landing operations | Kunlun beach-capable transport with authored opening ramp | Transport has only modest self-defense and must expose itself at the shoreline to unload |
+| Information denial around a defended base | Spectrum Control Node combines detection, a short jammer radius, and local shroud generation | Expensive, power-dependent, short-ranged, non-damaging, and countered by direct attack or power disruption |
 
 ## Fiction and safety decisions
 

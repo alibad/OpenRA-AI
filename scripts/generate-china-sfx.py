@@ -41,6 +41,13 @@ SOUNDS = {
     "china-naval-gun.wav": ("heavy", 0.76, 70),
     "china-carrier-launch.wav": ("drone", 1.08, 250),
     "china-ship-sink.wav": ("sink", 1.65, 48),
+    "china-mantis-launch.wav": ("launch", 0.68, 680),
+    "china-patrol-missile.wav": ("launch", 0.61, 540),
+    "china-landing-ramp.wav": ("heavy", 0.78, 46),
+    "china-torpedo.wav": ("launch", 0.90, 190),
+    "china-bastion-fire.wav": ("heavy", 0.62, 82),
+    "china-skyshield-launch.wav": ("launch", 0.74, 630),
+    "china-spectrum-pulse.wav": ("network", 0.88, 520),
 }
 
 

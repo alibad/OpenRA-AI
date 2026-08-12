@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import math
+import argparse
 from pathlib import Path
 
 from PIL import Image, ImageDraw
@@ -28,8 +29,8 @@ def yemen(draw: ImageDraw.ImageDraw, scale: int) -> None:
     draw.rectangle((x, y + 2 * band, x + w - 1, y + 3 * band - 1), fill=(0, 0, 0, 255))
 
 
-def china(draw: ImageDraw.ImageDraw, scale: int) -> None:
-    x, y, w, h = 226 * scale, 33 * scale, 30 * scale, 15 * scale
+def china(draw: ImageDraw.ImageDraw, scale: int, selector_y: int) -> None:
+    x, y, w, h = 226 * scale, selector_y * scale, 30 * scale, 15 * scale
     draw.rectangle((x, y, x + w - 1, y + h - 1), fill=(222, 41, 16, 255))
     # Five deterministic stars at each density; coordinates are centered in the
     # stock 30x15 selector region and remain legible at 1x.
@@ -44,20 +45,32 @@ def china(draw: ImageDraw.ImageDraw, scale: int) -> None:
         draw.polygon(polygon, fill=gold)
 
 
-def main() -> int:
-    for scale in (1, 2, 3):
-        suffix = "" if scale == 1 else f"-{scale}x"
-        source = UIBITS / f"glyphs{suffix}.png"
-        output = UIBITS / f"glyphs-redsea{suffix}.png"
+def main(engine_root: Path | None = None) -> int:
+    uibits = (engine_root / "mods" / "ra" / "uibits") if engine_root else UIBITS
+    chrome = (uibits.parent / "chrome.yaml").read_text(encoding="utf-8")
+    marker = "\t\tchina: 226, "
+    selector_y = int(chrome.split(marker, 1)[1].split(",", 1)[0])
+    for suffix in ("", "-2x", "-3x"):
+        output = uibits / f"glyphs-redsea{suffix}.png"
+        source = output if output.exists() else uibits / f"glyphs{suffix}.png"
         atlas = Image.open(source).convert("RGBA")
+        scale = atlas.width // 256
+        required_height = (selector_y + 15) * scale
+        if atlas.height < required_height:
+            expanded = Image.new("RGBA", (atlas.width, required_height), (0, 0, 0, 0))
+            expanded.paste(atlas, (0, 0))
+            atlas = expanded
         draw = ImageDraw.Draw(atlas)
         saudi(draw, scale)
         yemen(draw, scale)
-        china(draw, scale)
+        china(draw, scale, selector_y)
         atlas.save(output, optimize=True)
-        print(output.relative_to(ROOT))
+        print(output)
     return 0
 
 
 if __name__ == "__main__":
-	raise SystemExit(main())
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--engine-root", type=Path)
+    args = parser.parse_args()
+    raise SystemExit(main(args.engine_root))

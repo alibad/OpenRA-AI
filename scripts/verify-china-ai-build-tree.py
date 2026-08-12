@@ -17,17 +17,20 @@ from openra_ai_companion.models import GameSnapshot
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT / "missions" / "china-faction" / "ai-build-contract"
 PACKAGE = ROOT / "generated" / "missions" / "china-ai-build-contract.oramap"
-INSTALL = ROOT / "engine" / "openra" / "mods" / "ra" / "maps" / PACKAGE.name
 EVIDENCE = ROOT / ".artifacts" / "china-faction" / "ai-build-tree"
 
-REQUIRED_BUILDINGS = {"fact", "proc", "tent", "weap", "dome", "atek", "fix", "hpad", "syrd"}
+REQUIRED_BUILDINGS = {
+    "fact", "proc", "tent", "weap", "dome", "atek", "fix", "hpad", "syrd",
+    "cnbastion", "cnskyshield", "cnspectrum",
+}
 REQUIRED_UNITS = {
     "cnrifle", "cnportable", "cnnetwork", "redspear", "cnlynx", "cnzbd", "cnqilin", "cnphl",
-    "cncloud", "cncrane", "cnskyspear", "cnluyang", "cnhaiwang",
+    "cncloud", "cncrane", "cnskyspear", "cnmantis", "cnluyang", "cnhaiwang",
+    "cnhaiying", "cnkunlun", "cnjiaolong",
 }
 
 
-def package_fixture() -> None:
+def package_fixture(engine_root: Path) -> None:
     PACKAGE.parent.mkdir(parents=True, exist_ok=True)
     with zipfile.ZipFile(PACKAGE, "w", zipfile.ZIP_DEFLATED) as archive:
         for path in sorted(SOURCE.iterdir()):
@@ -36,8 +39,9 @@ def package_fixture() -> None:
                 info.compress_type = zipfile.ZIP_DEFLATED
                 info.external_attr = 0o644 << 16
                 archive.writestr(info, path.read_bytes())
-    INSTALL.parent.mkdir(parents=True, exist_ok=True)
-    shutil.copyfile(PACKAGE, INSTALL)
+    install = engine_root / "mods" / "ra" / "maps" / PACKAGE.name
+    install.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copyfile(PACKAGE, install)
 
 
 def wait_for_session(bridge: OpenRABridge) -> GameSnapshot:
@@ -54,12 +58,13 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--port", type=int, default=9995)
     parser.add_argument("--max-ticks", type=int, default=80000)
+    parser.add_argument("--engine-root", type=Path, default=ROOT / "engine" / "openra")
     args = parser.parse_args()
-    package_fixture()
+    engine_root = args.engine_root.resolve()
+    package_fixture(engine_root)
     EVIDENCE.mkdir(parents=True, exist_ok=True)
 
-    engine = EngineProcess(ROOT / "engine" / "openra" / "bin" / "OpenRA.exe",
-                           ROOT / "engine" / "openra", args.port, EVIDENCE)
+    engine = EngineProcess(engine_root / "bin" / "OpenRA.exe", engine_root, args.port, EVIDENCE)
     engine.start()
     bridge = OpenRABridge(f"127.0.0.1:{args.port}", timeout=20)
     session_id = ""

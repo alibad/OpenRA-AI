@@ -80,6 +80,15 @@ Actors:
 	NetworkRelay: fcom
 		Location: 44,43
 		Owner: China
+	BastionDefense: cnbastion
+		Location: 17,43
+		Owner: China
+	SkyShieldDefense: cnskyshield
+		Location: 29,38
+		Owner: China
+	SpectrumDefense: cnspectrum
+		Location: 34,38
+		Owner: China
 	NetworkSpecialist: cnnetwork
 		Location: 35,43
 		Owner: China
@@ -113,6 +122,9 @@ Actors:
 	LongbowOne: cnphl
 		Location: 22,43
 		Owner: China
+	MantisOne: cnmantis
+		Location: 29,43
+		Owner: China
 	SeaDragonOne: cnzbd
 		Location: 21,30
 		Owner: China
@@ -136,6 +148,15 @@ Actors:
 		Owner: China
 	HaiwangOne: cnhaiwang
 		Location: 57,24
+		Owner: China
+	HaiyingOne: cnhaiying
+		Location: 53,22
+		Owner: China
+	KunlunOne: cnkunlun
+		Location: 60,25
+		Owner: China
+	JiaolongOne: cnjiaolong
+		Location: 47,22
 		Owner: China
 	EnemyConyard: fact
 		Location: 77,53

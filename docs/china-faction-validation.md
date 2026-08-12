@@ -7,23 +7,26 @@ Validation date: 2026-08-12 (Asia/Riyadh)
 - Dedicated worktree: `C:\Users\Admin\Code\hq\games\OpenRA-AI-china`
 - Outer branch: `codex/china-faction`
 - Base outer commit: `c9294e60b3bffb0e1deb7bf8eed7290dddea16fd`
-- OpenRA engine commit: `a5ae3f69e04d297f60b29cacc55b93fc75f9975f`
-- No publishing, deployment, or hosted CI was performed.
+- Feature-engine commit: `667687c52f2d826dcb5f04581698e0f7b93c6fb6`
+- Canonical OpenRA `main`: `69e693344bd07656dd03d8b86855d518b8254c7c`
+- `alibad/OpenRA:main`: `69e693344bd07656dd03d8b86855d518b8254c7c`
+- No deployment or hosted CI was performed; validation was local and the validated engine commit was pushed to `main`.
 
 ## Implemented contracts
 
 - The faction selector registers `China` as an Allied-side country and supplies 1x, 2x, and 3x flags plus explicit China aliases for every in-game sidebar and command-button chrome state.
 - China inherits the complete native Allied construction yard, power, refinery/harvester, repair, radar, advanced-tech, barracks, war factory, helipad, and shipyard chains.
-- The original roster is `CNRIFLE`, `CNNETWORK`, `CNPORTABLE`, `REDSPEAR`, `CNQILIN`, `CNLYNX`, `CNZBD`, `CNPHL`, `CNSKYSPEAR`, `CNCLOUD`, `CNCRANE`, `CNLUYANG`, and `CNHAIWANG`.
+- The original combat roster is `CNRIFLE`, `CNNETWORK`, `CNPORTABLE`, `REDSPEAR`, `CNQILIN`, `CNLYNX`, `CNZBD`, `CNPHL`, `CNMANTIS`, `CNSKYSPEAR`, `CNCLOUD`, `CNCRANE`, `CNLUYANG`, `CNHAIWANG`, `CNHAIYING`, `CNKUNLUN`, and `CNJIAOLONG`.
+- Original fixed defenses are `CNBASTION`, `CNSKYSHIELD`, and `CNSPECTRUM`, covering direct fire, anti-air, and sensor/jammer/shroud-control roles.
 - Native traits handle infantry deployment, selectable portable-missile roles, the command-network condition, transports, amphibious locomotion, aircraft ammo/rearming, veterancy, body/turret layering, wakes, naval targeting, sinking, directional husks, and projectile flight.
 - `Red Spear` is fictional, build-limit-one, command-network/precision focused, and has no Tanya-style demolition/C4 behavior.
 - AI personality configuration covers economy and the complete land, air, and naval build/attack roster.
-- Audio contains 25 original procedural effects plus 26 generic synthetic Mandarin/English unit and scenario voice lines. Provenance explicitly records that no real person is represented or imitated.
+- Audio contains 32 original procedural effects plus 26 generic synthetic Mandarin/English unit and scenario voice lines. Provenance explicitly records that no real person is represented or imitated.
 - `03: Haitan Network` is a fictional RTS mission with a live network-specialist deployment, water-gated amphibious landing, ground/air/naval waves, a full starting production base, and 240 surplus power at tick 2.
 
 ## Sprite contract regeneration
 
-`powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\build-china-assets.ps1` was run after moving the old ignored staging directory to recoverable artifact storage. The command exited 0 in 93.9 seconds. Its exact contract lines were:
+`powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\build-china-assets.ps1` was rerun clean after the gap-completion work. The command exited 0 in 101 seconds. Its exact new and identifying contract lines were:
 
 ```text
 cnrifle: 378 authored frames at 24x24
@@ -50,6 +53,22 @@ cnluyangsink: 64 authored frames at 64x64
 cnhaiwang: 16 authored frames at 72x72
 cnhaiwangturret: 32 authored frames at 72x72
 cnhaiwangsink: 64 authored frames at 72x72
+cnmantis: 64 authored frames at 44x44
+cnmantishusk: 64 authored frames at 44x44
+cnhaiying: 16 authored frames at 56x56
+cnhaiyingturret: 32 authored frames at 56x56
+cnhaiyingsink: 64 authored frames at 56x56
+cnkunlun: 144 authored frames at 72x72
+cnkunlunturret: 32 authored frames at 72x72
+cnkunlunsink: 64 authored frames at 72x72
+cnjiaolong: 16 authored frames at 56x56
+cnjiaolongsink: 64 authored frames at 56x56
+cnbastion: 12 authored frames at 48x48
+cnbastiontop: 64 authored frames at 48x48
+cnskyshield: 12 authored frames at 48x48
+cnskyshieldtop: 64 authored frames at 48x48
+cnspectrum: 12 authored frames at 48x48
+cnspectrumtop: 32 authored frames at 48x48
 cncranerotor: 12 authored frames at 56x56
 China faction assets built successfully.
 ```
@@ -64,21 +83,36 @@ Clean engine compile:
 Build succeeded.
     0 Warning(s)
     0 Error(s)
-Time Elapsed 00:00:00.71
+Time Elapsed 00:00:00.40
 Clean complete.
 Building in Release configuration...
 Build succeeded.
     0 Warning(s)
     0 Error(s)
-Time Elapsed 00:00:07.91
+Time Elapsed 00:00:07.09
 Build succeeded.
 ```
 
-Faction, sprite, mission, research, resolved-rules, and Saudi/Yemen/air regression contracts:
+Full worldgen, companion, and evaluation suites:
 
 ```text
-.........................................                                [100%]
-41 passed in 12.60s
+........................................................................ [ 33%]
+........................................................................ [ 66%]
+........................................................................ [100%]
+216 passed, 1 warning in 27.85s
+```
+
+The warning is an external `pydantic-settings` incomplete-forward-reference warning. The China contract suite was also pointed at the exact final integration worktree:
+
+```text
+..............                                                           [100%]
+14 passed in 3.52s
+```
+
+Engine unit tests:
+
+```text
+Passed!  - Failed:     0, Passed:   476, Skipped:     2, Total:   478, Duration: 306 ms - OpenRA.Test.dll (net8.0)
 ```
 
 Full Red Alert YAML/Fluent/map validation exited 0 after testing all bundled maps. The identifying output was:
@@ -108,30 +142,30 @@ Tileset: DESERT
 Normal-AI full build-tree verification exited 0 with:
 
 ```json
-{"ok": true, "tick": 12527, "buildings": 12, "units": 24, "evidence": "C:\\Users\\Admin\\Code\\hq\\games\\OpenRA-AI-china\\.artifacts\\china-faction\\ai-build-tree\\ai-build-tree.json"}
+{"ok": true, "tick": 11525, "buildings": 15, "units": 22, "evidence": "C:\\Users\\Admin\\Code\\hq\\games\\OpenRA-AI-china\\.artifacts\\china-faction\\ai-build-tree\\ai-build-tree.json"}
 ```
 
-Its evidence has `missing_buildings: []` and `missing_units: []`. Observed buildings include `fact`, `powr`, `apwr`, `proc`, `tent`, `weap`, `fix`, `dome`, `atek`, `hpad`, `syrd`, and `mslo`; all 13 China roster actors were produced.
+Its evidence has `missing_buildings: []` and `missing_units: []`. The required building contract includes `fact`, `proc`, `tent`, `weap`, `dome`, `atek`, `fix`, `hpad`, `syrd`, `cnbastion`, `cnskyshield`, and `cnspectrum`; all 17 custom China combat actors were produced organically from an MCV-only start.
 
 Live movement/combat verification exited 0 with:
 
 ```json
-{"ok": true, "map": "03: Haitan Network", "start_tick": 2, "combat_tick": 3406, "orders": 0, "kills": 8, "losses": 15, "moved_actors": 15, "visible_enemies": 5}
+{"ok": true, "map": "03: Haitan Network", "start_tick": 2, "combat_tick": 3406, "orders": 0, "kills": 10, "losses": 20, "moved_actors": 17, "visible_enemies": 3}
 ```
 
-The engine telemetry records actual movement vectors in 15 distinct directions/paths; completion of both the network-deployment and sea-gate/eastern-beach amphibious objectives by tick 1605; aircraft ammo/rearming state; active ground, air, and naval combat; 8 kills and 15 losses by tick 3406; and starting power `240`. The bridge's aggregate `orders` counter remains zero in multi-session mode, so success is asserted from actor movement vectors, objective states, activities, ammo, targets, kills, and losses instead.
+The engine telemetry records actual movement vectors for all 17 custom combat roles; completion of both the network-deployment and sea-gate/eastern-beach amphibious objectives by tick 1605; aircraft ammo/rearming state; active ground, air, and naval combat; 10 kills and 20 losses by tick 3406; and starting power `240`. The bridge's aggregate `orders` counter remains zero in multi-session mode, so success is asserted from actor movement vectors, objective states, activities, ammo, targets, kills, and losses instead.
 
 Mission package:
 
 ```text
-SHA256: 79ac11a0649efcac441c2e05e799ad835196a1b998216a09f64adbaeff7d73f2
+SHA256: F5758014FAC89F5F1E9FC63D2233FA6FFC6895177B039908924D4B369542D670
 Testing map: 03: Haitan Network
 ```
 
 Native renderer capture:
 
 ```text
-Captured OpenRA PID 53304 to C:\Users\Admin\Code\hq\games\OpenRA-AI-china\.artifacts\china-faction\live\04-native-renderer.png (2902x1676).
+Captured OpenRA PID 61780 to C:\Users\Admin\Code\hq\games\OpenRA-AI-china\.artifacts\china-faction\live\04-native-renderer.png (2902x1676).
 ```
 
 ## Visual and telemetry evidence
@@ -151,18 +185,17 @@ The three tactical evidence frames are transparently labeled `live-engine-teleme
 - Sea Dragon combines amphibious access, transport capacity, autocannon, and missiles. Its current price is meant to pay for flexibility, but island maps may magnify that value.
 - Longbow and Haiwang standoff ranges can dominate narrow chokepoints if scouting is too easy. Counter-battery pressure, ammo cadence, and vision sharing are the first knobs to revisit.
 - Portable Missile Team mode switching is deliberately manual and tactical; AI weights produce it, but automated role timing remains less precise than a human player's.
-- The verification battle is intentionally punishing (8 kills, 15 losses) and shows that unsupported forward pushes fail. Mission difficulty-wave sizes should receive broader human playtesting before a balance freeze.
+- Mantis and Sky Shield overlap strongly when massed. Their shared no-ground-attack weakness is intentional, but range/cost should be watched on air-heavy maps.
+- Kunlun adds a large transport body and modest self-defense to amphibious play; beach maps should test whether its capacity justifies enough escort risk.
+- The verification battle is intentionally punishing (10 kills, 20 losses) and shows that unsupported forward pushes fail. Mission difficulty-wave sizes should receive broader human playtesting before a balance freeze.
 
 ## Integration
 
-The outer repository records the engine submodule at `a5ae3f69e04d297f60b29cacc55b93fc75f9975f`. To integrate locally:
+The validated result is already integrated and pushed. The single user-facing launch path is the canonical checkout:
 
 ```powershell
-git switch codex/china-faction
-git submodule update --init engine/openra
-$env:DOTNET_ROOT = 'C:\path\to\dotnet-8'
-.\engine\openra\make.cmd all
-powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\build-china-assets.ps1
+Set-Location C:\Users\Admin\Code\hq\games\OpenRA
+.\launch-game.cmd Game.Mod=ra
 ```
 
-The committed SHP/WAV/mission assets are already playable; regeneration is only required when changing source art, audio, or mission inputs.
+Select `China` in a skirmish, or open Missions -> OpenRA AI -> `03: Haitan Network`. The committed SHP/WAV/mission assets are already playable; regeneration is only required when changing source art, audio, or mission inputs.
