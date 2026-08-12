@@ -1,0 +1,74 @@
+Player:
+	PlayerResources:
+		DefaultCash: 10000
+
+World:
+	LuaScript:
+		Scripts: campaign.lua, utils.lua, haitan-network.lua
+	MissionData:
+		Briefing: briefing
+	ScriptLobbyDropdown@difficulty:
+		ID: difficulty
+		Label: dropdown-difficulty.label
+		Description: dropdown-difficulty.description
+		Values:
+			easy: options-difficulty.easy
+			normal: options-difficulty.normal
+			hard: options-difficulty.hard
+		Default: normal
+
+# Keep the scenario's production sidebar focused on the China roster. Economy,
+# engineers, MCVs, harvesters, repair, and the full building chain remain live.
+1TNK:
+	Buildable:
+		Prerequisites: ~disabled
+
+2TNK:
+	Buildable:
+		Prerequisites: ~disabled
+
+JEEP:
+	Buildable:
+		Prerequisites: ~disabled
+
+APC:
+	Buildable:
+		Prerequisites: ~disabled
+
+ARTY:
+	Buildable:
+		Prerequisites: ~disabled
+
+HELI:
+	Buildable:
+		Prerequisites: ~disabled
+
+MH60:
+	Buildable:
+		Prerequisites: ~disabled
+
+DD:
+	Buildable:
+		Prerequisites: ~disabled
+
+PT:
+	Buildable:
+		Prerequisites: ~disabled
+
+LST:
+	Buildable:
+		Prerequisites: ~disabled
+
+FCOM:
+	Tooltip:
+		Name: actor-haitan-network-relay.name
+
+MISS:
+	Tooltip:
+		Name: actor-haitan-command-node.name
+	Health:
+		HP: 90000
+
+MRJ:
+	Tooltip:
+		Name: actor-haitan-spectrum-jammer.name

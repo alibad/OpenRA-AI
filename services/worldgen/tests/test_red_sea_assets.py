@@ -446,7 +446,7 @@ class RedSeaAssetTests(unittest.TestCase):
                 break
             campaign.append(line)
         self.assertEqual(
-            ["jizan-corridor-2026", "hodeidah-lifeline-2026"],
+            ["jizan-corridor-2026", "hodeidah-lifeline-2026", "haitan-network-2026"],
             [line.strip() for line in campaign if line.strip()],
         )
 
