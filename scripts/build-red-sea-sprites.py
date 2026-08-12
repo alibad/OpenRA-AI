@@ -27,6 +27,7 @@ from red_sea_directional_vehicle import (
     render_air_muzzle_frames,
     render_directional_asset,
 )
+from red_sea_infantry import render_infantry_asset
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -123,6 +124,7 @@ WRECKS = {
     "sadshusk": {"model": "sads", "size": 40, "facings": 32, "turret": True},
     "techhusk": {"model": "tech", "size": 28, "facings": 32, "turret": True},
     "ymlrhusk": {"model": "ymlr", "size": 40, "facings": 32, "turret": False},
+    "samadhusk": {"model": "samad", "size": 40, "facings": 16, "turret": False},
     "f15sahusk": {"model": "f15sa", "size": 56, "facings": 16, "turret": False},
     "ah64sahusk": {"model": "ah64sa", "size": 56, "facings": 32, "turret": False},
 }
@@ -132,6 +134,30 @@ ANIMATIONS = {
     "ah64sarotor": {"size": 48, "renderer": render_ah64_rotor_frames},
     "redsea-air-muzzle": {"size": 48, "renderer": render_air_muzzle_frames},
     "redsea-air-impact": {"size": 64, "renderer": render_air_impact_frames},
+}
+
+
+INFANTRY = (
+    "sang",
+    "sajtac",
+    "saat",
+    "falcon1",
+    "ymr",
+    "yrpg",
+    "yspot",
+    "wadighost",
+)
+
+
+INFANTRY_ICONS = {
+    "sangicon": {"concept": "saudi-infantry-concept.png", "index": 0, "label": "NAT GUARD"},
+    "sajtacicon": {"concept": "saudi-infantry-concept.png", "index": 1, "label": "JTAC"},
+    "saaticon": {"concept": "saudi-infantry-concept.png", "index": 2, "label": "ATGM TEAM"},
+    "falcon1icon": {"concept": "saudi-infantry-concept.png", "index": 3, "label": "FALCON ONE"},
+    "ymricon": {"concept": "yemen-infantry-concept.png", "index": 0, "label": "MTN RIFLE"},
+    "yrpgicon": {"concept": "yemen-infantry-concept.png", "index": 1, "label": "RPG HUNTER"},
+    "yspoticon": {"concept": "yemen-infantry-concept.png", "index": 2, "label": "DRONE SPOT"},
+    "wadighosticon": {"concept": "yemen-infantry-concept.png", "index": 3, "label": "WADI GHOST"},
 }
 
 
@@ -450,6 +476,89 @@ def save_icon_frame(name: str, definition: dict[str, object], palette: Image.Ima
     print(f"{name}: 1 opaque production cameo at 64x48")
 
 
+def save_infantry_frames(name: str, palette: Image.Image) -> None:
+    """Write the complete native-style 342-frame infantry animation package."""
+
+    images = render_infantry_asset(name, palette)
+    output = FRAME_ROOT / name
+    output.mkdir(parents=True, exist_ok=True)
+    clear_output_frames(output, name)
+    for index, result in enumerate(images):
+        quantize_to_reference(result, palette).save(output / f"{name}-{index:04d}.png", transparency=0)
+
+    # Five rows expose every facing in the states that most readily reveal a
+    # broken facing order or a flat/unchanging animation.
+    indexes = [
+        *range(0, 8),
+        *(16 + facing * 6 + 2 for facing in range(8)),
+        *(64 + facing * 8 + 2 for facing in range(8)),
+        *(144 + facing * 4 + 2 for facing in range(8)),
+        *(192 + facing * 8 + 2 for facing in range(8)),
+    ]
+    sheet = Image.new("RGBA", (8 * 50, 5 * 39), (42, 36, 28, 255))
+    for slot, image_index in enumerate(indexes):
+        sheet.alpha_composite(images[image_index], ((slot % 8) * 50, (slot // 8) * 39))
+    sheet.save(FRAME_ROOT / f"{name}-contact-sheet.png")
+    print(f"{name}: {len(images)} full-state infantry frames at 50x39")
+
+
+def save_infantry_icon(name: str, definition: dict[str, object], palette: Image.Image) -> None:
+    concept_root = ROOT / "assets" / "red-sea-2026" / "infantry-concepts"
+    source = Image.open(concept_root / str(definition["concept"])).convert("RGB")
+    index = int(definition["index"])
+    segment_width = source.width / 4
+    left = round(index * segment_width)
+    right = round((index + 1) * segment_width)
+    role = source.crop((left, round(source.height * .04), right, round(source.height * .79)))
+
+    # Favor head, weapon, and upper-body role cues over the empty studio floor.
+    target_ratio = 4 / 3
+    if role.width / role.height > target_ratio:
+        width = round(role.height * target_ratio)
+        x = (role.width - width) // 2
+        role = role.crop((x, 0, x + width, role.height))
+    else:
+        height = round(role.width / target_ratio)
+        role = role.crop((0, 0, role.width, min(role.height, height)))
+
+    cameo = role.resize((64, 48), Image.Resampling.LANCZOS)
+    cameo = ImageEnhance.Color(cameo).enhance(.78)
+    cameo = ImageEnhance.Contrast(cameo).enhance(1.16)
+    cameo = ImageEnhance.Sharpness(cameo).enhance(1.55).convert("RGBA")
+    shade = Image.new("RGBA", cameo.size, (0, 0, 0, 0))
+    shade_draw = ImageDraw.Draw(shade)
+    for y in range(34, 48):
+        shade_draw.line((0, y, 63, y), fill=(0, 0, 0, min(210, 48 + (y - 34) * 12)))
+    cameo.alpha_composite(shade)
+
+    label = str(definition["label"])
+    font_path = ROOT / "engine" / "openra" / "mods" / "common" / "FreeSansBold.ttf"
+    font_size = 10
+    draw = ImageDraw.Draw(cameo)
+    while font_size > 6:
+        font = ImageFont.truetype(font_path, font_size)
+        bounds = draw.textbbox((0, 0), label, font=font, stroke_width=1)
+        if bounds[2] - bounds[0] <= 60:
+            break
+        font_size -= 1
+    bounds = draw.textbbox((0, 0), label, font=font, stroke_width=1)
+    draw.text(
+        ((64 - (bounds[2] - bounds[0])) // 2, 37),
+        label,
+        font=font,
+        fill=(245, 245, 236, 255),
+        stroke_width=1,
+        stroke_fill=(12, 12, 12, 255),
+    )
+
+    output = FRAME_ROOT / name
+    output.mkdir(parents=True, exist_ok=True)
+    clear_output_frames(output, name)
+    quantize_icon_to_reference(cameo, palette).save(output / f"{name}-0000.png")
+    cameo.save(FRAME_ROOT / f"{name}-review.png")
+    print(f"{name}: 1 concept-backed opaque production cameo at 64x48")
+
+
 def effect_frame(
     component: Image.Image,
     frame_size: int,
@@ -517,8 +626,12 @@ def main() -> int:
         save_wreck_frames(name, definition, palette)
     for name, definition in ANIMATIONS.items():
         save_animation_frames(name, definition, palette)
+    for name in INFANTRY:
+        save_infantry_frames(name, palette)
     for name, definition in ICONS.items():
         save_icon_frame(name, definition, palette)
+    for name, definition in INFANTRY_ICONS.items():
+        save_infantry_icon(name, definition, palette)
     for name, definition in EFFECTS.items():
         save_effect_frames(name, definition, palette)
     return 0

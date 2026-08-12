@@ -247,6 +247,68 @@ def m1_impact(rng: random.Random) -> list[float]:
     return samples
 
 
+def infantry_rifle(rng: random.Random, *, burst: bool) -> list[float]:
+    duration = 0.42 if burst else 0.25
+    pulses = (0.025, 0.115, 0.205) if burst else (0.025,)
+    samples: list[float] = []
+    noise = 0.0
+    for index in range(int(duration * SAMPLE_RATE)):
+        t = index / SAMPLE_RATE
+        p = t / duration
+        noise = noise * .18 + rng.uniform(-1, 1) * .82
+        cracks = sum(math.exp(-180 * abs(t - pulse)) for pulse in pulses)
+        body = sum(math.sin(math.tau * 145 * max(0, t - pulse)) * math.exp(-38 * max(0, t - pulse)) for pulse in pulses if t >= pulse)
+        samples.append((.84 * noise * cracks + .38 * body) * envelope(p, .002, .25))
+    return samples
+
+
+def shoulder_launcher(rng: random.Random, *, heavy: bool) -> list[float]:
+    duration = .92 if heavy else .68
+    samples: list[float] = []
+    hiss = 0.0
+    for index in range(int(duration * SAMPLE_RATE)):
+        t = index / SAMPLE_RATE
+        p = t / duration
+        hiss = hiss * .47 + rng.uniform(-1, 1) * .53
+        launch = math.exp(-105 * abs(t - .035)) * (hiss + .48 * math.sin(math.tau * 88 * t))
+        exhaust = hiss * min(1.0, t * 34) * math.exp((-1.55 if heavy else -2.1) * t)
+        motor = math.sin(math.tau * (320 + 1450 * p * p) * t) * min(1.0, t * 24) * (.42 - .18 * p)
+        samples.append((.74 * launch + .63 * exhaust + .32 * motor) * envelope(p, .003, .2))
+    return samples
+
+
+def suppressed_rifle(rng: random.Random) -> list[float]:
+    duration = .34
+    samples: list[float] = []
+    noise = 0.0
+    for index in range(int(duration * SAMPLE_RATE)):
+        t = index / SAMPLE_RATE
+        p = t / duration
+        noise = noise * .28 + rng.uniform(-1, 1) * .72
+        snap = noise * math.exp(-72 * t)
+        gas = math.sin(math.tau * 210 * t) * math.exp(-28 * t)
+        action = math.exp(-160 * abs(t - .12)) * math.sin(math.tau * 520 * t)
+        samples.append((.52 * snap + .42 * gas + .18 * action) * envelope(p, .002, .3))
+    return samples
+
+
+def remote_charge(rng: random.Random) -> list[float]:
+    duration = 1.05
+    samples: list[float] = []
+    debris = 0.0
+    for index in range(int(duration * SAMPLE_RATE)):
+        t = index / SAMPLE_RATE
+        p = t / duration
+        white = rng.uniform(-1, 1)
+        debris = debris * .38 + white * .62
+        beep = math.exp(-150 * abs(t - .05)) * math.sin(math.tau * 980 * t)
+        blast_t = max(0, t - .18)
+        crack = debris * math.exp(-42 * blast_t) if t >= .18 else 0
+        pressure = math.sin(math.tau * (58 - 20 * p) * blast_t) * math.exp(-7 * blast_t) if t >= .18 else 0
+        samples.append((.22 * beep + 1.05 * crack + .78 * pressure) * envelope(p, .002, .22))
+    return samples
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Generate original Red Sea vertical-slice sound effects")
     parser.add_argument(
@@ -270,6 +332,12 @@ def main() -> int:
         "redsea-f15-cannon.wav": (fighter_cannon(rng), 0.66),
         "redsea-ah64-cannon.wav": (apache_cannon(rng), 0.68),
         "redsea-ah64-rocket.wav": (apache_rocket(rng), 0.68),
+        "redsea-guard-rifle.wav": (infantry_rifle(rng, burst=True), 0.60),
+        "redsea-mountain-rifle.wav": (infantry_rifle(rng, burst=False), 0.62),
+        "redsea-atgm-launch.wav": (shoulder_launcher(rng, heavy=True), 0.66),
+        "redsea-rpg-launch.wav": (shoulder_launcher(rng, heavy=False), 0.64),
+        "redsea-suppressed.wav": (suppressed_rifle(rng), 0.48),
+        "redsea-remote-charge.wav": (remote_charge(rng), 0.70),
     }
     if args.air_only:
         air_names = {

@@ -238,6 +238,57 @@ class WorldgenTests(unittest.TestCase):
         analysis = TerrainAnalysis(relief="mountainous", water_confidence=0.8)
         self.assertEqual(terrain_profile(analysis), "MountainLakes")
 
+    def test_archetypes_compile_to_native_random_map_recipes(self) -> None:
+        analysis = TerrainAnalysis(biome="temperate", urban_density=0.15, relief="flat")
+
+        river = generation_options(
+            GeoSelection(51.5, -0.1, mission_archetype="river-crossing"),
+            analysis,
+        )
+        self.assertEqual(river["terrain"], "NarrowWetlands")
+        self.assertEqual(river["density"], "AreaAndPlayers")
+
+        siege = generation_options(
+            GeoSelection(51.5, -0.1, mission_archetype="urban-siege"),
+            analysis,
+        )
+        self.assertEqual(siege["terrain"], "Plots")
+        self.assertEqual(siege["shape"], "Square")
+        self.assertEqual(siege["buildings"], "Extra")
+        self.assertEqual(siege["civilian-density"], "High")
+
+        raid = generation_options(
+            GeoSelection(51.5, -0.1, mission_archetype="supply-raid"),
+            analysis,
+        )
+        self.assertEqual(raid["resources"], "VeryHigh")
+        self.assertEqual(raid["buildings"], "OilRush")
+
+    def test_reality_first_keeps_earth_terrain_while_applying_gameplay_layer(self) -> None:
+        selection = GeoSelection(
+            24.638916,
+            46.71601,
+            generation_mode="reality-first",
+            mission_archetype="urban-siege",
+        )
+        options = generation_options(selection, TerrainAnalysis(biome="desert", relief="flat"))
+        self.assertEqual(options["terrain"], "Plains")
+        self.assertEqual(options["shape"], "Square")
+        self.assertEqual(options["symmetry"], "None")
+        self.assertEqual(options["buildings"], "Extra")
+
+    def test_creative_remix_varies_native_recipe_deterministically(self) -> None:
+        analysis = TerrainAnalysis(relief="rolling", vegetation_density=0.4)
+        first = GeoSelection(51.5, -0.1, seed=7, generation_mode="creative-remix")
+        next_seed = GeoSelection(51.5, -0.1, seed=8, generation_mode="creative-remix")
+        first_options = generation_options(first, analysis)
+        self.assertEqual(first_options, generation_options(first, analysis))
+        self.assertNotEqual(
+            (first_options["terrain"], first_options["shape"], first_options["symmetry"]),
+            tuple(generation_options(next_seed, analysis)[key] for key in ("terrain", "shape", "symmetry")),
+        )
+        self.assertEqual(first_options["attempts"], 12)
+
     def test_intermittent_waterways_are_not_permanent_water(self) -> None:
         features = parse_overpass({"elements": [{
             "type": "way",
@@ -274,6 +325,7 @@ class WorldgenTests(unittest.TestCase):
                     "location_name": "Riyadh, Saudi Arabia",
                     "map_size": 64,
                     "seed": 7,
+                    "mission_archetype": "supply-raid",
                 }).encode()
                 request = urllib.request.Request(
                     base + "/v1/missions/generate",
@@ -286,6 +338,7 @@ class WorldgenTests(unittest.TestCase):
                         payload = json.loads(response.read())
                 installed = Path(payload["installed_path"])
                 self.assertTrue(installed.is_file())
+                self.assertEqual(payload["synthesis"]["generator"]["options"]["buildings"], "OilRush")
                 with urllib.request.urlopen(base + payload["download_url"], timeout=3) as response:
                     self.assertTrue(response.read().startswith(b"PK"))
             finally:

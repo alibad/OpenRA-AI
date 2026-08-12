@@ -107,6 +107,7 @@ class RedSeaAssetTests(unittest.TestCase):
             "AFLD": (("yemensoviettree", "yemen", "aircraft.soviet"),),
             "TENT": (("saudialliedtree", "saudi", "infantry.allies"),),
             "BARR": (("yemensoviettree", "yemen", "infantry.soviet"),),
+            "SAFLD": (("saudi", "saudi", "aircraft.saudi"),),
             "SYRD": (("saudialliedtree", "saudi", "ships.allies"),),
             "SPEN": (("yemensoviettree", "yemen", "ships.soviet"),),
         }
@@ -125,10 +126,13 @@ class RedSeaAssetTests(unittest.TestCase):
         for actor in ("m1a2s", "sads", "tech", "ymlr"):
             self.assertGreaterEqual(resolved.count(f"\t\t{actor}:"), 10, actor)
         self.assertGreaterEqual(resolved.count("\t\tsamad:"), 10)
-        self.assertIn("TechTypes: dome, atek, stek, fix, afld, hpad", resolved)
-        self.assertIn("TechTypes: mslo, dome, atek, stek, fix, afld, hpad", resolved)
-        self.assertIn("ProductionTypes: barr,tent,weap,afld,hpad", resolved)
-        self.assertGreaterEqual(resolved.count("AirUnitsTypes: mig, yak, heli, hind, mh60, samad"), 5)
+        self.assertIn("TechTypes: dome, atek, stek, fix, afld, hpad, safld", resolved)
+        self.assertIn("TechTypes: mslo, dome, atek, stek, fix, afld, hpad, safld", resolved)
+        self.assertIn("ProductionTypes: barr,tent,weap,afld,hpad,safld", resolved)
+        self.assertGreaterEqual(
+            resolved.count("AirUnitsTypes: mig, yak, heli, hind, mh60, samad, f15sa, ah64sa"),
+            5,
+        )
 
     def test_original_sprite_packages_have_expected_frames(self) -> None:
         expected = {
@@ -137,6 +141,12 @@ class RedSeaAssetTests(unittest.TestCase):
             "tech": 64,
             "ymlr": 64,
             "samad": 32,
+            "f15sa": 16,
+            "ah64sa": 32,
+            "samadhusk": 16,
+            "f15sahusk": 16,
+            "ah64sahusk": 32,
+            "ah64sarotor": 12,
             "m1a2shusk": 64,
             "sadshusk": 64,
             "techhusk": 64,
@@ -257,12 +267,52 @@ class RedSeaAssetTests(unittest.TestCase):
     def test_ground_models_use_exact_classic_red_alert_yaws(self) -> None:
         renderer = runpy.run_path(str(ROOT / "scripts" / "red_sea_directional_vehicle.py"))
         yaws = renderer["CLASSIC_YAWS"]
+        angles = renderer["_angles"](32, classic=True)
         self.assertEqual(len(yaws), 32)
         self.assertEqual(yaws[:8], (0, 40, 74, 112, 146, 172, 200, 228))
         self.assertEqual(yaws[-4:], (882, 914, 948, 984))
+        # Native RA frame 8 presents the vehicle nose on screen-left and frame
+        # 24 presents it on screen-right. The renderer therefore consumes the
+        # engine yaw ring with negative screen rotation, not positive rotation.
+        self.assertEqual(angles[0], 0)
+        self.assertEqual(angles[8], -90)
+        self.assertEqual(angles[16], -180)
+        self.assertEqual(angles[24], -270)
+        self.assertNotEqual(abs(angles[1]), 360 / 32)
+
+    def test_uniform_aircraft_facing_ring_uses_native_screen_handedness(self) -> None:
+        renderer = runpy.run_path(str(ROOT / "scripts" / "red_sea_directional_vehicle.py"))
+        angles = renderer["_angles"](16, classic=False)
+        self.assertEqual((angles[0], angles[4], angles[8], angles[12]), (0, -90, -180, -270))
+
+    def test_renderer_projects_front_marker_in_native_cardinal_order(self) -> None:
+        renderer = runpy.run_path(str(ROOT / "scripts" / "red_sea_directional_vehicle.py"))
+        mesh = renderer["Mesh"]()
+        mesh.box(-0.8, 0.8, -0.8, 0.8, 0.1, 0.5, renderer["OLIVE"])
+        mesh.box(-0.3, 0.3, -2.0, -1.4, 0.2, 0.8, renderer["LAMP"])
         angles = renderer["_angles"](32, classic=True)
-        self.assertNotEqual(angles[1], 360 / 32)
-        self.assertAlmostEqual(angles[8], 90.0)
+
+        centroids = []
+        for index in (0, 8, 16, 24):
+            frame = renderer["_render"](mesh, angles[index], 40, shadow=False, model_span=5)
+            marker = [
+                (x, y)
+                for y in range(frame.height)
+                for x in range(frame.width)
+                if (lambda color: color[3] and color[0] > 150 and color[1] > 120 and color[2] < 120)(
+                    frame.getpixel((x, y))
+                )
+            ]
+            self.assertGreater(len(marker), 10)
+            centroids.append(
+                (sum(x for x, _ in marker) / len(marker), sum(y for _, y in marker) / len(marker))
+            )
+
+        north, east, south, west = centroids
+        self.assertLess(north[1], 20)  # front marker at screen top
+        self.assertLess(east[0], 20)  # then screen left, matching native frame 8
+        self.assertGreater(south[1], 20)  # then screen bottom
+        self.assertGreater(west[0], 20)  # then screen right at native frame 24
 
     def test_m1_has_32_unique_hull_and_turret_frames_with_smooth_footprints(self) -> None:
         for start in (0, 32):
@@ -307,22 +357,27 @@ class RedSeaAssetTests(unittest.TestCase):
         self.assertEqual(len(effects["redsea-m1-muzzle"]["scales"]), 6)
         self.assertEqual(len(effects["redsea-m1-impact"]["scales"]), 9)
 
-    def test_samad_is_a_one_way_loitering_munition_not_a_rearming_yak(self) -> None:
+    def test_samad_is_a_native_one_way_aircraft_with_a_projectile_dive(self) -> None:
         resolved = self._resolved_rules("SAMAD")
         rules = (ROOT / "engine" / "openra" / "mods" / "ra" / "rules" / "red-sea.yaml").read_text(encoding="utf-8")
+        weapons = (ROOT / "engine" / "openra" / "mods" / "ra" / "weapons" / "red-sea.yaml").read_text(encoding="utf-8")
         self.assertIn("Weapon: RedSeaDroneStrike", resolved)
         self.assertIn("GrantConditionOnAttack@PAYLOAD:", resolved)
         self.assertIn("Condition: payload-released", resolved)
         self.assertIn("KillsSelf@PAYLOAD:", resolved)
         self.assertIn("RequiresCondition: payload-released", resolved)
-        self.assertIn("AttackDive:", resolved)
-        self.assertIn("DivingCondition: diving", resolved)
+        self.assertIn("AttackAircraft:", resolved)
+        self.assertNotIn("AttackDive:", resolved)
         self.assertIn("MoveIntoShroud: true", resolved)
         self.assertIn("SoundFiles: redsea-drone-loiter.wav", resolved)
         self.assertNotIn("Rearmable:", resolved)
         self.assertNotIn("Actor: YAK.Husk", resolved)
-        self.assertIn("WithFacingSpriteBody@LOITER:\n\t\tName: loiter", rules)
-        self.assertIn("WithFacingSpriteBody@DIVE:\n\t\tName: dive", rules)
+        self.assertIn("Actor: SAMAD.Husk", resolved)
+        self.assertNotIn("WithFacingSpriteBody@DIVE:", rules)
+        drone_weapon = weapons.split("\nRedSeaDroneStrike:\n", 1)[1].split("\nRedSeaF15AAM:\n", 1)[0]
+        self.assertIn("Projectile: Missile", drone_weapon)
+        self.assertIn("Image: samad", drone_weapon)
+        self.assertIn("Sequences: dive", drone_weapon)
 
     def test_drone_strike_has_dedicated_impact_animation(self) -> None:
         builder = runpy.run_path(str(ROOT / "scripts" / "build-red-sea-sprites.py"))
@@ -438,7 +493,16 @@ class RedSeaAssetTests(unittest.TestCase):
         self.assertIn("Title: 02: Hodeidah Lifeline", map_yaml)
         self.assertIn("Playable: True", map_yaml)
         self.assertIn("Faction: yemen", map_yaml)
-        for actor in ("YemenConyard: fact", "YemenWarFactory: weap", "YemenAirfield: afld", "DroneOne: samad"):
+        for actor in (
+            "YemenConyard: fact",
+            "YemenWarFactory: weap",
+            "YemenAirfield: afld",
+            "YemenTechCenter: stek",
+            "DroneOne: samad",
+            "YemenRifle1: ymr",
+            "YemenRocket1: yrpg",
+            "YemenDroneSpotter: yspot",
+        ):
             self.assertIn(actor, map_yaml)
         self.assertIn("hodeidah-lifeline.lua", rules)
         for mechanic in (
@@ -452,12 +516,12 @@ class RedSeaAssetTests(unittest.TestCase):
         ):
             self.assertIn(mechanic, script)
         self.assertEqual(manifest["id"], "hodeidah-lifeline-2026")
-        self.assertEqual(len(manifest["features"]), 7)
+        self.assertEqual(len(manifest["features"]), 8)
 
     def test_red_sea_missions_have_a_dedicated_campaign_group(self) -> None:
         missions = (ROOT / "engine" / "openra" / "mods" / "ra" / "missions.yaml").read_text(encoding="utf-8")
         lines = missions.splitlines()
-        campaign_start = lines.index("OpenRA AI:") + 1
+        campaign_start = lines.index("World War III:") + 1
         campaign = []
         for line in lines[campaign_start:]:
             if not line.startswith("\t"):

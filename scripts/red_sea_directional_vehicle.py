@@ -570,11 +570,17 @@ CLASSIC_YAWS = (
 
 
 def _angles(facings: int, *, classic: bool) -> tuple[float, ...]:
+    # Native RA frame order turns clockwise in world yaw but projects the
+    # recognizable vehicle nose TOP -> LEFT -> BOTTOM -> RIGHT at the four
+    # cardinal frame indexes. The fixed-camera renderer's positive Z rotation
+    # produces the opposite screen handedness, so authored meshes must use the
+    # negative yaw. A positive angle makes east/west and every intermediate
+    # facing slide backwards even though frame counts and uniqueness still pass.
     if classic:
         if facings != 32:
             raise ValueError("classic Red Alert vehicle artwork requires 32 facings")
-        return tuple(yaw * 360 / 1024 for yaw in CLASSIC_YAWS)
-    return tuple(360 * facing / facings for facing in range(facings))
+        return tuple(-yaw * 360 / 1024 for yaw in CLASSIC_YAWS)
+    return tuple(-360 * facing / facings for facing in range(facings))
 
 
 def render_m1a2s_frames(frame_size: int = 40, facings: int = 32) -> tuple[list[Image.Image], list[Image.Image]]:
@@ -636,7 +642,7 @@ def render_f15sa_frames(frame_size: int = 56, facings: int = 16) -> list[Image.I
 def render_ah64sa_frames(frame_size: int = 56, facings: int = 32) -> list[Image.Image]:
     angles = _angles(facings, classic=True)
     return [
-        _render(_ah64sa_airframe(), angle, frame_size, shadow=False, model_span=6.30, center_y_factor=0.59)
+        _render(_ah64sa_airframe(), angle, frame_size, shadow=False, model_span=8.40, center_y_factor=0.59)
         for angle in angles
     ]
 

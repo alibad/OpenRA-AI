@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "id": "salvage-and-scrap-economy",
+  "name": "Collectible battlefield salvage",
+  "kind": "trait",
+  "status": "integrated",
+  "summary": "Allows selected units to spawn value-carrying salvage on death and lets any crate-capable collector convert it into cash. The RA fixture reuses the stock supply-crate presentation and imports no upstream art.",
+  "sources": [
+    {
+      "project": "openhv",
+      "commit": "d507035349b05a774baedbdebd2e60abb6c57895",
+      "paths": [
+        "OpenRA.Mods.HV/ValueInit.cs",
+        "OpenRA.Mods.HV/Traits/ScrapValue.cs",
+        "OpenRA.Mods.HV/Traits/SpawnScrapOnDeath.cs",
+        "OpenRA.Mods.HV/Traits/Cubes/CollectScrapCrateAction.cs"
+      ],
+      "notes": "Adapted into generic salvage traits without the upstream lobby-option dependency. Empty TerrainTypes now means all terrain, and 0 percent probability reliably disables spawning."
+    }
+  ],
+  "license": {
+    "code": "GPL-3.0-or-later",
+    "assets": "No upstream assets imported; fixture uses the existing RA scrate sequences",
+    "redistribution": "allowed",
+    "attribution": ["OpenHV developers"]
+  },
+  "compatibility": {
+    "target_mod": "ra",
+    "engine_api": "native",
+    "dependencies": ["Crate", "PlayerResources", "Valued or sell-value provider"],
+    "conflicts": []
+  },
+  "integration": {
+    "files": [
+      "engine/openra/OpenRA.Mods.Common/Traits/WorldWarIII/BattlefieldSalvage.cs",
+      "engine/openra/mods/ra/experiences/components/battlefield-salvage.yaml",
+      "engine/openra/mods/ra/mod.yaml"
+    ],
+    "feature_flag": null,
+    "migration_notes": "Concrete units opt in by inheriting ^ReusableSalvageable. Override probability, death types, terrain, and actor selection per faction. Replace REUSABLESALVAGE only when original faction-specific art is available."
+  },
+  "verification": {
+    "lint": "passed",
+    "build": "passed",
+    "automated": "pending",
+    "live": "pending",
+    "evidence": [
+      "Isolated Debug build of OpenRA.Mods.Cnc/OpenRA.Mods.Common completed with 0 errors.",
+      "OpenRA.Utility ra --check-yaml passed with the salvageable abstract actor and collectible salvage actor plus all bundled RA maps, sequences, and Fluent references.",
+      "OpenRA.Utility all --check-explicit-interfaces and --check-conditional-trait-interface-overrides passed."
+    ]
+  }
+}

@@ -47,6 +47,7 @@ MISSION_SPECS = {
             "two-stage relief and evacuation convoy flow",
             "timed surveillance-dispersal mechanic",
             "scripted Saudi combined-arms pressure",
+            "starter Yemen infantry roster with drone-guided launchers",
             "player-buildable technicals, mobile launchers, and Samad drones",
             "bilingual Arabic and English radio",
             "difficulty-scaled sweep tolerance and attack waves",

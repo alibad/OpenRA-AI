@@ -12,6 +12,7 @@ Thumbs.db
 # Build output
 artifacts/
 .artifacts/
+.codex-build/
 bin/
 obj/
 dist/

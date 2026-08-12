@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "id": "mission-aware-minelayer-ai",
+  "name": "Mission-aware minelayer strategy AI",
+  "kind": "ai-module",
+  "status": "integrated",
+  "summary": "Extends the existing conflict-driven minelayer bot with mission-seeded mine zones, accelerated opening scans, explicit roster filtering, and recovery when assigned minelayers stop making progress.",
+  "sources": [
+    {
+      "project": "shattered-paradise",
+      "commit": "124b7054a636a9c51d8edc87b3171bf63b92556f",
+      "paths": ["OpenRA.Mods.Sp/Traits/BotModules/MinelayerBotModuleSP.cs"],
+      "notes": "Adapted the mission initialization, quick-scan, actor filtering, and stuck recovery behavior into the native OpenRA MinelayerBotModule instead of duplicating the full module."
+    }
+  ],
+  "license": {
+    "code": "GPL-3.0-or-later",
+    "assets": "No upstream assets imported",
+    "redistribution": "allowed",
+    "attribution": ["Shattered Paradise developers", "OpenRA developers and contributors"]
+  },
+  "compatibility": {
+    "target_mod": "ra",
+    "engine_api": "native",
+    "dependencies": ["Minelayer", "PathFinder", "ModularBot"],
+    "conflicts": []
+  },
+  "integration": {
+    "files": [
+      "engine/openra/OpenRA.Mods.Common/Traits/BotModules/BotModuleLogic/MinelayerBotModule.cs",
+      "engine/openra/mods/ra/rules/ai.yaml"
+    ],
+    "feature_flag": "enable-turtle-ai",
+    "migration_notes": "Set InitializingMinefieldActor on mission-specific bot definitions to seed authored defensive zones. QuickScanTickTimes and QuickScanTickAfterInitializing are safe for skirmish use without markers."
+  },
+  "verification": {
+    "lint": "passed",
+    "build": "passed",
+    "automated": "pending",
+    "live": "pending",
+    "evidence": [
+      "Isolated Debug build of OpenRA.Mods.Cnc/OpenRA.Mods.Common completed with 0 errors.",
+      "OpenRA.Utility ra --check-yaml passed with the quick-scan fields enabled on the turtle AI and all bundled RA maps, sequences, and Fluent references validated.",
+      "OpenRA.Utility all --check-explicit-interfaces and --check-conditional-trait-interface-overrides passed."
+    ]
+  }
+}

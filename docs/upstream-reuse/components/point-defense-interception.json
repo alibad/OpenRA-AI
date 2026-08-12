@@ -1,0 +1,64 @@
+{
+  "schema_version": 1,
+  "id": "point-defense-interception",
+  "name": "Opt-in projectile interception and point defense",
+  "kind": "trait",
+  "status": "integrated",
+  "summary": "Adds inert-by-default interception tags to native Missile and Bullet projectiles plus a reusable armament-driven defense trait. Intercepted projectiles may be removed harmlessly or configured to detonate at the interception point.",
+  "sources": [
+    {
+      "project": "combined-arms",
+      "commit": "ab9e477c3db818e91946d4cfdc86e71012966141",
+      "paths": [
+        "OpenRA.Mods.CA/Traits/PointDefense.cs",
+        "OpenRA.Mods.CA/TraitsInterfaces.cs",
+        "OpenRA.Mods.CA/Projectiles/MissileCA.cs",
+        "OpenRA.Mods.CA/Projectiles/BulletCA.cs"
+      ],
+      "notes": "Primary behavior reference. The adaptation uses native projectiles and makes harmless interception the default instead of always applying the incoming weapon impact."
+    },
+    {
+      "project": "ra-plus",
+      "commit": "3188783037c9d74dcf61f23e3cf7e49a32b6cd36",
+      "paths": ["OpenRA.Mods.CA/Traits/PointDefense.cs"],
+      "notes": "Secondary gameplay and configuration reference."
+    }
+  ],
+  "license": {
+    "code": "GPL-3.0-or-later",
+    "assets": "No upstream assets imported",
+    "redistribution": "allowed",
+    "attribution": ["OpenRA Combined Arms developers", "RA+ contributors", "OpenRA developers and contributors"]
+  },
+  "compatibility": {
+    "target_mod": "ra",
+    "engine_api": "native",
+    "dependencies": ["Armament", "Missile or Bullet projectile", "opt-in PointDefenseType value"],
+    "conflicts": []
+  },
+  "integration": {
+    "files": [
+      "engine/openra/OpenRA.Mods.Common/TraitsInterfaces.cs",
+      "engine/openra/OpenRA.Mods.Common/Projectiles/ProjectileInterception.cs",
+      "engine/openra/OpenRA.Mods.Common/Projectiles/Missile.cs",
+      "engine/openra/OpenRA.Mods.Common/Projectiles/Bullet.cs",
+      "engine/openra/OpenRA.Mods.Common/Traits/WorldWarIII/PointDefense.cs",
+      "engine/openra/mods/ra/experiences/components/point-defense-interception.yaml",
+      "engine/openra/mods/ra/experiences/weapons/point-defense-interception.yaml",
+      "engine/openra/mods/ra/mod.yaml"
+    ],
+    "feature_flag": null,
+    "migration_notes": "Set PointDefenseType only on projectiles intended to be interceptable. Inherit ^ReusablePointDefense or configure the trait directly, then replace the fixture weapon/range/reload with faction-specific balance. Existing projectiles are unaffected."
+  },
+  "verification": {
+    "lint": "passed",
+    "build": "passed",
+    "automated": "pending",
+    "live": "pending",
+    "evidence": [
+      "Isolated Debug build of OpenRA.Mods.Cnc/OpenRA.Mods.Common completed with 0 errors.",
+      "OpenRA.Utility ra --check-yaml passed with point-defense actor and weapon fixtures and all bundled RA maps, sequences, and Fluent references validated.",
+      "OpenRA.Utility all --check-explicit-interfaces and --check-conditional-trait-interface-overrides passed."
+    ]
+  }
+}

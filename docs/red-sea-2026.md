@@ -44,6 +44,26 @@ Yemen:
 - Samad Drone: low-altitude one-way loitering munition with a close-range dive,
   dedicated impact animation, blast, camera shake, and layered strike audio.
 
+Saudi infantry:
+
+- Saudi National Guard: durable burst-fire line infantry;
+- Saudi JTAC: long-range visible designation that improves air and artillery strikes;
+- Saudi ATGM Team: slow, long-range anti-vehicle specialist;
+- Falcon One: build-limit-one commando with suppressed fire, demolition, and a
+  precision F-15 strike.
+
+Yemen infantry:
+
+- Yemeni Mountain Rifleman: inexpensive stationary-camouflage ambusher;
+- Yemeni RPG Hunter: short-range anti-armor fighter enhanced by spotter guidance;
+- Yemeni Drone Spotter: reconnaissance, cloak detection, and launcher/RPG guidance;
+- Wadi Ghost: build-limit-one cloaked infiltrator with demolition and a remote charge.
+
+Each infantry role has a 342-frame native-style SHP package covering eight
+facings for standing, running, firing, prone movement, prone firing, idles, and
+deaths. Their 64x48 cameos are separate opaque illustrations, and their
+bilingual character voices and weapon sounds are original generated assets.
+
 All five actors use original SHP art rendered from fixed-camera 3D geometry,
 never a single bitmap rotated in 2D. Every ground vehicle has 32 native Red
 Alert classic facings; the M1A2S, air-defense vehicle, and technical have
@@ -98,7 +118,10 @@ Arabic with bilingual subtitles.
 ## Hodeidah Lifeline
 
 The second mission reverses the playable side. Yemen begins with a complete
-base, two missile launchers, two technicals, and two Samad drones. Four linked
+base, including its Tech Center, two missile launchers, two technicals, and two
+Samad drones. Mountain Riflemen, an RPG Hunter, and a Drone Spotter deploy with
+the opening force so their launcher-guidance interaction is available
+immediately. Four linked
 objectives require the player to protect civilian infrastructure, escort relief
 supplies inland, disperse mobile assets before a surveillance sweep, and cover
 the evacuation convoy on its return. Saudi combined-arms waves, the sweep
@@ -133,7 +156,7 @@ The three playable contracts are:
 - `bab-al-mandab-passage-2026`.
 
 The mission packages are reproducible via `scripts/build-red-sea-mission.py` and
-are listed in order under **OpenRA AI** in the mission browser. Remaining release
+are listed in order under **World War III** in the mission browser. Remaining release
 gates are hands-on balance/mix playtests and eventual separation into a
 standalone `redsea` mod shell.
 
