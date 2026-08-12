@@ -1,7 +1,7 @@
 {
   "schema": "openra-ai.iran-live-validation/v1",
-  "captured_at": "2026-08-12T09:55:08+03:00",
-  "bridge": "127.0.0.1:10018",
+  "captured_at": "2026-08-12T11:43:04+03:00",
+  "bridge": "127.0.0.1:10028",
   "checks": {
     "live_headings": {
       "ground_vehicle": {
@@ -27,127 +27,35 @@
         "distinct_facings": [
           128,
           144,
-          264,
-          272,
-          286,
-          299,
-          336,
+          256,
+          257,
+          293,
+          328,
+          330,
           344,
-          359,
-          371,
+          365,
           384,
-          472,
+          392,
           512,
-          527,
           535,
           600,
           608,
+          612,
           640,
-          671,
+          650,
           708,
-          744,
+          722,
           768
         ],
         "samples": [
           {
-            "tick": 150,
-            "cell": [
-              66,
-              78
-            ],
-            "facing": 512,
-            "activity": "",
-            "target": [
-              69,
-              80
-            ]
-          },
-          {
-            "tick": 160,
-            "cell": [
-              66,
-              78
-            ],
-            "facing": 512,
-            "activity": "",
-            "target": [
-              69,
-              80
-            ]
-          },
-          {
-            "tick": 170,
-            "cell": [
-              66,
-              78
-            ],
-            "facing": 640,
-            "activity": "Move",
-            "target": [
-              69,
-              80
-            ]
-          },
-          {
-            "tick": 180,
-            "cell": [
-              66,
-              78
-            ],
-            "facing": 640,
-            "activity": "Move",
-            "target": [
-              69,
-              80
-            ]
-          },
-          {
-            "tick": 190,
-            "cell": [
-              67,
-              79
-            ],
-            "facing": 640,
-            "activity": "Move",
-            "target": [
-              69,
-              80
-            ]
-          },
-          {
-            "tick": 200,
-            "cell": [
-              67,
-              79
-            ],
-            "facing": 640,
-            "activity": "Move",
-            "target": [
-              69,
-              80
-            ]
-          },
-          {
-            "tick": 210,
-            "cell": [
-              68,
-              80
-            ],
-            "facing": 671,
-            "activity": "Move",
-            "target": [
-              69,
-              80
-            ]
-          },
-          {
             "tick": 220,
             "cell": [
-              68,
-              80
+              66,
+              78
             ],
-            "facing": 744,
-            "activity": "Move",
+            "facing": 512,
+            "activity": "",
             "target": [
               69,
               80
@@ -155,6 +63,84 @@
           },
           {
             "tick": 230,
+            "cell": [
+              66,
+              78
+            ],
+            "facing": 612,
+            "activity": "Move",
+            "target": [
+              69,
+              80
+            ]
+          },
+          {
+            "tick": 240,
+            "cell": [
+              66,
+              78
+            ],
+            "facing": 640,
+            "activity": "Move",
+            "target": [
+              69,
+              80
+            ]
+          },
+          {
+            "tick": 250,
+            "cell": [
+              67,
+              79
+            ],
+            "facing": 640,
+            "activity": "Move",
+            "target": [
+              69,
+              80
+            ]
+          },
+          {
+            "tick": 260,
+            "cell": [
+              67,
+              79
+            ],
+            "facing": 640,
+            "activity": "Move",
+            "target": [
+              69,
+              80
+            ]
+          },
+          {
+            "tick": 270,
+            "cell": [
+              68,
+              80
+            ],
+            "facing": 650,
+            "activity": "Move",
+            "target": [
+              69,
+              80
+            ]
+          },
+          {
+            "tick": 280,
+            "cell": [
+              68,
+              80
+            ],
+            "facing": 722,
+            "activity": "Move",
+            "target": [
+              69,
+              80
+            ]
+          },
+          {
+            "tick": 290,
             "cell": [
               69,
               80
@@ -167,7 +153,7 @@
             ]
           },
           {
-            "tick": 230,
+            "tick": 290,
             "cell": [
               69,
               80
@@ -180,7 +166,7 @@
             ]
           },
           {
-            "tick": 240,
+            "tick": 300,
             "cell": [
               69,
               80
@@ -193,7 +179,7 @@
             ]
           },
           {
-            "tick": 250,
+            "tick": 310,
             "cell": [
               69,
               80
@@ -206,20 +192,7 @@
             ]
           },
           {
-            "tick": 260,
-            "cell": [
-              69,
-              81
-            ],
-            "facing": 527,
-            "activity": "Move",
-            "target": [
-              70,
-              84
-            ]
-          },
-          {
-            "tick": 270,
+            "tick": 330,
             "cell": [
               69,
               81
@@ -232,7 +205,7 @@
             ]
           },
           {
-            "tick": 280,
+            "tick": 340,
             "cell": [
               70,
               82
@@ -245,7 +218,7 @@
             ]
           },
           {
-            "tick": 290,
+            "tick": 350,
             "cell": [
               70,
               82
@@ -258,20 +231,7 @@
             ]
           },
           {
-            "tick": 300,
-            "cell": [
-              70,
-              83
-            ],
-            "facing": 512,
-            "activity": "Move",
-            "target": [
-              70,
-              84
-            ]
-          },
-          {
-            "tick": 310,
+            "tick": 370,
             "cell": [
               70,
               84
@@ -281,93 +241,15 @@
             "target": [
               70,
               84
-            ]
-          },
-          {
-            "tick": 310,
-            "cell": [
-              70,
-              84
-            ],
-            "facing": 512,
-            "activity": "Move",
-            "target": [
-              66,
-              86
-            ]
-          },
-          {
-            "tick": 320,
-            "cell": [
-              70,
-              84
-            ],
-            "facing": 472,
-            "activity": "Move",
-            "target": [
-              66,
-              86
-            ]
-          },
-          {
-            "tick": 330,
-            "cell": [
-              70,
-              84
-            ],
-            "facing": 272,
-            "activity": "Move",
-            "target": [
-              66,
-              86
-            ]
-          },
-          {
-            "tick": 340,
-            "cell": [
-              69,
-              84
-            ],
-            "facing": 264,
-            "activity": "Move",
-            "target": [
-              66,
-              86
-            ]
-          },
-          {
-            "tick": 350,
-            "cell": [
-              69,
-              84
-            ],
-            "facing": 336,
-            "activity": "Move",
-            "target": [
-              66,
-              86
-            ]
-          },
-          {
-            "tick": 360,
-            "cell": [
-              68,
-              85
-            ],
-            "facing": 359,
-            "activity": "Move",
-            "target": [
-              66,
-              86
             ]
           },
           {
             "tick": 370,
             "cell": [
-              68,
-              85
+              70,
+              84
             ],
-            "facing": 286,
+            "facing": 512,
             "activity": "Move",
             "target": [
               66,
@@ -377,11 +259,11 @@
           {
             "tick": 380,
             "cell": [
-              67,
-              85
+              70,
+              84
             ],
-            "facing": 299,
-            "activity": "Move",
+            "facing": 512,
+            "activity": "",
             "target": [
               66,
               86
@@ -390,10 +272,10 @@
           {
             "tick": 390,
             "cell": [
-              67,
-              85
+              70,
+              84
             ],
-            "facing": 371,
+            "facing": 392,
             "activity": "Move",
             "target": [
               66,
@@ -402,6 +284,84 @@
           },
           {
             "tick": 400,
+            "cell": [
+              70,
+              84
+            ],
+            "facing": 256,
+            "activity": "Move",
+            "target": [
+              66,
+              86
+            ]
+          },
+          {
+            "tick": 410,
+            "cell": [
+              69,
+              84
+            ],
+            "facing": 293,
+            "activity": "Move",
+            "target": [
+              66,
+              86
+            ]
+          },
+          {
+            "tick": 420,
+            "cell": [
+              69,
+              84
+            ],
+            "facing": 365,
+            "activity": "Move",
+            "target": [
+              66,
+              86
+            ]
+          },
+          {
+            "tick": 430,
+            "cell": [
+              68,
+              85
+            ],
+            "facing": 330,
+            "activity": "Move",
+            "target": [
+              66,
+              86
+            ]
+          },
+          {
+            "tick": 440,
+            "cell": [
+              68,
+              85
+            ],
+            "facing": 257,
+            "activity": "Move",
+            "target": [
+              66,
+              86
+            ]
+          },
+          {
+            "tick": 450,
+            "cell": [
+              67,
+              85
+            ],
+            "facing": 328,
+            "activity": "Move",
+            "target": [
+              66,
+              86
+            ]
+          },
+          {
+            "tick": 460,
             "cell": [
               66,
               86
@@ -414,7 +374,7 @@
             ]
           },
           {
-            "tick": 400,
+            "tick": 460,
             "cell": [
               66,
               86
@@ -427,7 +387,7 @@
             ]
           },
           {
-            "tick": 410,
+            "tick": 470,
             "cell": [
               66,
               86
@@ -440,7 +400,7 @@
             ]
           },
           {
-            "tick": 420,
+            "tick": 480,
             "cell": [
               66,
               86
@@ -453,7 +413,7 @@
             ]
           },
           {
-            "tick": 430,
+            "tick": 490,
             "cell": [
               66,
               86
@@ -466,85 +426,85 @@
             ]
           },
           {
-            "tick": 440,
-            "cell": [
-              65,
-              85
-            ],
-            "facing": 128,
-            "activity": "Move",
-            "target": [
-              62,
-              82
-            ]
-          },
-          {
-            "tick": 450,
-            "cell": [
-              65,
-              85
-            ],
-            "facing": 128,
-            "activity": "Move",
-            "target": [
-              62,
-              82
-            ]
-          },
-          {
-            "tick": 460,
-            "cell": [
-              64,
-              84
-            ],
-            "facing": 128,
-            "activity": "Move",
-            "target": [
-              62,
-              82
-            ]
-          },
-          {
-            "tick": 470,
-            "cell": [
-              64,
-              84
-            ],
-            "facing": 128,
-            "activity": "Move",
-            "target": [
-              62,
-              82
-            ]
-          },
-          {
-            "tick": 480,
-            "cell": [
-              63,
-              83
-            ],
-            "facing": 128,
-            "activity": "Move",
-            "target": [
-              62,
-              82
-            ]
-          },
-          {
-            "tick": 490,
-            "cell": [
-              63,
-              83
-            ],
-            "facing": 128,
-            "activity": "Move",
-            "target": [
-              62,
-              82
-            ]
-          },
-          {
             "tick": 500,
+            "cell": [
+              65,
+              85
+            ],
+            "facing": 128,
+            "activity": "Move",
+            "target": [
+              62,
+              82
+            ]
+          },
+          {
+            "tick": 510,
+            "cell": [
+              65,
+              85
+            ],
+            "facing": 128,
+            "activity": "Move",
+            "target": [
+              62,
+              82
+            ]
+          },
+          {
+            "tick": 520,
+            "cell": [
+              64,
+              84
+            ],
+            "facing": 128,
+            "activity": "Move",
+            "target": [
+              62,
+              82
+            ]
+          },
+          {
+            "tick": 530,
+            "cell": [
+              64,
+              84
+            ],
+            "facing": 128,
+            "activity": "Move",
+            "target": [
+              62,
+              82
+            ]
+          },
+          {
+            "tick": 540,
+            "cell": [
+              63,
+              83
+            ],
+            "facing": 128,
+            "activity": "Move",
+            "target": [
+              62,
+              82
+            ]
+          },
+          {
+            "tick": 550,
+            "cell": [
+              63,
+              83
+            ],
+            "facing": 128,
+            "activity": "Move",
+            "target": [
+              62,
+              82
+            ]
+          },
+          {
+            "tick": 560,
             "cell": [
               62,
               82
@@ -561,7 +521,7 @@
           {
             "request_id": "irkarr-heading-0",
             "accepted": true,
-            "game_tick": 158,
+            "game_tick": 221,
             "detail": "Queued 1 confirmed player order.",
             "results": [
               {
@@ -574,7 +534,7 @@
           {
             "request_id": "irkarr-heading-1",
             "accepted": true,
-            "game_tick": 233,
+            "game_tick": 293,
             "detail": "Queued 1 confirmed player order.",
             "results": [
               {
@@ -587,7 +547,7 @@
           {
             "request_id": "irkarr-heading-2",
             "accepted": true,
-            "game_tick": 313,
+            "game_tick": 379,
             "detail": "Queued 1 confirmed player order.",
             "results": [
               {
@@ -600,7 +560,7 @@
           {
             "request_id": "irkarr-heading-3",
             "accepted": true,
-            "game_tick": 404,
+            "game_tick": 461,
             "detail": "Queued 1 confirmed player order.",
             "results": [
               {
@@ -633,29 +593,29 @@
           ]
         ],
         "distinct_facings": [
-          92,
-          247,
-          250,
-          272,
-          423,
-          462,
-          530,
-          710,
-          779,
-          828,
-          936,
-          973,
-          976,
-          1008
+          40,
+          60,
+          240,
+          258,
+          347,
+          419,
+          597,
+          741,
+          744,
+          777,
+          884,
+          992,
+          1011,
+          1014
         ],
         "samples": [
           {
-            "tick": 500,
+            "tick": 560,
             "cell": [
               62,
-              85
+              84
             ],
-            "facing": 936,
+            "facing": 992,
             "activity": "FlyIdle",
             "target": [
               70,
@@ -663,259 +623,207 @@
             ]
           },
           {
-            "tick": 510,
+            "tick": 570,
             "cell": [
               62,
               82
             ],
-            "facing": 1008,
+            "facing": 40,
             "activity": "Fly",
             "target": [
               70,
               80
-            ]
-          },
-          {
-            "tick": 520,
-            "cell": [
-              64,
-              81
-            ],
-            "facing": 828,
-            "activity": "Fly",
-            "target": [
-              70,
-              80
-            ]
-          },
-          {
-            "tick": 530,
-            "cell": [
-              66,
-              80
-            ],
-            "facing": 779,
-            "activity": "Fly",
-            "target": [
-              70,
-              80
-            ]
-          },
-          {
-            "tick": 540,
-            "cell": [
-              68,
-              80
-            ],
-            "facing": 779,
-            "activity": "Fly",
-            "target": [
-              70,
-              80
-            ]
-          },
-          {
-            "tick": 540,
-            "cell": [
-              68,
-              80
-            ],
-            "facing": 779,
-            "activity": "Fly",
-            "target": [
-              70,
-              88
-            ]
-          },
-          {
-            "tick": 550,
-            "cell": [
-              70,
-              80
-            ],
-            "facing": 710,
-            "activity": "Fly",
-            "target": [
-              70,
-              88
-            ]
-          },
-          {
-            "tick": 560,
-            "cell": [
-              72,
-              82
-            ],
-            "facing": 530,
-            "activity": "Fly",
-            "target": [
-              70,
-              88
-            ]
-          },
-          {
-            "tick": 570,
-            "cell": [
-              71,
-              84
-            ],
-            "facing": 462,
-            "activity": "Fly",
-            "target": [
-              70,
-              88
             ]
           },
           {
             "tick": 580,
             "cell": [
-              71,
-              86
+              62,
+              80
             ],
-            "facing": 462,
+            "facing": 884,
             "activity": "Fly",
             "target": [
               70,
-              88
-            ]
-          },
-          {
-            "tick": 580,
-            "cell": [
-              71,
-              86
-            ],
-            "facing": 462,
-            "activity": "Fly",
-            "target": [
-              61,
-              89
+              80
             ]
           },
           {
             "tick": 590,
             "cell": [
+              65,
+              79
+            ],
+            "facing": 744,
+            "activity": "Fly",
+            "target": [
               70,
-              88
-            ],
-            "facing": 423,
-            "activity": "Fly",
-            "target": [
-              61,
-              89
-            ]
-          },
-          {
-            "tick": 600,
-            "cell": [
-              68,
-              89
-            ],
-            "facing": 250,
-            "activity": "Fly",
-            "target": [
-              61,
-              89
+              80
             ]
           },
           {
             "tick": 610,
             "cell": [
-              66,
-              89
+              69,
+              80
             ],
-            "facing": 250,
+            "facing": 741,
             "activity": "Fly",
             "target": [
-              61,
-              89
+              70,
+              80
+            ]
+          },
+          {
+            "tick": 610,
+            "cell": [
+              69,
+              80
+            ],
+            "facing": 741,
+            "activity": "Fly",
+            "target": [
+              70,
+              88
             ]
           },
           {
             "tick": 620,
             "cell": [
-              64,
-              89
-            ],
-            "facing": 247,
-            "activity": "Fly",
-            "target": [
-              61,
-              89
-            ]
-          },
-          {
-            "tick": 630,
-            "cell": [
-              61,
-              89
-            ],
-            "facing": 250,
-            "activity": "Fly",
-            "target": [
-              61,
-              89
-            ]
-          },
-          {
-            "tick": 630,
-            "cell": [
-              61,
-              89
-            ],
-            "facing": 250,
-            "activity": "Fly",
-            "target": [
-              59,
+              71,
               80
+            ],
+            "facing": 777,
+            "activity": "Fly",
+            "target": [
+              70,
+              88
+            ]
+          },
+          {
+            "tick": 630,
+            "cell": [
+              73,
+              81
+            ],
+            "facing": 597,
+            "activity": "Fly",
+            "target": [
+              70,
+              88
             ]
           },
           {
             "tick": 640,
             "cell": [
-              59,
-              90
+              73,
+              83
             ],
-            "facing": 272,
+            "facing": 419,
             "activity": "Fly",
             "target": [
-              59,
-              80
+              70,
+              88
             ]
           },
           {
             "tick": 650,
             "cell": [
-              57,
-              89
+              72,
+              85
             ],
-            "facing": 92,
+            "facing": 419,
             "activity": "Fly",
             "target": [
-              59,
-              80
+              70,
+              88
             ]
           },
           {
             "tick": 660,
             "cell": [
-              57,
+              71,
               87
             ],
-            "facing": 976,
+            "facing": 419,
             "activity": "Fly",
             "target": [
-              59,
-              80
+              70,
+              88
+            ]
+          },
+          {
+            "tick": 660,
+            "cell": [
+              71,
+              87
+            ],
+            "facing": 419,
+            "activity": "Fly",
+            "target": [
+              61,
+              89
             ]
           },
           {
             "tick": 670,
             "cell": [
-              58,
-              84
+              69,
+              89
             ],
-            "facing": 976,
+            "facing": 347,
+            "activity": "Fly",
+            "target": [
+              61,
+              89
+            ]
+          },
+          {
+            "tick": 680,
+            "cell": [
+              67,
+              89
+            ],
+            "facing": 258,
+            "activity": "Fly",
+            "target": [
+              61,
+              89
+            ]
+          },
+          {
+            "tick": 690,
+            "cell": [
+              65,
+              89
+            ],
+            "facing": 258,
+            "activity": "Fly",
+            "target": [
+              61,
+              89
+            ]
+          },
+          {
+            "tick": 700,
+            "cell": [
+              63,
+              89
+            ],
+            "facing": 258,
+            "activity": "Fly",
+            "target": [
+              61,
+              89
+            ]
+          },
+          {
+            "tick": 700,
+            "cell": [
+              63,
+              89
+            ],
+            "facing": 258,
             "activity": "Fly",
             "target": [
               59,
@@ -923,12 +831,64 @@
             ]
           },
           {
-            "tick": 680,
+            "tick": 710,
             "cell": [
-              58,
-              82
+              61,
+              89
             ],
-            "facing": 973,
+            "facing": 240,
+            "activity": "Fly",
+            "target": [
+              59,
+              80
+            ]
+          },
+          {
+            "tick": 720,
+            "cell": [
+              59,
+              88
+            ],
+            "facing": 60,
+            "activity": "Fly",
+            "target": [
+              59,
+              80
+            ]
+          },
+          {
+            "tick": 730,
+            "cell": [
+              59,
+              86
+            ],
+            "facing": 1014,
+            "activity": "Fly",
+            "target": [
+              59,
+              80
+            ]
+          },
+          {
+            "tick": 740,
+            "cell": [
+              59,
+              83
+            ],
+            "facing": 1014,
+            "activity": "Fly",
+            "target": [
+              59,
+              80
+            ]
+          },
+          {
+            "tick": 750,
+            "cell": [
+              59,
+              81
+            ],
+            "facing": 1011,
             "activity": "Fly",
             "target": [
               59,
@@ -940,7 +900,7 @@
           {
             "request_id": "irazar-heading-0",
             "accepted": true,
-            "game_tick": 502,
+            "game_tick": 563,
             "detail": "Queued 1 confirmed player order.",
             "results": [
               {
@@ -953,7 +913,7 @@
           {
             "request_id": "irazar-heading-1",
             "accepted": true,
-            "game_tick": 542,
+            "game_tick": 615,
             "detail": "Queued 1 confirmed player order.",
             "results": [
               {
@@ -966,7 +926,7 @@
           {
             "request_id": "irazar-heading-2",
             "accepted": true,
-            "game_tick": 583,
+            "game_tick": 663,
             "detail": "Queued 1 confirmed player order.",
             "results": [
               {
@@ -979,7 +939,7 @@
           {
             "request_id": "irazar-heading-3",
             "accepted": true,
-            "game_tick": 633,
+            "game_tick": 704,
             "detail": "Queued 1 confirmed player order.",
             "results": [
               {
@@ -1013,23 +973,22 @@
         ],
         "distinct_facings": [
           24,
-          180,
-          256,
+          78,
+          268,
+          271,
           384,
-          431,
-          441,
-          489,
-          492,
-          561,
-          631,
-          751,
-          797,
-          802,
-          805
+          449,
+          460,
+          503,
+          556,
+          650,
+          746,
+          813,
+          819
         ],
         "samples": [
           {
-            "tick": 680,
+            "tick": 750,
             "cell": [
               63,
               83
@@ -1042,259 +1001,168 @@
             ]
           },
           {
-            "tick": 690,
+            "tick": 760,
             "cell": [
               63,
               83
             ],
-            "facing": 441,
+            "facing": 460,
             "activity": "Fly",
             "target": [
               69,
               82
-            ]
-          },
-          {
-            "tick": 700,
-            "cell": [
-              64,
-              83
-            ],
-            "facing": 631,
-            "activity": "Fly",
-            "target": [
-              69,
-              82
-            ]
-          },
-          {
-            "tick": 710,
-            "cell": [
-              65,
-              83
-            ],
-            "facing": 797,
-            "activity": "Fly",
-            "target": [
-              69,
-              82
-            ]
-          },
-          {
-            "tick": 720,
-            "cell": [
-              66,
-              83
-            ],
-            "facing": 797,
-            "activity": "Fly",
-            "target": [
-              69,
-              82
-            ]
-          },
-          {
-            "tick": 730,
-            "cell": [
-              67,
-              82
-            ],
-            "facing": 802,
-            "activity": "Fly",
-            "target": [
-              69,
-              82
-            ]
-          },
-          {
-            "tick": 740,
-            "cell": [
-              68,
-              82
-            ],
-            "facing": 805,
-            "activity": "Fly",
-            "target": [
-              69,
-              82
-            ]
-          },
-          {
-            "tick": 740,
-            "cell": [
-              68,
-              82
-            ],
-            "facing": 805,
-            "activity": "Fly",
-            "target": [
-              68,
-              89
-            ]
-          },
-          {
-            "tick": 750,
-            "cell": [
-              69,
-              82
-            ],
-            "facing": 751,
-            "activity": "Fly",
-            "target": [
-              68,
-              89
-            ]
-          },
-          {
-            "tick": 760,
-            "cell": [
-              69,
-              84
-            ],
-            "facing": 561,
-            "activity": "Fly",
-            "target": [
-              68,
-              89
             ]
           },
           {
             "tick": 770,
             "cell": [
-              69,
-              85
+              63,
+              84
             ],
-            "facing": 489,
+            "facing": 650,
             "activity": "Fly",
             "target": [
-              68,
-              89
+              69,
+              82
             ]
           },
           {
             "tick": 780,
             "cell": [
-              68,
-              86
+              64,
+              83
             ],
-            "facing": 489,
+            "facing": 813,
             "activity": "Fly",
             "target": [
-              68,
-              89
+              69,
+              82
             ]
           },
           {
             "tick": 790,
             "cell": [
-              68,
-              87
+              66,
+              83
             ],
-            "facing": 489,
+            "facing": 813,
             "activity": "Fly",
             "target": [
-              68,
-              89
+              69,
+              82
             ]
           },
           {
             "tick": 800,
             "cell": [
-              68,
-              88
+              66,
+              83
             ],
-            "facing": 492,
+            "facing": 819,
             "activity": "Fly",
             "target": [
-              68,
-              89
-            ]
-          },
-          {
-            "tick": 800,
-            "cell": [
-              68,
-              88
-            ],
-            "facing": 492,
-            "activity": "Fly",
-            "target": [
-              60,
-              89
+              69,
+              82
             ]
           },
           {
             "tick": 810,
             "cell": [
               68,
-              89
+              82
             ],
-            "facing": 431,
+            "facing": 819,
             "activity": "Fly",
             "target": [
-              60,
+              69,
+              82
+            ]
+          },
+          {
+            "tick": 810,
+            "cell": [
+              68,
+              82
+            ],
+            "facing": 819,
+            "activity": "Fly",
+            "target": [
+              68,
               89
             ]
           },
           {
             "tick": 820,
             "cell": [
-              66,
-              89
+              68,
+              83
             ],
-            "facing": 256,
+            "facing": 746,
             "activity": "Fly",
             "target": [
-              60,
+              68,
               89
             ]
           },
           {
             "tick": 830,
             "cell": [
-              65,
-              89
+              68,
+              84
             ],
-            "facing": 256,
+            "facing": 556,
             "activity": "Fly",
             "target": [
-              60,
+              68,
               89
             ]
           },
           {
             "tick": 840,
             "cell": [
-              64,
-              89
+              68,
+              85
             ],
-            "facing": 256,
+            "facing": 503,
             "activity": "Fly",
             "target": [
-              60,
+              68,
               89
             ]
           },
           {
             "tick": 850,
             "cell": [
-              63,
-              89
+              68,
+              86
             ],
-            "facing": 256,
+            "facing": 503,
             "activity": "Fly",
             "target": [
-              60,
+              68,
               89
             ]
           },
           {
             "tick": 860,
             "cell": [
-              62,
-              89
+              68,
+              88
             ],
-            "facing": 256,
+            "facing": 503,
+            "activity": "Fly",
+            "target": [
+              68,
+              89
+            ]
+          },
+          {
+            "tick": 860,
+            "cell": [
+              68,
+              88
+            ],
+            "facing": 503,
             "activity": "Fly",
             "target": [
               60,
@@ -1304,49 +1172,101 @@
           {
             "tick": 870,
             "cell": [
-              60,
-              89
+              68,
+              88
             ],
-            "facing": 256,
+            "facing": 449,
             "activity": "Fly",
             "target": [
               60,
               89
-            ]
-          },
-          {
-            "tick": 870,
-            "cell": [
-              60,
-              89
-            ],
-            "facing": 256,
-            "activity": "Fly",
-            "target": [
-              59,
-              82
             ]
           },
           {
             "tick": 880,
             "cell": [
-              60,
+              66,
               89
             ],
-            "facing": 180,
+            "facing": 268,
             "activity": "Fly",
             "target": [
-              59,
-              82
+              60,
+              89
             ]
           },
           {
             "tick": 890,
             "cell": [
-              60,
-              87
+              65,
+              89
             ],
-            "facing": 24,
+            "facing": 268,
+            "activity": "Fly",
+            "target": [
+              60,
+              89
+            ]
+          },
+          {
+            "tick": 900,
+            "cell": [
+              64,
+              89
+            ],
+            "facing": 268,
+            "activity": "Fly",
+            "target": [
+              60,
+              89
+            ]
+          },
+          {
+            "tick": 910,
+            "cell": [
+              63,
+              89
+            ],
+            "facing": 268,
+            "activity": "Fly",
+            "target": [
+              60,
+              89
+            ]
+          },
+          {
+            "tick": 920,
+            "cell": [
+              62,
+              89
+            ],
+            "facing": 268,
+            "activity": "Fly",
+            "target": [
+              60,
+              89
+            ]
+          },
+          {
+            "tick": 930,
+            "cell": [
+              60,
+              89
+            ],
+            "facing": 271,
+            "activity": "Fly",
+            "target": [
+              60,
+              89
+            ]
+          },
+          {
+            "tick": 930,
+            "cell": [
+              60,
+              89
+            ],
+            "facing": 271,
             "activity": "Fly",
             "target": [
               59,
@@ -1354,7 +1274,33 @@
             ]
           },
           {
-            "tick": 900,
+            "tick": 940,
+            "cell": [
+              60,
+              89
+            ],
+            "facing": 268,
+            "activity": "Fly",
+            "target": [
+              59,
+              82
+            ]
+          },
+          {
+            "tick": 950,
+            "cell": [
+              60,
+              88
+            ],
+            "facing": 78,
+            "activity": "Fly",
+            "target": [
+              59,
+              82
+            ]
+          },
+          {
+            "tick": 960,
             "cell": [
               60,
               86
@@ -1367,7 +1313,7 @@
             ]
           },
           {
-            "tick": 910,
+            "tick": 970,
             "cell": [
               59,
               85
@@ -1380,7 +1326,7 @@
             ]
           },
           {
-            "tick": 920,
+            "tick": 980,
             "cell": [
               59,
               84
@@ -1393,7 +1339,7 @@
             ]
           },
           {
-            "tick": 930,
+            "tick": 990,
             "cell": [
               59,
               83
@@ -1410,7 +1356,7 @@
           {
             "request_id": "irtoufan-heading-0",
             "accepted": true,
-            "game_tick": 683,
+            "game_tick": 752,
             "detail": "Queued 1 confirmed player order.",
             "results": [
               {
@@ -1423,7 +1369,7 @@
           {
             "request_id": "irtoufan-heading-1",
             "accepted": true,
-            "game_tick": 742,
+            "game_tick": 812,
             "detail": "Queued 1 confirmed player order.",
             "results": [
               {
@@ -1436,7 +1382,7 @@
           {
             "request_id": "irtoufan-heading-2",
             "accepted": true,
-            "game_tick": 804,
+            "game_tick": 862,
             "detail": "Queued 1 confirmed player order.",
             "results": [
               {
@@ -1449,7 +1395,7 @@
           {
             "request_id": "irtoufan-heading-3",
             "accepted": true,
-            "game_tick": 872,
+            "game_tick": 934,
             "detail": "Queued 1 confirmed player order.",
             "results": [
               {
@@ -1486,15 +1432,14 @@
           90,
           120,
           256,
-          286,
-          586,
+          376,
           640,
           700,
           1000
         ],
         "samples": [
           {
-            "tick": 930,
+            "tick": 990,
             "cell": [
               39,
               94
@@ -1507,7 +1452,7 @@
             ]
           },
           {
-            "tick": 940,
+            "tick": 1000,
             "cell": [
               39,
               94
@@ -1520,7 +1465,7 @@
             ]
           },
           {
-            "tick": 950,
+            "tick": 1010,
             "cell": [
               38,
               94
@@ -1533,7 +1478,7 @@
             ]
           },
           {
-            "tick": 960,
+            "tick": 1020,
             "cell": [
               37,
               94
@@ -1546,7 +1491,7 @@
             ]
           },
           {
-            "tick": 960,
+            "tick": 1020,
             "cell": [
               37,
               94
@@ -1559,12 +1504,12 @@
             ]
           },
           {
-            "tick": 970,
+            "tick": 1030,
             "cell": [
               37,
               94
             ],
-            "facing": 286,
+            "facing": 376,
             "activity": "Move",
             "target": [
               39,
@@ -1572,12 +1517,12 @@
             ]
           },
           {
-            "tick": 980,
+            "tick": 1040,
             "cell": [
               37,
               94
             ],
-            "facing": 586,
+            "facing": 640,
             "activity": "Move",
             "target": [
               39,
@@ -1585,7 +1530,7 @@
             ]
           },
           {
-            "tick": 990,
+            "tick": 1050,
             "cell": [
               38,
               95
@@ -1598,7 +1543,7 @@
             ]
           },
           {
-            "tick": 1000,
+            "tick": 1060,
             "cell": [
               39,
               96
@@ -1611,7 +1556,7 @@
             ]
           },
           {
-            "tick": 1000,
+            "tick": 1060,
             "cell": [
               39,
               96
@@ -1624,7 +1569,7 @@
             ]
           },
           {
-            "tick": 1010,
+            "tick": 1070,
             "cell": [
               39,
               96
@@ -1637,7 +1582,7 @@
             ]
           },
           {
-            "tick": 1020,
+            "tick": 1080,
             "cell": [
               39,
               96
@@ -1650,7 +1595,7 @@
             ]
           },
           {
-            "tick": 1030,
+            "tick": 1090,
             "cell": [
               39,
               95
@@ -1663,7 +1608,7 @@
             ]
           },
           {
-            "tick": 1040,
+            "tick": 1100,
             "cell": [
               39,
               94
@@ -1676,7 +1621,7 @@
             ]
           },
           {
-            "tick": 1040,
+            "tick": 1100,
             "cell": [
               39,
               94
@@ -1689,7 +1634,7 @@
             ]
           },
           {
-            "tick": 1050,
+            "tick": 1110,
             "cell": [
               39,
               94
@@ -1702,7 +1647,7 @@
             ]
           },
           {
-            "tick": 1060,
+            "tick": 1120,
             "cell": [
               38,
               94
@@ -1715,7 +1660,7 @@
             ]
           },
           {
-            "tick": 1070,
+            "tick": 1130,
             "cell": [
               37,
               94
@@ -1732,7 +1677,7 @@
           {
             "request_id": "irpey-heading-0",
             "accepted": true,
-            "game_tick": 933,
+            "game_tick": 993,
             "detail": "Queued 1 confirmed player order.",
             "results": [
               {
@@ -1745,7 +1690,7 @@
           {
             "request_id": "irpey-heading-1",
             "accepted": true,
-            "game_tick": 964,
+            "game_tick": 1023,
             "detail": "Queued 1 confirmed player order.",
             "results": [
               {
@@ -1758,7 +1703,7 @@
           {
             "request_id": "irpey-heading-2",
             "accepted": true,
-            "game_tick": 1004,
+            "game_tick": 1063,
             "detail": "Queued 1 confirmed player order.",
             "results": [
               {
@@ -1771,7 +1716,7 @@
           {
             "request_id": "irpey-heading-3",
             "accepted": true,
-            "game_tick": 1044,
+            "game_tick": 1103,
             "detail": "Queued 1 confirmed player order.",
             "results": [
               {
@@ -1788,7 +1733,7 @@
       "receipt": {
         "request_id": "atgm-live-fire",
         "accepted": true,
-        "game_tick": 1074,
+        "game_tick": 1134,
         "detail": "Queued 1 confirmed player order.",
         "results": [
           {
@@ -1816,7 +1761,7 @@
       "receipt": {
         "request_id": "irkarr-attack-irantargettank",
         "accepted": true,
-        "game_tick": 1173,
+        "game_tick": 1234,
         "detail": "Queued 1 confirmed player order.",
         "results": [
           {
@@ -1833,7 +1778,7 @@
       "receipt": {
         "request_id": "shadowone-sabotage",
         "accepted": true,
-        "game_tick": 1304,
+        "game_tick": 1363,
         "detail": "Queued 1 confirmed player order.",
         "results": [
           {
@@ -1854,7 +1799,7 @@
       "receipt": {
         "request_id": "loitering-munition-dive",
         "accepted": true,
-        "game_tick": 1415,
+        "game_tick": 1474,
         "detail": "Queued 1 confirmed player order.",
         "results": [
           {
@@ -1873,7 +1818,7 @@
         "receipt": {
           "request_id": "irpey-attack-irantargetpt",
           "accepted": true,
-          "game_tick": 1491,
+          "game_tick": 1563,
           "detail": "Queued 1 confirmed player order.",
           "results": [
             {
@@ -1890,7 +1835,7 @@
         "receipt": {
           "request_id": "irghadir-attack-irantargetpt",
           "accepted": true,
-          "game_tick": 1553,
+          "game_tick": 1634,
           "detail": "Queued 1 confirmed player order.",
           "results": [
             {
@@ -1909,7 +1854,7 @@
   },
   "runtime": {
     "map": "Iran Doctrine Range",
-    "tick": 150,
+    "tick": 200,
     "phase": "playing",
     "player_faction": "iran",
     "enemy_faction": "iran",
@@ -1949,7 +1894,7 @@
         "move_target_y": 78,
         "can_target_air": false,
         "can_target_ground": true,
-        "last_seen_tick": 150,
+        "last_seen_tick": 200,
         "passenger_count": -1,
         "is_building": false,
         "is_producing": false,
@@ -2007,7 +1952,7 @@
         "move_target_y": 80,
         "can_target_air": false,
         "can_target_ground": true,
-        "last_seen_tick": 150,
+        "last_seen_tick": 200,
         "passenger_count": -1,
         "is_building": false,
         "is_producing": false,
@@ -2065,7 +2010,7 @@
         "move_target_y": 78,
         "can_target_air": false,
         "can_target_ground": true,
-        "last_seen_tick": 150,
+        "last_seen_tick": 200,
         "passenger_count": -1,
         "is_building": false,
         "is_producing": false,
@@ -2123,7 +2068,7 @@
         "move_target_y": 80,
         "can_target_air": false,
         "can_target_ground": true,
-        "last_seen_tick": 150,
+        "last_seen_tick": 200,
         "passenger_count": -1,
         "is_building": false,
         "is_producing": false,
@@ -2182,7 +2127,7 @@
         "move_target_y": 78,
         "can_target_air": false,
         "can_target_ground": true,
-        "last_seen_tick": 150,
+        "last_seen_tick": 200,
         "passenger_count": -1,
         "is_building": false,
         "is_producing": false,
@@ -2239,7 +2184,7 @@
         "move_target_y": 80,
         "can_target_air": false,
         "can_target_ground": false,
-        "last_seen_tick": 150,
+        "last_seen_tick": 200,
         "passenger_count": -1,
         "is_building": false,
         "is_producing": false,
@@ -2296,7 +2241,7 @@
         "move_target_y": 82,
         "can_target_air": false,
         "can_target_ground": true,
-        "last_seen_tick": 150,
+        "last_seen_tick": 200,
         "passenger_count": -1,
         "is_building": false,
         "is_producing": false,
@@ -2353,7 +2298,7 @@
         "move_target_y": 90,
         "can_target_air": false,
         "can_target_ground": false,
-        "last_seen_tick": 150,
+        "last_seen_tick": 200,
         "passenger_count": -1,
         "is_building": false,
         "is_producing": false,
@@ -2381,7 +2326,7 @@
       {
         "actor_id": 14,
         "kind": "irazar",
-        "cell_x": 61,
+        "cell_x": 59,
         "cell_y": 85,
         "hp_percent": 1.0,
         "idle": false,
@@ -2389,7 +2334,7 @@
         "current_activity": "FlyIdle",
         "owner": "Multi0",
         "ammo": 16,
-        "facing": 780,
+        "facing": 656,
         "experience_level": 0,
         "stance": 0,
         "speed": 0,
@@ -2409,7 +2354,7 @@
         "move_target_y": -1,
         "can_target_air": false,
         "can_target_ground": false,
-        "last_seen_tick": 150,
+        "last_seen_tick": 200,
         "passenger_count": -1,
         "is_building": false,
         "is_producing": false,
@@ -2465,7 +2410,7 @@
         "move_target_y": -1,
         "can_target_air": false,
         "can_target_ground": true,
-        "last_seen_tick": 150,
+        "last_seen_tick": 200,
         "passenger_count": -1,
         "is_building": false,
         "is_producing": false,
@@ -2493,15 +2438,15 @@
       {
         "actor_id": 16,
         "kind": "irmohajer",
-        "cell_x": 68,
-        "cell_y": 82,
+        "cell_x": 66,
+        "cell_y": 83,
         "hp_percent": 1.0,
         "idle": false,
         "can_attack": true,
         "current_activity": "FlyIdle",
         "owner": "Multi0",
         "ammo": 4,
-        "facing": 992,
+        "facing": 768,
         "experience_level": 0,
         "stance": 0,
         "speed": 0,
@@ -2521,7 +2466,7 @@
         "move_target_y": -1,
         "can_target_air": false,
         "can_target_ground": false,
-        "last_seen_tick": 150,
+        "last_seen_tick": 200,
         "passenger_count": -1,
         "is_building": false,
         "is_producing": false,
@@ -2549,15 +2494,15 @@
       {
         "actor_id": 17,
         "kind": "irloiter",
-        "cell_x": 66,
-        "cell_y": 83,
+        "cell_x": 65,
+        "cell_y": 81,
         "hp_percent": 1.0,
         "idle": false,
         "can_attack": true,
         "current_activity": "FlyIdle",
         "owner": "Multi0",
         "ammo": 1,
-        "facing": 798,
+        "facing": 424,
         "experience_level": 0,
         "stance": 0,
         "speed": 0,
@@ -2577,7 +2522,7 @@
         "move_target_y": -1,
         "can_target_air": false,
         "can_target_ground": true,
-        "last_seen_tick": 150,
+        "last_seen_tick": 200,
         "passenger_count": -1,
         "is_building": false,
         "is_producing": false,
@@ -2634,7 +2579,7 @@
         "move_target_y": 94,
         "can_target_air": false,
         "can_target_ground": false,
-        "last_seen_tick": 150,
+        "last_seen_tick": 200,
         "passenger_count": -1,
         "is_building": false,
         "is_producing": false,
@@ -2691,7 +2636,7 @@
         "move_target_y": 94,
         "can_target_air": false,
         "can_target_ground": false,
-        "last_seen_tick": 150,
+        "last_seen_tick": 200,
         "passenger_count": -1,
         "is_building": false,
         "is_producing": false,
@@ -2720,50 +2665,50 @@
   },
   "result": {
     "status": "passed",
-    "end_tick": 1650,
+    "end_tick": 1730,
     "units_lost": 0,
     "units_killed": 0,
     "order_count": 0,
     "captures": [
       {
         "file": "01-doctrine-range.png",
-        "tick": 154,
+        "tick": 201,
         "width": 1280,
         "height": 720,
         "scope": "rendered-player-viewport-fog-respecting",
-        "sha256": "a441327a4235b28975c7b58afdf71d3ea5e87c9b0aefcc0deb71f9e48371c068"
+        "sha256": "27e1aff81ddb6c9bbe8c8eb3ee50b0bc2161f469bd657fc54d7e24bca1663b96"
       },
       {
         "file": "02-live-headings.png",
-        "tick": 1070,
+        "tick": 1131,
         "width": 1280,
         "height": 720,
         "scope": "rendered-player-viewport-fog-respecting",
-        "sha256": "f60b26da7b8b4575e7e6bacb1483dc234ab7d4ca7291511266d9078998095ad0"
+        "sha256": "5f0e320ff2b80992f93a21375c560b2869acd71505f157582f5b0291f07cf47b"
       },
       {
         "file": "03-shadow-sabotage.png",
-        "tick": 1411,
+        "tick": 1470,
         "width": 1280,
         "height": 720,
         "scope": "rendered-player-viewport-fog-respecting",
-        "sha256": "89e33070d62c80d9ce1587e53493753fdfcad80bf3a2a66932e9d3f026269d17"
+        "sha256": "1e5cb24ee3f201f37c13f809437a2376a7be8e9083cfbe62ac27d77c2a310de1"
       },
       {
         "file": "04-loitering-attack.png",
-        "tick": 1423,
+        "tick": 1482,
         "width": 1280,
         "height": 720,
         "scope": "rendered-player-viewport-fog-respecting",
-        "sha256": "f276f8b1218cfb6c0da8e3aee6f5160e802f69014ff2ee5aa23a56d297dc431f"
+        "sha256": "37804137d7b50fafe3beacb56c3a6902e84071b0ae514bb16d4f0cc7c168f49e"
       },
       {
         "file": "05-naval-combat.png",
-        "tick": 1652,
+        "tick": 1732,
         "width": 1280,
         "height": 720,
         "scope": "rendered-player-viewport-fog-respecting",
-        "sha256": "23ae75a535d8b034465953677673afd8760ca427258f8c7aeb04688d2e55cca0"
+        "sha256": "0ceb7ab17abe8ba28e12dd9c27ad937e216d1fd0a60d768774e86c8ab5189305"
       }
     ]
   }

@@ -1,19 +1,21 @@
 {
   "schema": "openra-ai.iran-ai-validation/v1",
-  "captured_at": "2026-08-12T09:54:02+03:00",
+  "captured_at": "2026-08-12T11:44:21+03:00",
   "map": "Iran Doctrine Range",
   "ticks_per_personality": 25000,
   "personalities": [
     {
       "personality": "beginner",
-      "session_id": "46ce23314db8",
-      "end_tick": 25001,
-      "done": false,
-      "result": "",
+      "session_id": "15739190041f",
+      "end_tick": 23850,
+      "done": true,
+      "result": "lose",
       "custom_units_seen": [
+        "irbas",
         "irpey"
       ],
       "custom_domains_seen": [
+        "infantry",
         "naval"
       ],
       "force_domains_seen": [
@@ -24,6 +26,659 @@
         "e1",
         "e3",
         "harv",
+        "irbas",
+        "irpey"
+      ],
+      "base_buildings_seen": [
+        "barr",
+        "powr",
+        "proc"
+      ],
+      "all_buildings_seen": [
+        "barr",
+        "fact",
+        "powr",
+        "proc"
+      ],
+      "timeline": [
+        {
+          "tick": 2006,
+          "visible_units": [
+            "harv"
+          ],
+          "visible_buildings": [
+            "fact",
+            "powr",
+            "proc"
+          ],
+          "remembered_buildings": [],
+          "own_units_remaining": 14,
+          "done": false,
+          "result": ""
+        },
+        {
+          "tick": 4010,
+          "visible_units": [],
+          "visible_buildings": [],
+          "remembered_buildings": [
+            "barr",
+            "fact",
+            "powr",
+            "proc"
+          ],
+          "own_units_remaining": 11,
+          "done": false,
+          "result": ""
+        },
+        {
+          "tick": 6014,
+          "visible_units": [],
+          "visible_buildings": [],
+          "remembered_buildings": [
+            "barr",
+            "fact",
+            "powr",
+            "proc"
+          ],
+          "own_units_remaining": 11,
+          "done": false,
+          "result": ""
+        },
+        {
+          "tick": 8018,
+          "visible_units": [],
+          "visible_buildings": [],
+          "remembered_buildings": [
+            "barr",
+            "fact",
+            "powr",
+            "proc"
+          ],
+          "own_units_remaining": 11,
+          "done": false,
+          "result": ""
+        },
+        {
+          "tick": 10022,
+          "visible_units": [],
+          "visible_buildings": [],
+          "remembered_buildings": [
+            "barr",
+            "fact",
+            "powr",
+            "proc"
+          ],
+          "own_units_remaining": 11,
+          "done": false,
+          "result": ""
+        },
+        {
+          "tick": 12026,
+          "visible_units": [],
+          "visible_buildings": [],
+          "remembered_buildings": [
+            "barr",
+            "fact",
+            "powr",
+            "proc"
+          ],
+          "own_units_remaining": 11,
+          "done": false,
+          "result": ""
+        },
+        {
+          "tick": 14030,
+          "visible_units": [],
+          "visible_buildings": [],
+          "remembered_buildings": [
+            "barr",
+            "fact",
+            "powr",
+            "proc"
+          ],
+          "own_units_remaining": 11,
+          "done": false,
+          "result": ""
+        },
+        {
+          "tick": 16034,
+          "visible_units": [],
+          "visible_buildings": [],
+          "remembered_buildings": [
+            "barr",
+            "fact",
+            "powr",
+            "proc"
+          ],
+          "own_units_remaining": 11,
+          "done": false,
+          "result": ""
+        },
+        {
+          "tick": 18038,
+          "visible_units": [],
+          "visible_buildings": [],
+          "remembered_buildings": [
+            "barr",
+            "fact",
+            "powr",
+            "proc"
+          ],
+          "own_units_remaining": 11,
+          "done": false,
+          "result": ""
+        },
+        {
+          "tick": 20042,
+          "visible_units": [
+            "irpey"
+          ],
+          "visible_buildings": [],
+          "remembered_buildings": [
+            "barr",
+            "fact",
+            "powr",
+            "proc"
+          ],
+          "own_units_remaining": 11,
+          "done": false,
+          "result": ""
+        },
+        {
+          "tick": 22046,
+          "visible_units": [],
+          "visible_buildings": [],
+          "remembered_buildings": [
+            "barr",
+            "fact",
+            "powr",
+            "proc"
+          ],
+          "own_units_remaining": 10,
+          "done": false,
+          "result": ""
+        },
+        {
+          "tick": 23850,
+          "visible_units": [],
+          "visible_buildings": [],
+          "remembered_buildings": [],
+          "own_units_remaining": 0,
+          "done": true,
+          "result": "lose"
+        }
+      ],
+      "passed": true
+    },
+    {
+      "personality": "easy",
+      "session_id": "2e9fdfbd0cc9",
+      "end_tick": 10354,
+      "done": true,
+      "result": "lose",
+      "custom_units_seen": [
+        "irbas",
+        "irpey"
+      ],
+      "custom_domains_seen": [
+        "infantry",
+        "naval"
+      ],
+      "force_domains_seen": [
+        "infantry",
+        "naval",
+        "vehicle"
+      ],
+      "all_enemy_units_seen": [
+        "apc",
+        "e1",
+        "e2",
+        "e3",
+        "harv",
+        "irbas",
+        "irpey",
+        "mcv"
+      ],
+      "base_buildings_seen": [
+        "barr",
+        "powr",
+        "proc",
+        "spen",
+        "weap"
+      ],
+      "all_buildings_seen": [
+        "barr",
+        "fact",
+        "ftur",
+        "powr",
+        "proc",
+        "spen",
+        "weap"
+      ],
+      "timeline": [
+        {
+          "tick": 2006,
+          "visible_units": [
+            "harv"
+          ],
+          "visible_buildings": [
+            "fact",
+            "powr",
+            "proc"
+          ],
+          "remembered_buildings": [],
+          "own_units_remaining": 14,
+          "done": false,
+          "result": ""
+        },
+        {
+          "tick": 4010,
+          "visible_units": [
+            "e2",
+            "harv",
+            "irbas"
+          ],
+          "visible_buildings": [
+            "barr",
+            "fact",
+            "powr",
+            "proc"
+          ],
+          "remembered_buildings": [],
+          "own_units_remaining": 13,
+          "done": false,
+          "result": ""
+        },
+        {
+          "tick": 6014,
+          "visible_units": [
+            "e1",
+            "e2",
+            "harv",
+            "irbas"
+          ],
+          "visible_buildings": [
+            "barr",
+            "fact",
+            "ftur",
+            "powr",
+            "proc"
+          ],
+          "remembered_buildings": [],
+          "own_units_remaining": 12,
+          "done": false,
+          "result": ""
+        },
+        {
+          "tick": 8018,
+          "visible_units": [
+            "apc",
+            "e1",
+            "e2",
+            "e3",
+            "harv",
+            "irbas",
+            "irpey"
+          ],
+          "visible_buildings": [
+            "barr",
+            "ftur",
+            "powr",
+            "proc",
+            "weap"
+          ],
+          "remembered_buildings": [
+            "spen"
+          ],
+          "own_units_remaining": 10,
+          "done": false,
+          "result": ""
+        },
+        {
+          "tick": 10022,
+          "visible_units": [],
+          "visible_buildings": [],
+          "remembered_buildings": [
+            "barr",
+            "ftur",
+            "powr",
+            "proc",
+            "spen",
+            "weap"
+          ],
+          "own_units_remaining": 7,
+          "done": false,
+          "result": ""
+        },
+        {
+          "tick": 10354,
+          "visible_units": [],
+          "visible_buildings": [],
+          "remembered_buildings": [],
+          "own_units_remaining": 0,
+          "done": true,
+          "result": "lose"
+        }
+      ],
+      "passed": true
+    },
+    {
+      "personality": "medium",
+      "session_id": "219cf613e498",
+      "end_tick": 24105,
+      "done": true,
+      "result": "lose",
+      "custom_units_seen": [
+        "irbas",
+        "irghadir",
+        "irpey"
+      ],
+      "custom_domains_seen": [
+        "infantry",
+        "naval"
+      ],
+      "force_domains_seen": [
+        "infantry",
+        "naval",
+        "vehicle"
+      ],
+      "all_enemy_units_seen": [
+        "apc",
+        "e2",
+        "e3",
+        "e4",
+        "ftrk",
+        "harv",
+        "irbas",
+        "irghadir",
+        "irpey",
+        "irpey.sink",
+        "mcv"
+      ],
+      "base_buildings_seen": [
+        "barr",
+        "fix",
+        "powr",
+        "proc",
+        "spen",
+        "weap"
+      ],
+      "all_buildings_seen": [
+        "barr",
+        "fact",
+        "fix",
+        "ftur",
+        "powr",
+        "proc",
+        "spen",
+        "tsla",
+        "weap"
+      ],
+      "timeline": [
+        {
+          "tick": 2006,
+          "visible_units": [
+            "harv"
+          ],
+          "visible_buildings": [
+            "fact",
+            "powr",
+            "proc"
+          ],
+          "remembered_buildings": [],
+          "own_units_remaining": 14,
+          "done": false,
+          "result": ""
+        },
+        {
+          "tick": 4010,
+          "visible_units": [
+            "harv"
+          ],
+          "visible_buildings": [
+            "fact",
+            "powr",
+            "proc"
+          ],
+          "remembered_buildings": [
+            "spen"
+          ],
+          "own_units_remaining": 14,
+          "done": false,
+          "result": ""
+        },
+        {
+          "tick": 6014,
+          "visible_units": [
+            "harv"
+          ],
+          "visible_buildings": [
+            "fact",
+            "powr",
+            "proc",
+            "weap"
+          ],
+          "remembered_buildings": [],
+          "own_units_remaining": 14,
+          "done": false,
+          "result": ""
+        },
+        {
+          "tick": 8018,
+          "visible_units": [
+            "apc",
+            "harv"
+          ],
+          "visible_buildings": [
+            "fact",
+            "fix",
+            "powr",
+            "proc",
+            "tsla",
+            "weap"
+          ],
+          "remembered_buildings": [
+            "spen"
+          ],
+          "own_units_remaining": 14,
+          "done": false,
+          "result": ""
+        },
+        {
+          "tick": 10022,
+          "visible_units": [
+            "apc",
+            "e2",
+            "ftrk",
+            "harv",
+            "irbas",
+            "irpey.sink"
+          ],
+          "visible_buildings": [
+            "barr",
+            "fact",
+            "fix",
+            "ftur",
+            "powr",
+            "proc",
+            "tsla",
+            "weap"
+          ],
+          "remembered_buildings": [],
+          "own_units_remaining": 14,
+          "done": false,
+          "result": ""
+        },
+        {
+          "tick": 12026,
+          "visible_units": [],
+          "visible_buildings": [],
+          "remembered_buildings": [
+            "barr",
+            "fact",
+            "fix",
+            "ftur",
+            "powr",
+            "proc",
+            "spen",
+            "tsla",
+            "weap"
+          ],
+          "own_units_remaining": 11,
+          "done": false,
+          "result": ""
+        },
+        {
+          "tick": 14030,
+          "visible_units": [],
+          "visible_buildings": [],
+          "remembered_buildings": [
+            "barr",
+            "fact",
+            "fix",
+            "ftur",
+            "powr",
+            "proc",
+            "spen",
+            "tsla",
+            "weap"
+          ],
+          "own_units_remaining": 11,
+          "done": false,
+          "result": ""
+        },
+        {
+          "tick": 16034,
+          "visible_units": [],
+          "visible_buildings": [],
+          "remembered_buildings": [
+            "barr",
+            "fact",
+            "fix",
+            "ftur",
+            "powr",
+            "proc",
+            "spen",
+            "tsla",
+            "weap"
+          ],
+          "own_units_remaining": 11,
+          "done": false,
+          "result": ""
+        },
+        {
+          "tick": 18038,
+          "visible_units": [],
+          "visible_buildings": [],
+          "remembered_buildings": [
+            "barr",
+            "fact",
+            "fix",
+            "ftur",
+            "powr",
+            "proc",
+            "spen",
+            "tsla",
+            "weap"
+          ],
+          "own_units_remaining": 9,
+          "done": false,
+          "result": ""
+        },
+        {
+          "tick": 20042,
+          "visible_units": [],
+          "visible_buildings": [],
+          "remembered_buildings": [
+            "barr",
+            "fact",
+            "fix",
+            "ftur",
+            "powr",
+            "proc",
+            "spen",
+            "tsla",
+            "weap"
+          ],
+          "own_units_remaining": 9,
+          "done": false,
+          "result": ""
+        },
+        {
+          "tick": 22046,
+          "visible_units": [],
+          "visible_buildings": [],
+          "remembered_buildings": [
+            "barr",
+            "fact",
+            "fix",
+            "ftur",
+            "powr",
+            "proc",
+            "spen",
+            "tsla",
+            "weap"
+          ],
+          "own_units_remaining": 8,
+          "done": false,
+          "result": ""
+        },
+        {
+          "tick": 24050,
+          "visible_units": [],
+          "visible_buildings": [],
+          "remembered_buildings": [
+            "barr",
+            "fact",
+            "fix",
+            "ftur",
+            "powr",
+            "proc",
+            "spen",
+            "tsla",
+            "weap"
+          ],
+          "own_units_remaining": 7,
+          "done": false,
+          "result": ""
+        },
+        {
+          "tick": 24105,
+          "visible_units": [],
+          "visible_buildings": [],
+          "remembered_buildings": [],
+          "own_units_remaining": 0,
+          "done": true,
+          "result": "lose"
+        }
+      ],
+      "passed": true
+    },
+    {
+      "personality": "rush",
+      "session_id": "6642101ced7f",
+      "end_tick": 8753,
+      "done": true,
+      "result": "lose",
+      "custom_units_seen": [
+        "irbas",
+        "irpey"
+      ],
+      "custom_domains_seen": [
+        "infantry",
+        "naval"
+      ],
+      "force_domains_seen": [
+        "infantry",
+        "naval"
+      ],
+      "all_enemy_units_seen": [
+        "e1",
+        "e2",
+        "e3",
+        "e4",
+        "harv",
+        "irbas",
         "irpey"
       ],
       "base_buildings_seen": [
@@ -60,399 +715,40 @@
           "visible_units": [
             "e1",
             "e3",
-            "harv"
+            "harv",
+            "irbas"
           ],
           "visible_buildings": [
             "barr",
-            "fact",
             "powr",
             "proc"
           ],
           "remembered_buildings": [
             "spen"
           ],
-          "own_units_remaining": 14,
+          "own_units_remaining": 13,
           "done": false,
           "result": ""
         },
         {
           "tick": 6014,
-          "visible_units": [],
-          "visible_buildings": [],
-          "remembered_buildings": [
-            "barr",
-            "fact",
-            "powr",
-            "proc",
-            "spen"
-          ],
-          "own_units_remaining": 11,
-          "done": false,
-          "result": ""
-        },
-        {
-          "tick": 8018,
-          "visible_units": [],
-          "visible_buildings": [],
-          "remembered_buildings": [
-            "barr",
-            "fact",
-            "powr",
-            "proc",
-            "spen"
-          ],
-          "own_units_remaining": 11,
-          "done": false,
-          "result": ""
-        },
-        {
-          "tick": 10022,
-          "visible_units": [],
-          "visible_buildings": [],
-          "remembered_buildings": [
-            "barr",
-            "fact",
-            "powr",
-            "proc",
-            "spen"
-          ],
-          "own_units_remaining": 11,
-          "done": false,
-          "result": ""
-        },
-        {
-          "tick": 12026,
-          "visible_units": [],
-          "visible_buildings": [],
-          "remembered_buildings": [
-            "barr",
-            "fact",
-            "powr",
-            "proc",
-            "spen"
-          ],
-          "own_units_remaining": 11,
-          "done": false,
-          "result": ""
-        },
-        {
-          "tick": 14030,
-          "visible_units": [],
-          "visible_buildings": [],
-          "remembered_buildings": [
-            "barr",
-            "fact",
-            "powr",
-            "proc",
-            "spen"
-          ],
-          "own_units_remaining": 11,
-          "done": false,
-          "result": ""
-        },
-        {
-          "tick": 16034,
-          "visible_units": [],
-          "visible_buildings": [],
-          "remembered_buildings": [
-            "barr",
-            "fact",
-            "powr",
-            "proc",
-            "spen"
-          ],
-          "own_units_remaining": 11,
-          "done": false,
-          "result": ""
-        },
-        {
-          "tick": 18038,
-          "visible_units": [],
-          "visible_buildings": [],
-          "remembered_buildings": [
-            "barr",
-            "fact",
-            "powr",
-            "proc",
-            "spen"
-          ],
-          "own_units_remaining": 11,
-          "done": false,
-          "result": ""
-        },
-        {
-          "tick": 20042,
-          "visible_units": [],
-          "visible_buildings": [],
-          "remembered_buildings": [
-            "barr",
-            "fact",
-            "powr",
-            "proc",
-            "spen"
-          ],
-          "own_units_remaining": 11,
-          "done": false,
-          "result": ""
-        },
-        {
-          "tick": 22046,
-          "visible_units": [],
-          "visible_buildings": [],
-          "remembered_buildings": [
-            "barr",
-            "fact",
-            "powr",
-            "proc",
-            "spen"
-          ],
-          "own_units_remaining": 11,
-          "done": false,
-          "result": ""
-        },
-        {
-          "tick": 24050,
-          "visible_units": [],
-          "visible_buildings": [],
-          "remembered_buildings": [
-            "barr",
-            "fact",
-            "powr",
-            "proc",
-            "spen"
-          ],
-          "own_units_remaining": 11,
-          "done": false,
-          "result": ""
-        }
-      ],
-      "passed": true
-    },
-    {
-      "personality": "easy",
-      "session_id": "8ad9c7dbe005",
-      "end_tick": 13474,
-      "done": true,
-      "result": "lose",
-      "custom_units_seen": [
-        "irbas",
-        "irpey"
-      ],
-      "custom_domains_seen": [
-        "infantry",
-        "naval"
-      ],
-      "force_domains_seen": [
-        "infantry",
-        "naval"
-      ],
-      "all_enemy_units_seen": [
-        "e1",
-        "e2",
-        "e3",
-        "harv",
-        "irbas",
-        "irpey"
-      ],
-      "base_buildings_seen": [
-        "barr",
-        "powr",
-        "proc"
-      ],
-      "all_buildings_seen": [
-        "barr",
-        "fact",
-        "powr",
-        "proc"
-      ],
-      "timeline": [
-        {
-          "tick": 2006,
           "visible_units": [
+            "e1",
             "e2",
-            "harv"
-          ],
-          "visible_buildings": [
-            "barr",
-            "fact",
-            "powr",
-            "proc"
-          ],
-          "remembered_buildings": [],
-          "own_units_remaining": 14,
-          "done": false,
-          "result": ""
-        },
-        {
-          "tick": 4010,
-          "visible_units": [],
-          "visible_buildings": [],
-          "remembered_buildings": [
-            "barr",
-            "fact",
-            "powr",
-            "proc"
-          ],
-          "own_units_remaining": 11,
-          "done": false,
-          "result": ""
-        },
-        {
-          "tick": 6014,
-          "visible_units": [],
-          "visible_buildings": [],
-          "remembered_buildings": [
-            "barr",
-            "fact",
-            "powr",
-            "proc"
-          ],
-          "own_units_remaining": 11,
-          "done": false,
-          "result": ""
-        },
-        {
-          "tick": 8018,
-          "visible_units": [],
-          "visible_buildings": [],
-          "remembered_buildings": [
-            "barr",
-            "fact",
-            "powr",
-            "proc"
-          ],
-          "own_units_remaining": 10,
-          "done": false,
-          "result": ""
-        },
-        {
-          "tick": 10022,
-          "visible_units": [
+            "e4",
+            "harv",
+            "irbas",
             "irpey"
           ],
-          "visible_buildings": [],
-          "remembered_buildings": [
-            "barr",
-            "fact",
-            "powr",
-            "proc"
-          ],
-          "own_units_remaining": 9,
-          "done": false,
-          "result": ""
-        },
-        {
-          "tick": 12026,
-          "visible_units": [],
-          "visible_buildings": [],
-          "remembered_buildings": [
-            "barr",
-            "fact",
-            "powr",
-            "proc"
-          ],
-          "own_units_remaining": 7,
-          "done": false,
-          "result": ""
-        },
-        {
-          "tick": 13474,
-          "visible_units": [],
-          "visible_buildings": [],
-          "remembered_buildings": [],
-          "own_units_remaining": 0,
-          "done": true,
-          "result": "lose"
-        }
-      ],
-      "passed": true
-    },
-    {
-      "personality": "medium",
-      "session_id": "78f60c185826",
-      "end_tick": 25001,
-      "done": false,
-      "result": "",
-      "custom_units_seen": [
-        "irazar",
-        "irghadir",
-        "irmohajer",
-        "irpey",
-        "irtoufan"
-      ],
-      "custom_domains_seen": [
-        "air",
-        "naval"
-      ],
-      "force_domains_seen": [
-        "air",
-        "naval",
-        "vehicle"
-      ],
-      "all_enemy_units_seen": [
-        "apc",
-        "harv",
-        "irazar",
-        "irghadir",
-        "irmohajer",
-        "irpey",
-        "irtoufan"
-      ],
-      "base_buildings_seen": [
-        "powr",
-        "proc",
-        "weap"
-      ],
-      "all_buildings_seen": [
-        "fact",
-        "powr",
-        "proc",
-        "weap"
-      ],
-      "timeline": [
-        {
-          "tick": 2006,
-          "visible_units": [
-            "harv"
-          ],
           "visible_buildings": [
-            "fact",
+            "barr",
             "powr",
             "proc"
           ],
-          "remembered_buildings": [],
-          "own_units_remaining": 14,
-          "done": false,
-          "result": ""
-        },
-        {
-          "tick": 4010,
-          "visible_units": [
-            "apc",
-            "harv"
-          ],
-          "visible_buildings": [
-            "fact",
-            "powr",
-            "proc",
-            "weap"
-          ],
-          "remembered_buildings": [],
-          "own_units_remaining": 14,
-          "done": false,
-          "result": ""
-        },
-        {
-          "tick": 6014,
-          "visible_units": [],
-          "visible_buildings": [],
           "remembered_buildings": [
-            "fact",
-            "powr",
-            "proc",
-            "weap"
+            "spen"
           ],
-          "own_units_remaining": 11,
+          "own_units_remaining": 10,
           "done": false,
           "result": ""
         },
@@ -461,353 +757,17 @@
           "visible_units": [],
           "visible_buildings": [],
           "remembered_buildings": [
-            "fact",
+            "barr",
             "powr",
             "proc",
-            "weap"
-          ],
-          "own_units_remaining": 11,
-          "done": false,
-          "result": ""
-        },
-        {
-          "tick": 10022,
-          "visible_units": [],
-          "visible_buildings": [],
-          "remembered_buildings": [
-            "fact",
-            "powr",
-            "proc",
-            "weap"
-          ],
-          "own_units_remaining": 11,
-          "done": false,
-          "result": ""
-        },
-        {
-          "tick": 12026,
-          "visible_units": [],
-          "visible_buildings": [],
-          "remembered_buildings": [
-            "fact",
-            "powr",
-            "proc",
-            "weap"
-          ],
-          "own_units_remaining": 11,
-          "done": false,
-          "result": ""
-        },
-        {
-          "tick": 14030,
-          "visible_units": [
-            "irghadir"
-          ],
-          "visible_buildings": [],
-          "remembered_buildings": [
-            "fact",
-            "powr",
-            "proc",
-            "weap"
-          ],
-          "own_units_remaining": 11,
-          "done": false,
-          "result": ""
-        },
-        {
-          "tick": 16034,
-          "visible_units": [
-            "irghadir"
-          ],
-          "visible_buildings": [],
-          "remembered_buildings": [
-            "fact",
-            "powr",
-            "proc",
-            "weap"
-          ],
-          "own_units_remaining": 9,
-          "done": false,
-          "result": ""
-        },
-        {
-          "tick": 18038,
-          "visible_units": [],
-          "visible_buildings": [],
-          "remembered_buildings": [
-            "fact",
-            "powr",
-            "proc",
-            "weap"
-          ],
-          "own_units_remaining": 9,
-          "done": false,
-          "result": ""
-        },
-        {
-          "tick": 20042,
-          "visible_units": [],
-          "visible_buildings": [],
-          "remembered_buildings": [
-            "fact",
-            "powr",
-            "proc",
-            "weap"
-          ],
-          "own_units_remaining": 8,
-          "done": false,
-          "result": ""
-        },
-        {
-          "tick": 22046,
-          "visible_units": [],
-          "visible_buildings": [],
-          "remembered_buildings": [
-            "fact",
-            "powr",
-            "proc",
-            "weap"
-          ],
-          "own_units_remaining": 5,
-          "done": false,
-          "result": ""
-        },
-        {
-          "tick": 24050,
-          "visible_units": [],
-          "visible_buildings": [],
-          "remembered_buildings": [
-            "fact",
-            "powr",
-            "proc",
-            "weap"
-          ],
-          "own_units_remaining": 4,
-          "done": false,
-          "result": ""
-        }
-      ],
-      "passed": true
-    },
-    {
-      "personality": "rush",
-      "session_id": "dddb6227ba9c",
-      "end_tick": 24712,
-      "done": true,
-      "result": "lose",
-      "custom_units_seen": [
-        "irghadir",
-        "irloiter",
-        "irpey"
-      ],
-      "custom_domains_seen": [
-        "air",
-        "naval"
-      ],
-      "force_domains_seen": [
-        "air",
-        "naval",
-        "vehicle"
-      ],
-      "all_enemy_units_seen": [
-        "apc",
-        "harv",
-        "irghadir",
-        "irloiter",
-        "irpey",
-        "irpey.sink"
-      ],
-      "base_buildings_seen": [
-        "powr",
-        "proc",
-        "spen",
-        "weap"
-      ],
-      "all_buildings_seen": [
-        "fact",
-        "powr",
-        "proc",
-        "spen",
-        "weap"
-      ],
-      "timeline": [
-        {
-          "tick": 2006,
-          "visible_units": [
-            "harv"
-          ],
-          "visible_buildings": [
-            "fact",
-            "powr",
-            "proc"
-          ],
-          "remembered_buildings": [],
-          "own_units_remaining": 14,
-          "done": false,
-          "result": ""
-        },
-        {
-          "tick": 4010,
-          "visible_units": [
-            "harv"
-          ],
-          "visible_buildings": [
-            "fact",
-            "powr",
-            "proc"
-          ],
-          "remembered_buildings": [],
-          "own_units_remaining": 14,
-          "done": false,
-          "result": ""
-        },
-        {
-          "tick": 6014,
-          "visible_units": [
-            "apc",
-            "harv"
-          ],
-          "visible_buildings": [
-            "powr",
-            "proc",
-            "spen",
-            "weap"
-          ],
-          "remembered_buildings": [],
-          "own_units_remaining": 14,
-          "done": false,
-          "result": ""
-        },
-        {
-          "tick": 8018,
-          "visible_units": [],
-          "visible_buildings": [],
-          "remembered_buildings": [
-            "powr",
-            "proc",
-            "spen",
-            "weap"
-          ],
-          "own_units_remaining": 11,
-          "done": false,
-          "result": ""
-        },
-        {
-          "tick": 10022,
-          "visible_units": [],
-          "visible_buildings": [],
-          "remembered_buildings": [
-            "powr",
-            "proc",
-            "spen",
-            "weap"
-          ],
-          "own_units_remaining": 11,
-          "done": false,
-          "result": ""
-        },
-        {
-          "tick": 12026,
-          "visible_units": [],
-          "visible_buildings": [],
-          "remembered_buildings": [
-            "powr",
-            "proc",
-            "spen",
-            "weap"
-          ],
-          "own_units_remaining": 11,
-          "done": false,
-          "result": ""
-        },
-        {
-          "tick": 14030,
-          "visible_units": [],
-          "visible_buildings": [],
-          "remembered_buildings": [
-            "powr",
-            "proc",
-            "spen",
-            "weap"
-          ],
-          "own_units_remaining": 11,
-          "done": false,
-          "result": ""
-        },
-        {
-          "tick": 16034,
-          "visible_units": [
-            "irghadir"
-          ],
-          "visible_buildings": [],
-          "remembered_buildings": [
-            "powr",
-            "proc",
-            "spen",
-            "weap"
-          ],
-          "own_units_remaining": 11,
-          "done": false,
-          "result": ""
-        },
-        {
-          "tick": 18038,
-          "visible_units": [],
-          "visible_buildings": [],
-          "remembered_buildings": [
-            "powr",
-            "proc",
-            "spen",
-            "weap"
-          ],
-          "own_units_remaining": 10,
-          "done": false,
-          "result": ""
-        },
-        {
-          "tick": 20042,
-          "visible_units": [],
-          "visible_buildings": [],
-          "remembered_buildings": [
-            "powr",
-            "proc",
-            "spen",
-            "weap"
-          ],
-          "own_units_remaining": 10,
-          "done": false,
-          "result": ""
-        },
-        {
-          "tick": 22046,
-          "visible_units": [],
-          "visible_buildings": [],
-          "remembered_buildings": [
-            "powr",
-            "proc",
-            "spen",
-            "weap"
-          ],
-          "own_units_remaining": 10,
-          "done": false,
-          "result": ""
-        },
-        {
-          "tick": 24050,
-          "visible_units": [],
-          "visible_buildings": [],
-          "remembered_buildings": [
-            "powr",
-            "proc",
-            "spen",
-            "weap"
+            "spen"
           ],
           "own_units_remaining": 7,
           "done": false,
           "result": ""
         },
         {
-          "tick": 24712,
+          "tick": 8753,
           "visible_units": [],
           "visible_buildings": [],
           "remembered_buildings": [],
@@ -820,17 +780,15 @@
     },
     {
       "personality": "normal",
-      "session_id": "df99cff73b5b",
-      "end_tick": 15362,
+      "session_id": "827a1f144bdf",
+      "end_tick": 24419,
       "done": true,
       "result": "lose",
       "custom_units_seen": [
-        "irbas",
-        "irghadir"
+        "irbas"
       ],
       "custom_domains_seen": [
-        "infantry",
-        "naval"
+        "infantry"
       ],
       "force_domains_seen": [
         "infantry",
@@ -840,10 +798,226 @@
         "e1",
         "e2",
         "e3",
-        "e4",
+        "irbas",
+        "msub",
+        "ss"
+      ],
+      "base_buildings_seen": [
+        "barr",
+        "powr",
+        "proc"
+      ],
+      "all_buildings_seen": [
+        "barr",
+        "fact",
+        "powr",
+        "proc"
+      ],
+      "timeline": [
+        {
+          "tick": 2006,
+          "visible_units": [],
+          "visible_buildings": [],
+          "remembered_buildings": [
+            "barr",
+            "fact",
+            "powr",
+            "proc"
+          ],
+          "own_units_remaining": 11,
+          "done": false,
+          "result": ""
+        },
+        {
+          "tick": 4010,
+          "visible_units": [],
+          "visible_buildings": [],
+          "remembered_buildings": [
+            "barr",
+            "fact",
+            "powr",
+            "proc"
+          ],
+          "own_units_remaining": 11,
+          "done": false,
+          "result": ""
+        },
+        {
+          "tick": 6014,
+          "visible_units": [],
+          "visible_buildings": [],
+          "remembered_buildings": [
+            "barr",
+            "fact",
+            "powr",
+            "proc"
+          ],
+          "own_units_remaining": 11,
+          "done": false,
+          "result": ""
+        },
+        {
+          "tick": 8018,
+          "visible_units": [],
+          "visible_buildings": [],
+          "remembered_buildings": [
+            "barr",
+            "fact",
+            "powr",
+            "proc"
+          ],
+          "own_units_remaining": 11,
+          "done": false,
+          "result": ""
+        },
+        {
+          "tick": 10022,
+          "visible_units": [],
+          "visible_buildings": [],
+          "remembered_buildings": [
+            "barr",
+            "fact",
+            "powr",
+            "proc"
+          ],
+          "own_units_remaining": 11,
+          "done": false,
+          "result": ""
+        },
+        {
+          "tick": 12026,
+          "visible_units": [],
+          "visible_buildings": [],
+          "remembered_buildings": [
+            "barr",
+            "fact",
+            "powr",
+            "proc"
+          ],
+          "own_units_remaining": 10,
+          "done": false,
+          "result": ""
+        },
+        {
+          "tick": 14030,
+          "visible_units": [],
+          "visible_buildings": [],
+          "remembered_buildings": [
+            "barr",
+            "fact",
+            "powr",
+            "proc"
+          ],
+          "own_units_remaining": 10,
+          "done": false,
+          "result": ""
+        },
+        {
+          "tick": 16034,
+          "visible_units": [],
+          "visible_buildings": [],
+          "remembered_buildings": [
+            "barr",
+            "fact",
+            "powr",
+            "proc"
+          ],
+          "own_units_remaining": 10,
+          "done": false,
+          "result": ""
+        },
+        {
+          "tick": 18038,
+          "visible_units": [],
+          "visible_buildings": [],
+          "remembered_buildings": [
+            "barr",
+            "fact",
+            "powr",
+            "proc"
+          ],
+          "own_units_remaining": 10,
+          "done": false,
+          "result": ""
+        },
+        {
+          "tick": 20042,
+          "visible_units": [],
+          "visible_buildings": [],
+          "remembered_buildings": [
+            "barr",
+            "fact",
+            "powr",
+            "proc"
+          ],
+          "own_units_remaining": 10,
+          "done": false,
+          "result": ""
+        },
+        {
+          "tick": 22046,
+          "visible_units": [],
+          "visible_buildings": [],
+          "remembered_buildings": [
+            "barr",
+            "fact",
+            "powr",
+            "proc"
+          ],
+          "own_units_remaining": 10,
+          "done": false,
+          "result": ""
+        },
+        {
+          "tick": 24050,
+          "visible_units": [],
+          "visible_buildings": [],
+          "remembered_buildings": [
+            "barr",
+            "fact",
+            "powr",
+            "proc"
+          ],
+          "own_units_remaining": 7,
+          "done": false,
+          "result": ""
+        },
+        {
+          "tick": 24419,
+          "visible_units": [],
+          "visible_buildings": [],
+          "remembered_buildings": [],
+          "own_units_remaining": 0,
+          "done": true,
+          "result": "lose"
+        }
+      ],
+      "passed": true
+    },
+    {
+      "personality": "turtle",
+      "session_id": "1816116b3157",
+      "end_tick": 18177,
+      "done": true,
+      "result": "lose",
+      "custom_units_seen": [
+        "irbas",
+        "irloiter"
+      ],
+      "custom_domains_seen": [
+        "air",
+        "infantry"
+      ],
+      "force_domains_seen": [
+        "air",
+        "infantry"
+      ],
+      "all_enemy_units_seen": [
+        "e2",
+        "e3",
         "harv",
         "irbas",
-        "irghadir"
+        "irloiter"
       ],
       "base_buildings_seen": [
         "barr",
@@ -969,7 +1143,39 @@
           "result": ""
         },
         {
-          "tick": 15362,
+          "tick": 16034,
+          "visible_units": [
+            "irloiter"
+          ],
+          "visible_buildings": [],
+          "remembered_buildings": [
+            "barr",
+            "fact",
+            "ftur",
+            "powr",
+            "proc"
+          ],
+          "own_units_remaining": 9,
+          "done": false,
+          "result": ""
+        },
+        {
+          "tick": 18038,
+          "visible_units": [],
+          "visible_buildings": [],
+          "remembered_buildings": [
+            "barr",
+            "fact",
+            "ftur",
+            "powr",
+            "proc"
+          ],
+          "own_units_remaining": 9,
+          "done": false,
+          "result": ""
+        },
+        {
+          "tick": 18177,
           "visible_units": [],
           "visible_buildings": [],
           "remembered_buildings": [],
@@ -981,266 +1187,35 @@
       "passed": true
     },
     {
-      "personality": "turtle",
-      "session_id": "8b4d39a8f106",
-      "end_tick": 25001,
-      "done": false,
-      "result": "",
-      "custom_units_seen": [
-        "irghadir",
-        "irpey",
-        "irraad"
-      ],
-      "custom_domains_seen": [
-        "naval",
-        "vehicle"
-      ],
-      "force_domains_seen": [
-        "naval",
-        "vehicle"
-      ],
-      "all_enemy_units_seen": [
-        "harv",
-        "irghadir",
-        "irpey",
-        "irraad",
-        "ss"
-      ],
-      "base_buildings_seen": [
-        "powr",
-        "proc",
-        "weap"
-      ],
-      "all_buildings_seen": [
-        "fact",
-        "powr",
-        "proc",
-        "tsla",
-        "weap"
-      ],
-      "timeline": [
-        {
-          "tick": 2006,
-          "visible_units": [
-            "harv"
-          ],
-          "visible_buildings": [
-            "fact",
-            "powr",
-            "proc"
-          ],
-          "remembered_buildings": [],
-          "own_units_remaining": 14,
-          "done": false,
-          "result": ""
-        },
-        {
-          "tick": 4010,
-          "visible_units": [
-            "harv"
-          ],
-          "visible_buildings": [
-            "fact",
-            "powr",
-            "proc",
-            "tsla",
-            "weap"
-          ],
-          "remembered_buildings": [],
-          "own_units_remaining": 14,
-          "done": false,
-          "result": ""
-        },
-        {
-          "tick": 6014,
-          "visible_units": [],
-          "visible_buildings": [],
-          "remembered_buildings": [
-            "fact",
-            "powr",
-            "proc",
-            "tsla",
-            "weap"
-          ],
-          "own_units_remaining": 11,
-          "done": false,
-          "result": ""
-        },
-        {
-          "tick": 8018,
-          "visible_units": [],
-          "visible_buildings": [],
-          "remembered_buildings": [
-            "fact",
-            "powr",
-            "proc",
-            "tsla",
-            "weap"
-          ],
-          "own_units_remaining": 11,
-          "done": false,
-          "result": ""
-        },
-        {
-          "tick": 10022,
-          "visible_units": [],
-          "visible_buildings": [],
-          "remembered_buildings": [
-            "fact",
-            "powr",
-            "proc",
-            "tsla",
-            "weap"
-          ],
-          "own_units_remaining": 11,
-          "done": false,
-          "result": ""
-        },
-        {
-          "tick": 12026,
-          "visible_units": [],
-          "visible_buildings": [],
-          "remembered_buildings": [
-            "fact",
-            "powr",
-            "proc",
-            "tsla",
-            "weap"
-          ],
-          "own_units_remaining": 10,
-          "done": false,
-          "result": ""
-        },
-        {
-          "tick": 14030,
-          "visible_units": [],
-          "visible_buildings": [],
-          "remembered_buildings": [
-            "fact",
-            "powr",
-            "proc",
-            "tsla",
-            "weap"
-          ],
-          "own_units_remaining": 8,
-          "done": false,
-          "result": ""
-        },
-        {
-          "tick": 16034,
-          "visible_units": [],
-          "visible_buildings": [],
-          "remembered_buildings": [
-            "fact",
-            "powr",
-            "proc",
-            "tsla",
-            "weap"
-          ],
-          "own_units_remaining": 8,
-          "done": false,
-          "result": ""
-        },
-        {
-          "tick": 18038,
-          "visible_units": [],
-          "visible_buildings": [],
-          "remembered_buildings": [
-            "fact",
-            "powr",
-            "proc",
-            "tsla",
-            "weap"
-          ],
-          "own_units_remaining": 8,
-          "done": false,
-          "result": ""
-        },
-        {
-          "tick": 20042,
-          "visible_units": [],
-          "visible_buildings": [],
-          "remembered_buildings": [
-            "fact",
-            "powr",
-            "proc",
-            "tsla",
-            "weap"
-          ],
-          "own_units_remaining": 7,
-          "done": false,
-          "result": ""
-        },
-        {
-          "tick": 22046,
-          "visible_units": [],
-          "visible_buildings": [],
-          "remembered_buildings": [
-            "fact",
-            "powr",
-            "proc",
-            "tsla",
-            "weap"
-          ],
-          "own_units_remaining": 7,
-          "done": false,
-          "result": ""
-        },
-        {
-          "tick": 24050,
-          "visible_units": [],
-          "visible_buildings": [],
-          "remembered_buildings": [
-            "fact",
-            "powr",
-            "proc",
-            "tsla",
-            "weap"
-          ],
-          "own_units_remaining": 7,
-          "done": false,
-          "result": ""
-        }
-      ],
-      "passed": true
-    },
-    {
       "personality": "naval",
-      "session_id": "0c579ac0a877",
-      "end_tick": 19396,
+      "session_id": "82f29d68e8cc",
+      "end_tick": 18183,
       "done": true,
       "result": "lose",
       "custom_units_seen": [
-        "irbas",
         "irmohajer",
-        "irtoufan"
+        "irpey"
       ],
       "custom_domains_seen": [
         "air",
-        "infantry"
+        "naval"
       ],
       "force_domains_seen": [
         "air",
-        "infantry",
-        "vehicle"
+        "naval"
       ],
       "all_enemy_units_seen": [
-        "ftrk",
         "harv",
-        "irbas",
         "irmohajer",
-        "irtoufan"
+        "irpey"
       ],
       "base_buildings_seen": [
-        "barr",
         "powr",
         "proc",
         "weap"
       ],
       "all_buildings_seen": [
-        "barr",
         "fact",
-        "ftur",
         "powr",
         "proc",
         "weap"
@@ -1249,13 +1224,10 @@
         {
           "tick": 2006,
           "visible_units": [
-            "harv",
-            "irbas"
+            "harv"
           ],
           "visible_buildings": [
-            "barr",
             "fact",
-            "ftur",
             "powr",
             "proc"
           ],
@@ -1266,19 +1238,15 @@
         },
         {
           "tick": 4010,
-          "visible_units": [
-            "harv",
-            "irbas"
-          ],
-          "visible_buildings": [
-            "barr",
+          "visible_units": [],
+          "visible_buildings": [],
+          "remembered_buildings": [
             "fact",
-            "ftur",
             "powr",
-            "proc"
+            "proc",
+            "weap"
           ],
-          "remembered_buildings": [],
-          "own_units_remaining": 14,
+          "own_units_remaining": 11,
           "done": false,
           "result": ""
         },
@@ -1287,9 +1255,7 @@
           "visible_units": [],
           "visible_buildings": [],
           "remembered_buildings": [
-            "barr",
             "fact",
-            "ftur",
             "powr",
             "proc",
             "weap"
@@ -1303,9 +1269,7 @@
           "visible_units": [],
           "visible_buildings": [],
           "remembered_buildings": [
-            "barr",
             "fact",
-            "ftur",
             "powr",
             "proc",
             "weap"
@@ -1319,9 +1283,7 @@
           "visible_units": [],
           "visible_buildings": [],
           "remembered_buildings": [
-            "barr",
             "fact",
-            "ftur",
             "powr",
             "proc",
             "weap"
@@ -1335,9 +1297,7 @@
           "visible_units": [],
           "visible_buildings": [],
           "remembered_buildings": [
-            "barr",
             "fact",
-            "ftur",
             "powr",
             "proc",
             "weap"
@@ -1351,9 +1311,7 @@
           "visible_units": [],
           "visible_buildings": [],
           "remembered_buildings": [
-            "barr",
             "fact",
-            "ftur",
             "powr",
             "proc",
             "weap"
@@ -1367,35 +1325,33 @@
           "visible_units": [],
           "visible_buildings": [],
           "remembered_buildings": [
-            "barr",
             "fact",
-            "ftur",
             "powr",
             "proc",
             "weap"
           ],
-          "own_units_remaining": 10,
+          "own_units_remaining": 11,
           "done": false,
           "result": ""
         },
         {
           "tick": 18038,
-          "visible_units": [],
+          "visible_units": [
+            "irmohajer"
+          ],
           "visible_buildings": [],
           "remembered_buildings": [
-            "barr",
             "fact",
-            "ftur",
             "powr",
             "proc",
             "weap"
           ],
-          "own_units_remaining": 10,
+          "own_units_remaining": 11,
           "done": false,
           "result": ""
         },
         {
-          "tick": 19396,
+          "tick": 18183,
           "visible_units": [],
           "visible_buildings": [],
           "remembered_buildings": [],
