@@ -19,6 +19,7 @@ if (-not $dotnet) {
 }
 
 New-Item -ItemType Directory -Force -Path $outputRoot | Out-Null
+$env:DOTNET_ROLL_FORWARD = "Major"
 
 Push-Location $engineRoot
 try {
@@ -30,6 +31,9 @@ try {
 
 	& $dotnet build OpenRA.Utility/OpenRA.Utility.csproj --no-restore "-p:OutDir=$outputRoot/"
 	if ($LASTEXITCODE -ne 0) { throw "OpenRA.Utility build failed." }
+
+	& $dotnet test OpenRA.Test/OpenRA.Test.csproj --no-restore --filter ExperienceComposerTest "-p:OutDir=$outputRoot/tests/" --logger "console;verbosity=minimal"
+	if ($LASTEXITCODE -ne 0) { throw "Experience Composer tests failed." }
 
 	$env:ENGINE_DIR = $engineRoot
 	& "C:/Program Files/dotnet/dotnet.exe" "$outputRoot/OpenRA.Utility.dll" ra --check-yaml
