@@ -1,8 +1,8 @@
 ﻿{
     "schema":  "openra-ai.turkey-assets/v1",
-    "generated_at":  "2026-08-12T08:37:49.0078235Z",
+    "generated_at":  "2026-08-12T11:34:39.1440814Z",
     "branch":  "main",
-    "engine_commit":  "2ee9396c7a60ba48c801c6342c21b610eb0fb985",
+    "engine_commit":  "b740501a50f919849010b2d06a5ce87a5b664130",
     "asset_packages":  54,
     "frame_counts":  {
                          "denizkaplanhusk":  64,
