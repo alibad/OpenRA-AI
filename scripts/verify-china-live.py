@@ -94,9 +94,9 @@ def render_telemetry_frame(snapshot: GameSnapshot, path: Path) -> dict[str, obje
         draw.rectangle((x - 5, y - 5, x + 5, y + 5), fill=(210, 55, 48), outline=(255, 220, 150))
     for unit in snapshot.units:
         x, y = point(unit.cell_x, unit.cell_y)
-        radius = 5 if unit.kind.lower() in {"cnluyang", "cnhaiwang", "cnskyspear", "cncloud", "cncrane"} else 3
+        radius = 5 if unit.kind.lower() in {"cnluyang", "cnhaiwang", "cnhaiying", "cnkunlun", "cnjiaolong", "cnskyspear", "cncloud", "cncrane"} else 3
         draw.ellipse((x - radius, y - radius, x + radius, y + radius), fill=(240, 70, 55), outline=(255, 235, 160))
-        if unit.kind.lower() in {"cnnetwork", "redspear", "cnzbd", "cnluyang", "cnhaiwang"}:
+        if unit.kind.lower() in {"cnnetwork", "redspear", "cnzbd", "cnmantis", "cnluyang", "cnhaiwang", "cnhaiying", "cnkunlun", "cnjiaolong"}:
             draw.text((x + 5, y - 7), unit.kind.upper(), fill=(255, 245, 205), font=font)
     for enemy in (*snapshot.visible_enemies, *snapshot.visible_enemy_buildings):
         x, y = point(enemy.cell_x, enemy.cell_y)
@@ -122,12 +122,14 @@ def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--port", type=int, default=9996)
     parser.add_argument("--evidence", type=Path, default=DEFAULT_EVIDENCE)
-    parser.add_argument("--engine", type=Path, default=ROOT / "engine" / "openra" / "bin" / "OpenRA.exe")
+    parser.add_argument("--engine-root", type=Path, default=ROOT / "engine" / "openra")
     args = parser.parse_args()
 
     evidence = args.evidence.resolve()
     evidence.mkdir(parents=True, exist_ok=True)
-    engine = EngineProcess(args.engine.resolve(), ROOT / "engine" / "openra", args.port, evidence)
+    engine_root = args.engine_root.resolve()
+    engine_path = engine_root / "bin" / "OpenRA.exe"
+    engine = EngineProcess(engine_path, engine_root, args.port, evidence)
     engine.start()
     bridge = OpenRABridge(f"127.0.0.1:{args.port}", timeout=15)
     session_id = ""
@@ -136,12 +138,18 @@ def main() -> int:
         start = wait_for_session(bridge)
         required = {
             "cnrifle", "cnnetwork", "cnportable", "redspear", "cnqilin", "cnlynx", "cnzbd", "cnphl",
-            "cnskyspear", "cncloud", "cncrane", "cnluyang", "cnhaiwang",
+            "cnmantis", "cnskyspear", "cncloud", "cncrane", "cnluyang", "cnhaiwang",
+            "cnhaiying", "cnkunlun", "cnjiaolong",
         }
         present = {unit.kind.lower() for unit in start.units}
         missing = sorted(required - present)
         if missing:
             raise RuntimeError(f"live mission is missing China roster actors: {missing}")
+        required_defenses = {"cnbastion", "cnskyshield", "cnspectrum"}
+        present_defenses = {building.kind.lower() for building in start.buildings}
+        missing_defenses = sorted(required_defenses - present_defenses)
+        if missing_defenses:
+            raise RuntimeError(f"live mission is missing China defenses: {missing_defenses}")
 
         frames = [save_frame(bridge, start, evidence / "01-china-deployment.png")]
         start_positions = {unit.actor_id: (unit.cell_x, unit.cell_y) for unit in start.units}
@@ -153,12 +161,16 @@ def main() -> int:
             "cnqilin": [(48, 40), (48, 45)],
             "cnlynx": [(50, 43)],
             "cnphl": [(44, 37)],
+			"cnmantis": [(46, 41)],
             "cnzbd": [(66, 44), (68, 43), (65, 42)],
             "cnskyspear": [(78, 54)],
             "cncloud": [(82, 57)],
             "cncrane": [(72, 51)],
             "cnluyang": [(69, 40)],
             "cnhaiwang": [(72, 42)],
+			"cnhaiying": [(73, 39)],
+			"cnkunlun": [(70, 45)],
+			"cnjiaolong": [(76, 37)],
             "redspear": [(52, 44)],
         }
         commands = []
@@ -216,9 +228,10 @@ def main() -> int:
         telemetry = {
             "schema": "openra-ai.china-live-verification/v1",
             "session_id": session_id,
-            "engine": str(args.engine.resolve()),
+            "engine": str(engine_path),
             "seed": 8122026,
             "required_roster": sorted(required),
+			"required_defenses": sorted(required_defenses),
             "actual_movement_vectors": actual_vectors,
             "frames": frames,
             "snapshots": {

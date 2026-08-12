@@ -42,13 +42,16 @@ if ($LASTEXITCODE -ne 0) { throw "China sprite generation failed." }
 
 $assets = @(
     "cnrifle", "cnnetwork", "cnportable", "redspear",
-    "cnqilin", "cnqilinhusk", "cnlynx", "cnlynxhusk", "cnzbd", "cnzbdhusk", "cnphl", "cnphlhusk",
+    "cnqilin", "cnqilinhusk", "cnlynx", "cnlynxhusk", "cnzbd", "cnzbdhusk", "cnphl", "cnphlhusk", "cnmantis", "cnmantishusk",
     "cnskyspear", "cnskyspearhusk", "cncloud", "cncloudhusk", "cncrane", "cncranehusk", "cncranerotor",
     "cnluyang", "cnluyangturret", "cnluyangsink", "cnhaiwang", "cnhaiwangturret", "cnhaiwangsink",
+    "cnhaiying", "cnhaiyingturret", "cnhaiyingsink", "cnkunlun", "cnkunlunturret", "cnkunlunsink", "cnjiaolong", "cnjiaolongsink",
+    "cnbastion", "cnbastiontop", "cnskyshield", "cnskyshieldtop", "cnspectrum", "cnspectrumtop",
     "china-heavy-muzzle", "china-light-muzzle", "china-missile", "china-drone-projectile",
     "china-network-pulse", "china-network-impact", "china-precision-impact", "china-naval-impact", "china-wake",
     "cnrifleicon", "cnnetworkicon", "cnportableicon", "redspearicon", "cnqilinicon", "cnlynxicon", "cnzbdicon",
-    "cnphlicon", "cnskyspearicon", "cncloudicon", "cncraneicon", "cnluyangicon", "cnhaiwangicon"
+    "cnphlicon", "cnskyspearicon", "cncloudicon", "cncraneicon", "cnluyangicon", "cnhaiwangicon",
+    "cnmantisicon", "cnhaiyingicon", "cnkunlunicon", "cnjiaolongicon", "cnbastionicon", "cnskyshieldicon", "cnspectrumicon"
 )
 
 foreach ($asset in $assets) {
