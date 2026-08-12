@@ -14,8 +14,7 @@
     "Assets": { "type": "string", "default": "assets" },
     "Replaces": {
       "type": "string",
-      "minLength": 1,
-      "description": "Comma-separated virtual asset paths, matching the MiniYaml pack manifest format."
+      "description": "Comma-separated virtual asset paths. Empty is valid while a new pack is being composed."
     }
   },
   "additionalProperties": false

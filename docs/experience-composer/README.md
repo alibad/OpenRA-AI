@@ -2,13 +2,15 @@
 
 The Experience Builder is available from **Main Menu → Workshop → Experience Builder**. Workshop is the single home for Experience Builder, Mission Studio, Map Editor, and Asset Library; playback and credits remain under Extras.
 
-The Builder separates simulation-affecting capabilities from local presentation replacements. Selecting a gameplay module shows its behavior, enabled state, version, dependencies, contributed data files, source, and license. **Browse Asset Library** opens the searchable asset preview directly, and **Copy Pack Folder Path** provides the presentation-pack destination without requiring users to memorize it.
+The Builder separates simulation-affecting capabilities from local presentation replacements. Selecting a gameplay module shows its behavior, enabled state, version, dependencies, contributed data files, source, license, and typed parameters. **Browse Asset Library** opens the searchable comparison workspace directly, and **Copy Pack Folder Path** provides the selected presentation-pack destination without requiring users to memorize it.
 
 ## Gameplay profiles
 
 The default **World War III** profile enables every currently integrated and stable reusable capability. Players can select another preset or toggle individual components. Dependencies are enabled automatically; disabling a dependency also disables components that require it.
 
 Gameplay changes restart the mod. The selected component IDs, versions, and manifest file sets produce a deterministic gameplay fingerprint. Multiplayer peers must use the same gameplay fingerprint.
+
+Module parameters are declared beside their component in the catalog. Boolean, bounded integer, and enumerated choice controls are generated from that schema. Parameter values are validated, persisted in settings, included in the gameplay fingerprint, and read by the runtime capability. The initial modules expose practical controls for factions, units, weapons, economy, AI, effects, and balance.
 
 The catalog is defined in `engine/openra/mods/ra/experiences.yaml`. A component can contribute rule, weapon, sequence, cursor, chrome, voice, notification, or music definitions. The selected file set is resolved before OpenRA loads its default rules.
 
@@ -24,7 +26,7 @@ On first launch, the game creates:
 
 On a standard Windows installation this is normally under `%APPDATA%/OpenRA/ExperiencePacks/ra/`.
 
-Each immediate child folder is one pack. Copy the creator template, rename the folder to match its `Id`, add replacement files below `assets/`, and select **Refresh** in the Builder.
+Each immediate child folder is one pack. The Builder can create, duplicate, rename, and delete these packs. New packs are valid while empty, so creators can assemble them incrementally without hand-writing a manifest.
 
 ```text
 my-pack/
@@ -43,7 +45,17 @@ Assets not declared by the pack automatically fall back to the normal game prese
 
 ## Asset Library
 
-The native Asset Browser loaders and preview renderers are reused behind a redesigned **Asset Library** workspace. It provides search-first navigation, source and type filters, selected-asset context, a larger preview, automatic starting palette selection, and **Copy Asset Name** for exact presentation-pack replacement entries.
+The native Asset Browser loaders and preview renderers are reused behind a redesigned **Asset Library** workspace. It provides search-first navigation, source and type filters, automatic palette selection, original/candidate sprite comparison, and original/candidate audio playback.
+
+To create a replacement:
+
+1. Select or create an editable presentation pack in Experience Builder.
+2. Open Asset Library and select the asset that should be replaced.
+3. Choose **Set as Original** to lock the virtual target path.
+4. Select a compatible mounted asset and choose **Use Candidate**, or choose **Import File** and enter the full path to an external file.
+5. Return to Experience Builder to inspect or remove the exact replacement mapping, then apply and restart.
+
+Sources and targets must use the same format. Files are copied into the managed pack, declared in `Replaces`, fingerprinted, and validated automatically. Imported files remain data-only and are limited to supported presentation formats and 256 MB per file.
 
 ## Licensing fields
 
