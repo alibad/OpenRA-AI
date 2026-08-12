@@ -45,7 +45,7 @@ try {
         $map,
         (Join-Path $packageRoot "Play-OpenRAAI.cmd"),
         (Join-Path $packageRoot "bin\openra-ai-companion.exe"),
-        (Join-Path $packageRoot "engine\openra\bin\OpenRA.exe")
+        (Join-Path $packageRoot "engine\openra\bin\OpenRA-AI.exe")
     )) {
         if (-not (Test-Path -LiteralPath $required)) {
             throw "Portable package is missing: $required"

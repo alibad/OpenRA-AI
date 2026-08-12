@@ -18,12 +18,12 @@ $engineRoot = Join-Path $repositoryRoot "engine\openra"
 $python = Join-Path $repositoryRoot ".venv\Scripts\python.exe"
 $companion = Join-Path $repositoryRoot ".venv\Scripts\openra-ai-companion.exe"
 $bundledCompanion = Join-Path $repositoryRoot "bin\openra-ai-companion.exe"
-$game = Join-Path $engineRoot "bin\OpenRA.exe"
+$game = Join-Path $engineRoot "bin\OpenRA-AI.exe"
 $contentInstaller = Join-Path $PSScriptRoot "Install-OpenRAContent.ps1"
 
 foreach ($required in @($game, $contentInstaller)) {
     if (-not (Test-Path -LiteralPath $required)) {
-        throw "Missing local build output: $required. Run scripts\setup.ps1 first."
+        throw "Missing branded local build output: $required. Run scripts\setup.ps1 first."
     }
 }
 

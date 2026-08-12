@@ -43,7 +43,7 @@ if (-not (Test-Path -LiteralPath $StageRoot)) {
 foreach ($required in @(
     (Join-Path $StageRoot "Play-OpenRAAI.cmd"),
     (Join-Path $StageRoot "bin\openra-ai-companion.exe"),
-    (Join-Path $StageRoot "engine\openra\bin\OpenRA.exe")
+    (Join-Path $StageRoot "engine\openra\bin\OpenRA-AI.exe")
 )) {
     if (-not (Test-Path -LiteralPath $required)) {
         throw "Windows installer payload is incomplete: $required"

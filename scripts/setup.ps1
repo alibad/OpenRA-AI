@@ -33,6 +33,8 @@ if (-not $SkipEngine) {
     finally {
         Pop-Location
     }
+
+    & (Join-Path $PSScriptRoot "build-windows-launcher.ps1")
 }
 
 Write-Host "OpenRA AI local environment is ready." -ForegroundColor Green

@@ -39,7 +39,7 @@ if ($LASTEXITCODE -ne 0) {
     throw "Sample mission validation failed."
 }
 
-$runningEngine = @(Get-Process -Name "OpenRA" -ErrorAction SilentlyContinue | Where-Object {
+$runningEngine = @(Get-Process -Name "OpenRA", "OpenRA-AI" -ErrorAction SilentlyContinue | Where-Object {
     $_.Path -and $_.Path.StartsWith($engineRoot + [IO.Path]::DirectorySeparatorChar, [StringComparison]::OrdinalIgnoreCase)
 })
 if ($runningEngine.Count -gt 0) {
@@ -73,6 +73,10 @@ install_data '$enginePosix' '$stagePosix/engine/openra' 'ra'
 if ($LASTEXITCODE -ne 0) {
     throw "OpenRA portable engine packaging failed."
 }
+
+& (Join-Path $PSScriptRoot "build-windows-launcher.ps1") `
+    -OutputDirectory (Join-Path $stageRoot "engine\openra\bin") `
+    -SelfContained
 
 $pyinstallerWork = Join-Path $artifactRoot "package\pyinstaller-work"
 $pyinstallerSpec = Join-Path $artifactRoot "package\pyinstaller-spec"
