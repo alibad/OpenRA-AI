@@ -138,16 +138,37 @@ def _azar_airframe() -> Mesh:
 
 def _toufan_airframe() -> Mesh:
     mesh = Mesh()
-    mesh.tapered_box((-0.63, 0.63, -1.50, 1.25, 0.24), (-0.39, 0.39, -1.60, 1.07, 0.93), TEAM_MID)
-    mesh.polygon(((-0.37, -1.58, 0.46), (0.37, -1.58, 0.46), (0.27, -0.71, 0.88), (-0.27, -0.71, 0.88)), GLASS)
-    mesh.slanted_box_y(-0.11, 0.11, 0.74, 3.05, 0.50, 0.83, 0.18, TEAM_DARK)
-    mesh.polygon(((0, 2.42, 0.73), (-0.83, 2.99, 0.65), (0, 2.85, 0.82), (0.83, 2.99, 0.65)), TEAM_MID)
-    mesh.polygon(((0, 2.40, 0.69), (0, 3.03, 1.50), (0, 3.03, 0.62)), TEAM_DARK)
-    mesh.box(-1.31, -0.56, -0.18, 0.49, 0.31, 0.48, TEAM_LIGHT)
-    mesh.box(0.56, 1.31, -0.18, 0.49, 0.31, 0.48, TEAM_LIGHT)
-    for x in (-1.13, 0.87):
-        mesh.cylinder_y((x, -0.22, 0.38), 0.65, 0.10, METAL)
-    mesh.cylinder_z((0, -0.04, 1.03), 0.20, 0.15, METAL)
+    # Bright, tapered fuselage and pointed chin make the nose unambiguous at
+    # every classic facing.  The previous broad box hid the player remap and
+    # read as a flat card while turning.
+    mesh.tapered_box((-0.58, 0.58, -1.64, 0.91, 0.25), (-0.35, 0.35, -1.82, 0.72, 0.94), TEAM_LIGHT)
+    mesh.polygon(((-0.31, -1.82, 0.45), (0.31, -1.82, 0.45), (0.22, -2.12, 0.36), (-0.22, -2.12, 0.36)), TEAM_MID)
+    mesh.polygon(((-0.32, -1.79, 0.57), (0.32, -1.79, 0.57), (0.27, -0.74, 0.91), (-0.27, -0.74, 0.91)), GLASS)
+    mesh.polygon(((-0.28, -1.74, 0.91), (0.28, -1.74, 0.91), (0.20, -0.77, 1.02), (-0.20, -0.77, 1.02)), (69, 122, 126))
+
+    # Narrow tail boom, stabilizer, fin, and visible tail rotor prevent the
+    # rear half from collapsing into a one-pixel line at diagonal headings.
+    mesh.slanted_box_y(-0.12, 0.12, 0.61, 3.19, 0.52, 0.81, 0.18, TEAM_MID)
+    mesh.polygon(((0, 2.48, 0.75), (-0.91, 2.98, 0.66), (0, 2.86, 0.84), (0.91, 2.98, 0.66)), TEAM_LIGHT)
+    mesh.polygon(((0, 2.43, 0.72), (0, 3.18, 1.56), (0, 3.17, 0.66)), TEAM_DARK)
+    mesh.cylinder_x((0.15, 3.02, 1.13), 0.20, 0.24, METAL, segments=8)
+    mesh.polygon(((0.27, 2.70, 1.09), (0.27, 3.34, 1.17), (0.27, 3.34, 1.23), (0.27, 2.70, 1.15)), WHITE, outline=False)
+    mesh.polygon(((0.27, 2.98, 0.83), (0.27, 3.06, 1.43), (0.27, 3.12, 1.43), (0.27, 3.04, 0.83)), WHITE, outline=False)
+
+    # Stub wings, separate rocket pods, chin cannon, mast, and landing skids
+    # create independent depth cues instead of one merged rectangular mass.
+    mesh.box(-1.42, -0.48, -0.35, 0.42, 0.37, 0.51, TEAM_MID)
+    mesh.box(0.48, 1.42, -0.35, 0.42, 0.37, 0.51, TEAM_MID)
+    for x in (-1.18, 1.18):
+        mesh.cylinder_y((x, -0.18, 0.39), 0.92, 0.14, METAL, segments=10)
+        mesh.cylinder_y((x, -0.67, 0.39), 0.16, 0.145, TEAM_DEEP, segments=10)
+    mesh.box(-0.18, 0.18, -1.93, -1.55, 0.19, 0.37, METAL)
+    mesh.cylinder_y((0, -2.08, 0.23), 0.62, 0.065, METAL, segments=8)
+    mesh.cylinder_z((0, -0.02, 1.08), 0.26, 0.14, METAL)
+    for x in (-0.47, 0.47):
+        mesh.cylinder_y((x, -0.13, 0.10), 2.24, 0.035, METAL, segments=8)
+        mesh.slanted_box_y(x - 0.035, x + 0.035, -0.72, -0.53, 0.12, 0.34, 0.05, METAL)
+        mesh.slanted_box_y(x - 0.035, x + 0.035, 0.43, 0.62, 0.12, 0.34, 0.05, METAL)
     return mesh
 
 
@@ -245,7 +266,7 @@ def render_azar(frame_size: int = 56, facings: int = 16) -> list[Image.Image]:
 
 def render_toufan(frame_size: int = 56, facings: int = 32) -> list[Image.Image]:
     assert facings == 32
-    return _air_frames(_toufan_airframe(), frame_size, facings, 6.7)
+    return _air_frames(_toufan_airframe(), frame_size, facings, 7.1)
 
 
 def render_mohajer(frame_size: int = 44, facings: int = 16) -> list[Image.Image]:
@@ -305,8 +326,14 @@ def render_rotor(frame_size: int = 48) -> list[Image.Image]:
         for blade in range(4):
             radians = math.radians(angle + 90 * blade)
             dx, dy = math.cos(radians) * radius, math.sin(radians) * radius * 0.43
-            draw.line((center - dx, center - dy, center + dx, center + dy), fill=(42, 50, 43, 180), width=3 * supersample)
-        draw.ellipse((center - 3 * supersample, center - 3 * supersample, center + 3 * supersample, center + 3 * supersample), fill=(95, 99, 78, 255))
+            draw.line((center - dx, center - dy, center + dx, center + dy), fill=(94, 109, 99, 176), width=3 * supersample)
+            tip = 0.88
+            draw.line(
+                (center + dx * tip, center + dy * tip, center + dx, center + dy),
+                fill=(206, 213, 194, 210),
+                width=2 * supersample,
+            )
+        draw.ellipse((center - 3 * supersample, center - 3 * supersample, center + 3 * supersample, center + 3 * supersample), fill=(142, 151, 126, 255))
         if index < 4:
             image = image.filter(ImageFilter.GaussianBlur(0.45 * supersample))
         images.append(image.resize((frame_size, frame_size), Image.Resampling.LANCZOS))

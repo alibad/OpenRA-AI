@@ -55,6 +55,9 @@ SHOWCASE_ACTORS = """\
 \t\tOwner: Multi0
 \t\tLocation: 62,82
 \t\tFacing: 128
+\tIranShowcaseHelipad: irhpad
+\t\tOwner: Multi0
+\t\tLocation: 59,78
 \tIranShowcase9: irtoufan
 \t\tOwner: Multi0
 \t\tLocation: 63,83

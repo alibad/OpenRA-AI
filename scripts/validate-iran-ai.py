@@ -62,7 +62,10 @@ DESTROYED_CUSTOM_EVIDENCE = {
     "irpey.sink": "irpey",
     "irghadir.sink": "irghadir",
 }
-CORE_BUILDINGS = {"powr", "apwr", "proc", "barr", "tent", "weap", "afld", "dome", "stek", "fix", "spen"}
+CORE_BUILDINGS = {
+    "powr", "apwr", "proc", "barr", "tent", "weap", "afld", "irhpad",
+    "dome", "stek", "fix", "spen",
+}
 
 
 def scout_commands(snapshot: GameSnapshot) -> tuple[ActionCommand, ...]:

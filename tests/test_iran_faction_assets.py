@@ -15,7 +15,7 @@ from PIL import Image
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 
-from iran_directional_assets import render_directional_asset, render_infantry
+from iran_directional_assets import render_directional_asset, render_infantry, render_rotor
 
 BUILD_SPEC = importlib.util.spec_from_file_location(
     "build_iran_sprites", ROOT / "scripts" / "build-iran-sprites.py"
@@ -135,6 +135,18 @@ def test_every_directional_unit_has_explicit_player_color(name: str, size: int, 
     assert remap_share(indexed) >= 0.30
 
 
+def test_toufan_has_animated_rotor_and_strong_player_color_read() -> None:
+    rotor = render_rotor()
+    assert len(rotor) == 12
+    assert len({digest(frame) for frame in rotor}) == 12
+    assert all(frame.getchannel("A").getbbox() for frame in rotor)
+
+    palette = Image.new("P", (1, 1))
+    palette.putpalette([channel for value in range(256) for channel in (value, value, value)])
+    toufan = [quantize(frame, palette) for frame in render_directional_asset("irtoufan", 56, 32)]
+    assert remap_share(toufan) >= 0.45
+
+
 def test_generated_packages_match_declared_frame_counts() -> None:
     root = ROOT / "generated" / "iran-sprites"
     if not root.exists():
@@ -169,6 +181,13 @@ def test_doctrine_range_cannot_end_during_live_fire_sequence() -> None:
     assert "ShortGameCheckboxLocked: True" in rules
 
 
+def test_doctrine_range_supplies_a_toufan_rearm_pad() -> None:
+    path = ROOT / "engine" / "openra" / "mods" / "ra" / "maps" / "iran-doctrine-range.oramap"
+    with zipfile.ZipFile(path) as package:
+        actors = package.read("map.yaml").decode("utf-8")
+    assert "IranShowcaseHelipad: irhpad" in actors
+
+
 def actor_module(text: str, module: str, personality: str) -> str:
     match = re.search(
         rf"^\t{re.escape(module)}@{personality}:\n(?P<body>(?:\t\t.*\n|\t\t.*$)+)",
@@ -193,7 +212,7 @@ def test_every_standard_bot_has_construction_and_mixed_force_contracts() -> None
     for personality in personalities:
         base = actor_module(text, "BaseBuilderBotModule", personality)
         assert "ProductionTypes:" in base
-        assert all(kind in base for kind in ("barr", "weap", "afld", "spen"))
+        assert all(kind in base for kind in ("barr", "weap", "afld", "irhpad", "spen"))
         assert all(kind in base for kind in ("dome", "fix"))
 
         units = actor_module(text, "UnitBuilderBotModule", personality)
@@ -224,6 +243,20 @@ def test_native_progression_and_build_limit_contracts() -> None:
             text,
             re.MULTILINE | re.DOTALL,
         )
+    helipad = re.search(r"^IRHPAD:.*?(?=^[A-Z0-9.]+:)", text, re.MULTILINE | re.DOTALL)
+    assert helipad
+    assert "Inherits: HPAD" in helipad.group(0)
+    assert "Prerequisites: dome, ~structures.iran" in helipad.group(0)
+    assert "Prerequisite: aircraft.iran" in helipad.group(0)
+
+    toufan = re.search(r"^IRTOUFAN:.*?(?=^[A-Z0-9.]+:)", text, re.MULTILINE | re.DOTALL)
+    assert toufan
+    toufan_contract = toufan.group(0)
+    assert "BuildAtProductionType: Helicopter" in toufan_contract
+    assert "~irhpad" in toufan_contract
+    assert "CanSlide: False" in toufan_contract
+    assert "TurnToLand: True" in toufan_contract
+    assert "RearmActors: irhpad, hpad, afld, afld.ukraine" in toufan_contract
     shadow = re.search(r"^SHADOWONE:.*?(?=^[A-Z0-9.]+:)", text, re.MULTILINE | re.DOTALL)
     assert shadow
     assert "BuildLimit: 1" in shadow.group(0)

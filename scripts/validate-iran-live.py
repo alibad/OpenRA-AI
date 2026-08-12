@@ -222,6 +222,9 @@ def main() -> int:
             raise RuntimeError(f"Faction selector resolved to {state.get('player_faction')!r}")
         if start.units_lost:
             raise RuntimeError(f"Fresh doctrine range already lost {start.units_lost} units")
+        building_roster = {building.kind for building in start.buildings}
+        if "irhpad" not in building_roster:
+            raise RuntimeError("Fresh doctrine range has no Forward Aviation Pad for Toufan rearming")
 
         telemetry["runtime"] = {
             "map": start.map_name,
@@ -231,6 +234,7 @@ def main() -> int:
             "enemy_faction": state.get("enemy_faction"),
             "cash": start.cash,
             "explored_percent": round(start.explored_percent, 2),
+            "buildings": sorted(building_roster),
             "roster": [asdict(unit) for unit in start.units if unit.kind in EXPECTED_ROSTER],
         }
         capture(bridge, output, "01-doctrine-range.png", captures)
@@ -267,6 +271,66 @@ def main() -> int:
         }
         telemetry["checks"]["live_headings"] = headings
         capture(bridge, output, "02-live-headings.png", captures)
+
+        # Toufan uses the stock two-pool helicopter ammo contract.  Fire one
+        # burst, then exercise the aircraft deploy command (Return to Base) and
+        # wait for the Forward Aviation Pad to restore the full combined pool.
+        toufan_start = bridge.observe()
+        toufan = own(toufan_start, "irtoufan")
+        tank_for_toufan = enemy(toufan_start, "irantargettank")
+        if toufan.ammo <= 0:
+            raise RuntimeError(f"Toufan started without usable ammo: {toufan.ammo}")
+        full_ammo = toufan.ammo
+        fire_receipt = issue(
+            bridge,
+            "toufan-expend-ammo",
+            ActionCommand("attack", toufan.actor_id, target_actor_id=tank_for_toufan.actor_id),
+        )
+        expended_state = wait_until(
+            bridge,
+            lambda state: 0 <= own(state, "irtoufan").ammo < full_ammo,
+            timeout=12,
+            interval=0.06,
+        )
+        expended = own(expended_state, "irtoufan")
+        expended_ammo = expended.ammo
+        return_receipt = issue(
+            bridge,
+            "toufan-return-to-pad",
+            ActionCommand("deploy", expended.actor_id),
+        )
+        rearm_samples: list[dict[str, object]] = []
+        deadline = time.monotonic() + 24
+        rearmed_state = expended_state
+        while time.monotonic() < deadline:
+            rearmed_state = bridge.observe()
+            rearming = own(rearmed_state, "irtoufan")
+            sample = {
+                "tick": rearmed_state.tick,
+                "cell": [rearming.cell_x, rearming.cell_y],
+                "ammo": rearming.ammo,
+                "activity": rearming.current_activity,
+            }
+            if not rearm_samples or sample != rearm_samples[-1]:
+                rearm_samples.append(sample)
+            if rearming.ammo == full_ammo:
+                break
+            time.sleep(0.08)
+        else:
+            raise RuntimeError(
+                f"Toufan failed to rearm from {expended_ammo} to {full_ammo}; "
+                f"last sample: {rearm_samples[-1]}"
+            )
+        capture(bridge, output, "03-toufan-rearmed.png", captures)
+        telemetry["checks"]["toufan_rearm"] = {
+            "fire_receipt": fire_receipt,
+            "return_receipt": return_receipt,
+            "full_ammo": full_ammo,
+            "ammo_after_fire": expended_ammo,
+            "ammo_after_rearm": own(rearmed_state, "irtoufan").ammo,
+            "forward_aviation_pad_present": True,
+            "samples": rearm_samples,
+        }
 
         # The ATGM must damage armor, enter its authored reload state, and stay
         # immobile when a move order is issued during that vulnerable window.
@@ -349,7 +413,7 @@ def main() -> int:
             timeout=12,
             interval=0.06,
         )
-        capture(bridge, output, "03-shadow-sabotage.png", captures)
+        capture(bridge, output, "04-shadow-sabotage.png", captures)
         issue(
             bridge,
             "shadowone-stop",
@@ -378,7 +442,7 @@ def main() -> int:
             ),
         )
         time.sleep(0.35)
-        capture(bridge, output, "04-loitering-attack.png", captures)
+        capture(bridge, output, "05-loitering-attack.png", captures)
         loiter_end = wait_until(
             bridge,
             lambda state: all(unit.actor_id != loiter.actor_id for unit in state.units)
@@ -405,7 +469,7 @@ def main() -> int:
         )
         time.sleep(1.2)
         naval_end = bridge.observe()
-        capture(bridge, output, "05-naval-combat.png", captures)
+        capture(bridge, output, "06-naval-combat.png", captures)
         telemetry["checks"]["naval_combat"] = {
             "peykaap": {
                 "receipt": pey_receipt,
