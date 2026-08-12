@@ -1,0 +1,483 @@
+{
+  "schema": "openra-ai.turkey-ai-progression/v1",
+  "captured_at": "2026-08-12T07:02:44.314792+00:00",
+  "map": "Turkey AI Progression Range",
+  "personality": "normal",
+  "state": {
+    "episode_id": "5b82e56ed315",
+    "tick": 730,
+    "phase": "playing",
+    "player_count": 5,
+    "player_faction": "turkey",
+    "enemy_faction": "russia"
+  },
+  "samples": [
+    {
+      "wall_seconds": 0.0,
+      "tick": 730,
+      "cash": 20000,
+      "power": [
+        0,
+        0
+      ],
+      "buildings": [],
+      "units": [
+        "mcv"
+      ],
+      "custom_units": [],
+      "available_production": []
+    },
+    {
+      "wall_seconds": 5.0,
+      "tick": 850,
+      "cash": 20000,
+      "power": [
+        0,
+        0
+      ],
+      "buildings": [
+        "fact"
+      ],
+      "units": [],
+      "custom_units": [],
+      "available_production": []
+    },
+    {
+      "wall_seconds": 10.1,
+      "tick": 980,
+      "cash": 19810,
+      "power": [
+        0,
+        0
+      ],
+      "buildings": [
+        "fact"
+      ],
+      "units": [],
+      "custom_units": [],
+      "available_production": []
+    },
+    {
+      "wall_seconds": 15.1,
+      "tick": 1100,
+      "cash": 19680,
+      "power": [
+        100,
+        0
+      ],
+      "buildings": [
+        "fact",
+        "powr"
+      ],
+      "units": [],
+      "custom_units": [],
+      "available_production": []
+    },
+    {
+      "wall_seconds": 20.1,
+      "tick": 1230,
+      "cash": 19463,
+      "power": [
+        100,
+        0
+      ],
+      "buildings": [
+        "fact",
+        "powr"
+      ],
+      "units": [],
+      "custom_units": [],
+      "available_production": []
+    },
+    {
+      "wall_seconds": 25.1,
+      "tick": 1350,
+      "cash": 19263,
+      "power": [
+        100,
+        0
+      ],
+      "buildings": [
+        "fact",
+        "powr"
+      ],
+      "units": [],
+      "custom_units": [],
+      "available_production": []
+    },
+    {
+      "wall_seconds": 30.1,
+      "tick": 1480,
+      "cash": 19046,
+      "power": [
+        100,
+        0
+      ],
+      "buildings": [
+        "fact",
+        "powr"
+      ],
+      "units": [],
+      "custom_units": [],
+      "available_production": []
+    },
+    {
+      "wall_seconds": 35.1,
+      "tick": 1600,
+      "cash": 18846,
+      "power": [
+        100,
+        0
+      ],
+      "buildings": [
+        "fact",
+        "powr"
+      ],
+      "units": [],
+      "custom_units": [],
+      "available_production": []
+    },
+    {
+      "wall_seconds": 40.2,
+      "tick": 1730,
+      "cash": 18630,
+      "power": [
+        100,
+        0
+      ],
+      "buildings": [
+        "fact",
+        "powr"
+      ],
+      "units": [],
+      "custom_units": [],
+      "available_production": []
+    },
+    {
+      "wall_seconds": 45.2,
+      "tick": 1860,
+      "cash": 18413,
+      "power": [
+        100,
+        0
+      ],
+      "buildings": [
+        "fact",
+        "powr"
+      ],
+      "units": [],
+      "custom_units": [],
+      "available_production": []
+    },
+    {
+      "wall_seconds": 50.2,
+      "tick": 1980,
+      "cash": 18273,
+      "power": [
+        100,
+        30
+      ],
+      "buildings": [
+        "fact",
+        "powr",
+        "proc"
+      ],
+      "units": [
+        "harv"
+      ],
+      "custom_units": [],
+      "available_production": []
+    },
+    {
+      "wall_seconds": 55.2,
+      "tick": 2110,
+      "cash": 18056,
+      "power": [
+        100,
+        30
+      ],
+      "buildings": [
+        "fact",
+        "powr",
+        "proc"
+      ],
+      "units": [
+        "harv"
+      ],
+      "custom_units": [],
+      "available_production": []
+    },
+    {
+      "wall_seconds": 60.2,
+      "tick": 2230,
+      "cash": 17856,
+      "power": [
+        100,
+        30
+      ],
+      "buildings": [
+        "fact",
+        "powr",
+        "proc"
+      ],
+      "units": [
+        "harv"
+      ],
+      "custom_units": [],
+      "available_production": []
+    },
+    {
+      "wall_seconds": 65.3,
+      "tick": 2360,
+      "cash": 17813,
+      "power": [
+        100,
+        30
+      ],
+      "buildings": [
+        "fact",
+        "powr",
+        "proc"
+      ],
+      "units": [
+        "harv"
+      ],
+      "custom_units": [],
+      "available_production": []
+    },
+    {
+      "wall_seconds": 70.3,
+      "tick": 2480,
+      "cash": 17813,
+      "power": [
+        100,
+        30
+      ],
+      "buildings": [
+        "fact",
+        "powr",
+        "proc"
+      ],
+      "units": [
+        "harv"
+      ],
+      "custom_units": [],
+      "available_production": []
+    },
+    {
+      "wall_seconds": 75.3,
+      "tick": 2610,
+      "cash": 17723,
+      "power": [
+        100,
+        30
+      ],
+      "buildings": [
+        "fact",
+        "powr",
+        "proc"
+      ],
+      "units": [
+        "harv"
+      ],
+      "custom_units": [],
+      "available_production": []
+    },
+    {
+      "wall_seconds": 80.3,
+      "tick": 2730,
+      "cash": 17531,
+      "power": [
+        100,
+        30
+      ],
+      "buildings": [
+        "fact",
+        "powr",
+        "proc"
+      ],
+      "units": [
+        "harv"
+      ],
+      "custom_units": [],
+      "available_production": []
+    },
+    {
+      "wall_seconds": 85.3,
+      "tick": 2860,
+      "cash": 17531,
+      "power": [
+        100,
+        30
+      ],
+      "buildings": [
+        "fact",
+        "powr",
+        "proc"
+      ],
+      "units": [
+        "harv"
+      ],
+      "custom_units": [],
+      "available_production": []
+    },
+    {
+      "wall_seconds": 90.3,
+      "tick": 2980,
+      "cash": 17531,
+      "power": [
+        100,
+        30
+      ],
+      "buildings": [
+        "fact",
+        "powr",
+        "proc"
+      ],
+      "units": [
+        "harv"
+      ],
+      "custom_units": [],
+      "available_production": []
+    },
+    {
+      "wall_seconds": 95.4,
+      "tick": 3110,
+      "cash": 17405,
+      "power": [
+        100,
+        30
+      ],
+      "buildings": [
+        "fact",
+        "powr",
+        "proc"
+      ],
+      "units": [
+        "harv"
+      ],
+      "custom_units": [],
+      "available_production": []
+    },
+    {
+      "wall_seconds": 100.4,
+      "tick": 3240,
+      "cash": 17405,
+      "power": [
+        100,
+        60
+      ],
+      "buildings": [
+        "fact",
+        "powr",
+        "proc",
+        "weap"
+      ],
+      "units": [
+        "harv"
+      ],
+      "custom_units": [],
+      "available_production": []
+    },
+    {
+      "wall_seconds": 105.4,
+      "tick": 3360,
+      "cash": 17261,
+      "power": [
+        100,
+        60
+      ],
+      "buildings": [
+        "fact",
+        "powr",
+        "proc",
+        "weap"
+      ],
+      "units": [
+        "harv"
+      ],
+      "custom_units": [],
+      "available_production": []
+    },
+    {
+      "wall_seconds": 110.4,
+      "tick": 3490,
+      "cash": 16827,
+      "power": [
+        100,
+        60
+      ],
+      "buildings": [
+        "fact",
+        "powr",
+        "proc",
+        "weap"
+      ],
+      "units": [
+        "harv"
+      ],
+      "custom_units": [],
+      "available_production": []
+    },
+    {
+      "wall_seconds": 115.4,
+      "tick": 3610,
+      "cash": 16545,
+      "power": [
+        100,
+        60
+      ],
+      "buildings": [
+        "fact",
+        "powr",
+        "proc",
+        "weap"
+      ],
+      "units": [
+        "harv"
+      ],
+      "custom_units": [],
+      "available_production": []
+    },
+    {
+      "wall_seconds": 120.5,
+      "tick": 3740,
+      "cash": 16500,
+      "power": [
+        100,
+        60
+      ],
+      "buildings": [
+        "fact",
+        "powr",
+        "proc",
+        "weap"
+      ],
+      "units": [
+        "aras8",
+        "harv"
+      ],
+      "custom_units": [
+        "aras8"
+      ],
+      "available_production": []
+    }
+  ],
+  "checks": {
+    "turkey_faction": true,
+    "delegation_accepted": true,
+    "ticks_advanced": true,
+    "construction": true,
+    "economy": true,
+    "production_structure": true,
+    "turkey_unit_produced": true
+  },
+  "screenshot": {
+    "path": "C:\\Users\\Admin\\Code\\hq\\games\\OpenRA-AI-turkey\\artifacts\\turkey-faction\\turkey-ai-progression.png",
+    "tick": 3743,
+    "width": 1280,
+    "height": 720,
+    "scope": "rendered-player-viewport-fog-respecting"
+  },
+  "passed": true
+}
