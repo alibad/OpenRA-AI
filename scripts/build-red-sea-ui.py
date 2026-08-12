@@ -58,6 +58,20 @@ def draw_turkey_flag(draw: ImageDraw.ImageDraw, scale: int) -> None:
     draw.polygon(points, fill=(255, 255, 255, 255))
 
 
+def draw_iran_flag(draw: ImageDraw.ImageDraw, scale: int) -> None:
+    """Draw a legible 30x15 selector flag without microtext."""
+
+    x, y, width, band = 226 * scale, 33 * scale, 30 * scale, 5 * scale
+    draw.rectangle((x, y, x + width - 1, y + band - 1), fill=(35, 159, 64, 255))
+    draw.rectangle((x, y + band, x + width - 1, y + 2 * band - 1), fill=(255, 255, 255, 255))
+    draw.rectangle((x, y + 2 * band, x + width - 1, y + 3 * band - 1), fill=(218, 34, 46, 255))
+    # Abstract the central emblem at the same pixel density as stock flags.
+    cx, cy = x + 15 * scale, y + 7 * scale
+    stroke = max(1, scale)
+    draw.ellipse((cx - 2 * scale, cy - 2 * scale, cx + 2 * scale, cy + 2 * scale), outline=(206, 26, 42, 255), width=stroke)
+    draw.line((cx, cy - 3 * scale, cx, cy + 3 * scale), fill=(206, 26, 42, 255), width=stroke)
+
+
 def build_density(scale: int) -> Path:
     suffix = "" if scale == 1 else f"-{scale}x"
     source = UIBITS / f"glyphs{suffix}.png"
@@ -74,6 +88,7 @@ def build_density(scale: int) -> Path:
     draw_saudi_flag(draw, scale)
     draw_yemen_flag(draw, scale)
     draw_turkey_flag(draw, scale)
+    draw_iran_flag(draw, scale)
     atlas.save(output, optimize=True)
     return output
 

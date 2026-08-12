@@ -1,0 +1,2770 @@
+{
+  "schema": "openra-ai.iran-live-validation/v1",
+  "captured_at": "2026-08-12T09:55:08+03:00",
+  "bridge": "127.0.0.1:10018",
+  "checks": {
+    "live_headings": {
+      "ground_vehicle": {
+        "kind": "irkarr",
+        "destinations": [
+          [
+            69,
+            80
+          ],
+          [
+            70,
+            84
+          ],
+          [
+            66,
+            86
+          ],
+          [
+            62,
+            82
+          ]
+        ],
+        "distinct_facings": [
+          128,
+          144,
+          264,
+          272,
+          286,
+          299,
+          336,
+          344,
+          359,
+          371,
+          384,
+          472,
+          512,
+          527,
+          535,
+          600,
+          608,
+          640,
+          671,
+          708,
+          744,
+          768
+        ],
+        "samples": [
+          {
+            "tick": 150,
+            "cell": [
+              66,
+              78
+            ],
+            "facing": 512,
+            "activity": "",
+            "target": [
+              69,
+              80
+            ]
+          },
+          {
+            "tick": 160,
+            "cell": [
+              66,
+              78
+            ],
+            "facing": 512,
+            "activity": "",
+            "target": [
+              69,
+              80
+            ]
+          },
+          {
+            "tick": 170,
+            "cell": [
+              66,
+              78
+            ],
+            "facing": 640,
+            "activity": "Move",
+            "target": [
+              69,
+              80
+            ]
+          },
+          {
+            "tick": 180,
+            "cell": [
+              66,
+              78
+            ],
+            "facing": 640,
+            "activity": "Move",
+            "target": [
+              69,
+              80
+            ]
+          },
+          {
+            "tick": 190,
+            "cell": [
+              67,
+              79
+            ],
+            "facing": 640,
+            "activity": "Move",
+            "target": [
+              69,
+              80
+            ]
+          },
+          {
+            "tick": 200,
+            "cell": [
+              67,
+              79
+            ],
+            "facing": 640,
+            "activity": "Move",
+            "target": [
+              69,
+              80
+            ]
+          },
+          {
+            "tick": 210,
+            "cell": [
+              68,
+              80
+            ],
+            "facing": 671,
+            "activity": "Move",
+            "target": [
+              69,
+              80
+            ]
+          },
+          {
+            "tick": 220,
+            "cell": [
+              68,
+              80
+            ],
+            "facing": 744,
+            "activity": "Move",
+            "target": [
+              69,
+              80
+            ]
+          },
+          {
+            "tick": 230,
+            "cell": [
+              69,
+              80
+            ],
+            "facing": 768,
+            "activity": "Move",
+            "target": [
+              69,
+              80
+            ]
+          },
+          {
+            "tick": 230,
+            "cell": [
+              69,
+              80
+            ],
+            "facing": 768,
+            "activity": "Move",
+            "target": [
+              70,
+              84
+            ]
+          },
+          {
+            "tick": 240,
+            "cell": [
+              69,
+              80
+            ],
+            "facing": 708,
+            "activity": "Move",
+            "target": [
+              70,
+              84
+            ]
+          },
+          {
+            "tick": 250,
+            "cell": [
+              69,
+              80
+            ],
+            "facing": 512,
+            "activity": "Move",
+            "target": [
+              70,
+              84
+            ]
+          },
+          {
+            "tick": 260,
+            "cell": [
+              69,
+              81
+            ],
+            "facing": 527,
+            "activity": "Move",
+            "target": [
+              70,
+              84
+            ]
+          },
+          {
+            "tick": 270,
+            "cell": [
+              69,
+              81
+            ],
+            "facing": 600,
+            "activity": "Move",
+            "target": [
+              70,
+              84
+            ]
+          },
+          {
+            "tick": 280,
+            "cell": [
+              70,
+              82
+            ],
+            "facing": 608,
+            "activity": "Move",
+            "target": [
+              70,
+              84
+            ]
+          },
+          {
+            "tick": 290,
+            "cell": [
+              70,
+              82
+            ],
+            "facing": 535,
+            "activity": "Move",
+            "target": [
+              70,
+              84
+            ]
+          },
+          {
+            "tick": 300,
+            "cell": [
+              70,
+              83
+            ],
+            "facing": 512,
+            "activity": "Move",
+            "target": [
+              70,
+              84
+            ]
+          },
+          {
+            "tick": 310,
+            "cell": [
+              70,
+              84
+            ],
+            "facing": 512,
+            "activity": "Move",
+            "target": [
+              70,
+              84
+            ]
+          },
+          {
+            "tick": 310,
+            "cell": [
+              70,
+              84
+            ],
+            "facing": 512,
+            "activity": "Move",
+            "target": [
+              66,
+              86
+            ]
+          },
+          {
+            "tick": 320,
+            "cell": [
+              70,
+              84
+            ],
+            "facing": 472,
+            "activity": "Move",
+            "target": [
+              66,
+              86
+            ]
+          },
+          {
+            "tick": 330,
+            "cell": [
+              70,
+              84
+            ],
+            "facing": 272,
+            "activity": "Move",
+            "target": [
+              66,
+              86
+            ]
+          },
+          {
+            "tick": 340,
+            "cell": [
+              69,
+              84
+            ],
+            "facing": 264,
+            "activity": "Move",
+            "target": [
+              66,
+              86
+            ]
+          },
+          {
+            "tick": 350,
+            "cell": [
+              69,
+              84
+            ],
+            "facing": 336,
+            "activity": "Move",
+            "target": [
+              66,
+              86
+            ]
+          },
+          {
+            "tick": 360,
+            "cell": [
+              68,
+              85
+            ],
+            "facing": 359,
+            "activity": "Move",
+            "target": [
+              66,
+              86
+            ]
+          },
+          {
+            "tick": 370,
+            "cell": [
+              68,
+              85
+            ],
+            "facing": 286,
+            "activity": "Move",
+            "target": [
+              66,
+              86
+            ]
+          },
+          {
+            "tick": 380,
+            "cell": [
+              67,
+              85
+            ],
+            "facing": 299,
+            "activity": "Move",
+            "target": [
+              66,
+              86
+            ]
+          },
+          {
+            "tick": 390,
+            "cell": [
+              67,
+              85
+            ],
+            "facing": 371,
+            "activity": "Move",
+            "target": [
+              66,
+              86
+            ]
+          },
+          {
+            "tick": 400,
+            "cell": [
+              66,
+              86
+            ],
+            "facing": 384,
+            "activity": "Move",
+            "target": [
+              66,
+              86
+            ]
+          },
+          {
+            "tick": 400,
+            "cell": [
+              66,
+              86
+            ],
+            "facing": 384,
+            "activity": "Move",
+            "target": [
+              62,
+              82
+            ]
+          },
+          {
+            "tick": 410,
+            "cell": [
+              66,
+              86
+            ],
+            "facing": 344,
+            "activity": "Move",
+            "target": [
+              62,
+              82
+            ]
+          },
+          {
+            "tick": 420,
+            "cell": [
+              66,
+              86
+            ],
+            "facing": 144,
+            "activity": "Move",
+            "target": [
+              62,
+              82
+            ]
+          },
+          {
+            "tick": 430,
+            "cell": [
+              66,
+              86
+            ],
+            "facing": 128,
+            "activity": "Move",
+            "target": [
+              62,
+              82
+            ]
+          },
+          {
+            "tick": 440,
+            "cell": [
+              65,
+              85
+            ],
+            "facing": 128,
+            "activity": "Move",
+            "target": [
+              62,
+              82
+            ]
+          },
+          {
+            "tick": 450,
+            "cell": [
+              65,
+              85
+            ],
+            "facing": 128,
+            "activity": "Move",
+            "target": [
+              62,
+              82
+            ]
+          },
+          {
+            "tick": 460,
+            "cell": [
+              64,
+              84
+            ],
+            "facing": 128,
+            "activity": "Move",
+            "target": [
+              62,
+              82
+            ]
+          },
+          {
+            "tick": 470,
+            "cell": [
+              64,
+              84
+            ],
+            "facing": 128,
+            "activity": "Move",
+            "target": [
+              62,
+              82
+            ]
+          },
+          {
+            "tick": 480,
+            "cell": [
+              63,
+              83
+            ],
+            "facing": 128,
+            "activity": "Move",
+            "target": [
+              62,
+              82
+            ]
+          },
+          {
+            "tick": 490,
+            "cell": [
+              63,
+              83
+            ],
+            "facing": 128,
+            "activity": "Move",
+            "target": [
+              62,
+              82
+            ]
+          },
+          {
+            "tick": 500,
+            "cell": [
+              62,
+              82
+            ],
+            "facing": 128,
+            "activity": "Move",
+            "target": [
+              62,
+              82
+            ]
+          }
+        ],
+        "receipts": [
+          {
+            "request_id": "irkarr-heading-0",
+            "accepted": true,
+            "game_tick": 158,
+            "detail": "Queued 1 confirmed player order.",
+            "results": [
+              {
+                "action": "MOVE",
+                "accepted": true,
+                "detail": "Queued as a synchronized local-player order."
+              }
+            ]
+          },
+          {
+            "request_id": "irkarr-heading-1",
+            "accepted": true,
+            "game_tick": 233,
+            "detail": "Queued 1 confirmed player order.",
+            "results": [
+              {
+                "action": "MOVE",
+                "accepted": true,
+                "detail": "Queued as a synchronized local-player order."
+              }
+            ]
+          },
+          {
+            "request_id": "irkarr-heading-2",
+            "accepted": true,
+            "game_tick": 313,
+            "detail": "Queued 1 confirmed player order.",
+            "results": [
+              {
+                "action": "MOVE",
+                "accepted": true,
+                "detail": "Queued as a synchronized local-player order."
+              }
+            ]
+          },
+          {
+            "request_id": "irkarr-heading-3",
+            "accepted": true,
+            "game_tick": 404,
+            "detail": "Queued 1 confirmed player order.",
+            "results": [
+              {
+                "action": "MOVE",
+                "accepted": true,
+                "detail": "Queued as a synchronized local-player order."
+              }
+            ]
+          }
+        ]
+      },
+      "fixed_wing": {
+        "kind": "irazar",
+        "destinations": [
+          [
+            70,
+            80
+          ],
+          [
+            70,
+            88
+          ],
+          [
+            61,
+            89
+          ],
+          [
+            59,
+            80
+          ]
+        ],
+        "distinct_facings": [
+          92,
+          247,
+          250,
+          272,
+          423,
+          462,
+          530,
+          710,
+          779,
+          828,
+          936,
+          973,
+          976,
+          1008
+        ],
+        "samples": [
+          {
+            "tick": 500,
+            "cell": [
+              62,
+              85
+            ],
+            "facing": 936,
+            "activity": "FlyIdle",
+            "target": [
+              70,
+              80
+            ]
+          },
+          {
+            "tick": 510,
+            "cell": [
+              62,
+              82
+            ],
+            "facing": 1008,
+            "activity": "Fly",
+            "target": [
+              70,
+              80
+            ]
+          },
+          {
+            "tick": 520,
+            "cell": [
+              64,
+              81
+            ],
+            "facing": 828,
+            "activity": "Fly",
+            "target": [
+              70,
+              80
+            ]
+          },
+          {
+            "tick": 530,
+            "cell": [
+              66,
+              80
+            ],
+            "facing": 779,
+            "activity": "Fly",
+            "target": [
+              70,
+              80
+            ]
+          },
+          {
+            "tick": 540,
+            "cell": [
+              68,
+              80
+            ],
+            "facing": 779,
+            "activity": "Fly",
+            "target": [
+              70,
+              80
+            ]
+          },
+          {
+            "tick": 540,
+            "cell": [
+              68,
+              80
+            ],
+            "facing": 779,
+            "activity": "Fly",
+            "target": [
+              70,
+              88
+            ]
+          },
+          {
+            "tick": 550,
+            "cell": [
+              70,
+              80
+            ],
+            "facing": 710,
+            "activity": "Fly",
+            "target": [
+              70,
+              88
+            ]
+          },
+          {
+            "tick": 560,
+            "cell": [
+              72,
+              82
+            ],
+            "facing": 530,
+            "activity": "Fly",
+            "target": [
+              70,
+              88
+            ]
+          },
+          {
+            "tick": 570,
+            "cell": [
+              71,
+              84
+            ],
+            "facing": 462,
+            "activity": "Fly",
+            "target": [
+              70,
+              88
+            ]
+          },
+          {
+            "tick": 580,
+            "cell": [
+              71,
+              86
+            ],
+            "facing": 462,
+            "activity": "Fly",
+            "target": [
+              70,
+              88
+            ]
+          },
+          {
+            "tick": 580,
+            "cell": [
+              71,
+              86
+            ],
+            "facing": 462,
+            "activity": "Fly",
+            "target": [
+              61,
+              89
+            ]
+          },
+          {
+            "tick": 590,
+            "cell": [
+              70,
+              88
+            ],
+            "facing": 423,
+            "activity": "Fly",
+            "target": [
+              61,
+              89
+            ]
+          },
+          {
+            "tick": 600,
+            "cell": [
+              68,
+              89
+            ],
+            "facing": 250,
+            "activity": "Fly",
+            "target": [
+              61,
+              89
+            ]
+          },
+          {
+            "tick": 610,
+            "cell": [
+              66,
+              89
+            ],
+            "facing": 250,
+            "activity": "Fly",
+            "target": [
+              61,
+              89
+            ]
+          },
+          {
+            "tick": 620,
+            "cell": [
+              64,
+              89
+            ],
+            "facing": 247,
+            "activity": "Fly",
+            "target": [
+              61,
+              89
+            ]
+          },
+          {
+            "tick": 630,
+            "cell": [
+              61,
+              89
+            ],
+            "facing": 250,
+            "activity": "Fly",
+            "target": [
+              61,
+              89
+            ]
+          },
+          {
+            "tick": 630,
+            "cell": [
+              61,
+              89
+            ],
+            "facing": 250,
+            "activity": "Fly",
+            "target": [
+              59,
+              80
+            ]
+          },
+          {
+            "tick": 640,
+            "cell": [
+              59,
+              90
+            ],
+            "facing": 272,
+            "activity": "Fly",
+            "target": [
+              59,
+              80
+            ]
+          },
+          {
+            "tick": 650,
+            "cell": [
+              57,
+              89
+            ],
+            "facing": 92,
+            "activity": "Fly",
+            "target": [
+              59,
+              80
+            ]
+          },
+          {
+            "tick": 660,
+            "cell": [
+              57,
+              87
+            ],
+            "facing": 976,
+            "activity": "Fly",
+            "target": [
+              59,
+              80
+            ]
+          },
+          {
+            "tick": 670,
+            "cell": [
+              58,
+              84
+            ],
+            "facing": 976,
+            "activity": "Fly",
+            "target": [
+              59,
+              80
+            ]
+          },
+          {
+            "tick": 680,
+            "cell": [
+              58,
+              82
+            ],
+            "facing": 973,
+            "activity": "Fly",
+            "target": [
+              59,
+              80
+            ]
+          }
+        ],
+        "receipts": [
+          {
+            "request_id": "irazar-heading-0",
+            "accepted": true,
+            "game_tick": 502,
+            "detail": "Queued 1 confirmed player order.",
+            "results": [
+              {
+                "action": "MOVE",
+                "accepted": true,
+                "detail": "Queued as a synchronized local-player order."
+              }
+            ]
+          },
+          {
+            "request_id": "irazar-heading-1",
+            "accepted": true,
+            "game_tick": 542,
+            "detail": "Queued 1 confirmed player order.",
+            "results": [
+              {
+                "action": "MOVE",
+                "accepted": true,
+                "detail": "Queued as a synchronized local-player order."
+              }
+            ]
+          },
+          {
+            "request_id": "irazar-heading-2",
+            "accepted": true,
+            "game_tick": 583,
+            "detail": "Queued 1 confirmed player order.",
+            "results": [
+              {
+                "action": "MOVE",
+                "accepted": true,
+                "detail": "Queued as a synchronized local-player order."
+              }
+            ]
+          },
+          {
+            "request_id": "irazar-heading-3",
+            "accepted": true,
+            "game_tick": 633,
+            "detail": "Queued 1 confirmed player order.",
+            "results": [
+              {
+                "action": "MOVE",
+                "accepted": true,
+                "detail": "Queued as a synchronized local-player order."
+              }
+            ]
+          }
+        ]
+      },
+      "helicopter": {
+        "kind": "irtoufan",
+        "destinations": [
+          [
+            69,
+            82
+          ],
+          [
+            68,
+            89
+          ],
+          [
+            60,
+            89
+          ],
+          [
+            59,
+            82
+          ]
+        ],
+        "distinct_facings": [
+          24,
+          180,
+          256,
+          384,
+          431,
+          441,
+          489,
+          492,
+          561,
+          631,
+          751,
+          797,
+          802,
+          805
+        ],
+        "samples": [
+          {
+            "tick": 680,
+            "cell": [
+              63,
+              83
+            ],
+            "facing": 384,
+            "activity": "FlyIdle",
+            "target": [
+              69,
+              82
+            ]
+          },
+          {
+            "tick": 690,
+            "cell": [
+              63,
+              83
+            ],
+            "facing": 441,
+            "activity": "Fly",
+            "target": [
+              69,
+              82
+            ]
+          },
+          {
+            "tick": 700,
+            "cell": [
+              64,
+              83
+            ],
+            "facing": 631,
+            "activity": "Fly",
+            "target": [
+              69,
+              82
+            ]
+          },
+          {
+            "tick": 710,
+            "cell": [
+              65,
+              83
+            ],
+            "facing": 797,
+            "activity": "Fly",
+            "target": [
+              69,
+              82
+            ]
+          },
+          {
+            "tick": 720,
+            "cell": [
+              66,
+              83
+            ],
+            "facing": 797,
+            "activity": "Fly",
+            "target": [
+              69,
+              82
+            ]
+          },
+          {
+            "tick": 730,
+            "cell": [
+              67,
+              82
+            ],
+            "facing": 802,
+            "activity": "Fly",
+            "target": [
+              69,
+              82
+            ]
+          },
+          {
+            "tick": 740,
+            "cell": [
+              68,
+              82
+            ],
+            "facing": 805,
+            "activity": "Fly",
+            "target": [
+              69,
+              82
+            ]
+          },
+          {
+            "tick": 740,
+            "cell": [
+              68,
+              82
+            ],
+            "facing": 805,
+            "activity": "Fly",
+            "target": [
+              68,
+              89
+            ]
+          },
+          {
+            "tick": 750,
+            "cell": [
+              69,
+              82
+            ],
+            "facing": 751,
+            "activity": "Fly",
+            "target": [
+              68,
+              89
+            ]
+          },
+          {
+            "tick": 760,
+            "cell": [
+              69,
+              84
+            ],
+            "facing": 561,
+            "activity": "Fly",
+            "target": [
+              68,
+              89
+            ]
+          },
+          {
+            "tick": 770,
+            "cell": [
+              69,
+              85
+            ],
+            "facing": 489,
+            "activity": "Fly",
+            "target": [
+              68,
+              89
+            ]
+          },
+          {
+            "tick": 780,
+            "cell": [
+              68,
+              86
+            ],
+            "facing": 489,
+            "activity": "Fly",
+            "target": [
+              68,
+              89
+            ]
+          },
+          {
+            "tick": 790,
+            "cell": [
+              68,
+              87
+            ],
+            "facing": 489,
+            "activity": "Fly",
+            "target": [
+              68,
+              89
+            ]
+          },
+          {
+            "tick": 800,
+            "cell": [
+              68,
+              88
+            ],
+            "facing": 492,
+            "activity": "Fly",
+            "target": [
+              68,
+              89
+            ]
+          },
+          {
+            "tick": 800,
+            "cell": [
+              68,
+              88
+            ],
+            "facing": 492,
+            "activity": "Fly",
+            "target": [
+              60,
+              89
+            ]
+          },
+          {
+            "tick": 810,
+            "cell": [
+              68,
+              89
+            ],
+            "facing": 431,
+            "activity": "Fly",
+            "target": [
+              60,
+              89
+            ]
+          },
+          {
+            "tick": 820,
+            "cell": [
+              66,
+              89
+            ],
+            "facing": 256,
+            "activity": "Fly",
+            "target": [
+              60,
+              89
+            ]
+          },
+          {
+            "tick": 830,
+            "cell": [
+              65,
+              89
+            ],
+            "facing": 256,
+            "activity": "Fly",
+            "target": [
+              60,
+              89
+            ]
+          },
+          {
+            "tick": 840,
+            "cell": [
+              64,
+              89
+            ],
+            "facing": 256,
+            "activity": "Fly",
+            "target": [
+              60,
+              89
+            ]
+          },
+          {
+            "tick": 850,
+            "cell": [
+              63,
+              89
+            ],
+            "facing": 256,
+            "activity": "Fly",
+            "target": [
+              60,
+              89
+            ]
+          },
+          {
+            "tick": 860,
+            "cell": [
+              62,
+              89
+            ],
+            "facing": 256,
+            "activity": "Fly",
+            "target": [
+              60,
+              89
+            ]
+          },
+          {
+            "tick": 870,
+            "cell": [
+              60,
+              89
+            ],
+            "facing": 256,
+            "activity": "Fly",
+            "target": [
+              60,
+              89
+            ]
+          },
+          {
+            "tick": 870,
+            "cell": [
+              60,
+              89
+            ],
+            "facing": 256,
+            "activity": "Fly",
+            "target": [
+              59,
+              82
+            ]
+          },
+          {
+            "tick": 880,
+            "cell": [
+              60,
+              89
+            ],
+            "facing": 180,
+            "activity": "Fly",
+            "target": [
+              59,
+              82
+            ]
+          },
+          {
+            "tick": 890,
+            "cell": [
+              60,
+              87
+            ],
+            "facing": 24,
+            "activity": "Fly",
+            "target": [
+              59,
+              82
+            ]
+          },
+          {
+            "tick": 900,
+            "cell": [
+              60,
+              86
+            ],
+            "facing": 24,
+            "activity": "Fly",
+            "target": [
+              59,
+              82
+            ]
+          },
+          {
+            "tick": 910,
+            "cell": [
+              59,
+              85
+            ],
+            "facing": 24,
+            "activity": "Fly",
+            "target": [
+              59,
+              82
+            ]
+          },
+          {
+            "tick": 920,
+            "cell": [
+              59,
+              84
+            ],
+            "facing": 24,
+            "activity": "Fly",
+            "target": [
+              59,
+              82
+            ]
+          },
+          {
+            "tick": 930,
+            "cell": [
+              59,
+              83
+            ],
+            "facing": 24,
+            "activity": "Fly",
+            "target": [
+              59,
+              82
+            ]
+          }
+        ],
+        "receipts": [
+          {
+            "request_id": "irtoufan-heading-0",
+            "accepted": true,
+            "game_tick": 683,
+            "detail": "Queued 1 confirmed player order.",
+            "results": [
+              {
+                "action": "MOVE",
+                "accepted": true,
+                "detail": "Queued as a synchronized local-player order."
+              }
+            ]
+          },
+          {
+            "request_id": "irtoufan-heading-1",
+            "accepted": true,
+            "game_tick": 742,
+            "detail": "Queued 1 confirmed player order.",
+            "results": [
+              {
+                "action": "MOVE",
+                "accepted": true,
+                "detail": "Queued as a synchronized local-player order."
+              }
+            ]
+          },
+          {
+            "request_id": "irtoufan-heading-2",
+            "accepted": true,
+            "game_tick": 804,
+            "detail": "Queued 1 confirmed player order.",
+            "results": [
+              {
+                "action": "MOVE",
+                "accepted": true,
+                "detail": "Queued as a synchronized local-player order."
+              }
+            ]
+          },
+          {
+            "request_id": "irtoufan-heading-3",
+            "accepted": true,
+            "game_tick": 872,
+            "detail": "Queued 1 confirmed player order.",
+            "results": [
+              {
+                "action": "MOVE",
+                "accepted": true,
+                "detail": "Queued as a synchronized local-player order."
+              }
+            ]
+          }
+        ]
+      },
+      "ship": {
+        "kind": "irpey",
+        "destinations": [
+          [
+            37,
+            94
+          ],
+          [
+            39,
+            96
+          ],
+          [
+            39,
+            94
+          ],
+          [
+            37,
+            94
+          ]
+        ],
+        "distinct_facings": [
+          0,
+          90,
+          120,
+          256,
+          286,
+          586,
+          640,
+          700,
+          1000
+        ],
+        "samples": [
+          {
+            "tick": 930,
+            "cell": [
+              39,
+              94
+            ],
+            "facing": 0,
+            "activity": "",
+            "target": [
+              37,
+              94
+            ]
+          },
+          {
+            "tick": 940,
+            "cell": [
+              39,
+              94
+            ],
+            "facing": 120,
+            "activity": "Move",
+            "target": [
+              37,
+              94
+            ]
+          },
+          {
+            "tick": 950,
+            "cell": [
+              38,
+              94
+            ],
+            "facing": 256,
+            "activity": "Move",
+            "target": [
+              37,
+              94
+            ]
+          },
+          {
+            "tick": 960,
+            "cell": [
+              37,
+              94
+            ],
+            "facing": 256,
+            "activity": "Move",
+            "target": [
+              37,
+              94
+            ]
+          },
+          {
+            "tick": 960,
+            "cell": [
+              37,
+              94
+            ],
+            "facing": 256,
+            "activity": "Move",
+            "target": [
+              39,
+              96
+            ]
+          },
+          {
+            "tick": 970,
+            "cell": [
+              37,
+              94
+            ],
+            "facing": 286,
+            "activity": "Move",
+            "target": [
+              39,
+              96
+            ]
+          },
+          {
+            "tick": 980,
+            "cell": [
+              37,
+              94
+            ],
+            "facing": 586,
+            "activity": "Move",
+            "target": [
+              39,
+              96
+            ]
+          },
+          {
+            "tick": 990,
+            "cell": [
+              38,
+              95
+            ],
+            "facing": 640,
+            "activity": "Move",
+            "target": [
+              39,
+              96
+            ]
+          },
+          {
+            "tick": 1000,
+            "cell": [
+              39,
+              96
+            ],
+            "facing": 640,
+            "activity": "Move",
+            "target": [
+              39,
+              96
+            ]
+          },
+          {
+            "tick": 1000,
+            "cell": [
+              39,
+              96
+            ],
+            "facing": 640,
+            "activity": "Move",
+            "target": [
+              39,
+              94
+            ]
+          },
+          {
+            "tick": 1010,
+            "cell": [
+              39,
+              96
+            ],
+            "facing": 700,
+            "activity": "Move",
+            "target": [
+              39,
+              94
+            ]
+          },
+          {
+            "tick": 1020,
+            "cell": [
+              39,
+              96
+            ],
+            "facing": 1000,
+            "activity": "Move",
+            "target": [
+              39,
+              94
+            ]
+          },
+          {
+            "tick": 1030,
+            "cell": [
+              39,
+              95
+            ],
+            "facing": 0,
+            "activity": "Move",
+            "target": [
+              39,
+              94
+            ]
+          },
+          {
+            "tick": 1040,
+            "cell": [
+              39,
+              94
+            ],
+            "facing": 0,
+            "activity": "",
+            "target": [
+              39,
+              94
+            ]
+          },
+          {
+            "tick": 1040,
+            "cell": [
+              39,
+              94
+            ],
+            "facing": 0,
+            "activity": "",
+            "target": [
+              37,
+              94
+            ]
+          },
+          {
+            "tick": 1050,
+            "cell": [
+              39,
+              94
+            ],
+            "facing": 90,
+            "activity": "Move",
+            "target": [
+              37,
+              94
+            ]
+          },
+          {
+            "tick": 1060,
+            "cell": [
+              38,
+              94
+            ],
+            "facing": 256,
+            "activity": "Move",
+            "target": [
+              37,
+              94
+            ]
+          },
+          {
+            "tick": 1070,
+            "cell": [
+              37,
+              94
+            ],
+            "facing": 256,
+            "activity": "Move",
+            "target": [
+              37,
+              94
+            ]
+          }
+        ],
+        "receipts": [
+          {
+            "request_id": "irpey-heading-0",
+            "accepted": true,
+            "game_tick": 933,
+            "detail": "Queued 1 confirmed player order.",
+            "results": [
+              {
+                "action": "MOVE",
+                "accepted": true,
+                "detail": "Queued as a synchronized local-player order."
+              }
+            ]
+          },
+          {
+            "request_id": "irpey-heading-1",
+            "accepted": true,
+            "game_tick": 964,
+            "detail": "Queued 1 confirmed player order.",
+            "results": [
+              {
+                "action": "MOVE",
+                "accepted": true,
+                "detail": "Queued as a synchronized local-player order."
+              }
+            ]
+          },
+          {
+            "request_id": "irpey-heading-2",
+            "accepted": true,
+            "game_tick": 1004,
+            "detail": "Queued 1 confirmed player order.",
+            "results": [
+              {
+                "action": "MOVE",
+                "accepted": true,
+                "detail": "Queued as a synchronized local-player order."
+              }
+            ]
+          },
+          {
+            "request_id": "irpey-heading-3",
+            "accepted": true,
+            "game_tick": 1044,
+            "detail": "Queued 1 confirmed player order.",
+            "results": [
+              {
+                "action": "MOVE",
+                "accepted": true,
+                "detail": "Queued as a synchronized local-player order."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "atgm_setup_reload": {
+      "receipt": {
+        "request_id": "atgm-live-fire",
+        "accepted": true,
+        "game_tick": 1074,
+        "detail": "Queued 1 confirmed player order.",
+        "results": [
+          {
+            "action": "ATTACK",
+            "accepted": true,
+            "detail": "Queued as a synchronized local-player order."
+          }
+        ]
+      },
+      "target_hp_before": 1.0,
+      "target_hp_after": 0.793,
+      "reload_total_ticks": 128,
+      "reload_remaining_at_move_order": 123,
+      "cell_before_move_order": [
+        64,
+        79
+      ],
+      "cell_during_reload": [
+        64,
+        79
+      ],
+      "movement_paused": true
+    },
+    "tank_combat": {
+      "receipt": {
+        "request_id": "irkarr-attack-irantargettank",
+        "accepted": true,
+        "game_tick": 1173,
+        "detail": "Queued 1 confirmed player order.",
+        "results": [
+          {
+            "action": "ATTACK",
+            "accepted": true,
+            "detail": "Queued as a synchronized local-player order."
+          }
+        ]
+      },
+      "target_hp_before": 0.793,
+      "target_hp_after": 0.6181333
+    },
+    "shadow_one": {
+      "receipt": {
+        "request_id": "shadowone-sabotage",
+        "accepted": true,
+        "game_tick": 1304,
+        "detail": "Queued 1 confirmed player order.",
+        "results": [
+          {
+            "action": "ATTACK",
+            "accepted": true,
+            "detail": "Queued as a synchronized local-player order."
+          }
+        ]
+      },
+      "target_hp_before": 1.0,
+      "target_hp_after": 0.5125,
+      "can_demolish": true,
+      "valid_demolition_targets": [
+        22
+      ]
+    },
+    "loitering_munition": {
+      "receipt": {
+        "request_id": "loitering-munition-dive",
+        "accepted": true,
+        "game_tick": 1415,
+        "detail": "Queued 1 confirmed player order.",
+        "results": [
+          {
+            "action": "ATTACK",
+            "accepted": true,
+            "detail": "Queued as a synchronized local-player order."
+          }
+        ]
+      },
+      "actor_consumed": true,
+      "target_hp_before": 0.6181333,
+      "target_hp_after": 0.46213335
+    },
+    "naval_combat": {
+      "peykaap": {
+        "receipt": {
+          "request_id": "irpey-attack-irantargetpt",
+          "accepted": true,
+          "game_tick": 1491,
+          "detail": "Queued 1 confirmed player order.",
+          "results": [
+            {
+              "action": "ATTACK",
+              "accepted": true,
+              "detail": "Queued as a synchronized local-player order."
+            }
+          ]
+        },
+        "target_hp_before": 1.0,
+        "target_hp_after": 0.8824
+      },
+      "ghadir": {
+        "receipt": {
+          "request_id": "irghadir-attack-irantargetpt",
+          "accepted": true,
+          "game_tick": 1553,
+          "detail": "Queued 1 confirmed player order.",
+          "results": [
+            {
+              "action": "ATTACK",
+              "accepted": true,
+              "detail": "Queued as a synchronized local-player order."
+            }
+          ]
+        },
+        "target_hp_before": 0.8824,
+        "target_hp_after_first_impact": 0.729,
+        "target_hp_after_burst_settled": 0.5756
+      },
+      "target_survived": true
+    }
+  },
+  "runtime": {
+    "map": "Iran Doctrine Range",
+    "tick": 150,
+    "phase": "playing",
+    "player_faction": "iran",
+    "enemy_faction": "iran",
+    "cash": 5000,
+    "explored_percent": 5.93,
+    "roster": [
+      {
+        "actor_id": 6,
+        "kind": "irbas",
+        "cell_x": 62,
+        "cell_y": 78,
+        "hp_percent": 1.0,
+        "idle": true,
+        "can_attack": true,
+        "current_activity": "",
+        "owner": "Multi0",
+        "ammo": -1,
+        "facing": 0,
+        "experience_level": 0,
+        "stance": 0,
+        "speed": 58,
+        "attack_range": 4352,
+        "minimum_attack_range": 0,
+        "armor_type": "None",
+        "target_types": [
+          "GroundActor",
+          "Infantry",
+          "Disguise"
+        ],
+        "cost": 70,
+        "reload_remaining_ticks": 0,
+        "reload_total_ticks": 36,
+        "weapon": "IranBasijRifle",
+        "burst": 1,
+        "current_target_actor_id": 0,
+        "move_target_x": 62,
+        "move_target_y": 78,
+        "can_target_air": false,
+        "can_target_ground": true,
+        "last_seen_tick": 150,
+        "passenger_count": -1,
+        "is_building": false,
+        "is_producing": false,
+        "production_progress": 0.0,
+        "producing_item": "",
+        "powered": true,
+        "repairing": false,
+        "sell_value": 0,
+        "rally_x": -1,
+        "rally_y": -1,
+        "power_amount": 0,
+        "can_produce": [],
+        "is_disguised": false,
+        "disguise_owner": "",
+        "can_disguise": false,
+        "can_infiltrate": false,
+        "valid_disguise_targets": [],
+        "valid_infiltration_targets": [],
+        "detects_disguise": false,
+        "can_demolish": false,
+        "valid_demolition_targets": [],
+        "can_capture": false,
+        "valid_capture_targets": []
+      },
+      {
+        "actor_id": 7,
+        "kind": "iratgm",
+        "cell_x": 63,
+        "cell_y": 80,
+        "hp_percent": 1.0,
+        "idle": true,
+        "can_attack": true,
+        "current_activity": "",
+        "owner": "Multi0",
+        "ammo": -1,
+        "facing": 128,
+        "experience_level": 0,
+        "stance": 0,
+        "speed": 46,
+        "attack_range": 8960,
+        "minimum_attack_range": 2304,
+        "armor_type": "None",
+        "target_types": [
+          "GroundActor",
+          "Infantry",
+          "Disguise"
+        ],
+        "cost": 475,
+        "reload_remaining_ticks": 0,
+        "reload_total_ticks": 128,
+        "weapon": "IranATGM",
+        "burst": 1,
+        "current_target_actor_id": 0,
+        "move_target_x": 63,
+        "move_target_y": 80,
+        "can_target_air": false,
+        "can_target_ground": true,
+        "last_seen_tick": 150,
+        "passenger_count": -1,
+        "is_building": false,
+        "is_producing": false,
+        "production_progress": 0.0,
+        "producing_item": "",
+        "powered": true,
+        "repairing": false,
+        "sell_value": 0,
+        "rally_x": -1,
+        "rally_y": -1,
+        "power_amount": 0,
+        "can_produce": [],
+        "is_disguised": false,
+        "disguise_owner": "",
+        "can_disguise": false,
+        "can_infiltrate": false,
+        "valid_disguise_targets": [],
+        "valid_infiltration_targets": [],
+        "detects_disguise": false,
+        "can_demolish": false,
+        "valid_demolition_targets": [],
+        "can_capture": false,
+        "valid_capture_targets": []
+      },
+      {
+        "actor_id": 8,
+        "kind": "irdc",
+        "cell_x": 64,
+        "cell_y": 78,
+        "hp_percent": 1.0,
+        "idle": true,
+        "can_attack": true,
+        "current_activity": "",
+        "owner": "Multi0",
+        "ammo": -1,
+        "facing": 256,
+        "experience_level": 0,
+        "stance": 0,
+        "speed": 54,
+        "attack_range": 4096,
+        "minimum_attack_range": 0,
+        "armor_type": "None",
+        "target_types": [
+          "GroundActor",
+          "Infantry",
+          "Disguise"
+        ],
+        "cost": 550,
+        "reload_remaining_ticks": 0,
+        "reload_total_ticks": 46,
+        "weapon": "IranControllerCarbine",
+        "burst": 1,
+        "current_target_actor_id": 0,
+        "move_target_x": 64,
+        "move_target_y": 78,
+        "can_target_air": false,
+        "can_target_ground": true,
+        "last_seen_tick": 150,
+        "passenger_count": -1,
+        "is_building": false,
+        "is_producing": false,
+        "production_progress": 0.0,
+        "producing_item": "",
+        "powered": true,
+        "repairing": false,
+        "sell_value": 0,
+        "rally_x": -1,
+        "rally_y": -1,
+        "power_amount": 0,
+        "can_produce": [],
+        "is_disguised": false,
+        "disguise_owner": "",
+        "can_disguise": false,
+        "can_infiltrate": false,
+        "valid_disguise_targets": [],
+        "valid_infiltration_targets": [],
+        "detects_disguise": false,
+        "can_demolish": false,
+        "valid_demolition_targets": [],
+        "can_capture": false,
+        "valid_capture_targets": []
+      },
+      {
+        "actor_id": 9,
+        "kind": "shadowone",
+        "cell_x": 65,
+        "cell_y": 80,
+        "hp_percent": 1.0,
+        "idle": true,
+        "can_attack": true,
+        "current_activity": "",
+        "owner": "Multi0",
+        "ammo": -1,
+        "facing": 384,
+        "experience_level": 0,
+        "stance": 0,
+        "speed": 74,
+        "attack_range": 5120,
+        "minimum_attack_range": 0,
+        "armor_type": "None",
+        "target_types": [
+          "GroundActor",
+          "Infantry",
+          "Disguise"
+        ],
+        "cost": 1900,
+        "reload_remaining_ticks": 0,
+        "reload_total_ticks": 18,
+        "weapon": "IranShadowSMG",
+        "burst": 3,
+        "current_target_actor_id": 0,
+        "move_target_x": 65,
+        "move_target_y": 80,
+        "can_target_air": false,
+        "can_target_ground": true,
+        "last_seen_tick": 150,
+        "passenger_count": -1,
+        "is_building": false,
+        "is_producing": false,
+        "production_progress": 0.0,
+        "producing_item": "",
+        "powered": true,
+        "repairing": false,
+        "sell_value": 0,
+        "rally_x": -1,
+        "rally_y": -1,
+        "power_amount": 0,
+        "can_produce": [],
+        "is_disguised": false,
+        "disguise_owner": "",
+        "can_disguise": false,
+        "can_infiltrate": false,
+        "valid_disguise_targets": [],
+        "valid_infiltration_targets": [],
+        "detects_disguise": false,
+        "can_demolish": true,
+        "valid_demolition_targets": [
+          22
+        ],
+        "can_capture": false,
+        "valid_capture_targets": []
+      },
+      {
+        "actor_id": 10,
+        "kind": "irkarr",
+        "cell_x": 66,
+        "cell_y": 78,
+        "hp_percent": 1.0,
+        "idle": true,
+        "can_attack": true,
+        "current_activity": "",
+        "owner": "Multi0",
+        "ammo": -1,
+        "facing": 512,
+        "experience_level": 0,
+        "stance": 0,
+        "speed": 65,
+        "attack_range": 6400,
+        "minimum_attack_range": 0,
+        "armor_type": "Heavy",
+        "target_types": [
+          "GroundActor",
+          "Vehicle"
+        ],
+        "cost": 1350,
+        "reload_remaining_ticks": 0,
+        "reload_total_ticks": 76,
+        "weapon": "IranKarrar125mm",
+        "burst": 1,
+        "current_target_actor_id": 0,
+        "move_target_x": 66,
+        "move_target_y": 78,
+        "can_target_air": false,
+        "can_target_ground": true,
+        "last_seen_tick": 150,
+        "passenger_count": -1,
+        "is_building": false,
+        "is_producing": false,
+        "production_progress": 0.0,
+        "producing_item": "",
+        "powered": true,
+        "repairing": false,
+        "sell_value": 0,
+        "rally_x": -1,
+        "rally_y": -1,
+        "power_amount": 0,
+        "can_produce": [],
+        "is_disguised": false,
+        "disguise_owner": "",
+        "can_disguise": false,
+        "can_infiltrate": false,
+        "valid_disguise_targets": [],
+        "valid_infiltration_targets": [],
+        "detects_disguise": false,
+        "can_demolish": false,
+        "valid_demolition_targets": [],
+        "can_capture": false,
+        "valid_capture_targets": []
+      },
+      {
+        "actor_id": 11,
+        "kind": "irraad",
+        "cell_x": 67,
+        "cell_y": 80,
+        "hp_percent": 1.0,
+        "idle": true,
+        "can_attack": true,
+        "current_activity": "",
+        "owner": "Multi0",
+        "ammo": -1,
+        "facing": 640,
+        "experience_level": 0,
+        "stance": 0,
+        "speed": 90,
+        "attack_range": 9216,
+        "minimum_attack_range": 512,
+        "armor_type": "Light",
+        "target_types": [
+          "GroundActor",
+          "Vehicle"
+        ],
+        "cost": 950,
+        "reload_remaining_ticks": 0,
+        "reload_total_ticks": 44,
+        "weapon": "IranRaadMissile",
+        "burst": 1,
+        "current_target_actor_id": 0,
+        "move_target_x": 67,
+        "move_target_y": 80,
+        "can_target_air": false,
+        "can_target_ground": false,
+        "last_seen_tick": 150,
+        "passenger_count": -1,
+        "is_building": false,
+        "is_producing": false,
+        "production_progress": 0.0,
+        "producing_item": "",
+        "powered": true,
+        "repairing": false,
+        "sell_value": 0,
+        "rally_x": -1,
+        "rally_y": -1,
+        "power_amount": 0,
+        "can_produce": [],
+        "is_disguised": false,
+        "disguise_owner": "",
+        "can_disguise": false,
+        "can_infiltrate": false,
+        "valid_disguise_targets": [],
+        "valid_infiltration_targets": [],
+        "detects_disguise": false,
+        "can_demolish": false,
+        "valid_demolition_targets": [],
+        "can_capture": false,
+        "valid_capture_targets": []
+      },
+      {
+        "actor_id": 12,
+        "kind": "irfajr",
+        "cell_x": 64,
+        "cell_y": 82,
+        "hp_percent": 1.0,
+        "idle": true,
+        "can_attack": true,
+        "current_activity": "",
+        "owner": "Multi0",
+        "ammo": -1,
+        "facing": 768,
+        "experience_level": 0,
+        "stance": 0,
+        "speed": 76,
+        "attack_range": 10240,
+        "minimum_attack_range": 3072,
+        "armor_type": "Light",
+        "target_types": [
+          "GroundActor",
+          "Vehicle"
+        ],
+        "cost": 1050,
+        "reload_remaining_ticks": 0,
+        "reload_total_ticks": 165,
+        "weapon": "IranFajrRocket",
+        "burst": 1,
+        "current_target_actor_id": 0,
+        "move_target_x": 64,
+        "move_target_y": 82,
+        "can_target_air": false,
+        "can_target_ground": true,
+        "last_seen_tick": 150,
+        "passenger_count": -1,
+        "is_building": false,
+        "is_producing": false,
+        "production_progress": 0.0,
+        "producing_item": "",
+        "powered": true,
+        "repairing": false,
+        "sell_value": 0,
+        "rally_x": -1,
+        "rally_y": -1,
+        "power_amount": 0,
+        "can_produce": [],
+        "is_disguised": false,
+        "disguise_owner": "",
+        "can_disguise": false,
+        "can_infiltrate": false,
+        "valid_disguise_targets": [],
+        "valid_infiltration_targets": [],
+        "detects_disguise": false,
+        "can_demolish": false,
+        "valid_demolition_targets": [],
+        "can_capture": false,
+        "valid_capture_targets": []
+      },
+      {
+        "actor_id": 13,
+        "kind": "ircoast",
+        "cell_x": 48,
+        "cell_y": 90,
+        "hp_percent": 1.0,
+        "idle": true,
+        "can_attack": true,
+        "current_activity": "",
+        "owner": "Multi0",
+        "ammo": -1,
+        "facing": 896,
+        "experience_level": 0,
+        "stance": 0,
+        "speed": 70,
+        "attack_range": 12288,
+        "minimum_attack_range": 4096,
+        "armor_type": "Light",
+        "target_types": [
+          "GroundActor",
+          "Vehicle"
+        ],
+        "cost": 1250,
+        "reload_remaining_ticks": 0,
+        "reload_total_ticks": 138,
+        "weapon": "IranCoastalMissile",
+        "burst": 1,
+        "current_target_actor_id": 0,
+        "move_target_x": 48,
+        "move_target_y": 90,
+        "can_target_air": false,
+        "can_target_ground": false,
+        "last_seen_tick": 150,
+        "passenger_count": -1,
+        "is_building": false,
+        "is_producing": false,
+        "production_progress": 0.0,
+        "producing_item": "",
+        "powered": true,
+        "repairing": false,
+        "sell_value": 0,
+        "rally_x": -1,
+        "rally_y": -1,
+        "power_amount": 0,
+        "can_produce": [],
+        "is_disguised": false,
+        "disguise_owner": "",
+        "can_disguise": false,
+        "can_infiltrate": false,
+        "valid_disguise_targets": [],
+        "valid_infiltration_targets": [],
+        "detects_disguise": false,
+        "can_demolish": false,
+        "valid_demolition_targets": [],
+        "can_capture": false,
+        "valid_capture_targets": []
+      },
+      {
+        "actor_id": 14,
+        "kind": "irazar",
+        "cell_x": 61,
+        "cell_y": 85,
+        "hp_percent": 1.0,
+        "idle": false,
+        "can_attack": true,
+        "current_activity": "FlyIdle",
+        "owner": "Multi0",
+        "ammo": 16,
+        "facing": 780,
+        "experience_level": 0,
+        "stance": 0,
+        "speed": 0,
+        "attack_range": 8704,
+        "minimum_attack_range": 2048,
+        "armor_type": "Light",
+        "target_types": [
+          "AirborneActor"
+        ],
+        "cost": 2050,
+        "reload_remaining_ticks": 0,
+        "reload_total_ticks": 48,
+        "weapon": "IranAzarAAM",
+        "burst": 1,
+        "current_target_actor_id": 0,
+        "move_target_x": -1,
+        "move_target_y": -1,
+        "can_target_air": false,
+        "can_target_ground": false,
+        "last_seen_tick": 150,
+        "passenger_count": -1,
+        "is_building": false,
+        "is_producing": false,
+        "production_progress": 0.0,
+        "producing_item": "",
+        "powered": true,
+        "repairing": false,
+        "sell_value": 0,
+        "rally_x": -1,
+        "rally_y": -1,
+        "power_amount": 0,
+        "can_produce": [],
+        "is_disguised": false,
+        "disguise_owner": "",
+        "can_disguise": false,
+        "can_infiltrate": false,
+        "valid_disguise_targets": [],
+        "valid_infiltration_targets": [],
+        "detects_disguise": false,
+        "can_demolish": false,
+        "valid_demolition_targets": [],
+        "can_capture": false,
+        "valid_capture_targets": []
+      },
+      {
+        "actor_id": 15,
+        "kind": "irtoufan",
+        "cell_x": 63,
+        "cell_y": 83,
+        "hp_percent": 1.0,
+        "idle": false,
+        "can_attack": true,
+        "current_activity": "FlyIdle",
+        "owner": "Multi0",
+        "ammo": 30,
+        "facing": 384,
+        "experience_level": 0,
+        "stance": 0,
+        "speed": 0,
+        "attack_range": 6144,
+        "minimum_attack_range": 768,
+        "armor_type": "Light",
+        "target_types": [
+          "AirborneActor"
+        ],
+        "cost": 1700,
+        "reload_remaining_ticks": 0,
+        "reload_total_ticks": 12,
+        "weapon": "IranToufanCannon",
+        "burst": 4,
+        "current_target_actor_id": 0,
+        "move_target_x": -1,
+        "move_target_y": -1,
+        "can_target_air": false,
+        "can_target_ground": true,
+        "last_seen_tick": 150,
+        "passenger_count": -1,
+        "is_building": false,
+        "is_producing": false,
+        "production_progress": 0.0,
+        "producing_item": "",
+        "powered": true,
+        "repairing": false,
+        "sell_value": 0,
+        "rally_x": -1,
+        "rally_y": -1,
+        "power_amount": 0,
+        "can_produce": [],
+        "is_disguised": false,
+        "disguise_owner": "",
+        "can_disguise": false,
+        "can_infiltrate": false,
+        "valid_disguise_targets": [],
+        "valid_infiltration_targets": [],
+        "detects_disguise": false,
+        "can_demolish": false,
+        "valid_demolition_targets": [],
+        "can_capture": false,
+        "valid_capture_targets": []
+      },
+      {
+        "actor_id": 16,
+        "kind": "irmohajer",
+        "cell_x": 68,
+        "cell_y": 82,
+        "hp_percent": 1.0,
+        "idle": false,
+        "can_attack": true,
+        "current_activity": "FlyIdle",
+        "owner": "Multi0",
+        "ammo": 4,
+        "facing": 992,
+        "experience_level": 0,
+        "stance": 0,
+        "speed": 0,
+        "attack_range": 7168,
+        "minimum_attack_range": 1536,
+        "armor_type": "Light",
+        "target_types": [
+          "AirborneActor"
+        ],
+        "cost": 850,
+        "reload_remaining_ticks": 0,
+        "reload_total_ticks": 62,
+        "weapon": "IranMohajerStrike",
+        "burst": 1,
+        "current_target_actor_id": 0,
+        "move_target_x": -1,
+        "move_target_y": -1,
+        "can_target_air": false,
+        "can_target_ground": false,
+        "last_seen_tick": 150,
+        "passenger_count": -1,
+        "is_building": false,
+        "is_producing": false,
+        "production_progress": 0.0,
+        "producing_item": "",
+        "powered": true,
+        "repairing": false,
+        "sell_value": 0,
+        "rally_x": -1,
+        "rally_y": -1,
+        "power_amount": 0,
+        "can_produce": [],
+        "is_disguised": false,
+        "disguise_owner": "",
+        "can_disguise": false,
+        "can_infiltrate": false,
+        "valid_disguise_targets": [],
+        "valid_infiltration_targets": [],
+        "detects_disguise": false,
+        "can_demolish": false,
+        "valid_demolition_targets": [],
+        "can_capture": false,
+        "valid_capture_targets": []
+      },
+      {
+        "actor_id": 17,
+        "kind": "irloiter",
+        "cell_x": 66,
+        "cell_y": 83,
+        "hp_percent": 1.0,
+        "idle": false,
+        "can_attack": true,
+        "current_activity": "FlyIdle",
+        "owner": "Multi0",
+        "ammo": 1,
+        "facing": 798,
+        "experience_level": 0,
+        "stance": 0,
+        "speed": 0,
+        "attack_range": 256,
+        "minimum_attack_range": 0,
+        "armor_type": "Light",
+        "target_types": [
+          "AirborneActor"
+        ],
+        "cost": 600,
+        "reload_remaining_ticks": 0,
+        "reload_total_ticks": 1,
+        "weapon": "IranLoiterImpact",
+        "burst": 1,
+        "current_target_actor_id": 0,
+        "move_target_x": -1,
+        "move_target_y": -1,
+        "can_target_air": false,
+        "can_target_ground": true,
+        "last_seen_tick": 150,
+        "passenger_count": -1,
+        "is_building": false,
+        "is_producing": false,
+        "production_progress": 0.0,
+        "producing_item": "",
+        "powered": true,
+        "repairing": false,
+        "sell_value": 0,
+        "rally_x": -1,
+        "rally_y": -1,
+        "power_amount": 0,
+        "can_produce": [],
+        "is_disguised": false,
+        "disguise_owner": "",
+        "can_disguise": false,
+        "can_infiltrate": false,
+        "valid_disguise_targets": [],
+        "valid_infiltration_targets": [],
+        "detects_disguise": false,
+        "can_demolish": false,
+        "valid_demolition_targets": [],
+        "can_capture": false,
+        "valid_capture_targets": []
+      },
+      {
+        "actor_id": 18,
+        "kind": "irpey",
+        "cell_x": 39,
+        "cell_y": 94,
+        "hp_percent": 1.0,
+        "idle": true,
+        "can_attack": true,
+        "current_activity": "",
+        "owner": "Multi0",
+        "ammo": -1,
+        "facing": 0,
+        "experience_level": 0,
+        "stance": 0,
+        "speed": 132,
+        "attack_range": 8704,
+        "minimum_attack_range": 1536,
+        "armor_type": "Light",
+        "target_types": [
+          "WaterActor",
+          "Ship"
+        ],
+        "cost": 750,
+        "reload_remaining_ticks": 0,
+        "reload_total_ticks": 72,
+        "weapon": "IranPeykaapMissile",
+        "burst": 1,
+        "current_target_actor_id": 0,
+        "move_target_x": 39,
+        "move_target_y": 94,
+        "can_target_air": false,
+        "can_target_ground": false,
+        "last_seen_tick": 150,
+        "passenger_count": -1,
+        "is_building": false,
+        "is_producing": false,
+        "production_progress": 0.0,
+        "producing_item": "",
+        "powered": true,
+        "repairing": false,
+        "sell_value": 0,
+        "rally_x": -1,
+        "rally_y": -1,
+        "power_amount": 0,
+        "can_produce": [],
+        "is_disguised": false,
+        "disguise_owner": "",
+        "can_disguise": false,
+        "can_infiltrate": false,
+        "valid_disguise_targets": [],
+        "valid_infiltration_targets": [],
+        "detects_disguise": false,
+        "can_demolish": false,
+        "valid_demolition_targets": [],
+        "can_capture": false,
+        "valid_capture_targets": []
+      },
+      {
+        "actor_id": 19,
+        "kind": "irghadir",
+        "cell_x": 41,
+        "cell_y": 94,
+        "hp_percent": 1.0,
+        "idle": true,
+        "can_attack": true,
+        "current_activity": "",
+        "owner": "Multi0",
+        "ammo": -1,
+        "facing": 512,
+        "experience_level": 0,
+        "stance": 0,
+        "speed": 88,
+        "attack_range": 7680,
+        "minimum_attack_range": 0,
+        "armor_type": "Light",
+        "target_types": [
+          "Submarine",
+          "Underwater"
+        ],
+        "cost": 1050,
+        "reload_remaining_ticks": 0,
+        "reload_total_ticks": 92,
+        "weapon": "IranGhadirTorpedo",
+        "burst": 2,
+        "current_target_actor_id": 0,
+        "move_target_x": 41,
+        "move_target_y": 94,
+        "can_target_air": false,
+        "can_target_ground": false,
+        "last_seen_tick": 150,
+        "passenger_count": -1,
+        "is_building": false,
+        "is_producing": false,
+        "production_progress": 0.0,
+        "producing_item": "",
+        "powered": true,
+        "repairing": false,
+        "sell_value": 0,
+        "rally_x": -1,
+        "rally_y": -1,
+        "power_amount": 0,
+        "can_produce": [],
+        "is_disguised": false,
+        "disguise_owner": "",
+        "can_disguise": false,
+        "can_infiltrate": false,
+        "valid_disguise_targets": [],
+        "valid_infiltration_targets": [],
+        "detects_disguise": false,
+        "can_demolish": false,
+        "valid_demolition_targets": [],
+        "can_capture": false,
+        "valid_capture_targets": []
+      }
+    ]
+  },
+  "result": {
+    "status": "passed",
+    "end_tick": 1650,
+    "units_lost": 0,
+    "units_killed": 0,
+    "order_count": 0,
+    "captures": [
+      {
+        "file": "01-doctrine-range.png",
+        "tick": 154,
+        "width": 1280,
+        "height": 720,
+        "scope": "rendered-player-viewport-fog-respecting",
+        "sha256": "a441327a4235b28975c7b58afdf71d3ea5e87c9b0aefcc0deb71f9e48371c068"
+      },
+      {
+        "file": "02-live-headings.png",
+        "tick": 1070,
+        "width": 1280,
+        "height": 720,
+        "scope": "rendered-player-viewport-fog-respecting",
+        "sha256": "f60b26da7b8b4575e7e6bacb1483dc234ab7d4ca7291511266d9078998095ad0"
+      },
+      {
+        "file": "03-shadow-sabotage.png",
+        "tick": 1411,
+        "width": 1280,
+        "height": 720,
+        "scope": "rendered-player-viewport-fog-respecting",
+        "sha256": "89e33070d62c80d9ce1587e53493753fdfcad80bf3a2a66932e9d3f026269d17"
+      },
+      {
+        "file": "04-loitering-attack.png",
+        "tick": 1423,
+        "width": 1280,
+        "height": 720,
+        "scope": "rendered-player-viewport-fog-respecting",
+        "sha256": "f276f8b1218cfb6c0da8e3aee6f5160e802f69014ff2ee5aa23a56d297dc431f"
+      },
+      {
+        "file": "05-naval-combat.png",
+        "tick": 1652,
+        "width": 1280,
+        "height": 720,
+        "scope": "rendered-player-viewport-fog-respecting",
+        "sha256": "23ae75a535d8b034465953677673afd8760ca427258f8c7aeb04688d2e55cca0"
+      }
+    ]
+  }
+}

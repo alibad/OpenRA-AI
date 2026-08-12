@@ -1,0 +1,106 @@
+{
+  "generated": "2026-08-12",
+  "sample_rate": 44100,
+  "files": [
+    {
+      "file": "iran-rifle.wav",
+      "method": "deterministic procedural PCM",
+      "seed": "iran-faction:iran-rifle.wav:2026-08-12"
+    },
+    {
+      "file": "iran-suppressed.wav",
+      "method": "deterministic procedural PCM",
+      "seed": "iran-faction:iran-suppressed.wav:2026-08-12"
+    },
+    {
+      "file": "iran-shadow-fire.wav",
+      "method": "deterministic procedural PCM",
+      "seed": "iran-faction:iran-shadow-fire.wav:2026-08-12"
+    },
+    {
+      "file": "iran-atgm-launch.wav",
+      "method": "deterministic procedural PCM",
+      "seed": "iran-faction:iran-atgm-launch.wav:2026-08-12"
+    },
+    {
+      "file": "iran-atgm-impact.wav",
+      "method": "deterministic procedural PCM",
+      "seed": "iran-faction:iran-atgm-impact.wav:2026-08-12"
+    },
+    {
+      "file": "iran-sabotage.wav",
+      "method": "deterministic procedural PCM",
+      "seed": "iran-faction:iran-sabotage.wav:2026-08-12"
+    },
+    {
+      "file": "iran-tank-fire.wav",
+      "method": "deterministic procedural PCM",
+      "seed": "iran-faction:iran-tank-fire.wav:2026-08-12"
+    },
+    {
+      "file": "iran-heavy-impact.wav",
+      "method": "deterministic procedural PCM",
+      "seed": "iran-faction:iran-heavy-impact.wav:2026-08-12"
+    },
+    {
+      "file": "iran-raad-launch.wav",
+      "method": "deterministic procedural PCM",
+      "seed": "iran-faction:iran-raad-launch.wav:2026-08-12"
+    },
+    {
+      "file": "iran-missile-impact.wav",
+      "method": "deterministic procedural PCM",
+      "seed": "iran-faction:iran-missile-impact.wav:2026-08-12"
+    },
+    {
+      "file": "iran-fajr-launch.wav",
+      "method": "deterministic procedural PCM",
+      "seed": "iran-faction:iran-fajr-launch.wav:2026-08-12"
+    },
+    {
+      "file": "iran-coastal-launch.wav",
+      "method": "deterministic procedural PCM",
+      "seed": "iran-faction:iran-coastal-launch.wav:2026-08-12"
+    },
+    {
+      "file": "iran-air-missile.wav",
+      "method": "deterministic procedural PCM",
+      "seed": "iran-faction:iran-air-missile.wav:2026-08-12"
+    },
+    {
+      "file": "iran-air-cannon.wav",
+      "method": "deterministic procedural PCM",
+      "seed": "iran-faction:iran-air-cannon.wav:2026-08-12"
+    },
+    {
+      "file": "iran-heli-cannon.wav",
+      "method": "deterministic procedural PCM",
+      "seed": "iran-faction:iran-heli-cannon.wav:2026-08-12"
+    },
+    {
+      "file": "iran-heli-rocket.wav",
+      "method": "deterministic procedural PCM",
+      "seed": "iran-faction:iran-heli-rocket.wav:2026-08-12"
+    },
+    {
+      "file": "iran-drone-release.wav",
+      "method": "deterministic procedural PCM",
+      "seed": "iran-faction:iran-drone-release.wav:2026-08-12"
+    },
+    {
+      "file": "iran-loiter-impact.wav",
+      "method": "deterministic procedural PCM",
+      "seed": "iran-faction:iran-loiter-impact.wav:2026-08-12"
+    },
+    {
+      "file": "iran-naval-launch.wav",
+      "method": "deterministic procedural PCM",
+      "seed": "iran-faction:iran-naval-launch.wav:2026-08-12"
+    },
+    {
+      "file": "iran-torpedo.wav",
+      "method": "deterministic procedural PCM",
+      "seed": "iran-faction:iran-torpedo.wav:2026-08-12"
+    }
+  ]
+}
