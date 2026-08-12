@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "id": "building-garrisons",
+  "name": "Building Garrisons",
+  "kind": "trait",
+  "status": "integrated",
+  "summary": "Makes cities tactically meaningful through enterable buildings, passenger firing, evacuation, and AI occupancy.",
+  "sources": [
+    {
+      "project": "romanovs-vengeance",
+      "commit": "231059963663dcb07d07b56f607b41d173795da9",
+      "paths": [
+        "OpenRA.Mods.RA2/Traits/Render/WithCargoBuilding.cs"
+      ],
+      "notes": "Mechanic or architecture reference only; no upstream story or binary presentation content imported."
+    }
+  ],
+  "license": {
+    "code": "GPL-3.0-or-later",
+    "assets": "No upstream binary assets imported; original or native OpenRA presentation is required.",
+    "redistribution": "allowed",
+    "attribution": [
+      "Romanov's Vengeance contributors"
+    ]
+  },
+  "compatibility": {
+    "target_mod": "ra",
+    "engine_api": "native",
+    "dependencies": [
+      "cargo firing contract",
+      "civilian building roster",
+      "garrison AI"
+    ],
+    "conflicts": []
+  },
+  "integration": {
+    "files": [
+      "engine/openra/mods/ra/experiences/components/building-garrisons.yaml",
+      "engine/openra/mods/ra/experiences.yaml"
+    ],
+    "feature_flag": "building-garrisons",
+    "migration_notes": "Enable in Experience Composer, then inherit the reusable templates or consume the stable capability IDs in concrete faction, AI, or mission data."
+  },
+  "verification": {
+    "lint": "passed",
+    "build": "passed",
+    "automated": "pending",
+    "live": "pending",
+    "evidence": [
+      "Isolated OpenRA.Mods.Common build completed with zero errors.",
+      "Default RA rules and the bundled map corpus load with the component in the World War III profile."
+    ]
+  }
+}

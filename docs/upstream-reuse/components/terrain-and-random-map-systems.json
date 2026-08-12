@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "id": "terrain-and-random-map-systems",
+  "name": "Terrain And Random Map Systems",
+  "kind": "strategy",
+  "status": "integrated",
+  "summary": "OpenHV terrain layers, auto-tiling, forests, liquids, underground resources, and random generation can inform Earth map enrichment.",
+  "sources": [
+    {
+      "project": "openhv",
+      "commit": "d507035349b05a774baedbdebd2e60abb6c57895",
+      "paths": [
+        "OpenRA.Mods.HV/Traits/World/RandomMapGenerator.cs"
+      ],
+      "notes": "Mechanic or architecture reference only; no upstream story or binary presentation content imported."
+    }
+  ],
+  "license": {
+    "code": "GPL-3.0-or-later",
+    "assets": "No upstream binary assets imported; original or native OpenRA presentation is required.",
+    "redistribution": "allowed",
+    "attribution": [
+      "OpenHV contributors"
+    ]
+  },
+  "compatibility": {
+    "target_mod": "ra",
+    "engine_api": "native",
+    "dependencies": [
+      "Earth tileset pipeline",
+      "worldgen compatibility"
+    ],
+    "conflicts": []
+  },
+  "integration": {
+    "files": [
+      "engine/openra/mods/ra/experiences/components/terrain-and-random-map-systems.yaml",
+      "engine/openra/OpenRA.Mods.Common/UtilityCommands/GenerateOpenRAAIMapCommand.cs",
+      "engine/openra/mods/ra/experiences.yaml"
+    ],
+    "feature_flag": "terrain-and-random-map-systems",
+    "migration_notes": "Enable in Experience Composer, then inherit the reusable templates or consume the stable capability IDs in concrete faction, AI, or mission data."
+  },
+  "verification": {
+    "lint": "passed",
+    "build": "passed",
+    "automated": "pending",
+    "live": "pending",
+    "evidence": [
+      "Isolated OpenRA.Mods.Common build completed with zero errors.",
+      "Default RA rules and the bundled map corpus load with the component in the World War III profile."
+    ]
+  }
+}

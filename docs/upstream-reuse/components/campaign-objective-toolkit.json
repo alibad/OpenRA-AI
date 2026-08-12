@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "id": "campaign-objective-toolkit",
+  "name": "Campaign Objective Toolkit",
+  "kind": "mission-pattern",
+  "status": "integrated",
+  "summary": "Reusable Lua modules for objective lifecycles, reinforcements, escalation timers, capture beats, extraction, waves, and difficulty scaling.",
+  "sources": [
+    {
+      "project": "combined-arms",
+      "commit": "ab9e477c3db818e91946d4cfdc86e71012966141",
+      "paths": [
+        "mods/ca/maps"
+      ],
+      "notes": "Mechanic or architecture reference only; no upstream story or binary presentation content imported."
+    }
+  ],
+  "license": {
+    "code": "GPL-3.0-or-later",
+    "assets": "No upstream binary assets imported; original or native OpenRA presentation is required.",
+    "redistribution": "allowed",
+    "attribution": [
+      "Combined Arms contributors"
+    ]
+  },
+  "compatibility": {
+    "target_mod": "ra",
+    "engine_api": "native",
+    "dependencies": [
+      "mission scripting API",
+      "Earth mission metadata",
+      "localization keys"
+    ],
+    "conflicts": []
+  },
+  "integration": {
+    "files": [
+      "engine/openra/mods/ra/experiences/components/campaign-objective-toolkit.yaml",
+      "engine/openra/mods/ra/scripts/experience-objectives.lua",
+      "engine/openra/mods/ra/experiences.yaml"
+    ],
+    "feature_flag": "campaign-objective-toolkit",
+    "migration_notes": "Enable in Experience Composer, then inherit the reusable templates or consume the stable capability IDs in concrete faction, AI, or mission data."
+  },
+  "verification": {
+    "lint": "passed",
+    "build": "passed",
+    "automated": "pending",
+    "live": "pending",
+    "evidence": [
+      "Isolated OpenRA.Mods.Common build completed with zero errors.",
+      "Default RA rules and the bundled map corpus load with the component in the World War III profile."
+    ]
+  }
+}

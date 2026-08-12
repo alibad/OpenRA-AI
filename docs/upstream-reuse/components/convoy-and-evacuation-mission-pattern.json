@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "id": "convoy-and-evacuation-mission-pattern",
+  "name": "Convoy And Evacuation Mission Pattern",
+  "kind": "mission-pattern",
+  "status": "integrated",
+  "summary": "Composable escort, interdiction, embarkation, unloading, extraction, and failure-state beats suit modern regional campaigns.",
+  "sources": [
+    {
+      "project": "combined-arms",
+      "commit": "ab9e477c3db818e91946d4cfdc86e71012966141",
+      "paths": [
+        "mods/ca/maps"
+      ],
+      "notes": "Mechanic or architecture reference only; no upstream story or binary presentation content imported."
+    }
+  ],
+  "license": {
+    "code": "GPL-3.0-or-later",
+    "assets": "No upstream binary assets imported; original or native OpenRA presentation is required.",
+    "redistribution": "allowed",
+    "attribution": [
+      "Combined Arms contributors"
+    ]
+  },
+  "compatibility": {
+    "target_mod": "ra",
+    "engine_api": "native",
+    "dependencies": [
+      "transport role tags",
+      "waypoint/route helpers",
+      "objective toolkit"
+    ],
+    "conflicts": []
+  },
+  "integration": {
+    "files": [
+      "engine/openra/mods/ra/experiences/components/convoy-and-evacuation-mission-pattern.yaml",
+      "engine/openra/mods/ra/scripts/experience-objectives.lua",
+      "engine/openra/mods/ra/maps/convoy-shield/convoy-shield.lua",
+      "engine/openra/mods/ra/experiences.yaml"
+    ],
+    "feature_flag": "convoy-and-evacuation-mission-pattern",
+    "migration_notes": "Enable in Experience Composer, then inherit the reusable templates or consume the stable capability IDs in concrete faction, AI, or mission data."
+  },
+  "verification": {
+    "lint": "passed",
+    "build": "passed",
+    "automated": "pending",
+    "live": "pending",
+    "evidence": [
+      "Isolated OpenRA.Mods.Common build completed with zero errors.",
+      "Default RA rules and the bundled map corpus load with the component in the World War III profile."
+    ]
+  }
+}

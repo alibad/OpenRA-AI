@@ -70,6 +70,9 @@ try
 
 	& $python 'scripts\check_openra_reuse.py'
 	if ($LASTEXITCODE -ne 0) { throw 'Reuse manifest and roadmap validation failed.' }
+
+	& $python 'scripts\check_openra_asset_provenance.py'
+	if ($LASTEXITCODE -ne 0) { throw 'Asset provenance and facing evidence validation failed.' }
 }
 finally
 {

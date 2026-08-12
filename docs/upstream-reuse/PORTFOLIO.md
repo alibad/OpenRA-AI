@@ -15,16 +15,28 @@ The portfolio has four reuse classes:
 
 The machine-readable decisions and dependencies are in [`roadmap.json`](roadmap.json). Exact actors, weapons, traits, files, factions, assets, Lua calls, and story-pattern tags are in [`generated/catalog.json`](generated/catalog.json).
 
-## Integrated foundation slice
+## Integrated Composer portfolio
 
-Four opt-in components now prove the pipeline end to end:
+All 25 roadmap components now have pinned provenance manifests, isolated
+Composer rules files, stable dependency IDs, and entries in the curated World
+War III profile. Four foundation mechanics prove the complete behavior path:
 
 - `^ReusableMinefieldGenerator` maintains deterministic, non-stacking mine patterns.
 - The native turtle minelayer AI now supports mission marker seeds, accelerated opening scans, roster filtering, and stuck recovery.
 - `^ReusablePointDefense` intercepts explicitly tagged native Missile or Bullet projectiles, with harmless removal as the safe default.
 - `^ReusableSalvageable` can create value-carrying battlefield salvage using the stock RA crate presentation.
 
-The three actor components do not change an existing concrete unit merely by being loaded; a faction, actor, or mission must opt in. The minelayer enhancement is explicitly enabled for the existing turtle AI, where it performs two faster opening scans and remains compatible with mission marker overrides.
+The systems wave also includes concrete native behavior: stock city buildings
+become firing garrisons, a mission/editor supply node resupplies aircraft,
+captured production structures unlock their former faction domains, role-aware
+bot production spans every current roster, mission helpers drive Convoy Shield,
+and deterministic sandstorm rendering is available to authored missions.
+
+The remaining portfolio entries are plug-in contracts and archetype templates.
+They are `integrated` because they compile, lint, resolve dependencies, and are
+selectable; their manifests remain explicit about pending automated or live
+verification. `integrated` never means that upstream binary assets were copied,
+or that every future faction already has final original presentation content.
 
 ## Source-by-source judgment
 

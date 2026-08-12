@@ -35,7 +35,7 @@ finally { Pop-Location }
 $paletteReference = Get-ChildItem -LiteralPath $paletteDirectory -Filter "2tnk-*.png" | Select-Object -First 1
 if (-not $paletteReference) { throw "Palette export produced no indexed PNG frame." }
 
-& $python (Join-Path $PSScriptRoot "build-china-ui.py")
+& $python (Join-Path $PSScriptRoot "build-red-sea-ui.py")
 if ($LASTEXITCODE -ne 0) { throw "China selector UI generation failed." }
 & $python (Join-Path $PSScriptRoot "build-china-assets.py") --palette $paletteReference.FullName
 if ($LASTEXITCODE -ne 0) { throw "China sprite generation failed." }

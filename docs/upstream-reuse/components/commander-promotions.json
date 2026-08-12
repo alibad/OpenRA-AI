@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "id": "commander-promotions",
+  "name": "Commander Promotions",
+  "kind": "trait",
+  "status": "integrated",
+  "summary": "Match-scoped commander points and mutually exclusive doctrine upgrades support meaningful faction customization.",
+  "sources": [
+    {
+      "project": "cameo",
+      "commit": "729db68e12f2aaf0feb3fdf0d97b98526fbe65fc",
+      "paths": [
+        "OpenRA.Mods.Cameo/Traits/Player/PlayerPromotions.cs"
+      ],
+      "notes": "Mechanic or architecture reference only; no upstream story or binary presentation content imported."
+    }
+  ],
+  "license": {
+    "code": "GPL-3.0-compatible",
+    "assets": "No upstream binary assets imported; original or native OpenRA presentation is required.",
+    "redistribution": "allowed",
+    "attribution": [
+      "Cameo contributors"
+    ]
+  },
+  "compatibility": {
+    "target_mod": "ra",
+    "engine_api": "native",
+    "dependencies": [
+      "doctrine contract",
+      "save/replay sync",
+      "native promotion UI"
+    ],
+    "conflicts": []
+  },
+  "integration": {
+    "files": [
+      "engine/openra/mods/ra/experiences/components/commander-promotions.yaml",
+      "engine/openra/mods/ra/experiences.yaml"
+    ],
+    "feature_flag": "commander-promotions",
+    "migration_notes": "Enable in Experience Composer, then inherit the reusable templates or consume the stable capability IDs in concrete faction, AI, or mission data."
+  },
+  "verification": {
+    "lint": "passed",
+    "build": "passed",
+    "automated": "pending",
+    "live": "pending",
+    "evidence": [
+      "Isolated OpenRA.Mods.Common build completed with zero errors.",
+      "Default RA rules and the bundled map corpus load with the component in the World War III profile."
+    ]
+  }
+}

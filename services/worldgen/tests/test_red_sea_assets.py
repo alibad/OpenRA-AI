@@ -210,14 +210,13 @@ class RedSeaAssetTests(unittest.TestCase):
         self.assertTrue(selectable_factions)
         self.assertEqual(set(), selectable_factions - registered_flags)
 
-        for suffix in ("", "-2x", "-3x"):
+        for suffix, scale in (("", 1), ("-2x", 2), ("-3x", 3)):
             path = ROOT / "engine" / "openra" / "mods" / "ra" / "uibits" / f"glyphs-redsea{suffix}.png"
             source = ROOT / "engine" / "openra" / "mods" / "ra" / "uibits" / f"glyphs{suffix}.png"
             with Image.open(path) as atlas:
                 with Image.open(source) as original:
                     self.assertEqual(atlas.width, original.width)
                     self.assertGreaterEqual(atlas.height, original.height)
-                scale = atlas.width // 256
                 saudi = atlas.crop((226 * scale, 1 * scale, 256 * scale, 16 * scale)).convert("RGB")
                 yemen = atlas.crop((226 * scale, 17 * scale, 256 * scale, 32 * scale)).convert("RGB")
                 self.assertIn((0, 108, 53), set(saudi.get_flattened_data()))

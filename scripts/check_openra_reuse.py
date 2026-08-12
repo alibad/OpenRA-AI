@@ -7,6 +7,7 @@ import json
 from pathlib import Path
 import subprocess
 import sys
+import re
 
 from jsonschema import Draft202012Validator
 from openra_upstream_inventory import target_baseline
@@ -15,6 +16,33 @@ from openra_upstream_inventory import target_baseline
 ROOT = Path(__file__).resolve().parents[1]
 DOCS = ROOT / "docs" / "upstream-reuse"
 REFERENCES = ROOT.parent / "OpenRA-Upstreams"
+
+
+def composer_component_ids(path: Path) -> tuple[set[str], set[str]]:
+    """Read the small fixed-indent ExperienceCatalog without treating MiniYAML as YAML."""
+    component_ids: set[str] = set()
+    default_components: set[str] = set()
+    section = None
+    profile = None
+    component_pattern = re.compile(r"^\t\t([a-z0-9]+(?:-[a-z0-9]+)*):$")
+    for line in path.read_text(encoding="utf-8").splitlines():
+        if line == "\tComponents:":
+            section = "components"
+            continue
+        if line == "\tProfiles:":
+            section = "profiles"
+            continue
+
+        match = component_pattern.match(line)
+        if match and section == "components":
+            component_ids.add(match.group(1))
+        elif match and section == "profiles":
+            profile = match.group(1)
+        elif section == "profiles" and profile == "world-war-iii" and line.startswith("\t\t\tComponents:"):
+            value = line.split(":", 1)[1]
+            default_components.update(part.strip() for part in value.split(",") if part.strip())
+
+    return component_ids, default_components
 
 
 def load(path: Path):
@@ -112,6 +140,17 @@ def main() -> int:
                 fail(errors, f"roadmap {item['id']}: unknown source {source_id}")
         if item["status"] == "integrated" and item["id"] not in manifests:
             fail(errors, f"roadmap {item['id']}: integrated item has no component manifest")
+
+    composer_ids, default_components = composer_component_ids(
+        ROOT / "engine" / "openra" / "mods" / "ra" / "experiences.yaml"
+    )
+    roadmap_set = set(roadmap_ids)
+    if composer_ids != roadmap_set:
+        fail(errors, f"Experience Composer IDs differ from roadmap: missing={sorted(roadmap_set - composer_ids)}, extra={sorted(composer_ids - roadmap_set)}")
+    if default_components != roadmap_set:
+        fail(errors, f"World War III profile does not enable the full roadmap: missing={sorted(roadmap_set - default_components)}, extra={sorted(default_components - roadmap_set)}")
+    if set(manifests) != roadmap_set:
+        fail(errors, f"component manifest IDs differ from roadmap: missing={sorted(roadmap_set - set(manifests))}, extra={sorted(set(manifests) - roadmap_set)}")
 
     if errors:
         for error in errors:

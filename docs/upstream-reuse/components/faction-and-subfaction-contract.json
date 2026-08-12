@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "id": "faction-and-subfaction-contract",
+  "name": "Faction And Subfaction Contract",
+  "kind": "faction",
+  "status": "integrated",
+  "summary": "A stable country/doctrine contract for roster gates, bonuses, UI selection, captured technology, and mission overrides.",
+  "sources": [
+    {
+      "project": "combined-arms",
+      "commit": "ab9e477c3db818e91946d4cfdc86e71012966141",
+      "paths": [
+        "OpenRA.Mods.CA/Traits/Player/ProvidesPrerequisiteValidatedFaction.cs"
+      ],
+      "notes": "Mechanic or architecture reference only; no upstream story or binary presentation content imported."
+    }
+  ],
+  "license": {
+    "code": "GPL-3.0-or-later",
+    "assets": "No upstream binary assets imported; original or native OpenRA presentation is required.",
+    "redistribution": "allowed",
+    "attribution": [
+      "Combined Arms contributors"
+    ]
+  },
+  "compatibility": {
+    "target_mod": "ra",
+    "engine_api": "native",
+    "dependencies": [
+      "Saudi/Yemen faction identifiers",
+      "stable doctrine IDs"
+    ],
+    "conflicts": []
+  },
+  "integration": {
+    "files": [
+      "engine/openra/mods/ra/experiences/components/faction-doctrine-contract.yaml",
+      "engine/openra/OpenRA.Mods.Common/Traits/WorldWarIII/FactionDoctrine.cs",
+      "engine/openra/OpenRA.Mods.Common/Traits/WorldWarIII/ReusableCapability.cs",
+      "engine/openra/mods/ra/experiences.yaml"
+    ],
+    "feature_flag": "faction-and-subfaction-contract",
+    "migration_notes": "Enable in Experience Composer, then inherit the reusable templates or consume the stable capability IDs in concrete faction, AI, or mission data."
+  },
+  "verification": {
+    "lint": "passed",
+    "build": "passed",
+    "automated": "pending",
+    "live": "pending",
+    "evidence": [
+      "Isolated OpenRA.Mods.Common build completed with zero errors.",
+      "Default RA rules and the bundled map corpus load with the component in the World War III profile."
+    ]
+  }
+}

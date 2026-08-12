@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+import argparse
+import math
+import re
 from pathlib import Path
 
 from PIL import Image, ImageDraw
@@ -72,10 +75,25 @@ def draw_iran_flag(draw: ImageDraw.ImageDraw, scale: int) -> None:
     draw.line((cx, cy - 3 * scale, cx, cy + 3 * scale), fill=(206, 26, 42, 255), width=stroke)
 
 
-def build_density(scale: int) -> Path:
+def draw_china_flag(draw: ImageDraw.ImageDraw, scale: int, origin: tuple[int, int]) -> None:
+    x, y = (coordinate * scale for coordinate in origin)
+    width, height = 30 * scale, 15 * scale
+    draw.rectangle((x, y, x + width - 1, y + height - 1), fill=(222, 41, 16, 255))
+
+    gold = (255, 222, 0, 255)
+    for sx, sy, radius in ((5, 4, 2.2), (10, 2, 1.0), (12, 5, 1.0), (12, 9, 1.0), (9, 11, 1.0)):
+        points = []
+        for index in range(10):
+            angle = math.radians(-90 + index * 36)
+            r = radius * scale * (1 if index % 2 == 0 else 0.42)
+            points.append((x + sx * scale + math.cos(angle) * r, y + sy * scale + math.sin(angle) * r))
+        draw.polygon(points, fill=gold)
+
+
+def build_density(scale: int, china_origin: tuple[int, int], uibits: Path = UIBITS) -> Path:
     suffix = "" if scale == 1 else f"-{scale}x"
-    source = UIBITS / f"glyphs{suffix}.png"
-    output = UIBITS / f"glyphs-redsea{suffix}.png"
+    source = uibits / f"glyphs{suffix}.png"
+    output = uibits / f"glyphs-redsea{suffix}.png"
     atlas = Image.open(source).convert("RGBA")
     expected = 256 * scale
     # The upstream file named glyphs-3x.png currently carries a 1024px canvas,
@@ -89,16 +107,28 @@ def build_density(scale: int) -> Path:
     draw_yemen_flag(draw, scale)
     draw_turkey_flag(draw, scale)
     draw_iran_flag(draw, scale)
+    draw_china_flag(draw, scale, china_origin)
     atlas.save(output, optimize=True)
     return output
 
 
-def main() -> int:
+def main(engine_root: Path | None = None) -> int:
+    root = engine_root if engine_root else ROOT / "engine" / "openra"
+    uibits = root / "mods" / "ra" / "uibits"
+    chrome = (root / "mods" / "ra" / "chrome.yaml").read_text(encoding="utf-8")
+    match = re.search(r"^\s*china:\s*(\d+),\s*(\d+),\s*30,\s*15\s*$", chrome, re.MULTILINE)
+    if match is None:
+        raise ValueError("chrome.yaml must define a 30x15 China flag region")
+
+    china_origin = tuple(int(value) for value in match.groups())
     for scale in (1, 2, 3):
-        output = build_density(scale)
-        print(output.relative_to(ROOT))
+        output = build_density(scale, china_origin, uibits)
+        print(output)
     return 0
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--engine-root", type=Path)
+    args = parser.parse_args()
+    raise SystemExit(main(args.engine_root))

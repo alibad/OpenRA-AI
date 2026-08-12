@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "id": "mind-control-and-disguise",
+  "name": "Mind Control And Disguise",
+  "kind": "trait",
+  "status": "integrated",
+  "summary": "Reference implementation for control capacity, disguise, mirage visuals, and counter-intelligence mechanics.",
+  "sources": [
+    {
+      "project": "openra-ra2",
+      "commit": "61e24e3c1d7b586aa55a86096d29e1559aa9b994",
+      "paths": [
+        "OpenRA.Mods.RA2/Traits/MindController.cs"
+      ],
+      "notes": "Mechanic or architecture reference only; no upstream story or binary presentation content imported."
+    }
+  ],
+  "license": {
+    "code": "GPL-3.0-or-later",
+    "assets": "No upstream binary assets imported; original or native OpenRA presentation is required.",
+    "redistribution": "allowed",
+    "attribution": [
+      "OpenRA Red Alert 2 contributors"
+    ]
+  },
+  "compatibility": {
+    "target_mod": "ra",
+    "engine_api": "native",
+    "dependencies": [
+      "future faction design",
+      "clear counterplay/UI"
+    ],
+    "conflicts": []
+  },
+  "integration": {
+    "files": [
+      "engine/openra/mods/ra/experiences/components/mind-control-and-disguise.yaml",
+      "engine/openra/mods/ra/experiences.yaml"
+    ],
+    "feature_flag": "mind-control-and-disguise",
+    "migration_notes": "Enable in Experience Composer, then inherit the reusable templates or consume the stable capability IDs in concrete faction, AI, or mission data."
+  },
+  "verification": {
+    "lint": "passed",
+    "build": "passed",
+    "automated": "pending",
+    "live": "pending",
+    "evidence": [
+      "Isolated OpenRA.Mods.Common build completed with zero errors.",
+      "Default RA rules and the bundled map corpus load with the component in the World War III profile."
+    ]
+  }
+}

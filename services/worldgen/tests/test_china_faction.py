@@ -49,15 +49,22 @@ def test_faction_selector_registers_china_and_hidpi_flag() -> None:
     assert "Faction@china:" in WORLD
     assert "Name: faction-china" in WORLD
     assert "InternalName: china" in WORLD
-    match = re.search(r"china: 226, (\d+), 30, 15", chrome)
+    match = re.search(r"china: (\d+), (\d+), 30, 15", chrome)
     assert match is not None
-    selector_y = int(match.group(1))
+    selector_x, selector_y = (int(value) for value in match.groups())
     assert "sidebar-china:" in chrome
     assert "Inherits: sidebar-allies" in chrome.split("sidebar-china:", 1)[1].split("\n\n", 1)[0]
     assert "command-button-china-highlighted-disabled:" in chrome
-    for scale, suffix in ((1, ""), (2, "-2x"), (4, "-3x")):
+    for scale, suffix in ((1, ""), (2, "-2x"), (3, "-3x")):
         with Image.open(RA / "uibits" / f"glyphs-redsea{suffix}.png") as atlas:
-            flag = atlas.crop((226 * scale, selector_y * scale, 256 * scale, (selector_y + 15) * scale)).convert("RGB")
+            flag = atlas.crop(
+                (
+                    selector_x * scale,
+                    selector_y * scale,
+                    (selector_x + 30) * scale,
+                    (selector_y + 15) * scale,
+                )
+            ).convert("RGB")
             colors = set(flag.get_flattened_data())
         assert (222, 41, 16) in colors
         assert (255, 222, 0) in colors

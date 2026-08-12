@@ -40,6 +40,9 @@ classes, and asset paths.
 - `components/*.json` records exact provenance, integration files, and evidence
   for each component that enters implementation.
 - `component.schema.json` is the contract for those manifests.
+- `assets/*.json` records exact hashes, generator sources, credit, licensing,
+  cardinal handedness, and live-turn evidence for accepted presentation assets.
+- `asset.schema.json` is the mandatory per-asset acceptance contract.
 
 Validate pins, catalog freshness, upstream paths, component manifests,
 integration paths, and roadmap references with:
@@ -54,6 +57,11 @@ check, and manifest check without touching a running game process with:
 ```powershell
 ./scripts/verify_openra_reuse.ps1
 ```
+
+The Experience Composer and the default World War III profile are checked
+against `roadmap.json`: all three must contain the same 25 component IDs. A
+roadmap item cannot silently disappear from the product UI, and an untracked
+Composer component cannot bypass its provenance manifest.
 
 ## Component lifecycle
 

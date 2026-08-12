@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "id": "red-sea-directional-vehicles",
+  "origin": "project-original",
+  "license": {
+    "spdx": "GPL-3.0-only",
+    "redistribution": "allowed",
+    "credit": ["OpenRA AI contributors"]
+  },
+  "generator": {
+    "commit": "4b2632ee6de8b10423b26d690b2a21b1cc698b83",
+    "sources": [
+      "scripts/build-red-sea-sprites.py",
+      "scripts/red_sea_directional_vehicle.py"
+    ]
+  },
+  "assets": [
+    {
+      "id": "m1a2s",
+      "path": "engine/openra/mods/ra/bits/m1a2s.shp",
+      "sha256": "353db85ec86d3222943122ba3655661fa8e4dd9885a0b485057b2d503415d43b",
+      "facings": 32,
+      "layers": ["body", "turret"]
+    },
+    {
+      "id": "sads",
+      "path": "engine/openra/mods/ra/bits/sads.shp",
+      "sha256": "6dd1f6ed70ea1e1a5f3bda7b8435ccddef3187a6a4dfed3e113a9a3a2ea0f899",
+      "facings": 32,
+      "layers": ["body", "turret"]
+    },
+    {
+      "id": "tech",
+      "path": "engine/openra/mods/ra/bits/tech.shp",
+      "sha256": "091b7867bd1eba72a4c1245d6dd4fea95be498bcc862155e2c43148e3112270d",
+      "facings": 32,
+      "layers": ["body", "turret"]
+    },
+    {
+      "id": "ymlr",
+      "path": "engine/openra/mods/ra/bits/ymlr.shp",
+      "sha256": "c800d138ba24006a98e3d33e7548b9eaa5a30c2322d38feaf8d1a96da3a92690",
+      "facings": 32,
+      "layers": ["body", "turret"]
+    }
+  ],
+  "verification": {
+    "structural": "passed",
+    "cardinal_handedness": "passed",
+    "live_turn": "passed",
+    "evidence": [
+      "artifacts/upstream-reuse-vehicle-audit-20260812/audit-report.json",
+      "artifacts/upstream-reuse-vehicle-audit-20260812/cardinal-handedness-check.png",
+      "artifacts/yemen-tank-motion-2026-08-12/contact-sheet.png"
+    ]
+  }
+}
