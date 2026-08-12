@@ -1,0 +1,238 @@
+MapFormat: 12
+
+RequiresMod: ra
+
+Title: 03: Straits Shield
+
+Author: OpenRA AI
+
+Tileset: TEMPERAT
+
+MapSize: 192,192
+
+Bounds: 16,16,160,160
+
+Visibility: MissionSelector
+
+Categories: Campaign
+
+LockPreview: True
+
+Players:
+	PlayerReference@Turkey:
+		Name: Turkey
+		AllowBots: False
+		Playable: True
+		Required: True
+		LockFaction: True
+		Faction: turkey
+		LockColor: True
+		Color: A73731
+		LockSpawn: True
+		LockTeam: True
+		Enemies: Orion Group
+	PlayerReference@Orion:
+		Name: Orion Group
+		Bot: campaign
+		Faction: russia
+		Color: 545D66
+		Enemies: Turkey
+	PlayerReference@Civilians:
+		Name: Civilians
+		Bot: campaign
+		Faction: allies
+		Color: 76AFC4
+	PlayerReference@Neutral:
+		Name: Neutral
+		OwnsWorld: True
+		NonCombatant: True
+		Faction: allies
+
+Actors:
+	TurkeyConyard: fact
+		Location: 43,66
+		Owner: Turkey
+	TurkeyPower: powr
+		Location: 48,63
+		Owner: Turkey
+	TurkeyRefinery: proc
+		Location: 50,68
+		Owner: Turkey
+	TurkeyBarracks: tent
+		Location: 43,71
+		Owner: Turkey
+	TurkeyHarvester: harv
+		Location: 53,68
+		Owner: Turkey
+		Facing: 768
+	StartAras: aras8
+		Location: 47,72
+		Owner: Turkey
+		Facing: 256
+	StartAmphibious: denizkaplan
+		Location: 51,73
+		Owner: Turkey
+		Facing: 256
+	StartRifle1: trrifle
+		Location: 46,73
+		Owner: Turkey
+		SubCell: 0
+	StartRifle2: trrifle
+		Location: 46,73
+		Owner: Turkey
+		SubCell: 2
+	StartAT: trat
+		Location: 47,73
+		Owner: Turkey
+		SubCell: 1
+	StartOperator: trdroneop
+		Location: 48,73
+		Owner: Turkey
+		SubCell: 3
+	StartDrone: kuzgunm
+		Location: 50,65
+		Owner: Turkey
+		Facing: 256
+	HarborRelay: fcom
+		Location: 94,93
+		Owner: Civilians
+	RelayGuard1: 3tnk
+		Location: 91,96
+		Owner: Orion Group
+		Facing: 768
+	RelayGuard2: ftrk
+		Location: 99,91
+		Owner: Orion Group
+		Facing: 640
+	UplinkNorth: dome
+		Location: 100,69
+		Owner: Orion Group
+	UplinkEast: dome
+		Location: 115,85
+		Owner: Orion Group
+	UplinkSouth: dome
+		Location: 95,119
+		Owner: Orion Group
+	NorthGuard: 3tnk
+		Location: 102,72
+		Owner: Orion Group
+		Facing: 640
+	EastGuard: ftrk
+		Location: 112,89
+		Owner: Orion Group
+		Facing: 768
+	SouthGuard: v2rl
+		Location: 92,116
+		Owner: Orion Group
+		Facing: 128
+	OrionConyard: fact
+		Location: 148,65
+		Owner: Orion Group
+	OrionPower1: apwr
+		Location: 153,61
+		Owner: Orion Group
+	OrionPower2: powr
+		Location: 156,62
+		Owner: Orion Group
+	OrionRefinery: proc
+		Location: 151,70
+		Owner: Orion Group
+	OrionWarFactory: weap
+		Location: 143,68
+		Owner: Orion Group
+	OrionAirfield: afld
+		Location: 149,58
+		Owner: Orion Group
+	OrionBarracks: barr
+		Location: 143,63
+		Owner: Orion Group
+	OrionTank1: 3tnk
+		Location: 145,73
+		Owner: Orion Group
+		Facing: 768
+	OrionTank2: 3tnk
+		Location: 149,74
+		Owner: Orion Group
+		Facing: 768
+	OrionAA: ftrk
+		Location: 153,73
+		Owner: Orion Group
+		Facing: 768
+	OrionFrigate: marmara
+		Location: 75,54
+		Owner: Orion Group
+		Facing: 384
+	OrionCorvette1: ege
+		Location: 69,61
+		Owner: Orion Group
+		Facing: 384
+	OrionCorvette2: ege
+		Location: 81,48
+		Owner: Orion Group
+		Facing: 384
+	OrionUSV1: poyraz
+		Location: 65,66
+		Owner: Orion Group
+		Facing: 384
+	OrionUSV2: poyraz
+		Location: 72,58
+		Owner: Orion Group
+		Facing: 384
+	TurkeyMine1: mine
+		Location: 40,58
+		Owner: Neutral
+	TurkeyMine2: mine
+		Location: 38,60
+		Owner: Neutral
+	TurkeyMine3: mine
+		Location: 54,69
+		Owner: Neutral
+	TurkeyMine4: mine
+		Location: 53,71
+		Owner: Neutral
+	OrionMine1: mine
+		Location: 141,63
+		Owner: Neutral
+	OrionMine2: mine
+		Location: 140,65
+		Owner: Neutral
+	OrionMine3: mine
+		Location: 155,72
+		Owner: Neutral
+	CentralMine1: gmine
+		Location: 95,93
+		Owner: Neutral
+	CentralMine2: mine
+		Location: 97,103
+		Owner: Neutral
+	WestOil1: oilb
+		Location: 61,40
+		Owner: Neutral
+	WestOil2: oilb
+		Location: 64,43
+		Owner: Neutral
+	EastOil1: oilb
+		Location: 157,97
+		Owner: Neutral
+	EastOil2: oilb
+		Location: 162,95
+		Owner: Neutral
+	TurkeyCamera: waypoint
+		Location: 47,68
+		Owner: Neutral
+	DroneEntryNorth: waypoint
+		Location: 89,17
+		Owner: Neutral
+	DroneEntryEast: waypoint
+		Location: 174,88
+		Owner: Neutral
+	NavalRally: waypoint
+		Location: 66,62
+		Owner: Neutral
+	TurkeyRally: waypoint
+		Location: 51,67
+		Owner: Neutral
+
+Rules: ra|rules/campaign-rules.yaml, ra|rules/campaign-tooltips.yaml, ra|rules/campaign-palettes.yaml, rules.yaml
+
+FluentMessages: ra|fluent/lua.ftl, ra|fluent/campaign.ftl, map.ftl

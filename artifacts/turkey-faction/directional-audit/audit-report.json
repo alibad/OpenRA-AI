@@ -1,0 +1,143 @@
+{
+  "mode": "existing-frames",
+  "engine_root": null,
+  "input_root": "C:\\Users\\Admin\\Code\\hq\\games\\OpenRA-AI-turkey\\generated\\turkey-sprites",
+  "mod": "ra",
+  "palette": null,
+  "classic_facings": true,
+  "palette_shadows_removed": false,
+  "vehicles": {
+    "bozkir": {
+      "frame_count": 64,
+      "canvas": [
+        44,
+        44
+      ],
+      "facings": 32,
+      "turret_start": 32,
+      "unique_body_frames": 32,
+      "unique_turret_frames": 32,
+      "body_visible_width_range": [
+        20,
+        32
+      ],
+      "body_visible_height_range": [
+        15,
+        22
+      ],
+      "structural_contract_passed": true,
+      "semantic_facing_check_required": "Identify a front landmark and confirm projected positions TOP, LEFT, BOTTOM, RIGHT at body frames 0, 8, 16, 24.",
+      "warning": "Structural checks do not prove that movement looks natural; inspect sheets and run a live 32-transition turn."
+    },
+    "aras8": {
+      "frame_count": 64,
+      "canvas": [
+        42,
+        42
+      ],
+      "facings": 32,
+      "turret_start": 32,
+      "unique_body_frames": 32,
+      "unique_turret_frames": 32,
+      "body_visible_width_range": [
+        16,
+        29
+      ],
+      "body_visible_height_range": [
+        15,
+        21
+      ],
+      "structural_contract_passed": true,
+      "semantic_facing_check_required": "Identify a front landmark and confirm projected positions TOP, LEFT, BOTTOM, RIGHT at body frames 0, 8, 16, 24.",
+      "warning": "Structural checks do not prove that movement looks natural; inspect sheets and run a live 32-transition turn."
+    },
+    "yildirim": {
+      "frame_count": 64,
+      "canvas": [
+        46,
+        46
+      ],
+      "facings": 32,
+      "turret_start": 32,
+      "unique_body_frames": 32,
+      "unique_turret_frames": 32,
+      "body_visible_width_range": [
+        18,
+        32
+      ],
+      "body_visible_height_range": [
+        16,
+        23
+      ],
+      "structural_contract_passed": true,
+      "semantic_facing_check_required": "Identify a front landmark and confirm projected positions TOP, LEFT, BOTTOM, RIGHT at body frames 0, 8, 16, 24.",
+      "warning": "Structural checks do not prove that movement looks natural; inspect sheets and run a live 32-transition turn."
+    },
+    "gokkalkan": {
+      "frame_count": 64,
+      "canvas": [
+        44,
+        44
+      ],
+      "facings": 32,
+      "turret_start": 32,
+      "unique_body_frames": 32,
+      "unique_turret_frames": 32,
+      "body_visible_width_range": [
+        18,
+        30
+      ],
+      "body_visible_height_range": [
+        16,
+        22
+      ],
+      "structural_contract_passed": true,
+      "semantic_facing_check_required": "Identify a front landmark and confirm projected positions TOP, LEFT, BOTTOM, RIGHT at body frames 0, 8, 16, 24.",
+      "warning": "Structural checks do not prove that movement looks natural; inspect sheets and run a live 32-transition turn."
+    },
+    "sancak": {
+      "frame_count": 64,
+      "canvas": [
+        44,
+        44
+      ],
+      "facings": 32,
+      "turret_start": 32,
+      "unique_body_frames": 32,
+      "unique_turret_frames": 32,
+      "body_visible_width_range": [
+        18,
+        30
+      ],
+      "body_visible_height_range": [
+        19,
+        24
+      ],
+      "structural_contract_passed": true,
+      "semantic_facing_check_required": "Identify a front landmark and confirm projected positions TOP, LEFT, BOTTOM, RIGHT at body frames 0, 8, 16, 24.",
+      "warning": "Structural checks do not prove that movement looks natural; inspect sheets and run a live 32-transition turn."
+    },
+    "denizkaplan": {
+      "frame_count": 64,
+      "canvas": [
+        44,
+        44
+      ],
+      "facings": 32,
+      "turret_start": 32,
+      "unique_body_frames": 32,
+      "unique_turret_frames": 32,
+      "body_visible_width_range": [
+        18,
+        30
+      ],
+      "body_visible_height_range": [
+        17,
+        22
+      ],
+      "structural_contract_passed": true,
+      "semantic_facing_check_required": "Identify a front landmark and confirm projected positions TOP, LEFT, BOTTOM, RIGHT at body frames 0, 8, 16, 24.",
+      "warning": "Structural checks do not prove that movement looks natural; inspect sheets and run a live 32-transition turn."
+    }
+  }
+}

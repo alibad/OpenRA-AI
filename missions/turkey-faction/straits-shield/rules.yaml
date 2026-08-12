@@ -1,0 +1,76 @@
+Player:
+	PlayerResources:
+		DefaultCash: 14000
+
+World:
+	LuaScript:
+		Scripts: campaign.lua, utils.lua, straits-shield.lua
+	MissionData:
+		Briefing: briefing
+	ScriptLobbyDropdown@difficulty:
+		ID: difficulty
+		Label: dropdown-difficulty.label
+		Description: dropdown-difficulty.description
+		Values:
+			easy: options-difficulty.easy
+			normal: options-difficulty.normal
+			hard: options-difficulty.hard
+		Default: normal
+
+FCOM:
+	Tooltip:
+		Name: actor-harbor-relay.name
+
+# The player must build the complete Turkey roster. Legacy Allied combat
+# buttons are hidden while economic, repair, engineer, medic, mechanic, and
+# construction actors remain native.
+E1:
+	Buildable:
+		Prerequisites: ~disabled
+E3:
+	Buildable:
+		Prerequisites: ~disabled
+E7:
+	Buildable:
+		Prerequisites: ~disabled
+E7.noautotarget:
+	-Buildable:
+SPY:
+	Buildable:
+		Prerequisites: ~disabled
+1TNK:
+	Buildable:
+		Prerequisites: ~disabled
+2TNK:
+	Buildable:
+		Prerequisites: ~disabled
+ARTY:
+	Buildable:
+		Prerequisites: ~disabled
+JEEP:
+	Buildable:
+		Prerequisites: ~disabled
+MRJ:
+	Buildable:
+		Prerequisites: ~disabled
+APC:
+	Buildable:
+		Prerequisites: ~disabled
+HELI:
+	Buildable:
+		Prerequisites: ~disabled
+TRAN:
+	Buildable:
+		Prerequisites: ~disabled
+DD:
+	Buildable:
+		Prerequisites: ~disabled
+CA:
+	Buildable:
+		Prerequisites: ~disabled
+PT:
+	Buildable:
+		Prerequisites: ~disabled
+LST:
+	Buildable:
+		Prerequisites: ~disabled

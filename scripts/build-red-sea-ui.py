@@ -1,4 +1,4 @@
-"""Build deterministic HiDPI Red Sea faction flags for the OpenRA chrome atlas."""
+"""Build deterministic HiDPI World War III faction flags for the chrome atlas."""
 
 from __future__ import annotations
 
@@ -39,6 +39,25 @@ def draw_yemen_flag(draw: ImageDraw.ImageDraw, scale: int) -> None:
     draw.rectangle((x, y + 2 * band, x + width - 1, y + 3 * band - 1), fill=(0, 0, 0, 255))
 
 
+def draw_turkey_flag(draw: ImageDraw.ImageDraw, scale: int) -> None:
+    # Reuse the native Turkey region already declared by the RA chrome contract.
+    x, y, width, height = 226 * scale, 113 * scale, 30 * scale, 15 * scale
+    draw.rectangle((x, y, x + width - 1, y + height - 1), fill=(200, 16, 46, 255))
+    # The crescent and star are redrawn at every density to stay sharp in the
+    # selector rather than scaling a 1x bitmap.
+    cx, cy, radius = x + 12 * scale, y + 7 * scale, 5 * scale
+    draw.ellipse((cx - radius, cy - radius, cx + radius, cy + radius), fill=(255, 255, 255, 255))
+    cut = 4 * scale
+    draw.ellipse((cx - cut + 2 * scale, cy - cut, cx + cut + 2 * scale, cy + cut), fill=(200, 16, 46, 255))
+    star_center = (x + 20 * scale, y + 7 * scale)
+    points = []
+    for index in range(10):
+        angle = -1.57079632679 + index * 3.14159265359 / 5
+        r = (3.2 if index % 2 == 0 else 1.35) * scale
+        points.append((star_center[0] + r * __import__("math").cos(angle), star_center[1] + r * __import__("math").sin(angle)))
+    draw.polygon(points, fill=(255, 255, 255, 255))
+
+
 def build_density(scale: int) -> Path:
     suffix = "" if scale == 1 else f"-{scale}x"
     source = UIBITS / f"glyphs{suffix}.png"
@@ -54,6 +73,7 @@ def build_density(scale: int) -> Path:
     draw = ImageDraw.Draw(atlas)
     draw_saudi_flag(draw, scale)
     draw_yemen_flag(draw, scale)
+    draw_turkey_flag(draw, scale)
     atlas.save(output, optimize=True)
     return output
 

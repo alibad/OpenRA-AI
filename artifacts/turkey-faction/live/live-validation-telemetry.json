@@ -1,0 +1,334 @@
+{
+  "schema": "openra-ai.turkey-live/v1",
+  "captured_at": "2026-08-12T06:47:47.072747+00:00",
+  "branch": "codex/turkey-faction",
+  "engine_commit": "4dead6a150091b41a9b1a0719d224d7dfef8ef22",
+  "bridge": "127.0.0.1:18081",
+  "map": "03: Straits Shield",
+  "initial_tick": 380,
+  "initial_turkey_units": [
+    {
+      "actor_id": 11,
+      "type": "aras8",
+      "cell": [
+        47,
+        72
+      ],
+      "facing": 256,
+      "hp_percent": 1.0,
+      "activity": "",
+      "ammo": -1,
+      "target_actor_id": 0
+    },
+    {
+      "actor_id": 12,
+      "type": "denizkaplan",
+      "cell": [
+        51,
+        73
+      ],
+      "facing": 256,
+      "hp_percent": 1.0,
+      "activity": "",
+      "ammo": -1,
+      "target_actor_id": 0
+    },
+    {
+      "actor_id": 13,
+      "type": "trrifle",
+      "cell": [
+        46,
+        73
+      ],
+      "facing": 0,
+      "hp_percent": 1.0,
+      "activity": "",
+      "ammo": -1,
+      "target_actor_id": 0
+    },
+    {
+      "actor_id": 14,
+      "type": "trrifle",
+      "cell": [
+        46,
+        73
+      ],
+      "facing": 0,
+      "hp_percent": 1.0,
+      "activity": "",
+      "ammo": -1,
+      "target_actor_id": 0
+    },
+    {
+      "actor_id": 15,
+      "type": "trat",
+      "cell": [
+        47,
+        73
+      ],
+      "facing": 0,
+      "hp_percent": 1.0,
+      "activity": "",
+      "ammo": -1,
+      "target_actor_id": 0
+    },
+    {
+      "actor_id": 16,
+      "type": "trdroneop",
+      "cell": [
+        48,
+        73
+      ],
+      "facing": 0,
+      "hp_percent": 1.0,
+      "activity": "",
+      "ammo": -1,
+      "target_actor_id": 0
+    },
+    {
+      "actor_id": 17,
+      "type": "kuzgunm",
+      "cell": [
+        48,
+        66
+      ],
+      "facing": 456,
+      "hp_percent": 1.0,
+      "activity": "FlyIdle",
+      "ammo": 8,
+      "target_actor_id": 0
+    }
+  ],
+  "opening_frame": {
+    "path": "C:\\Users\\Admin\\Code\\hq\\games\\OpenRA-AI-turkey\\artifacts\\turkey-faction\\live\\straits-shield-opening.png",
+    "tick": 390,
+    "width": 1280,
+    "height": 720,
+    "scope": "rendered-player-viewport-fog-respecting"
+  },
+  "movement": {
+    "receipt": {
+      "request_id": "turkey-live-cardinal-movement",
+      "accepted": true,
+      "game_tick": 393,
+      "detail": "Queued 4 confirmed player orders.",
+      "results": [
+        {
+          "action": "MOVE",
+          "accepted": true,
+          "detail": "Queued as a synchronized local-player order."
+        },
+        {
+          "index": 1,
+          "action": "MOVE",
+          "accepted": true,
+          "detail": "Queued as a synchronized local-player order."
+        },
+        {
+          "index": 2,
+          "action": "MOVE",
+          "accepted": true,
+          "detail": "Queued as a synchronized local-player order."
+        },
+        {
+          "index": 3,
+          "action": "MOVE",
+          "accepted": true,
+          "detail": "Queued as a synchronized local-player order."
+        }
+      ]
+    },
+    "tick_after": 510,
+    "headings": [
+      {
+        "heading": "north",
+        "actor_id": 11,
+        "type": "aras8",
+        "start_cell": [
+          47,
+          72
+        ],
+        "target_cell": [
+          47,
+          69
+        ],
+        "end_cell": [
+          47,
+          69
+        ],
+        "start_facing": 256,
+        "end_facing": 0,
+        "distance_moved": 3.0,
+        "passed": true
+      },
+      {
+        "heading": "east",
+        "actor_id": 12,
+        "type": "denizkaplan",
+        "start_cell": [
+          51,
+          73
+        ],
+        "target_cell": [
+          54,
+          73
+        ],
+        "end_cell": [
+          54,
+          73
+        ],
+        "start_facing": 256,
+        "end_facing": 768,
+        "distance_moved": 3.0,
+        "passed": true
+      },
+      {
+        "heading": "south",
+        "actor_id": 13,
+        "type": "trrifle",
+        "start_cell": [
+          46,
+          73
+        ],
+        "target_cell": [
+          46,
+          76
+        ],
+        "end_cell": [
+          46,
+          76
+        ],
+        "start_facing": 0,
+        "end_facing": 512,
+        "distance_moved": 3.0,
+        "passed": true
+      },
+      {
+        "heading": "west",
+        "actor_id": 14,
+        "type": "trrifle",
+        "start_cell": [
+          46,
+          73
+        ],
+        "target_cell": [
+          43,
+          73
+        ],
+        "end_cell": [
+          43,
+          73
+        ],
+        "start_facing": 0,
+        "end_facing": 256,
+        "distance_moved": 3.0,
+        "passed": true
+      }
+    ],
+    "passed": true
+  },
+  "combat": {
+    "approach_receipt": {
+      "request_id": "turkey-live-combat-approach",
+      "accepted": true,
+      "game_tick": 519,
+      "detail": "Queued 2 confirmed player orders.",
+      "results": [
+        {
+          "action": "ATTACK_MOVE",
+          "accepted": true,
+          "detail": "Queued as a synchronized local-player order."
+        },
+        {
+          "index": 1,
+          "action": "ATTACK_MOVE",
+          "accepted": true,
+          "detail": "Queued as a synchronized local-player order."
+        }
+      ]
+    },
+    "focus_receipt": {
+      "request_id": "turkey-live-focus-fire",
+      "accepted": true,
+      "game_tick": 820,
+      "detail": "Queued 1 confirmed player order.",
+      "results": [
+        {
+          "action": "ATTACK",
+          "accepted": true,
+          "detail": "Queued as a synchronized local-player order."
+        }
+      ]
+    },
+    "contact_tick": 810,
+    "final_tick": 1120,
+    "attackers_before": [
+      {
+        "actor_id": 12,
+        "type": "denizkaplan",
+        "cell": [
+          54,
+          73
+        ],
+        "facing": 768,
+        "hp_percent": 1.0,
+        "activity": "",
+        "ammo": -1,
+        "target_actor_id": 0
+      },
+      {
+        "actor_id": 17,
+        "type": "kuzgunm",
+        "cell": [
+          50,
+          65
+        ],
+        "facing": 228,
+        "hp_percent": 1.0,
+        "activity": "FlyIdle",
+        "ammo": 8,
+        "target_actor_id": 0
+      }
+    ],
+    "attackers_after": [],
+    "focused_target_before": {
+      "actor_id": 39,
+      "type": "ege",
+      "cell": [
+        66,
+        62
+      ],
+      "facing": 288,
+      "hp_percent": 0.9695,
+      "activity": "AttackActivity",
+      "ammo": -1,
+      "target_actor_id": 12
+    },
+    "focused_target_after": null,
+    "signals": {
+      "target_acquired": true,
+      "target_damaged_or_destroyed": true,
+      "ammo_changed": false,
+      "active_target": false,
+      "kill_counter_changed": true,
+      "return_fire_losses": true
+    },
+    "passed": true
+  },
+  "combat_frame": {
+    "path": "C:\\Users\\Admin\\Code\\hq\\games\\OpenRA-AI-turkey\\artifacts\\turkey-faction\\live\\straits-shield-live-combat.png",
+    "tick": 1120,
+    "width": 1280,
+    "height": 720,
+    "scope": "rendered-player-viewport-fog-respecting"
+  },
+  "final_counters": {
+    "tick": 1120,
+    "cash": 14000,
+    "units_killed": 1,
+    "units_lost": 2,
+    "order_count": 0,
+    "explored_percent": 2.84
+  },
+  "passed": true
+}
