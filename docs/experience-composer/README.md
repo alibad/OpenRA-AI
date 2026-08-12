@@ -1,6 +1,8 @@
 # Experience Composer
 
-The Experience Composer is available from the Red Alert main menu under **Experience**. It separates simulation-affecting capabilities from local presentation replacements.
+The Experience Builder is available from **Main Menu → Workshop → Experience Builder**. Workshop is the single home for Experience Builder, Mission Studio, Map Editor, and Asset Library; playback and credits remain under Extras.
+
+The Builder separates simulation-affecting capabilities from local presentation replacements. Selecting a gameplay module shows its behavior, enabled state, version, dependencies, contributed data files, source, and license. **Browse Asset Library** opens the searchable asset preview directly, and **Copy Pack Folder Path** provides the presentation-pack destination without requiring users to memorize it.
 
 ## Gameplay profiles
 
@@ -22,7 +24,7 @@ On first launch, the game creates:
 
 On a standard Windows installation this is normally under `%APPDATA%/OpenRA/ExperiencePacks/ra/`.
 
-Each immediate child folder is one pack. Copy the creator template, rename the folder to match its `Id`, add replacement files below `assets/`, and select **Refresh** in the Composer.
+Each immediate child folder is one pack. Copy the creator template, rename the folder to match its `Id`, add replacement files below `assets/`, and select **Refresh** in the Builder.
 
 ```text
 my-pack/
@@ -38,6 +40,10 @@ Replacement paths are OpenRA virtual filenames, not source paths. For example, r
 Packs are deliberately data-only. They may contain supported image, sprite, palette, audio, and video formats, but no DLLs, scripts, executables, archives, or YAML below the assets folder. Every file must be declared by `Replaces`; undeclared and missing files invalidate the pack. Symbolic links and junctions are rejected.
 
 Assets not declared by the pack automatically fall back to the normal game presentation.
+
+## Asset Library
+
+The native Asset Browser loaders and preview renderers are reused behind a redesigned **Asset Library** workspace. It provides search-first navigation, source and type filters, selected-asset context, a larger preview, automatic starting palette selection, and **Copy Asset Name** for exact presentation-pack replacement entries.
 
 ## Licensing fields
 
