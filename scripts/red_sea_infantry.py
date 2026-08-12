@@ -33,6 +33,7 @@ class InfantryStyle:
     bulky: float = 1.0
     hood: bool = False
     scarf: bool = False
+    heroic: bool = False
 
 
 STYLES: dict[str, InfantryStyle] = {
@@ -116,8 +117,17 @@ def _draw_weapon(
     cx, cy = center
     if prone:
         cy += 0.8
-    start = (cx - fx * back + rx * 0.25, cy - fy * back + ry * 0.25)
-    end = (cx + fx * (length - recoil), cy + fy * (length - recoil))
+    if style.heroic:
+        # Iran's compact silhouettes hold long weapons across the body instead
+        # of pointing the bitmap-thin barrel directly into the camera. This
+        # preserves a readable weapon at front/rear facings without rotating a
+        # finished image. Existing Red Sea infantry retain their authored pose.
+        side = 2.0 if kind in {"rpg", "atgm"} else 1.15
+        start = (cx - fx * back - rx * side, cy - fy * back - ry * side)
+        end = (cx + fx * (length - recoil) + rx * side, cy + fy * (length - recoil) + ry * side)
+    else:
+        start = (cx - fx * back + rx * .25, cy - fy * back + ry * .25)
+        end = (cx + fx * (length - recoil), cy + fy * (length - recoil))
     outline = _c((20, 22, 20))
     body = _c((61, 58, 43) if kind in {"rpg", "atgm"} else (35, 37, 34))
     _line(draw, (start, end), outline, 2.0 if kind in {"rpg", "atgm"} else 1.55)
@@ -180,6 +190,28 @@ def _draw_equipment(draw: ImageDraw.ImageDraw, style: InfantryStyle, facing: int
         _polygon(draw, ((charge[0] - 1.1, charge[1] - 1.2), (charge[0] + 1.1, charge[1] - 1.2),
                         (charge[0] + 1.1, charge[1] + 1.2), (charge[0] - 1.1, charge[1] + 1.2)), _c(style.accent), outline)
 
+    if style.role == "basij":
+        # Broad shoulder roll and cross-body ammunition band distinguish the
+        # inexpensive section from the stock rifleman at native zoom.
+        shoulder_l = (tx - rx * 3.7, ty - ry * 3.7 - 2.0)
+        shoulder_r = (tx + rx * 3.7, ty + ry * 3.7 - 2.0)
+        _line(draw, (shoulder_l, shoulder_r), _c(team[0]), 1.45)
+        _line(
+            draw,
+            ((tx - rx * 2.8 - fx * 1.8, ty - ry * 2.8 - fy * 1.8 - 2.2),
+             (tx + rx * 2.2 + fx * 1.9, ty + ry * 2.2 + fy * 1.9 + 2.8)),
+            _c(style.gear),
+            1.25,
+        )
+
+    if style.role == "atgm":
+        # A visible sight housing and folded tripod make this read as a heavy
+        # guided launcher rather than a rifle with a long black line.
+        mount = (tx + fx * 1.0 + rx * 3.0, ty + fy * 1.0 + ry * 3.0 + 1.5)
+        _ellipse(draw, (mount[0] - 1.35, mount[1] - 1.35, mount[0] + 1.35, mount[1] + 1.35), _c(team[0]), outline)
+        _line(draw, ((mount[0] - rx * .8, mount[1] - ry * .8),
+                     (mount[0] - rx * 3.2 - fx * 2.4, mount[1] - ry * 3.2 - fy * 2.4 + 4.0)), _c(style.gear), 1.0)
+
     if style.role == "shadow":
         # An asymmetric half-cloak hangs vertically while its exposed edge
         # shifts with facing. This keeps the commando upright and recognizable
@@ -218,16 +250,19 @@ def _draw_upright(
     if idle_phase is not None:
         bob += math.sin(math.tau * idle_phase / 16) * .18
 
-    cx, ground = 25.0 + rx * sway, 25.0 + ry * sway
+    cx, ground = 25.0 + rx * sway, (26.0 if style.heroic else 25.0) + ry * sway
     aim_shift = (0.0, .25, .62, .85, .52, .28, .12, 0.0)[shoot_phase] if shoot_phase is not None else 0.0
-    hips = (cx + fx * stride * .35, ground - 7.0 + bob)
-    torso = (cx + fx * (stride * .18 + aim_shift), ground - 12.0 + bob - aim_shift * .28)
-    head = (torso[0], torso[1] - 5.0)
+    hip_height = 5.8 if style.heroic else 7.0
+    torso_height = 10.2 if style.heroic else 12.0
+    head_height = 4.2 if style.heroic else 5.0
+    hips = (cx + fx * stride * .35, ground - hip_height + bob)
+    torso = (cx + fx * (stride * .18 + aim_shift), ground - torso_height + bob - aim_shift * .28)
+    head = (torso[0], torso[1] - head_height)
     outline = _c((27, 27, 23))
 
     _ellipse(draw, (cx - 4.6, ground - .8, cx + 5.2, ground + 1.2), _c((20, 18, 15), 92))
 
-    leg_spread = 2.0 + abs(stride) * 1.7
+    leg_spread = (2.7 if style.heroic else 2.0) + abs(stride) * 1.7
     left_foot = (hips[0] + rx * leg_spread + fx * stride * 2.0, ground + ry * leg_spread + fy * stride * 2.0)
     right_foot = (hips[0] - rx * leg_spread - fx * stride * 2.0, ground - ry * leg_spread - fy * stride * 2.0)
     _line(draw, (hips, left_foot), outline, 2.8 * style.bulky)
@@ -237,7 +272,7 @@ def _draw_upright(
     _ellipse(draw, (left_foot[0] - 1.7, left_foot[1] - .7, left_foot[0] + 1.8, left_foot[1] + .7), _c(style.gear), outline)
     _ellipse(draw, (right_foot[0] - 1.7, right_foot[1] - .7, right_foot[0] + 1.8, right_foot[1] + .7), _c(style.gear), outline)
 
-    width = 3.5 * style.bulky
+    width = (4.15 if style.heroic else 3.5) * style.bulky
     _polygon(draw, ((torso[0] - width, torso[1] - 3.0), (torso[0] + width, torso[1] - 3.0),
                     (hips[0] + width * .78, hips[1] + .7), (hips[0] - width * .78, hips[1] + .7)), _c(style.cloth), outline)
     _polygon(draw, ((torso[0] - width * .82, torso[1] - 2.2), (torso[0] + width * .82, torso[1] - 2.2),

@@ -24,6 +24,7 @@ assert BUILD_SPEC and BUILD_SPEC.loader
 BUILD_MODULE = importlib.util.module_from_spec(BUILD_SPEC)
 BUILD_SPEC.loader.exec_module(BUILD_MODULE)
 quantize = BUILD_MODULE.quantize
+build_icon = BUILD_MODULE.build_icon
 
 
 def digest(image) -> str:
@@ -77,20 +78,50 @@ def test_infantry_has_native_scale_and_explicit_player_color(role: str) -> None:
     indexed = [quantize(frame, palette) for frame in frames[:128]]
     assert remap_share(indexed) >= (0.22 if role == "shadow" else 0.38)
 
-    # The old Iran figures averaged only ~34 px of bounding-box area compared
-    # with ~200 px for native E1/E3/E7. Keep the live silhouette substantial.
+    # The first Iran figures were tall ~10 px-wide stick figures. The authored
+    # replacement must retain native-scale body mass and role equipment.
     areas = []
+    widths = []
+    opaque_pixels = []
     for frame in frames[:128]:
         bbox = frame.getchannel("A").getbbox()
         assert bbox
-        areas.append((bbox[2] - bbox[0]) * (bbox[3] - bbox[1]))
-    assert sum(areas) / len(areas) >= 90
+        width = bbox[2] - bbox[0]
+        areas.append(width * (bbox[3] - bbox[1]))
+        widths.append(width)
+        opaque_pixels.append(sum(alpha >= 96 for alpha in frame.getchannel("A").tobytes()))
+    assert sum(areas) / len(areas) >= 300
+    assert sum(widths) / len(widths) >= 15
+    assert sum(opaque_pixels) / len(opaque_pixels) >= 120
 
     if role == "shadow":
         for frame in frames[:8]:
             bbox = frame.getchannel("A").getbbox()
             assert bbox
-            assert bbox[3] - bbox[1] > bbox[2] - bbox[0]
+            assert bbox[2] - bbox[0] >= 16
+
+
+def test_every_iran_cameo_is_large_role_specific_and_player_colored() -> None:
+    cameos = {
+        name: build_icon(asset, label)
+        for name, (asset, label) in BUILD_MODULE.ICONS.items()
+    }
+    assert len(cameos) == 14
+    assert len({digest(image) for image in cameos.values()}) == 14
+
+    for name, image in cameos.items():
+        assert image.size == (64, 48), name
+        marker_pixels = []
+        for y in range(34):
+            for x in range(64):
+                red, green, blue, _ = image.getpixel((x, y))
+                if red >= 135 and blue >= 135 and green <= 72 and green * 3 <= min(red, blue):
+                    marker_pixels.append((x, y))
+        assert len(marker_pixels) >= 180, name
+        marker_width = max(x for x, _ in marker_pixels) - min(x for x, _ in marker_pixels) + 1
+        marker_height = max(y for _, y in marker_pixels) - min(y for _, y in marker_pixels) + 1
+        assert marker_width >= 38, name
+        assert marker_height >= 18, name
 
 
 @pytest.mark.parametrize(
@@ -260,7 +291,7 @@ def test_native_progression_and_build_limit_contracts() -> None:
     shadow = re.search(r"^SHADOWONE:.*?(?=^[A-Z0-9.]+:)", text, re.MULTILINE | re.DOTALL)
     assert shadow
     assert "BuildLimit: 1" in shadow.group(0)
-    assert "CloakedAlpha: 0.72" in shadow.group(0)
+    assert "CloakedAlpha: 0.94" in shadow.group(0)
     assert "UncloakOn: Attack, Unload, Infiltrate, Demolish, Move" in shadow.group(0)
     assert "IranSabotageCharge" in shadow.group(0)
 

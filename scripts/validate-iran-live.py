@@ -240,6 +240,34 @@ def main() -> int:
         capture(bridge, output, "01-doctrine-range.png", captures)
 
         headings = {
+            "basij_infantry": move_trace(
+                bridge,
+                "irbas",
+                [(61, 79), (61, 82), (64, 84), (62, 78)],
+                tolerance=0,
+                timeout_per_leg=8,
+            ),
+            "atgm_infantry": move_trace(
+                bridge,
+                "iratgm",
+                [(62, 81), (64, 84), (66, 81), (63, 80)],
+                tolerance=0,
+                timeout_per_leg=8,
+            ),
+            "controller_infantry": move_trace(
+                bridge,
+                "irdc",
+                [(63, 79), (62, 82), (66, 82), (64, 78)],
+                tolerance=0,
+                timeout_per_leg=8,
+            ),
+            "shadow_infantry": move_trace(
+                bridge,
+                "shadowone",
+                [(64, 81), (62, 83), (67, 82), (65, 80)],
+                tolerance=0,
+                timeout_per_leg=8,
+            ),
             "ground_vehicle": move_trace(
                 bridge,
                 "irkarr",

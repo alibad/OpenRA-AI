@@ -366,10 +366,10 @@ def _infantry_pose(action: str, phase: int, length: int) -> dict[str, float]:
 
 
 IRAN_INFANTRY_STYLES = {
-    "basij": InfantryStyle("rifle", TEAM_MID, TEAM_DEEP, TEAM_LIGHT, (137, 91, 61), GREEN_DARK, SAND_LIGHT, 1.04),
-    "atgm": InfantryStyle("atgm", TEAM_MID, TEAM_DEEP, TEAM_DARK, (137, 91, 61), METAL, SAND_LIGHT, 1.16),
-    "controller": InfantryStyle("controller", TEAM_LIGHT, TEAM_DEEP, TEAM_MID, (137, 91, 61), GLASS, (74, 194, 166), 1.02),
-    "shadow": InfantryStyle("shadow", TEAM_DEEP, (31, 38, 36), (76, 84, 79), (127, 84, 58), (21, 26, 25), (79, 224, 184), 1.13, hood=True),
+    "basij": InfantryStyle("basij", TEAM_MID, TEAM_DEEP, TEAM_LIGHT, (147, 100, 68), GREEN_DARK, SAND_LIGHT, 1.18, scarf=True, heroic=True),
+    "atgm": InfantryStyle("atgm", TEAM_MID, TEAM_DEEP, TEAM_LIGHT, (145, 96, 64), METAL, SAND_LIGHT, 1.28, heroic=True),
+    "controller": InfantryStyle("controller", TEAM_LIGHT, TEAM_DEEP, TEAM_MID, (145, 96, 64), GLASS, (74, 224, 194), 1.17, heroic=True),
+    "shadow": InfantryStyle("shadow", TEAM_MID, (42, 49, 46), TEAM_DEEP, (137, 91, 61), (20, 25, 24), (92, 242, 205), 1.30, hood=True, scarf=True, heroic=True),
 }
 
 
