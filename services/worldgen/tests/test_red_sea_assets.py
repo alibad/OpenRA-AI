@@ -198,12 +198,14 @@ class RedSeaAssetTests(unittest.TestCase):
         self.assertTrue(selectable_factions)
         self.assertEqual(set(), selectable_factions - registered_flags)
 
-        for scale, suffix in ((1, ""), (2, "-2x"), (3, "-3x")):
+        for suffix in ("", "-2x", "-3x"):
             path = ROOT / "engine" / "openra" / "mods" / "ra" / "uibits" / f"glyphs-redsea{suffix}.png"
             source = ROOT / "engine" / "openra" / "mods" / "ra" / "uibits" / f"glyphs{suffix}.png"
             with Image.open(path) as atlas:
                 with Image.open(source) as original:
-                    self.assertEqual(atlas.size, original.size)
+                    self.assertEqual(atlas.width, original.width)
+                    self.assertGreaterEqual(atlas.height, original.height)
+                scale = atlas.width // 256
                 saudi = atlas.crop((226 * scale, 1 * scale, 256 * scale, 16 * scale)).convert("RGB")
                 yemen = atlas.crop((226 * scale, 17 * scale, 256 * scale, 32 * scale)).convert("RGB")
                 self.assertIn((0, 108, 53), set(saudi.get_flattened_data()))
@@ -336,7 +338,8 @@ class RedSeaAssetTests(unittest.TestCase):
         self.assertGreater(regular.stat().st_size, 250_000)
         self.assertGreater(bold.stat().st_size, 275_000)
         mod_yaml = (ROOT / "engine" / "openra" / "mods" / "ra" / "mod.yaml").read_text(encoding="utf-8")
-        self.assertIn("FallbackFonts: common|NotoSansArabic-Regular.ttf", mod_yaml)
+        self.assertIn("Font: common|FreeSansArabic.ttf", mod_yaml)
+        self.assertIn("Font: common|FreeSansArabicBold.ttf", mod_yaml)
         self.assertIn("FallbackFonts: common|NotoSansArabic-Bold.ttf", mod_yaml)
         for path in (regular, bold):
             data = path.read_bytes()
@@ -446,7 +449,7 @@ class RedSeaAssetTests(unittest.TestCase):
                 break
             campaign.append(line)
         self.assertEqual(
-            ["jizan-corridor-2026", "hodeidah-lifeline-2026", "haitan-network-2026"],
+            ["jizan-corridor-2026", "hodeidah-lifeline-2026", "straits-shield-2026", "haitan-network-2026"],
             [line.strip() for line in campaign if line.strip()],
         )
 

@@ -9,9 +9,9 @@ class MissionCorpusEvalTests(unittest.TestCase):
     def test_every_declared_red_alert_mission_is_inventoried(self) -> None:
         missions = inventory_missions()
 
-        self.assertEqual(len(missions), 63)
+        self.assertEqual(len(missions), 65)
         self.assertTrue(all(mission.available for mission in missions))
-        self.assertEqual(len({mission.map_name for mission in missions}), 63)
+        self.assertEqual(len({mission.map_name for mission in missions}), 65)
 
     def test_required_human_slots_are_detected_from_each_map(self) -> None:
         missions = {mission.map_name: mission for mission in inventory_missions()}

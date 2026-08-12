@@ -93,13 +93,14 @@ Time Elapsed 00:00:07.09
 Build succeeded.
 ```
 
-Full worldgen, companion, and evaluation suites:
+Full combined-main worldgen, companion, and evaluation suites (including Saudi/Yemen, Turkey, Iran, and China):
 
 ```text
-........................................................................ [ 33%]
-........................................................................ [ 66%]
-........................................................................ [100%]
-216 passed, 1 warning in 27.85s
+........................................................................ [ 32%]
+........................................................................ [ 64%]
+........................................................................ [ 96%]
+........                                                                 [100%]
+224 passed, 1 warning in 29.78s
 ```
 
 The warning is an external `pydantic-settings` incomplete-forward-reference warning. The China contract suite was also pointed at the exact final integration worktree:
