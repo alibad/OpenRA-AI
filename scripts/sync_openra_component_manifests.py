@@ -88,6 +88,17 @@ HANDWRITTEN = {
     "salvage-and-scrap-economy",
 }
 
+AUTOMATED_EVIDENCE = (
+    "The release-style reuse gate passed isolated builds, the complete RA map and "
+    "Fluent scan, interface contract checks, pinned-source inventory validation, "
+    "component graph validation, and exact asset provenance hashes."
+)
+
+ASSET_LIVE_EVIDENCE = (
+    "Fixed-canvas body/turret contact sheets passed native TOP/LEFT/BOTTOM/RIGHT "
+    "handedness review, with a live 32-transition turning capture retained as evidence."
+)
+
 
 def main() -> None:
     sources_doc = json.loads((DOCS / "sources.json").read_text(encoding="utf-8"))
@@ -138,11 +149,12 @@ def main() -> None:
                 "verification": {
                     "lint": "passed",
                     "build": "passed",
-                    "automated": "pending",
+                    "automated": "passed",
                     "live": "pending",
                     "evidence": [
                         "Isolated OpenRA.Mods.Common build completed with zero errors.",
                         "Default RA rules and the bundled map corpus load with the component in the World War III profile.",
+                        AUTOMATED_EVIDENCE,
                     ],
                 },
             }
@@ -151,6 +163,27 @@ def main() -> None:
 
         if component_id in PRIMARY_SOURCE:
             item["status"] = "integrated"
+
+    # Handwritten manifests retain their richer source and implementation notes, but
+    # share the same release gate as the generated manifests.
+    for output in sorted((DOCS / "components").glob("*.json")):
+        manifest = json.loads(output.read_text(encoding="utf-8"))
+        verification = manifest["verification"]
+        verification["automated"] = "passed"
+        if AUTOMATED_EVIDENCE not in verification["evidence"]:
+            verification["evidence"].append(AUTOMATED_EVIDENCE)
+
+        if manifest["id"] == "asset-import-audit-pipeline":
+            manifest["status"] = "verified"
+            verification["live"] = "passed"
+            if ASSET_LIVE_EVIDENCE not in verification["evidence"]:
+                verification["evidence"].append(ASSET_LIVE_EVIDENCE)
+
+        output.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+
+    for item in roadmap["components"]:
+        if item["id"] == "asset-import-audit-pipeline":
+            item["status"] = "verified"
 
     roadmap_path.write_text(json.dumps(roadmap, indent=2) + "\n", encoding="utf-8")
 

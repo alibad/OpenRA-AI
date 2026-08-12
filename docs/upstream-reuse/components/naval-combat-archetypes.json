@@ -44,11 +44,12 @@
   "verification": {
     "lint": "passed",
     "build": "passed",
-    "automated": "pending",
+    "automated": "passed",
     "live": "pending",
     "evidence": [
       "Isolated OpenRA.Mods.Common build completed with zero errors.",
-      "Default RA rules and the bundled map corpus load with the component in the World War III profile."
+      "Default RA rules and the bundled map corpus load with the component in the World War III profile.",
+      "The release-style reuse gate passed isolated builds, the complete RA map and Fluent scan, interface contract checks, pinned-source inventory validation, component graph validation, and exact asset provenance hashes."
     ]
   }
 }

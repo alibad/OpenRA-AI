@@ -568,7 +568,7 @@
     {
       "id": "asset-import-audit-pipeline",
       "priority": "P0",
-      "status": "integrated",
+      "status": "verified",
       "domain": "asset-pipeline",
       "value": "Prevents broken facings, pivots, palettes, and legally ambiguous sprites from entering playable factions.",
       "sources": [

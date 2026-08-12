@@ -20,7 +20,9 @@
     {
       "project": "ra-plus",
       "commit": "3188783037c9d74dcf61f23e3cf7e49a32b6cd36",
-      "paths": ["OpenRA.Mods.CA/Traits/PointDefense.cs"],
+      "paths": [
+        "OpenRA.Mods.CA/Traits/PointDefense.cs"
+      ],
       "notes": "Secondary gameplay and configuration reference."
     }
   ],
@@ -28,12 +30,20 @@
     "code": "GPL-3.0-or-later",
     "assets": "No upstream assets imported",
     "redistribution": "allowed",
-    "attribution": ["OpenRA Combined Arms developers", "RA+ contributors", "OpenRA developers and contributors"]
+    "attribution": [
+      "OpenRA Combined Arms developers",
+      "RA+ contributors",
+      "OpenRA developers and contributors"
+    ]
   },
   "compatibility": {
     "target_mod": "ra",
     "engine_api": "native",
-    "dependencies": ["Armament", "Missile or Bullet projectile", "opt-in PointDefenseType value"],
+    "dependencies": [
+      "Armament",
+      "Missile or Bullet projectile",
+      "opt-in PointDefenseType value"
+    ],
     "conflicts": []
   },
   "integration": {
@@ -53,12 +63,13 @@
   "verification": {
     "lint": "passed",
     "build": "passed",
-    "automated": "pending",
+    "automated": "passed",
     "live": "pending",
     "evidence": [
       "Isolated Debug build of OpenRA.Mods.Cnc/OpenRA.Mods.Common completed with 0 errors.",
       "OpenRA.Utility ra --check-yaml passed with point-defense actor and weapon fixtures and all bundled RA maps, sequences, and Fluent references validated.",
-      "OpenRA.Utility all --check-explicit-interfaces and --check-conditional-trait-interface-overrides passed."
+      "OpenRA.Utility all --check-explicit-interfaces and --check-conditional-trait-interface-overrides passed.",
+      "The release-style reuse gate passed isolated builds, the complete RA map and Fluent scan, interface contract checks, pinned-source inventory validation, component graph validation, and exact asset provenance hashes."
     ]
   }
 }

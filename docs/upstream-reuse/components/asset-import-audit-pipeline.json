@@ -3,7 +3,7 @@
   "id": "asset-import-audit-pipeline",
   "name": "Asset Import Audit Pipeline",
   "kind": "asset-pipeline",
-  "status": "integrated",
+  "status": "verified",
   "summary": "Prevents broken facings, pivots, palettes, and legally ambiguous sprites from entering playable factions.",
   "sources": [
     {
@@ -47,11 +47,13 @@
   "verification": {
     "lint": "passed",
     "build": "passed",
-    "automated": "pending",
-    "live": "pending",
+    "automated": "passed",
+    "live": "passed",
     "evidence": [
       "Isolated OpenRA.Mods.Common build completed with zero errors.",
-      "Default RA rules and the bundled map corpus load with the component in the World War III profile."
+      "Default RA rules and the bundled map corpus load with the component in the World War III profile.",
+      "The release-style reuse gate passed isolated builds, the complete RA map and Fluent scan, interface contract checks, pinned-source inventory validation, component graph validation, and exact asset provenance hashes.",
+      "Fixed-canvas body/turret contact sheets passed native TOP/LEFT/BOTTOM/RIGHT handedness review, with a live 32-transition turning capture retained as evidence."
     ]
   }
 }

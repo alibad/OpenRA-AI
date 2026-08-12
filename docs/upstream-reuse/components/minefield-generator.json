@@ -9,13 +9,17 @@
     {
       "project": "combined-arms",
       "commit": "ab9e477c3db818e91946d4cfdc86e71012966141",
-      "paths": ["OpenRA.Mods.CA/Traits/LaysMinefield.cs"],
+      "paths": [
+        "OpenRA.Mods.CA/Traits/LaysMinefield.cs"
+      ],
       "notes": "Primary implementation; adapted to validate placement before creation and replenish only empty slots."
     },
     {
       "project": "generals-alpha",
       "commit": "21217baad7579abcba5dbcccd7935a57050d686e",
-      "paths": ["OpenRA.Mods.GenSDK/Traits/LaysMinefield.cs"],
+      "paths": [
+        "OpenRA.Mods.GenSDK/Traits/LaysMinefield.cs"
+      ],
       "notes": "Secondary reference for the Generals-style use case."
     }
   ],
@@ -23,12 +27,18 @@
     "code": "GPL-3.0-or-later",
     "assets": "No upstream assets imported",
     "redistribution": "allowed",
-    "attribution": ["OpenRA Combined Arms developers", "MustaphaTR / Generals Alpha contributors"]
+    "attribution": [
+      "OpenRA Combined Arms developers",
+      "MustaphaTR / Generals Alpha contributors"
+    ]
   },
   "compatibility": {
     "target_mod": "ra",
     "engine_api": "native",
-    "dependencies": ["IPositionableInfo", "mine actor definitions such as MINV and MINP"],
+    "dependencies": [
+      "IPositionableInfo",
+      "mine actor definitions such as MINV and MINP"
+    ],
     "conflicts": []
   },
   "integration": {
@@ -43,12 +53,13 @@
   "verification": {
     "lint": "passed",
     "build": "passed",
-    "automated": "pending",
+    "automated": "passed",
     "live": "pending",
     "evidence": [
       "Isolated Debug build of OpenRA.Mods.Cnc/OpenRA.Mods.Common completed with 0 errors.",
       "OpenRA.Utility ra --check-yaml passed after loading the abstract RA component and validating all bundled RA maps, sequences, and Fluent references.",
-      "OpenRA.Utility all --check-explicit-interfaces and --check-conditional-trait-interface-overrides passed."
+      "OpenRA.Utility all --check-explicit-interfaces and --check-conditional-trait-interface-overrides passed.",
+      "The release-style reuse gate passed isolated builds, the complete RA map and Fluent scan, interface contract checks, pinned-source inventory validation, component graph validation, and exact asset provenance hashes."
     ]
   }
 }

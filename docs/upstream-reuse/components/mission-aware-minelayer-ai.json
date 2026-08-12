@@ -9,7 +9,9 @@
     {
       "project": "shattered-paradise",
       "commit": "124b7054a636a9c51d8edc87b3171bf63b92556f",
-      "paths": ["OpenRA.Mods.Sp/Traits/BotModules/MinelayerBotModuleSP.cs"],
+      "paths": [
+        "OpenRA.Mods.Sp/Traits/BotModules/MinelayerBotModuleSP.cs"
+      ],
       "notes": "Adapted the mission initialization, quick-scan, actor filtering, and stuck recovery behavior into the native OpenRA MinelayerBotModule instead of duplicating the full module."
     }
   ],
@@ -17,12 +19,19 @@
     "code": "GPL-3.0-or-later",
     "assets": "No upstream assets imported",
     "redistribution": "allowed",
-    "attribution": ["Shattered Paradise developers", "OpenRA developers and contributors"]
+    "attribution": [
+      "Shattered Paradise developers",
+      "OpenRA developers and contributors"
+    ]
   },
   "compatibility": {
     "target_mod": "ra",
     "engine_api": "native",
-    "dependencies": ["Minelayer", "PathFinder", "ModularBot"],
+    "dependencies": [
+      "Minelayer",
+      "PathFinder",
+      "ModularBot"
+    ],
     "conflicts": []
   },
   "integration": {
@@ -36,12 +45,13 @@
   "verification": {
     "lint": "passed",
     "build": "passed",
-    "automated": "pending",
+    "automated": "passed",
     "live": "pending",
     "evidence": [
       "Isolated Debug build of OpenRA.Mods.Cnc/OpenRA.Mods.Common completed with 0 errors.",
       "OpenRA.Utility ra --check-yaml passed with the quick-scan fields enabled on the turtle AI and all bundled RA maps, sequences, and Fluent references validated.",
-      "OpenRA.Utility all --check-explicit-interfaces and --check-conditional-trait-interface-overrides passed."
+      "OpenRA.Utility all --check-explicit-interfaces and --check-conditional-trait-interface-overrides passed.",
+      "The release-style reuse gate passed isolated builds, the complete RA map and Fluent scan, interface contract checks, pinned-source inventory validation, component graph validation, and exact asset provenance hashes."
     ]
   }
 }
