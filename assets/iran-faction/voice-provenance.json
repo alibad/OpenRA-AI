@@ -1,0 +1,370 @@
+{
+  "generated": "2026-08-12",
+  "disclosure": "Generic Microsoft neural voices; no real-person imitation.",
+  "lines": [
+    {
+      "filename": "iran-inf-select-fa.wav",
+      "language": "fa-IR",
+      "voice": "fa-IR-FaridNeural",
+      "text": "آماده‌ایم.",
+      "role": "generic infantry"
+    },
+    {
+      "filename": "iran-inf-select-en.wav",
+      "language": "en-US",
+      "voice": "en-US-GuyNeural",
+      "text": "Section ready.",
+      "role": "generic infantry"
+    },
+    {
+      "filename": "iran-inf-move-fa.wav",
+      "language": "fa-IR",
+      "voice": "fa-IR-FaridNeural",
+      "text": "در حال حرکت.",
+      "role": "generic infantry"
+    },
+    {
+      "filename": "iran-inf-move-en.wav",
+      "language": "en-US",
+      "voice": "en-US-GuyNeural",
+      "text": "Moving now.",
+      "role": "generic infantry"
+    },
+    {
+      "filename": "iran-inf-action-fa.wav",
+      "language": "fa-IR",
+      "voice": "fa-IR-FaridNeural",
+      "text": "دستور دریافت شد.",
+      "role": "generic infantry"
+    },
+    {
+      "filename": "iran-inf-action-en.wav",
+      "language": "en-US",
+      "voice": "en-US-GuyNeural",
+      "text": "Order received.",
+      "role": "generic infantry"
+    },
+    {
+      "filename": "iran-inf-attack-fa.wav",
+      "language": "fa-IR",
+      "voice": "fa-IR-FaridNeural",
+      "text": "درگیر می‌شویم.",
+      "role": "generic infantry"
+    },
+    {
+      "filename": "iran-inf-attack-en.wav",
+      "language": "en-US",
+      "voice": "en-US-GuyNeural",
+      "text": "Engaging.",
+      "role": "generic infantry"
+    },
+    {
+      "filename": "iran-veh-select-fa.wav",
+      "language": "fa-IR",
+      "voice": "fa-IR-FaridNeural",
+      "text": "خدمه آماده است.",
+      "role": "generic vehicle crew"
+    },
+    {
+      "filename": "iran-veh-select-en.wav",
+      "language": "en-US",
+      "voice": "en-US-GuyNeural",
+      "text": "Crew standing by.",
+      "role": "generic vehicle crew"
+    },
+    {
+      "filename": "iran-veh-move-fa.wav",
+      "language": "fa-IR",
+      "voice": "fa-IR-FaridNeural",
+      "text": "ستون حرکت می‌کند.",
+      "role": "generic vehicle crew"
+    },
+    {
+      "filename": "iran-veh-move-en.wav",
+      "language": "en-US",
+      "voice": "en-US-GuyNeural",
+      "text": "Column moving.",
+      "role": "generic vehicle crew"
+    },
+    {
+      "filename": "iran-veh-action-fa.wav",
+      "language": "fa-IR",
+      "voice": "fa-IR-FaridNeural",
+      "text": "مسیر تأیید شد.",
+      "role": "generic vehicle crew"
+    },
+    {
+      "filename": "iran-veh-action-en.wav",
+      "language": "en-US",
+      "voice": "en-US-GuyNeural",
+      "text": "Route confirmed.",
+      "role": "generic vehicle crew"
+    },
+    {
+      "filename": "iran-veh-attack-fa.wav",
+      "language": "fa-IR",
+      "voice": "fa-IR-FaridNeural",
+      "text": "سامانه روی هدف است.",
+      "role": "generic vehicle crew"
+    },
+    {
+      "filename": "iran-veh-attack-en.wav",
+      "language": "en-US",
+      "voice": "en-US-GuyNeural",
+      "text": "System on target.",
+      "role": "generic vehicle crew"
+    },
+    {
+      "filename": "iran-air-select-fa.wav",
+      "language": "fa-IR",
+      "voice": "fa-IR-FaridNeural",
+      "text": "پرواز آماده است.",
+      "role": "generic aircrew"
+    },
+    {
+      "filename": "iran-air-select-en.wav",
+      "language": "en-US",
+      "voice": "en-US-GuyNeural",
+      "text": "Flight ready.",
+      "role": "generic aircrew"
+    },
+    {
+      "filename": "iran-air-move-fa.wav",
+      "language": "fa-IR",
+      "voice": "fa-IR-FaridNeural",
+      "text": "به سمت نقطه مسیر.",
+      "role": "generic aircrew"
+    },
+    {
+      "filename": "iran-air-move-en.wav",
+      "language": "en-US",
+      "voice": "en-US-GuyNeural",
+      "text": "Proceeding to waypoint.",
+      "role": "generic aircrew"
+    },
+    {
+      "filename": "iran-air-action-fa.wav",
+      "language": "fa-IR",
+      "voice": "fa-IR-FaridNeural",
+      "text": "دریافت شد، کنترل.",
+      "role": "generic aircrew"
+    },
+    {
+      "filename": "iran-air-action-en.wav",
+      "language": "en-US",
+      "voice": "en-US-GuyNeural",
+      "text": "Copy, control.",
+      "role": "generic aircrew"
+    },
+    {
+      "filename": "iran-air-attack-fa.wav",
+      "language": "fa-IR",
+      "voice": "fa-IR-FaridNeural",
+      "text": "هدف در دید است.",
+      "role": "generic aircrew"
+    },
+    {
+      "filename": "iran-air-attack-en.wav",
+      "language": "en-US",
+      "voice": "en-US-GuyNeural",
+      "text": "Target in sight.",
+      "role": "generic aircrew"
+    },
+    {
+      "filename": "iran-drone-select-fa.wav",
+      "language": "fa-IR",
+      "voice": "fa-IR-FaridNeural",
+      "text": "پیوند داده برقرار است.",
+      "role": "generic drone operator"
+    },
+    {
+      "filename": "iran-drone-select-en.wav",
+      "language": "en-US",
+      "voice": "en-US-GuyNeural",
+      "text": "Data link established.",
+      "role": "generic drone operator"
+    },
+    {
+      "filename": "iran-drone-move-fa.wav",
+      "language": "fa-IR",
+      "voice": "fa-IR-FaridNeural",
+      "text": "مسیر پرواز به‌روز شد.",
+      "role": "generic drone operator"
+    },
+    {
+      "filename": "iran-drone-move-en.wav",
+      "language": "en-US",
+      "voice": "en-US-GuyNeural",
+      "text": "Flight path updated.",
+      "role": "generic drone operator"
+    },
+    {
+      "filename": "iran-drone-action-fa.wav",
+      "language": "fa-IR",
+      "voice": "fa-IR-FaridNeural",
+      "text": "تصویر روشن است.",
+      "role": "generic drone operator"
+    },
+    {
+      "filename": "iran-drone-action-en.wav",
+      "language": "en-US",
+      "voice": "en-US-GuyNeural",
+      "text": "Picture is clear.",
+      "role": "generic drone operator"
+    },
+    {
+      "filename": "iran-drone-attack-fa.wav",
+      "language": "fa-IR",
+      "voice": "fa-IR-FaridNeural",
+      "text": "نشانه‌گذاری کامل شد.",
+      "role": "generic drone operator"
+    },
+    {
+      "filename": "iran-drone-attack-en.wav",
+      "language": "en-US",
+      "voice": "en-US-GuyNeural",
+      "text": "Designation complete.",
+      "role": "generic drone operator"
+    },
+    {
+      "filename": "iran-naval-select-fa.wav",
+      "language": "fa-IR",
+      "voice": "fa-IR-FaridNeural",
+      "text": "خدمه دریایی آماده است.",
+      "role": "generic naval crew"
+    },
+    {
+      "filename": "iran-naval-select-en.wav",
+      "language": "en-US",
+      "voice": "en-US-GuyNeural",
+      "text": "Naval crew ready.",
+      "role": "generic naval crew"
+    },
+    {
+      "filename": "iran-naval-move-fa.wav",
+      "language": "fa-IR",
+      "voice": "fa-IR-FaridNeural",
+      "text": "به سوی مسیر ساحلی.",
+      "role": "generic naval crew"
+    },
+    {
+      "filename": "iran-naval-move-en.wav",
+      "language": "en-US",
+      "voice": "en-US-GuyNeural",
+      "text": "Taking the coastal route.",
+      "role": "generic naval crew"
+    },
+    {
+      "filename": "iran-naval-action-fa.wav",
+      "language": "fa-IR",
+      "voice": "fa-IR-FaridNeural",
+      "text": "فرمان دریافت شد.",
+      "role": "generic naval crew"
+    },
+    {
+      "filename": "iran-naval-action-en.wav",
+      "language": "en-US",
+      "voice": "en-US-GuyNeural",
+      "text": "Command received.",
+      "role": "generic naval crew"
+    },
+    {
+      "filename": "iran-naval-attack-fa.wav",
+      "language": "fa-IR",
+      "voice": "fa-IR-FaridNeural",
+      "text": "ردیابی تثبیت شد.",
+      "role": "generic naval crew"
+    },
+    {
+      "filename": "iran-naval-attack-en.wav",
+      "language": "en-US",
+      "voice": "en-US-GuyNeural",
+      "text": "Track is steady.",
+      "role": "generic naval crew"
+    },
+    {
+      "filename": "shadow-select-fa.wav",
+      "language": "fa-IR",
+      "voice": "fa-IR-FaridNeural",
+      "text": "سایه در شبکه است.",
+      "role": "fictional Shadow One performer"
+    },
+    {
+      "filename": "shadow-select-en.wav",
+      "language": "en-US",
+      "voice": "en-US-GuyNeural",
+      "text": "Shadow is on the net.",
+      "role": "fictional Shadow One performer"
+    },
+    {
+      "filename": "shadow-move-fa.wav",
+      "language": "fa-IR",
+      "voice": "fa-IR-FaridNeural",
+      "text": "بی‌صدا حرکت می‌کنم.",
+      "role": "fictional Shadow One performer"
+    },
+    {
+      "filename": "shadow-move-en.wav",
+      "language": "en-US",
+      "voice": "en-US-GuyNeural",
+      "text": "Moving quietly.",
+      "role": "fictional Shadow One performer"
+    },
+    {
+      "filename": "shadow-action-fa.wav",
+      "language": "fa-IR",
+      "voice": "fa-IR-FaridNeural",
+      "text": "نقطه ورود مشخص شد.",
+      "role": "fictional Shadow One performer"
+    },
+    {
+      "filename": "shadow-action-en.wav",
+      "language": "en-US",
+      "voice": "en-US-GuyNeural",
+      "text": "Entry point marked.",
+      "role": "fictional Shadow One performer"
+    },
+    {
+      "filename": "shadow-attack-fa.wav",
+      "language": "fa-IR",
+      "voice": "fa-IR-FaridNeural",
+      "text": "هدف جدا شد.",
+      "role": "fictional Shadow One performer"
+    },
+    {
+      "filename": "shadow-attack-en.wav",
+      "language": "en-US",
+      "voice": "en-US-GuyNeural",
+      "text": "Target isolated.",
+      "role": "fictional Shadow One performer"
+    },
+    {
+      "filename": "shadow-demolish-fa.wav",
+      "language": "fa-IR",
+      "voice": "fa-IR-FaridNeural",
+      "text": "بارگذاری انجام شد.",
+      "role": "fictional Shadow One performer"
+    },
+    {
+      "filename": "shadow-demolish-en.wav",
+      "language": "en-US",
+      "voice": "en-US-GuyNeural",
+      "text": "Charge is set.",
+      "role": "fictional Shadow One performer"
+    },
+    {
+      "filename": "shadow-build-fa.wav",
+      "language": "fa-IR",
+      "voice": "fa-IR-FaridNeural",
+      "text": "سایه یک آماده است.",
+      "role": "fictional Shadow One performer"
+    },
+    {
+      "filename": "shadow-build-en.wav",
+      "language": "en-US",
+      "voice": "en-US-GuyNeural",
+      "text": "Shadow One ready.",
+      "role": "fictional Shadow One performer"
+    }
+  ]
+}
