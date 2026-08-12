@@ -1,0 +1,73 @@
+Player:
+	PlayerResources:
+		DefaultCashDropdownVisible: False
+		DefaultCashDropdownLocked: True
+		DefaultCash: 100000
+	Shroud:
+		FogCheckboxVisible: False
+		FogCheckboxLocked: True
+		FogCheckboxEnabled: False
+		ExploredMapCheckboxVisible: False
+		ExploredMapCheckboxLocked: True
+		ExploredMapCheckboxEnabled: True
+	BaseBuilderBotModule@normal:
+		TechTypes: dome, atek, fix, hpad
+		ProductionTypes: tent,weap,hpad
+		NavalProductionTypes: syrd
+		BuildingLimits:
+			tent: 1
+			weap: 1
+			dome: 1
+			atek: 1
+			fix: 1
+			hpad: 2
+			syrd: 1
+		BuildingFractions:
+			powr: 1
+			proc: 1
+			tent: 1
+			weap: 1
+			dome: 1
+			atek: 1
+			fix: 1
+			hpad: 1
+			syrd: 1
+		BuildingDelays:
+			dome: 0
+			atek: 0
+			fix: 0
+			hpad: 0
+			syrd: 0
+	UnitBuilderBotModule@normal:
+		UnitsToBuild:
+			cnrifle: 100
+			cnportable: 100
+			cnnetwork: 100
+			redspear: 100
+			cnlynx: 100
+			cnzbd: 100
+			cnqilin: 100
+			cnphl: 100
+			cncloud: 100
+			cncrane: 100
+			cnskyspear: 100
+			cnluyang: 100
+			cnhaiwang: 100
+		UnitLimits:
+			cnrifle: 2
+			cnportable: 1
+			cnnetwork: 1
+			redspear: 1
+			cnlynx: 1
+			cnzbd: 1
+			cnqilin: 1
+			cnphl: 1
+			cncloud: 1
+			cncrane: 1
+			cnskyspear: 1
+			cnluyang: 1
+			cnhaiwang: 1
+
+FACT:
+	DamageMultiplier@AICONTRACT:
+		Modifier: 0

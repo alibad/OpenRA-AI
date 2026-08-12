@@ -1,0 +1,215 @@
+MapFormat: 12
+
+RequiresMod: ra
+
+Title: 03: Haitan Network
+
+Author: OpenRA AI
+
+Tileset: DESERT
+
+MapSize: 96,96
+
+Bounds: 1,1,94,94
+
+Visibility: MissionSelector
+
+Categories: Campaign
+
+LockPreview: True
+
+Players:
+	PlayerReference@China:
+		Name: China
+		AllowBots: False
+		Playable: True
+		Required: True
+		LockFaction: True
+		Faction: china
+		LockColor: True
+		Color: C83A32
+		LockSpawn: True
+		LockTeam: True
+		Enemies: Obsidian Directorate
+	PlayerReference@Obsidian:
+		Name: Obsidian Directorate
+		Bot: campaign
+		Faction: russia
+		Color: 505A67
+		Enemies: China
+	PlayerReference@Neutral:
+		Name: Neutral
+		OwnsWorld: True
+		NonCombatant: True
+		Faction: allies
+
+Actors:
+	ChinaConyard: fact
+		Location: 18,34
+		Owner: China
+	ChinaRefinery: proc
+		Location: 26,34
+		Owner: China
+	ChinaPower: apwr
+		Location: 13,34
+		Owner: China
+	ChinaPowerTwo: apwr
+		Location: 36,34
+		Owner: China
+	ChinaPowerThree: apwr
+		Location: 40,34
+		Owner: China
+	ChinaBarracks: tent
+		Location: 19,40
+		Owner: China
+	ChinaWarFactory: weap
+		Location: 25,40
+		Owner: China
+	ChinaRadar: dome
+		Location: 31,40
+		Owner: China
+	ChinaTech: atek
+		Location: 31,34
+		Owner: China
+	ChinaRepair: fix
+		Location: 9,39
+		Owner: China
+	ChinaHelipad: hpad
+		Location: 9,34
+		Owner: China
+	NetworkRelay: fcom
+		Location: 44,43
+		Owner: China
+	NetworkSpecialist: cnnetwork
+		Location: 35,43
+		Owner: China
+	RifleOne: cnrifle
+		Location: 32,44
+		Owner: China
+	RifleTwo: cnrifle
+		Location: 33,44
+		Owner: China
+	RifleThree: cnrifle
+		Location: 34,44
+		Owner: China
+	PortableOne: cnportable
+		Location: 32,42
+		Owner: China
+	PortableTwo: cnportable
+		Location: 33,42
+		Owner: China
+	RedSpear: redspear
+		Location: 34,42
+		Owner: China
+	QilinOne: cnqilin
+		Location: 24,43
+		Owner: China
+	QilinTwo: cnqilin
+		Location: 26,43
+		Owner: China
+	LynxOne: cnlynx
+		Location: 28,43
+		Owner: China
+	LongbowOne: cnphl
+		Location: 22,43
+		Owner: China
+	SeaDragonOne: cnzbd
+		Location: 21,30
+		Owner: China
+	SeaDragonTwo: cnzbd
+		Location: 23,30
+		Owner: China
+	SeaDragonThree: cnzbd
+		Location: 25,30
+		Owner: China
+	SkySpearOne: cnskyspear
+		Location: 16,39
+		Owner: China
+	CloudOne: cncloud
+		Location: 14,40
+		Owner: China
+	CraneOne: cncrane
+		Location: 11,42
+		Owner: China
+	LuyangOne: cnluyang
+		Location: 50,24
+		Owner: China
+	HaiwangOne: cnhaiwang
+		Location: 57,24
+		Owner: China
+	EnemyConyard: fact
+		Location: 77,53
+		Owner: Obsidian Directorate
+	EnemyPower: apwr
+		Location: 72,54
+		Owner: Obsidian Directorate
+	EnemyBarracks: barr
+		Location: 72,59
+		Owner: Obsidian Directorate
+	EnemyWarFactory: weap
+		Location: 78,59
+		Owner: Obsidian Directorate
+	EnemyRadar: dome
+		Location: 84,53
+		Owner: Obsidian Directorate
+	EnemyCommand: miss
+		Location: 86,58
+		Owner: Obsidian Directorate
+	JammerOne: mrj
+		Location: 64,53
+		Owner: Obsidian Directorate
+		Facing: 640
+	JammerTwo: mrj
+		Location: 70,61
+		Owner: Obsidian Directorate
+		Facing: 640
+	JammerThree: mrj
+		Location: 90,54
+		Owner: Obsidian Directorate
+		Facing: 640
+	EnemyTankOne: 3tnk
+		Location: 68,55
+		Owner: Obsidian Directorate
+		Facing: 640
+	EnemyTankTwo: 3tnk
+		Location: 68,58
+		Owner: Obsidian Directorate
+		Facing: 640
+	EnemyV2: v2rl
+		Location: 74,63
+		Owner: Obsidian Directorate
+		Facing: 640
+	NetworkNode: waypoint
+		Location: 44,44
+		Owner: Neutral
+	AmphibiousGate: waypoint
+		Location: 66,44
+		Owner: Neutral
+	EastBeach: waypoint
+		Location: 72,50
+		Owner: Neutral
+	GroundWaveEntry: waypoint
+		Location: 91,58
+		Owner: Neutral
+	GroundWaveRally: waypoint
+		Location: 63,54
+		Owner: Neutral
+	AirWaveEntry: waypoint
+		Location: 91,45
+		Owner: Neutral
+	NavalWaveEntry: waypoint
+		Location: 90,38
+		Owner: Neutral
+	NavalWaveRally: waypoint
+		Location: 68,44
+		Owner: Neutral
+	WestCamera: waypoint
+		Location: 27,39
+		Owner: Neutral
+	EastCamera: waypoint
+		Location: 76,55
+		Owner: Neutral
+
+Rules: ra|rules/campaign-rules.yaml, ra|rules/campaign-tooltips.yaml, ra|rules/campaign-palettes.yaml, rules.yaml
+
+FluentMessages: ra|fluent/lua.ftl, ra|fluent/campaign.ftl, map.ftl
