@@ -100,7 +100,7 @@ Full combined-main worldgen, companion, and evaluation suites (including Saudi/Y
 ........................................................................ [ 64%]
 ........................................................................ [ 96%]
 ........                                                                 [100%]
-224 passed, 1 warning in 29.78s
+224 passed, 1 warning in 29.45s
 ```
 
 The warning is an external `pydantic-settings` incomplete-forward-reference warning. The China contract suite was also pointed at the exact final integration worktree:
