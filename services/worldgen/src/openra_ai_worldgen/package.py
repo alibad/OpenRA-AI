@@ -11,7 +11,7 @@ from .raster import TerrainPlan
 from .scenarios import mission_blueprint, scenario_manifest
 from .terrain import TerrainView
 
-GENERATOR_VERSION = "0.3.0"
+GENERATOR_VERSION = "0.4.0"
 
 
 def artifact_paths(selection: GeoSelection, output_directory: Path) -> tuple[Path, Path, Path]:
@@ -32,6 +32,106 @@ def _zip_info(name: str) -> ZipInfo:
     info.compress_type = ZIP_DEFLATED
     info.external_attr = 0o644 << 16
     return info
+
+
+def _fluent_value(value: str) -> str:
+    """Keep generated story text on one safe Fluent line."""
+    return " ".join(value.replace("{", "(").replace("}", ")").split())[:500]
+
+
+def _mission_files(selection: GeoSelection) -> dict[str, bytes]:
+    """Build a complete deterministic objective/story runtime for generated maps."""
+    blueprint = mission_blueprint(selection.scenario_id)
+    if blueprint and blueprint.objectives:
+        primary = blueprint.objectives[0]
+        secondary = blueprint.objectives[1] if len(blueprint.objectives) > 1 else "Preserve your combat strength."
+        situation = blueprint.situation
+    else:
+        objective_by_archetype = {
+            "river-crossing": "Secure both approaches and break the opposing force.",
+            "urban-siege": "Establish a foothold and defeat the opposing force.",
+            "supply-raid": "Disrupt hostile supply operations and eliminate resistance.",
+            "convoy-defense": "Hold the route and defeat the interdiction force.",
+            "infrastructure-defense": "Protect the approaches and eliminate the attackers.",
+            "balanced-skirmish": "Defeat the opposing command and retain the battlefield.",
+        }
+        primary = objective_by_archetype[selection.mission_archetype]
+        secondary = "Keep a viable field force until the escalation phase ends."
+        situation = selection.story_seed.strip() or (
+            f"A fictional operation unfolds around {selection.location_name}. "
+            "Both commands are racing to control the terrain."
+        )
+
+    fluent = (
+        f"earth-mission-situation = {_fluent_value(situation)}\n"
+        f"earth-mission-primary = {_fluent_value(primary)}\n"
+        f"earth-mission-secondary = {_fluent_value(secondary)}\n"
+        "earth-mission-phase-one = Phase I: establish your foothold and scout the approaches.\n"
+        "earth-mission-phase-two = Phase II: enemy operations are escalating. Commit your reserves.\n"
+        "earth-mission-phase-three = Phase III: break the opposing command to secure the operation.\n"
+    )
+    rules = """World:
+\tLuaScript:
+\t\tScripts: campaign.lua, utils.lua, earth-mission.lua
+\tMissionData:
+\t\tBriefing: earth-mission-situation
+"""
+    script = """PlayerOne = nil
+PlayerTwo = nil
+PlayerOneObjective = nil
+PlayerTwoObjective = nil
+PlayerOneSurvival = nil
+PlayerTwoSurvival = nil
+MissionResolved = false
+
+CompleteFor = function(winner, objective, loser, loserObjective)
+\tif MissionResolved then return end
+\tMissionResolved = true
+\twinner.MarkCompletedObjective(objective)
+\tloser.MarkFailedObjective(loserObjective)
+end
+
+Tick = function()
+\tif MissionResolved then return end
+\tif PlayerOne.HasNoRequiredUnits() then
+\t\tCompleteFor(PlayerTwo, PlayerTwoObjective, PlayerOne, PlayerOneObjective)
+\telseif PlayerTwo.HasNoRequiredUnits() then
+\t\tCompleteFor(PlayerOne, PlayerOneObjective, PlayerTwo, PlayerTwoObjective)
+\tend
+end
+
+WorldLoaded = function()
+\tPlayerOne = Player.GetPlayer("Multi0")
+\tPlayerTwo = Player.GetPlayer("Multi1")
+\tInitObjectives(PlayerOne)
+\tInitObjectives(PlayerTwo)
+\tPlayerOneObjective = AddPrimaryObjective(PlayerOne, "earth-mission-primary")
+\tPlayerTwoObjective = AddPrimaryObjective(PlayerTwo, "earth-mission-primary")
+\tPlayerOneSurvival = AddSecondaryObjective(PlayerOne, "earth-mission-secondary")
+\tPlayerTwoSurvival = AddSecondaryObjective(PlayerTwo, "earth-mission-secondary")
+\tMedia.DisplayMessageToPlayer(PlayerOne, UserInterface.GetFluentMessage("earth-mission-situation"), "Mission")
+\tMedia.DisplayMessageToPlayer(PlayerTwo, UserInterface.GetFluentMessage("earth-mission-situation"), "Mission")
+\tMedia.DisplayMessageToPlayer(PlayerOne, UserInterface.GetFluentMessage("earth-mission-phase-one"), "Command")
+\tMedia.DisplayMessageToPlayer(PlayerTwo, UserInterface.GetFluentMessage("earth-mission-phase-one"), "Command")
+\tTrigger.AfterDelay(DateTime.Minutes(3), function()
+\t\tMedia.DisplayMessageToPlayer(PlayerOne, UserInterface.GetFluentMessage("earth-mission-phase-two"), "Command")
+\t\tMedia.DisplayMessageToPlayer(PlayerTwo, UserInterface.GetFluentMessage("earth-mission-phase-two"), "Command")
+\tend)
+\tTrigger.AfterDelay(DateTime.Minutes(7), function()
+\t\tif not MissionResolved then
+\t\t\tPlayerOne.MarkCompletedObjective(PlayerOneSurvival)
+\t\t\tPlayerTwo.MarkCompletedObjective(PlayerTwoSurvival)
+\t\t\tMedia.DisplayMessageToPlayer(PlayerOne, UserInterface.GetFluentMessage("earth-mission-phase-three"), "Command")
+\t\t\tMedia.DisplayMessageToPlayer(PlayerTwo, UserInterface.GetFluentMessage("earth-mission-phase-three"), "Command")
+\t\tend
+\tend)
+end
+"""
+    return {
+        "rules.yaml": rules.encode("utf-8"),
+        "earth-mission.lua": script.encode("utf-8"),
+        "map.ftl": fluent.encode("utf-8"),
+    }
 
 
 def finalize_native_package(
@@ -80,6 +180,7 @@ def finalize_native_package(
             "This is a stylized fictional scenario, not a factual simulation of people or events.\n"
         )
     briefing = briefing_text.encode("utf-8")
+    mission_files = _mission_files(selection)
     checksums = {
         "map.yaml": hashlib.sha256(map_yaml).hexdigest(),
         "map.bin": hashlib.sha256(map_binary).hexdigest(),
@@ -87,6 +188,8 @@ def finalize_native_package(
     }
     if terrain_view:
         checksums["earth-terrain.png"] = hashlib.sha256(terrain_view.image).hexdigest()
+    for name, content in mission_files.items():
+        checksums[name] = hashlib.sha256(content).hexdigest()
 
     effective_player_faction = blueprint.player_faction if blueprint else selection.player_faction
     effective_opponent_faction = blueprint.opponent_faction if blueprint else selection.opponent_faction
@@ -132,6 +235,8 @@ def finalize_native_package(
     with ZipFile(package_path, "a", compression=ZIP_DEFLATED) as archive:
         archive.writestr(_zip_info("briefing.md"), briefing)
         archive.writestr(_zip_info("openra-ai-manifest.json"), manifest_bytes)
+        for name, content in mission_files.items():
+            archive.writestr(_zip_info(name), content)
         if terrain_view:
             archive.writestr(_zip_info("earth-terrain.png"), terrain_view.image)
 
