@@ -15,7 +15,7 @@ local packaging experiments and should not be used for a public release.
 Inspect the native plan without creating artifacts:
 
 ```powershell
-python scripts/release.py plan --version 0.1.0-alpha.10 --target windows-x64
+python scripts/release.py plan --version 0.1.0-alpha.11 --target windows-x64
 ```
 
 Validate the model lock without downloading its approximately 1.7 GiB payload:
@@ -29,11 +29,11 @@ python scripts/ai_pack.py validate
 Run on Windows 10/11 x64 with the repository prerequisites and NSIS installed:
 
 ```powershell
-python scripts/release.py build --version 0.1.0-alpha.10 --target windows-x64
+python scripts/release.py build --version 0.1.0-alpha.11 --target windows-x64
 ```
 
 This runs the full checks, creates the portable ZIP and setup executable, smoke
-tests both, and writes `artifacts/releases/OpenRA-AI-0.1.0-alpha.10-release-index.json`.
+tests both, and writes `artifacts/releases/OpenRA-AI-0.1.0-alpha.11-release-index.json`.
 
 The Windows target builds its local AI pack by default because the guided
 installer offers Local AI as its recommended option. The target-specific pack
@@ -58,7 +58,7 @@ export MACOS_DEVELOPER_IDENTITY="Developer ID Application: Example (TEAMID)"
 export MACOS_DEVELOPER_TEAM_ID="TEAMID"
 export MACOS_DEVELOPER_USERNAME="release@example.com"
 export MACOS_DEVELOPER_PASSWORD="@keychain:OPENRA_AI_NOTARY"
-python3 scripts/release.py build --version 0.1.0-alpha.10 --target macos-arm64
+python3 scripts/release.py build --version 0.1.0-alpha.11 --target macos-arm64
 ```
 
 Without those variables, the same command produces an ad-hoc-signed DMG for
@@ -69,8 +69,8 @@ After copying the Windows and macOS artifacts into the same release directory,
 regenerate and verify the combined index:
 
 ```bash
-python3 scripts/release.py index --version 0.1.0-alpha.10
-python3 scripts/release.py verify --version 0.1.0-alpha.10
+python3 scripts/release.py index --version 0.1.0-alpha.11
+python3 scripts/release.py verify --version 0.1.0-alpha.11
 ```
 
 ## Updating the AI pack
@@ -81,7 +81,7 @@ revision, HTTPS URL, exact byte length, SHA-256, destination, and license. Then:
 ```powershell
 python scripts/ai_pack.py validate
 python scripts/ai_pack.py fetch
-python scripts/ai_pack.py build --release-version 0.1.0-alpha.10 --target windows-x64
+python scripts/ai_pack.py build --release-version 0.1.0-alpha.11 --target windows-x64
 ```
 
 The output is

@@ -16,13 +16,14 @@ OpenRA project or Electronic Arts.
 
 | Platform | Status | Download |
 | --- | --- | --- |
-| Windows 10/11 x64 | Playable alpha | [Installer](https://github.com/alibad/OpenRA-AI/releases/download/v0.1.0-alpha.10/OpenRA-AI-0.1.0-alpha.10-windows-x64-setup.exe) · [Portable ZIP](https://github.com/alibad/OpenRA-AI/releases/download/v0.1.0-alpha.10/OpenRA-AI-0.1.0-alpha.10-windows-x64.zip) |
+| Windows 10/11 x64 | Playable alpha | [Installer](https://github.com/alibad/OpenRA-AI/releases/download/v0.1.0-alpha.11/OpenRA-AI-0.1.0-alpha.11-windows-x64-setup.exe) · [Portable ZIP](https://github.com/alibad/OpenRA-AI/releases/download/v0.1.0-alpha.11/OpenRA-AI-0.1.0-alpha.11-windows-x64.zip) |
 | macOS | Not packaged yet | Planned after a signed and notarized build is ready |
 
 [See every release and its checksum](https://github.com/alibad/OpenRA-AI/releases).
-The [optional local AI model pack](https://github.com/alibad/OpenRA-AI/releases/download/v0.1.0-alpha.10/OpenRA-AI-AI-Pack-0.1.0-alpha.10.zip)
-contains the pinned model payload; alpha.10 still requires a compatible local AI
-router to serve those models.
+The guided installer downloads the matching
+[local AI pack](https://github.com/alibad/OpenRA-AI/releases/download/v0.1.0-alpha.11/OpenRA-AI-AI-Pack-0.1.0-alpha.11-windows-x64.zip)
+by default. It contains the pinned models and Windows CPU runtimes; choose an
+external OpenAI-compatible provider during setup to skip it.
 
 ### Start a match on Windows
 
