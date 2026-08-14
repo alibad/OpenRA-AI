@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from pathlib import Path
 from urllib.parse import parse_qs, urlparse
 
 from .core import Companion
@@ -43,6 +44,10 @@ class CompanionHandler(BaseHTTPRequestHandler):
         self._headers(HTTPStatus.OK, "text/html; charset=utf-8", len(body))
         self.wfile.write(body)
 
+    def _binary(self, value: bytes, content_type: str, *, cache_control: str = "no-store") -> None:
+        self._headers(HTTPStatus.OK, content_type, len(value), Cache_Control=cache_control)
+        self.wfile.write(value)
+
     def _publish_action_response(self, response: object) -> None:
         metadata = getattr(response, "metadata", {})
         action = metadata.get("action", {}) if isinstance(metadata, dict) else {}
@@ -63,6 +68,43 @@ class CompanionHandler(BaseHTTPRequestHandler):
                 publisher(state, f"AI  •  {getattr(response, 'text', '')}")
             except Exception:
                 pass
+
+    def _state_payload(self) -> dict:
+        return {
+            "enabled": self.companion.enabled,
+            "voice_enabled": not self.companion.muted,
+            "auto_act_enabled": self.companion.auto_act_enabled,
+            "pending_action": self.companion.pending_action(),
+            "brain": self.companion.brain_state(),
+            "snapshot": self.companion.latest_snapshot.compact() if self.companion.latest_snapshot else None,
+            "threat": self.companion.threat_status(),
+            "config": self.companion.router.settings.as_dict(),
+            "usage": self.companion.router.usage_summary(),
+            "router": self.companion.router.health(),
+        }
+
+    def _war_room_payload(self) -> dict:
+        store = LearningStore()
+        dashboard = store.dashboard()
+        state = self._state_payload()
+        return {
+            "contract_version": 1,
+            "live": {
+                "active": state["snapshot"] is not None,
+                "enabled": state["enabled"],
+                "voice_enabled": state["voice_enabled"],
+                "auto_act_enabled": state["auto_act_enabled"],
+                "pending_action": state["pending_action"],
+                "snapshot": state["snapshot"],
+                "threat": state["threat"],
+                "brain": state["brain"],
+                "strategy": self.companion.status()["strategy"],
+                "router": state["router"],
+            },
+            "debrief": store.latest(),
+            "learning": dashboard,
+            "settings": state["config"],
+        }
 
     def _payload(self, limit: int = 256_000) -> bytes:
         size = int(self.headers.get("Content-Length", "0"))
@@ -91,21 +133,43 @@ class CompanionHandler(BaseHTTPRequestHandler):
             self._json(HTTPStatus.OK, learning_dashboard())
         elif path == "/v1/learning/latest":
             self._json(HTTPStatus.OK, LearningStore().latest())
+        elif path == "/v1/war-room":
+            self._json(HTTPStatus.OK, self._war_room_payload())
         elif path.startswith("/v1/learning/matches/"):
-            attempt = path.rsplit("/", 1)[-1]
-            record = LearningStore().match(attempt)
-            self._json(HTTPStatus.OK if record else HTTPStatus.NOT_FOUND, record or {"error": "not_found"})
+            parts = path.strip("/").split("/")
+            attempt = parts[3] if len(parts) >= 4 else ""
+            try:
+                record = LearningStore().match(attempt)
+            except ValueError:
+                self._json(HTTPStatus.NOT_FOUND, {"error": "not_found"})
+                return
+            if len(parts) == 4:
+                self._json(HTTPStatus.OK if record else HTTPStatus.NOT_FOUND, record or {"error": "not_found"})
+            elif len(parts) == 6 and parts[4] == "frames" and record:
+                filename = parts[5]
+                evidence_dir = Path(str(record.get("evidence_dir", ""))).resolve()
+                frames_dir = (evidence_dir / "frames").resolve()
+                frame = (frames_dir / filename).resolve()
+                visual_evidence = record.get("visual_evidence", {})
+                recent_frames = visual_evidence.get("recent_frames", []) if isinstance(visual_evidence, dict) else []
+                known_frames = {
+                    Path(str(item.get("file", ""))).name
+                    for item in recent_frames
+                    if isinstance(item, dict)
+                }
+                if (
+                    filename in known_frames
+                    and frame.parent == frames_dir
+                    and frame.suffix.lower() == ".png"
+                    and frame.is_file()
+                ):
+                    self._binary(frame.read_bytes(), "image/png", cache_control="private, max-age=300")
+                else:
+                    self._json(HTTPStatus.NOT_FOUND, {"error": "frame_not_found"})
+            else:
+                self._json(HTTPStatus.NOT_FOUND, {"error": "not_found"})
         elif path in {"/v1/state", "/v1/usage"}:
-            state = {
-                "enabled": self.companion.enabled,
-                "voice_enabled": not self.companion.muted,
-                "auto_act_enabled": self.companion.auto_act_enabled,
-                "pending_action": self.companion.pending_action(),
-                "brain": self.companion.brain_state(),
-                "config": self.companion.router.settings.as_dict(),
-                "usage": self.companion.router.usage_summary(),
-                "router": self.companion.router.health(),
-            }
+            state = self._state_payload()
             self._json(HTTPStatus.OK, state if path == "/v1/state" else state["usage"])
         else:
             self._json(HTTPStatus.NOT_FOUND, {"error": "not_found"})

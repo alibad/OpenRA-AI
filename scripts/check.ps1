@@ -33,6 +33,17 @@ if (-not (Test-Path -LiteralPath $python)) {
     throw "Python environment is missing. Run scripts\setup.ps1 first."
 }
 
+# Keep the validation command reproducible even when the virtual environment
+# was created before the local packages were installed in editable mode.
+$sourcePaths = @(
+    (Join-Path $repositoryRoot "services\worldgen\src"),
+    (Join-Path $repositoryRoot "services\companion\src")
+)
+if ($env:PYTHONPATH) {
+    $sourcePaths += $env:PYTHONPATH
+}
+$env:PYTHONPATH = $sourcePaths -join [IO.Path]::PathSeparator
+
 & $python -m py_compile (Join-Path $repositoryRoot "scripts\release.py") (Join-Path $repositoryRoot "scripts\ai_pack.py")
 if ($LASTEXITCODE -ne 0) { throw "Release framework compilation failed." }
 & $python (Join-Path $repositoryRoot "scripts\ai_pack.py") validate

@@ -10,7 +10,7 @@ import urllib.parse
 import urllib.request
 import uuid
 import wave
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 
 from .settings import Settings
 
@@ -26,6 +26,7 @@ class RouterResult:
     model: str
     input_tokens: int = 0
     output_tokens: int = 0
+    vision_used: bool = False
 
 
 class AIRouter:
@@ -214,9 +215,30 @@ class AIRouter:
         return self._chat(messages, self.settings.text_model)
 
     def vision(self, prompt: str, image: bytes, media_type: str = "image/png") -> RouterResult:
-        return self.vision_many(prompt, [(image, media_type)])
+        return self._vision_many(prompt, [(image, media_type)])
 
     def vision_many(self, prompt: str, images: list[tuple[bytes, str]]) -> RouterResult:
+        try:
+            return self._vision_many(prompt, images)
+        except RouterError as exc:
+            # Local text models still receive the complete structured game
+            # snapshot. If the selected route cannot consume pixels, preserve
+            # useful local intelligence instead of degrading the whole answer.
+            if "not a multimodal model" not in str(exc).lower():
+                raise
+            return self.chat([
+                {
+                    "role": "system",
+                    "content": (
+                        "Image input is unavailable for this local text model. "
+                        "Use only the structured battlefield snapshot in the prompt, "
+                        "and do not invent details from the omitted images."
+                    ),
+                },
+                {"role": "user", "content": prompt},
+            ])
+
+    def _vision_many(self, prompt: str, images: list[tuple[bytes, str]]) -> RouterResult:
         if not images or any(not image for image, _ in images):
             raise ValueError("at least one non-empty image is required")
         content: list[dict[str, object]] = [{"type": "text", "text": prompt}]
@@ -229,12 +251,13 @@ class AIRouter:
                     "detail": "high",
                 },
             })
-        return self._chat([
+        result = self._chat([
             {
                 "role": "user",
                 "content": content,
             }
         ], self.settings.vision_model)
+        return replace(result, vision_used=True)
 
     def transcribe(self, audio: bytes, filename: str = "question.wav") -> RouterResult:
         boundary = f"----OpenRAAI{uuid.uuid4().hex}"

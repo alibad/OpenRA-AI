@@ -452,7 +452,11 @@ class Companion:
                 result = self.router.chat(messages)
             metadata = {"model": result.model}
             if views:
-                metadata["vision"] = {"used": True, "views": views}
+                metadata["vision"] = {
+                    "used": result.vision_used,
+                    "views": views,
+                    "fallback": None if result.vision_used else "structured-context",
+                }
             response = CompanionResponse(humanize_text(result.text), "ai-layer", utterance_id=generation, insight=insight, latency_ms=result.latency_ms, metadata=metadata)
         except RouterError as exc:
             response = CompanionResponse(insight.fallback_text, "deterministic-fallback", utterance_id=generation, insight=insight, latency_ms=round((time.perf_counter() - started) * 1000), metadata={"degraded": True, "reason": str(exc)})
@@ -568,7 +572,11 @@ class Companion:
                 ])
             metadata = {"model": result.model}
             if views:
-                metadata["vision"] = {"used": True, "views": views}
+                metadata["vision"] = {
+                    "used": result.vision_used,
+                    "views": views,
+                    "fallback": None if result.vision_used else "structured-context",
+                }
             response = CompanionResponse(humanize_text(result.text), "ai-layer", utterance_id=generation, latency_ms=result.latency_ms, metadata=metadata)
         except RouterError as exc:
             response = CompanionResponse("The AI router is unavailable; I can still watch for critical deterministic alerts.", "deterministic-fallback", utterance_id=generation, latency_ms=round((time.perf_counter() - started) * 1000), metadata={"degraded": True, "reason": str(exc)})
@@ -1653,7 +1661,11 @@ class Companion:
         elif planner_error:
             result_metadata["mcp"] = {"connected": False, "fallback": True, "reason": planner_error}
         if views:
-            result_metadata["vision"] = {"used": True, "views": views}
+            result_metadata["vision"] = {
+                "used": result.vision_used,
+                "views": views,
+                "fallback": None if result.vision_used else "structured-context",
+            }
         if str(decoded.get("mode", "")).lower() != "action":
             answer = humanize_text(str(decoded.get("answer", "")).strip())
             if not answer:

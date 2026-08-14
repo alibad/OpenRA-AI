@@ -2,9 +2,16 @@ from __future__ import annotations
 
 import argparse
 import json
+import sys
 import time
+from pathlib import Path
 from urllib.error import URLError
 from urllib.request import urlopen
+
+REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
+COMPANION_SOURCE = REPOSITORY_ROOT / "services" / "companion" / "src"
+if str(COMPANION_SOURCE) not in sys.path:
+    sys.path.insert(0, str(COMPANION_SOURCE))
 
 from openra_ai_companion.bridge import OpenRABridge
 from openra_ai_companion.core import Companion

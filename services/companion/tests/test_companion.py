@@ -3,6 +3,7 @@ from __future__ import annotations
 import threading
 import time
 import unittest
+import urllib.error
 import urllib.request
 import wave
 import json
@@ -107,7 +108,7 @@ class VisionRouter(FakeRouter):
     def vision_many(self, prompt, images):  # noqa: ANN001
         self.calls += 1
         self.vision_requests.append((prompt, images))
-        return RouterResult(self.response, 7, "fake-full-vision")
+        return RouterResult(self.response, 7, "fake-full-vision", vision_used=True)
 
 
 class FakePlayer:
@@ -2118,6 +2119,27 @@ class CompanionTests(unittest.TestCase):
         self.assertTrue(content[1]["image_url"]["url"].startswith("data:image/png;base64,"))
         self.assertEqual(content[1]["image_url"]["detail"], "high")
 
+    def test_text_only_local_vision_route_falls_back_to_structured_context(self) -> None:
+        router = AIRouter(Settings(text_model="local-coder", vision_model="local-coder"))
+        requests = []
+
+        def request(path, body, content_type):  # noqa: ANN001
+            payload = json.loads(body)
+            requests.append(payload)
+            if len(requests) == 1:
+                raise RouterError("AI router returned HTTP 400: model is not a multimodal model")
+            return b'{"choices":[{"message":{"content":"Hold the ridge."}}]}', 8, "application/json"
+
+        with mock.patch.object(router, "_request", side_effect=request):
+            result = router.vision_many("CONTEXT: structured snapshot", [(b"PNG", "image/png")])
+
+        self.assertEqual(result.text, "Hold the ridge.")
+        self.assertEqual(result.model, "local-coder")
+        self.assertFalse(result.vision_used)
+        self.assertEqual(len(requests), 2)
+        self.assertIsInstance(requests[0]["messages"][0]["content"], list)
+        self.assertEqual(requests[1]["messages"][1]["content"], "CONTEXT: structured snapshot")
+
     def test_transcription_is_pinned_to_the_configured_app_language(self) -> None:
         router = AIRouter(Settings(transcribe_language="en"))
         captured = {}
@@ -2224,10 +2246,16 @@ class CompanionTests(unittest.TestCase):
         try:
             base = f"http://127.0.0.1:{server.server_address[1]}"
             with urllib.request.urlopen(base + "/", timeout=3) as response:
-                self.assertIn(b"Companion Console", response.read())
+                console = response.read()
+            self.assertIn(b"Companion Console", console)
+            self.assertIn(b"AI WAR ROOM", console)
+            self.assertIn(b"Learning Lab", console)
+            self.assertIn(b"Brain Inspector", console)
             with urllib.request.urlopen(base + "/v1/state", timeout=3) as response:
                 state = response.read()
             self.assertIn(b'"session_cost_usd": 0.001', state)
+            self.assertIn(b'"snapshot": null', state)
+            self.assertIn(b'"threat":', state)
             with urllib.request.urlopen(base + "/v1/catalog", timeout=3) as response:
                 catalogue = response.read()
             self.assertIn(b'"requires_endpoint": false', catalogue)
@@ -2237,6 +2265,34 @@ class CompanionTests(unittest.TestCase):
                 with urllib.request.urlopen(base + "/v1/learning", timeout=3) as response:
                     learning = response.read()
                 self.assertIn(b'"attempts": 0', learning)
+                with urllib.request.urlopen(base + "/v1/war-room", timeout=3) as response:
+                    war_room = json.loads(response.read())
+                self.assertEqual(war_room["contract_version"], 1)
+                self.assertFalse(war_room["live"]["active"])
+                self.assertEqual(war_room["learning"]["attempts"], 0)
+                self.assertEqual(war_room["settings"]["text_model"], "fake")
+                evidence = Path(learning_directory) / "evidence"
+                frames = evidence / "frames"
+                matches = Path(learning_directory) / "matches"
+                frames.mkdir(parents=True)
+                matches.mkdir()
+                image = b"\x89PNG\r\n\x1a\nwar-room-frame"
+                (frames / "known.png").write_bytes(image)
+                (matches / "attempt-1.json").write_text(json.dumps({
+                    "attempt_id": "attempt-1",
+                    "evidence_dir": str(evidence),
+                    "visual_evidence": {"recent_frames": [{"file": "frames/known.png", "tick": 500}]},
+                }), encoding="utf-8")
+                with urllib.request.urlopen(
+                    base + "/v1/learning/matches/attempt-1/frames/known.png", timeout=3
+                ) as response:
+                    self.assertEqual(response.headers["Content-Type"], "image/png")
+                    self.assertEqual(response.read(), image)
+                with self.assertRaises(urllib.error.HTTPError) as missing:
+                    urllib.request.urlopen(
+                        base + "/v1/learning/matches/attempt-1/frames/unlisted.png", timeout=3
+                    )
+                self.assertEqual(missing.exception.code, 404)
             request = urllib.request.Request(
                 base + "/v1/state",
                 data=b'{"notification_pace":"balanced","voice_priority":"important","transcribe_language":"en"}',
