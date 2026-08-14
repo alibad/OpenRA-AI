@@ -129,10 +129,10 @@ class RedSeaAssetTests(unittest.TestCase):
         self.assertIn("TechTypes: dome, atek, stek, fix, afld, hpad, safld", resolved)
         self.assertIn("TechTypes: mslo, dome, atek, stek, fix, afld, hpad, safld", resolved)
         self.assertIn("ProductionTypes: barr,tent,weap,afld,hpad,safld", resolved)
-        self.assertGreaterEqual(
-            resolved.count("AirUnitsTypes: mig, yak, heli, hind, mh60, samad, f15sa, ah64sa"),
-            5,
-        )
+        for actor in ("SAMAD", "F15SA", "AH64SA"):
+            air = self._resolved_rules(actor)
+            self.assertIn("StrategicRole:", air)
+            self.assertIn("Domain: air", air)
 
     def test_original_sprite_packages_have_expected_frames(self) -> None:
         expected = {
