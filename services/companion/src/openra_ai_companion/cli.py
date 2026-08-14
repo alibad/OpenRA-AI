@@ -19,7 +19,7 @@ from .models import CompanionResponse, GameSnapshot
 from .server import create_server as create_companion_server, serve
 from .strategy_contracts import strategy_contract
 from .strategy_director import StrategyDirector
-from .voice import AudioPlayer, playback_hold_seconds, play_wav, record_question
+from .voice import AudioPlayer, microphone_status, playback_hold_seconds, play_wav, record_question
 from .agent_models import default_agent_model, default_agent_provider, default_agent_router_url
 
 
@@ -50,6 +50,12 @@ def _parser() -> argparse.ArgumentParser:
     voice = commands.add_parser("voice", help="record one voice question and answer aloud")
     voice.add_argument("--bridge", default="127.0.0.1:9998")
     voice.add_argument("--seconds", type=float, default=4.0)
+    voice_check = commands.add_parser("voice-check", help="verify local microphone capture support")
+    voice_check.add_argument(
+        "--dependencies-only",
+        action="store_true",
+        help="verify bundled capture libraries without requiring microphone hardware",
+    )
     agent_provider = default_agent_provider()
     autoplay = commands.add_parser("autoplay", help="run an autonomous AI-controlled headless match")
     autoplay.add_argument("--provider", default=agent_provider)
@@ -156,6 +162,10 @@ def main(argv: list[str] | None = None) -> int:
     if args.command == "serve":
         serve(args.host, args.port)
         return 0
+    if args.command == "voice-check":
+        status = microphone_status(check_device=not args.dependencies_only)
+        print(json.dumps(status, ensure_ascii=False))
+        return 0 if status["available"] else 2
     if args.command == "autoplay":
         from dataclasses import asdict
         from .autonomous import autoplay

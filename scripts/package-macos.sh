@@ -28,6 +28,11 @@ for required in "$BRAND_SOURCE" "$PLIST_TEMPLATE" "$WRAPPER_SOURCE" "$PYTHON" "$
   [ -f "$required" ] || { echo >&2 "macOS packaging input is missing: $required"; exit 1; }
 done
 
+"$PYTHON" -m openra_ai_companion.cli voice-check --dependencies-only || {
+  echo >&2 "macOS packaging requires the companion voice extra. Run scripts/setup.ps1 again."
+  exit 1
+}
+
 if [ ! -f "$SAMPLE_MISSION" ]; then
   "$PYTHON" -m openra_ai_worldgen.cli generate \
     --lat 24.7136 --lon 46.6753 \
@@ -108,6 +113,11 @@ rm -rf "$ICONSET"
   --workpath "$PACKAGE_ROOT/pyinstaller-work-$RELEASE_ARCH" \
   --specpath "$PACKAGE_ROOT/pyinstaller-spec-$RELEASE_ARCH" \
   "$REPOSITORY_ROOT/apps/launcher/companion_entry.py"
+
+"$RESOURCES/bin/openra-ai-companion" voice-check --dependencies-only || {
+  echo >&2 "Packaged companion is missing local microphone capture support."
+  exit 1
+}
 
 cp "$SAMPLE_MISSION" "$RESOURCES/generated/missions/"
 cp "$REPOSITORY_ROOT/.env.example" "$RESOURCES/"

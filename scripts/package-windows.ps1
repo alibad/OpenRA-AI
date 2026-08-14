@@ -27,6 +27,11 @@ foreach ($required in @($python, $brandIcon, $aiPackLock, $aiRuntimeLock, $model
     }
 }
 
+& $python -m openra_ai_companion.cli voice-check --dependencies-only
+if ($LASTEXITCODE -ne 0) {
+    throw "Windows packaging requires the companion voice extra. Run scripts\setup.ps1 again."
+}
+
 if (-not (Test-Path -LiteralPath $sampleMission)) {
     & $python -m openra_ai_worldgen.cli generate --lat 24.7136 --lon 46.6753 `
         --title "Riyadh Crossing" --location "Riyadh, Saudi Arabia" `
@@ -93,6 +98,11 @@ $pyinstallerSpec = Join-Path $artifactRoot "package\pyinstaller-spec"
     (Join-Path $repositoryRoot "apps\launcher\companion_entry.py")
 if ($LASTEXITCODE -ne 0) {
     throw "Companion executable packaging failed."
+}
+$companionExecutable = Join-Path $stageRoot "bin\openra-ai-companion.exe"
+& $companionExecutable voice-check --dependencies-only
+if ($LASTEXITCODE -ne 0) {
+    throw "Packaged companion is missing local microphone capture support."
 }
 
 & $python -m PyInstaller --noconfirm --clean --onefile `

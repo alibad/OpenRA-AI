@@ -13,6 +13,69 @@ from pathlib import Path
 from typing import Callable
 
 
+def microphone_status(*, check_device: bool = True) -> dict[str, object]:
+    """Report whether microphone capture is bundled and usable.
+
+    Package verification uses the dependency-only mode because build hosts do
+    not necessarily have an input device. Runtime diagnostics also inspect the
+    actual PortAudio device list so a missing dependency and a missing
+    microphone are reported as different failures.
+    """
+    try:
+        import sounddevice as sd
+    except ImportError as exc:
+        return {
+            "available": False,
+            "dependency_available": False,
+            "device_available": False,
+            "device_name": "",
+            "reason": f"Microphone capture dependency is missing: {exc}",
+        }
+
+    if not check_device:
+        return {
+            "available": True,
+            "dependency_available": True,
+            "device_available": False,
+            "device_name": "",
+            "reason": "",
+        }
+
+    try:
+        devices = list(sd.query_devices())
+        input_devices = [device for device in devices if device["max_input_channels"] > 0]
+        if not input_devices:
+            return {
+                "available": False,
+                "dependency_available": True,
+                "device_available": False,
+                "device_name": "",
+                "reason": "No input microphone is available to the local audio runtime.",
+            }
+
+        default_input = sd.default.device[0]
+        selected = (
+            devices[default_input]
+            if isinstance(default_input, int) and default_input >= 0
+            else input_devices[0]
+        )
+        return {
+            "available": True,
+            "dependency_available": True,
+            "device_available": True,
+            "device_name": str(selected["name"]),
+            "reason": "",
+        }
+    except Exception as exc:
+        return {
+            "available": False,
+            "dependency_available": True,
+            "device_available": False,
+            "device_name": "",
+            "reason": f"Microphone device discovery failed: {exc}",
+        }
+
+
 def _wav_bytes(frames: list[bytes], sample_rate: int) -> bytes:
     output = io.BytesIO()
     with wave.open(output, "wb") as wav:

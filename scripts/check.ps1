@@ -44,6 +44,11 @@ if ($env:PYTHONPATH) {
 }
 $env:PYTHONPATH = $sourcePaths -join [IO.Path]::PathSeparator
 
+& $python -m openra_ai_companion.cli voice-check --dependencies-only
+if ($LASTEXITCODE -ne 0) {
+    throw "Local voice capture dependencies are missing. Run scripts\setup.ps1 again."
+}
+
 # Faction and theater fixtures intentionally exercise the complete built-in
 # portfolio. Point OpenRA.Utility at disposable settings now that new installs
 # correctly default to AI Assistant Only.

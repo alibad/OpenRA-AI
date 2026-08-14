@@ -52,6 +52,18 @@ if (-not (Test-Path -LiteralPath $bundledCompanion)) {
     }
 }
 
+if (-not $NoSpeech -and -not $NoVoiceHotkeys) {
+    if (Test-Path -LiteralPath $bundledCompanion) {
+        & $bundledCompanion voice-check --dependencies-only
+    }
+    else {
+        & $python -m openra_ai_companion.cli voice-check --dependencies-only
+    }
+    if ($LASTEXITCODE -ne 0) {
+        throw "Local microphone capture is unavailable. Run scripts\setup.ps1 again before launching voice controls."
+    }
+}
+
 $supportRoot = Join-Path $env:APPDATA "OpenRA"
 $requiredContent = Join-Path $supportRoot "Content\ra\v2\allies.mix"
 if ($SkipContentInstall) {
