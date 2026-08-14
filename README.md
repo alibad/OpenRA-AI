@@ -16,12 +16,12 @@ OpenRA project or Electronic Arts.
 
 | Platform | Status | Download |
 | --- | --- | --- |
-| Windows 10/11 x64 | Playable alpha | [Installer](https://github.com/alibad/OpenRA-AI/releases/download/v0.1.0-alpha.9/OpenRA-AI-0.1.0-alpha.9-windows-x64-setup.exe) · [Portable ZIP](https://github.com/alibad/OpenRA-AI/releases/download/v0.1.0-alpha.9/OpenRA-AI-0.1.0-alpha.9-windows-x64.zip) |
+| Windows 10/11 x64 | Playable alpha | [Installer](https://github.com/alibad/OpenRA-AI/releases/download/v0.1.0-alpha.10/OpenRA-AI-0.1.0-alpha.10-windows-x64-setup.exe) · [Portable ZIP](https://github.com/alibad/OpenRA-AI/releases/download/v0.1.0-alpha.10/OpenRA-AI-0.1.0-alpha.10-windows-x64.zip) |
 | macOS | Not packaged yet | Planned after a signed and notarized build is ready |
 
 [See every release and its checksum](https://github.com/alibad/OpenRA-AI/releases).
-The [optional local AI model pack](https://github.com/alibad/OpenRA-AI/releases/download/v0.1.0-alpha.9/OpenRA-AI-AI-Pack-0.1.0-alpha.9.zip)
-contains the pinned model payload; alpha.9 still requires a compatible local AI
+The [optional local AI model pack](https://github.com/alibad/OpenRA-AI/releases/download/v0.1.0-alpha.10/OpenRA-AI-AI-Pack-0.1.0-alpha.10.zip)
+contains the pinned model payload; alpha.10 still requires a compatible local AI
 router to serve those models.
 
 ### Start a match on Windows
