@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import argparse
 import hashlib
 import json
 import shutil
@@ -24,6 +25,9 @@ def zip_info(name: str) -> zipfile.ZipInfo:
 
 
 def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--skip-install", action="store_true")
+    args = parser.parse_args()
     files = {
         path.name: path.read_bytes()
         for path in sorted(SOURCE.iterdir())
@@ -60,10 +64,12 @@ def main() -> int:
         for name, data in sorted(files.items()):
             archive.writestr(zip_info(name), data)
 
-    INSTALL.parent.mkdir(parents=True, exist_ok=True)
-    shutil.copyfile(OUTPUT, INSTALL)
+    if not args.skip_install:
+        INSTALL.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(OUTPUT, INSTALL)
     print(f"Mission: {OUTPUT}")
-    print(f"Installed: {INSTALL}")
+    if not args.skip_install:
+        print(f"Installed: {INSTALL}")
     print(f"SHA256: {hashlib.sha256(OUTPUT.read_bytes()).hexdigest()}")
     return 0
 

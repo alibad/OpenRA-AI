@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import argparse
 import hashlib
 import io
 import json
@@ -216,6 +217,9 @@ def preview(data: bytes) -> bytes:
 
 
 def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--skip-install", action="store_true")
+    args = parser.parse_args()
     with zipfile.ZipFile(SOURCE) as source:
         files = {name: source.read(name) for name in source.namelist()}
     yaml = files["map.yaml"].decode("utf-8")
@@ -255,10 +259,12 @@ def main() -> int:
     with zipfile.ZipFile(OUTPUT, "w") as output:
         for name, data in sorted(files.items()):
             output.writestr(info(name), data)
-    INSTALL.parent.mkdir(parents=True, exist_ok=True)
-    shutil.copyfile(OUTPUT, INSTALL)
+    if not args.skip_install:
+        INSTALL.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(OUTPUT, INSTALL)
     print(f"Map: {OUTPUT}")
-    print(f"Installed: {INSTALL}")
+    if not args.skip_install:
+        print(f"Installed: {INSTALL}")
     print(f"SHA256: {hashlib.sha256(OUTPUT.read_bytes()).hexdigest()}")
     return 0
 
