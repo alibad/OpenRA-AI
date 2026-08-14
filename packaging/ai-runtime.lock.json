@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "targets": {
+    "windows-x64": {
+      "components": [
+        {
+          "id": "llama-cpp-b10430-cpu-windows-x64",
+          "license": "MIT",
+          "source_revision": "b10430",
+          "url": "https://github.com/ggml-org/llama.cpp/releases/download/b10430/llama-b10430-bin-win-cpu-x64.zip",
+          "sha256": "63988c0e4a2527cf9a90c229de0199201f7ba5957c06c92dacc1c96e4c0851d7",
+          "bytes": 18459208,
+          "archive": "zip",
+          "destination": "runtime/llama"
+        },
+        {
+          "id": "whisper-cpp-v1.9.2-cpu-windows-x64",
+          "license": "MIT",
+          "source_revision": "v1.9.2",
+          "url": "https://github.com/ggml-org/whisper.cpp/releases/download/v1.9.2/whisper-bin-x64.zip",
+          "sha256": "49dcc16de826f20bd53d44f947a1ae49dfa81f86cad67a64d80820cb192d674a",
+          "bytes": 8194445,
+          "archive": "zip",
+          "strip_prefix": "Release",
+          "destination": "runtime/whisper"
+        }
+      ]
+    }
+  }
+}

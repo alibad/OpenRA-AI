@@ -33,6 +33,7 @@ try {
     foreach ($required in @(
         (Join-Path $testRoot "Play-OpenRAAI.cmd"),
         (Join-Path $testRoot "bin\openra-ai-companion.exe"),
+        (Join-Path $testRoot "bin\openra-ai-runtime.exe"),
         (Join-Path $testRoot "engine\openra\bin\OpenRA-AI.exe"),
         (Join-Path $testRoot "assets\brand\rtsai.ico"),
         (Join-Path $testRoot "Uninstall OpenRA AI.exe")

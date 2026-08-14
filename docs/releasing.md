@@ -35,10 +35,12 @@ python scripts/release.py build --version 0.1.0-alpha.10 --target windows-x64
 This runs the full checks, creates the portable ZIP and setup executable, smoke
 tests both, and writes `artifacts/releases/OpenRA-AI-0.1.0-alpha.10-release-index.json`.
 
-Add `--include-ai-pack` when the platform-neutral local models should be
-downloaded, verified, and assembled as part of the release. Downloads are
-cached by SHA-256 under `artifacts/download-cache/ai-pack`, so subsequent builds
-reuse identical inputs.
+The Windows target builds its local AI pack by default because the guided
+installer offers Local AI as its recommended option. The target-specific pack
+contains both the pinned models and the pinned Windows inference executables.
+Downloads are cached by SHA-256 under `artifacts/download-cache/ai-pack`, so
+subsequent builds reuse identical inputs. `--include-ai-pack` remains available
+for targets that do not opt in through the release plan.
 
 ## macOS release
 
@@ -79,8 +81,14 @@ revision, HTTPS URL, exact byte length, SHA-256, destination, and license. Then:
 ```powershell
 python scripts/ai_pack.py validate
 python scripts/ai_pack.py fetch
-python scripts/ai_pack.py build --release-version 0.1.0-alpha.10
+python scripts/ai_pack.py build --release-version 0.1.0-alpha.10 --target windows-x64
 ```
+
+The output is
+`OpenRA-AI-AI-Pack-<version>-<target>.zip`. Model inputs are locked in
+`packaging/ai-pack.lock.json`; platform runtime archives are locked separately
+in `packaging/ai-runtime.lock.json` so a runtime update cannot silently change
+the model payload or another target.
 
 Never replace a file at an existing pinned URL without changing the pack
 version. Keep model notices with the pack and audit new voice data separately

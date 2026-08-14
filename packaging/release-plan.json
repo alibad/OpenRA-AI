@@ -6,6 +6,7 @@
     "windows-x64": {
       "hosts": ["windows"],
       "architectures": ["amd64", "x86_64"],
+      "include_ai_pack_by_default": true,
       "build": {
         "program": "powershell.exe",
         "arguments": [
