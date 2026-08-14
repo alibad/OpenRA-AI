@@ -17,13 +17,14 @@ ENGINE = ROOT / "engine" / "openra"
 BITS = ENGINE / "mods" / "ra" / "bits"
 FRAMES = ROOT / "generated" / "turkey-sprites"
 RULES = ENGINE / "mods" / "ra" / "rules" / "turkey.yaml"
+FACTION_PACK = ENGINE / "mods" / "ra" / "experiences" / "factions" / "turkey.yaml"
 SEQUENCES = ENGINE / "mods" / "ra" / "sequences" / "turkey.yaml"
 MISSION = ROOT / "generated" / "missions" / "straits-shield-2026.oramap"
 
 
 class TurkeyFactionTests(unittest.TestCase):
     def test_selector_and_complete_native_tree_contract(self) -> None:
-        world = (ENGINE / "mods" / "ra" / "rules" / "world.yaml").read_text(encoding="utf-8")
+        world = FACTION_PACK.read_text(encoding="utf-8")
         rules = RULES.read_text(encoding="utf-8")
         chrome = (ENGINE / "mods" / "ra" / "chrome.yaml").read_text(encoding="utf-8")
         self.assertIn("Faction@turkey:", world)
@@ -46,7 +47,7 @@ class TurkeyFactionTests(unittest.TestCase):
             self.assertRegex(rules, rf"(?m)^{actor}:$")
         self.assertIn("BuildLimit: 1", rules.split("GREYWOLF:", 1)[1].split("\n\n", 1)[0])
         for contract in ("ProximityExternalCondition@MECHANIZED", "Warhead@DESIGNATE: GrantExternalCondition",
-                         "JamsMissiles", "Locomotor: amphibious", "Inherits: F15SA", "AmmoPool",
+                         "JamsMissiles", "Locomotor: amphibious", "Inherits: MIG", "AmmoPool",
                          "SpawnActorOnDeath", "LeavesTrails@WAKE"):
             haystack = rules + (ENGINE / "mods" / "ra" / "weapons" / "turkey.yaml").read_text(encoding="utf-8")
             self.assertIn(contract, haystack)

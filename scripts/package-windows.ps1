@@ -17,10 +17,11 @@ $engineRoot = Join-Path $repositoryRoot "engine\openra"
 $dotnetRoot = Join-Path $env:USERPROFILE ".dotnet"
 $brandIcon = Join-Path $repositoryRoot "assets\brand\rtsai.ico"
 $aiPackLock = Join-Path $repositoryRoot "packaging\ai-pack.lock.json"
+$aiRuntimeLock = Join-Path $repositoryRoot "packaging\ai-runtime.lock.json"
 $modelNotices = Join-Path $repositoryRoot "packaging\THIRD_PARTY_MODELS.md"
 $sampleMission = Join-Path $repositoryRoot "generated\missions\riyadh-crossing-42.oramap"
 
-foreach ($required in @($python, $brandIcon, $aiPackLock, $modelNotices)) {
+foreach ($required in @($python, $brandIcon, $aiPackLock, $aiRuntimeLock, $modelNotices)) {
     if (-not (Test-Path -LiteralPath $required)) {
         throw "Packaging input is missing: $required"
     }
@@ -94,12 +95,29 @@ if ($LASTEXITCODE -ne 0) {
     throw "Companion executable packaging failed."
 }
 
+& $python -m PyInstaller --noconfirm --clean --onefile `
+    --name openra-ai-runtime `
+    --icon $brandIcon `
+    --paths (Join-Path $repositoryRoot "services\companion\src") `
+    --collect-all kokoro_onnx `
+    --collect-all espeakng_loader `
+    --collect-all phonemizer `
+    --collect-all language_tags `
+    --distpath (Join-Path $stageRoot "bin") `
+    --workpath (Join-Path $pyinstallerWork "local-runtime") `
+    --specpath (Join-Path $pyinstallerSpec "local-runtime") `
+    (Join-Path $repositoryRoot "apps\launcher\local_ai_entry.py")
+if ($LASTEXITCODE -ne 0) {
+    throw "Local AI runtime executable packaging failed."
+}
+
 $launcherTarget = Join-Path $stageRoot "apps\launcher"
 $missionTarget = Join-Path $stageRoot "generated\missions"
 New-Item -ItemType Directory -Path $launcherTarget -Force | Out-Null
 New-Item -ItemType Directory -Path $missionTarget -Force | Out-Null
 Copy-Item -LiteralPath (Join-Path $repositoryRoot "apps\launcher\Start-OpenRAAI.ps1") -Destination $launcherTarget
 Copy-Item -LiteralPath (Join-Path $repositoryRoot "apps\launcher\Install-OpenRAContent.ps1") -Destination $launcherTarget
+Copy-Item -LiteralPath (Join-Path $repositoryRoot "apps\launcher\Install-AIPack.ps1") -Destination $launcherTarget
 Copy-Item -LiteralPath (Join-Path $repositoryRoot "Play-OpenRAAI.cmd") -Destination $stageRoot
 Copy-Item -LiteralPath $sampleMission -Destination $missionTarget
 Copy-Item -LiteralPath (Join-Path $repositoryRoot ".env.example") -Destination $stageRoot
@@ -108,6 +126,7 @@ Copy-Item -LiteralPath (Join-Path $repositoryRoot "LICENSE") -Destination $stage
 $packagingMetadata = Join-Path $stageRoot "packaging"
 New-Item -ItemType Directory -Path $packagingMetadata -Force | Out-Null
 Copy-Item -LiteralPath $aiPackLock -Destination $packagingMetadata
+Copy-Item -LiteralPath $aiRuntimeLock -Destination $packagingMetadata
 Copy-Item -LiteralPath $modelNotices -Destination $packagingMetadata
 $brandTarget = Join-Path $stageRoot "assets\brand"
 New-Item -ItemType Directory -Path $brandTarget -Force | Out-Null
@@ -124,7 +143,9 @@ $manifest = [ordered]@{
     content = "Downloaded on first run from OpenRA's supported Red Alert quick-install mirrors"
     ai_pack = [ordered]@{
         manifest = "packaging/ai-pack.lock.json"
-        optional = $true
+        runtime_manifest = "packaging/ai-runtime.lock.json"
+        installer_default = $true
+        portable_install = "Extract the matching AI pack into the ai folder, or configure an external provider."
         runtime_cost = "No hosted-provider charge"
     }
 }

@@ -16,6 +16,7 @@ dependencies = [
 
 [project.optional-dependencies]
 voice = ["sounddevice>=0.5,<1", "edge-tts>=7.2,<8"]
+local-runtime = ["kokoro-onnx>=0.5,<0.6"]
 dev = ["grpcio-tools>=1.67,<2"]
 package = ["pyinstaller>=6.16,<7", "huggingface_hub[hf_xet]>=1.7,<2"]
 

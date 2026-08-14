@@ -42,14 +42,32 @@ first launch.
 ### AI availability
 
 The game, native map tools, and deterministic battlefield alerts work without
-a model provider. Model-written answers, transcription, speech, and terrain
-vision currently require an OpenAI-compatible AI layer running locally at
-`http://127.0.0.1:4000`.
+a model provider. The guided Windows installer selects **Local AI
+(recommended)** by default and downloads a checksum-verified, platform-specific
+pack containing the text/vision model, speech recognition, speech synthesis,
+and their local CPU runtimes. It requires no API key or usage fees. The download
+is about 1.8 GB and needs a 4-core AVX2 x64 CPU, 8 GB RAM, and 5 GB free disk;
+a recent 6-core CPU and 16 GB RAM are recommended. This Windows pack is
+CPU-only and does not require or use a GPU.
 
-The game never stores a provider API key. Open **Settings > AI** to select
-named model routes, control voice and notification priority, test the full
-connection, and see an estimated session cost. If the AI layer is unavailable,
-OpenRA keeps running normally.
+During setup, users can instead choose **External or existing
+OpenAI-compatible provider**, then enter an endpoint, model name, and optional
+API key. This supports hosted providers as well as local servers such as LM
+Studio or Ollama. Windows protects a supplied key for the current user with
+DPAPI; it is never written to the repository or game settings in plaintext.
+
+Portable users can extract the matching target AI pack into the package's
+`ai` folder. To use an external provider, save its key in a temporary text file
+and run:
+
+```powershell
+.\bin\openra-ai-runtime.exe configure --mode external --endpoint https://api.openai.com/v1 --text-model gpt-4.1-mini --key-file .\provider-key.txt
+```
+
+The configuration command encrypts the key and deletes the temporary key file.
+Open **Settings > AI** to control voice and notification priority and test the
+connection. If the local runtime or external provider is unavailable, OpenRA
+keeps running normally.
 
 ### In-game controls
 
@@ -175,6 +193,17 @@ Tech Center progression, coastal reconnaissance, actual civilian ship lanes,
 deadlock recovery, and a final combined-arms passage defense.
 
 See the [Red Sea 2026 theater](docs/red-sea-2026.md).
+
+### Experience and faction packs
+
+New installs use the **AI Assistant Only** profile: optional built-in gameplay,
+capability, and faction packs are installed but disabled. Enabling one in
+**Workshop > Experience Builder** activates files already shipped with the
+game, resolves its dependencies, and restarts the mod; it does not download the
+original source mod. External community packs are a separate import action.
+They are restricted to validated data, copied into the user's OpenRA support
+directory, and can be removed without changing the base installation. See the
+[Experience Composer guide](docs/experience-composer/README.md).
 
 ## Build from source
 

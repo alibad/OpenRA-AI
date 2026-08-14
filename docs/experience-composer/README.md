@@ -6,13 +6,46 @@ The Builder separates simulation-affecting capabilities from local presentation 
 
 ## Gameplay profiles
 
-The default **World War III** profile enables every currently integrated and stable reusable capability. Players can select another preset or toggle individual components. Dependencies are enabled automatically; disabling a dependency also disables components that require it.
+The default **AI Assistant Only** profile enables no optional gameplay or
+faction packs. This gives a new player the standard base simulation plus the AI
+assistant. Players explicitly select a preset or enable individual capability
+and faction packs in Experience Builder. Dependencies are enabled
+automatically; disabling a dependency also disables components that require
+it.
+
+Built-in packs are part of the OpenRA AI game package. Their manifests, rules,
+weapons, sequences, previews, and other declared data are copied into the
+installed mod by the normal packager. Turning one on only changes the selected
+local file set and restarts the mod; it does not contact a server or download
+the source mod again. Source, author, version, and license metadata remain
+visible in Experience Builder so the origin of reused systems stays auditable.
+
+This distinction is important:
+
+- **Installed and disabled**: built-in capability/faction packs ship with the
+  game and are ready to enable offline.
+- **Imported**: external community capability packs are validated, copied into
+  the user's OpenRA support directory, and mounted from there. They are not in
+  the base installer unless they have been deliberately promoted to a built-in
+  pack for a release.
+- **Active**: only packs selected by the current profile contribute gameplay
+  data. Their dependency closure and exact files determine the fingerprint.
 
 Gameplay changes restart the mod. The selected component IDs, versions, and manifest file sets produce a deterministic gameplay fingerprint. Multiplayer peers must use the same gameplay fingerprint.
 
 Module parameters are declared beside their component in the catalog. Boolean, bounded integer, and enumerated choice controls are generated from that schema. Parameter values are validated, persisted in settings, included in the gameplay fingerprint, and read by the runtime capability. The initial modules expose practical controls for factions, units, weapons, economy, AI, effects, and balance.
 
-The catalog is defined in `engine/openra/mods/ra/experiences.yaml`. A component can contribute rule, weapon, sequence, cursor, chrome, voice, notification, or music definitions. The selected file set is resolved before OpenRA loads its default rules.
+The built-in catalog is defined in
+`engine/openra/mods/ra/experiences.yaml`. A component can contribute rule,
+weapon, sequence, cursor, chrome, voice, notification, or music definitions.
+The selected file set is resolved before OpenRA loads its default rules.
+
+Imported capability packs are data-only: compiled assemblies, executable code,
+scripts, path traversal, and undeclared files are rejected. Valid imports are
+copied under the RA experience-pack area in the OpenRA support directory,
+assigned a mounted namespace, fingerprinted, and can be removed through the
+manager. Importing is therefore a separate, explicit action from enabling a
+built-in pack.
 
 ## Presentation packs
 

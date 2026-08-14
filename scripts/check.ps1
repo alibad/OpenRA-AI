@@ -44,6 +44,21 @@ if ($env:PYTHONPATH) {
 }
 $env:PYTHONPATH = $sourcePaths -join [IO.Path]::PathSeparator
 
+# Faction and theater fixtures intentionally exercise the complete built-in
+# portfolio. Point OpenRA.Utility at disposable settings now that new installs
+# correctly default to AI Assistant Only.
+$originalSupportDir = $env:SUPPORT_DIR
+$originalUtilityExperienceProfile = $env:OPENRA_UTILITY_EXPERIENCE_PROFILE
+$testSettingsDirectory = Join-Path $repositoryRoot "artifacts\check\support"
+$testSettingsFile = Join-Path $testSettingsDirectory "settings.yaml"
+New-Item -ItemType Directory -Path $testSettingsDirectory -Force | Out-Null
+@"
+Experience@ra:
+	Profile: world-war-iii
+"@ | Set-Content -LiteralPath $testSettingsFile -Encoding UTF8
+$env:SUPPORT_DIR = $testSettingsDirectory
+$env:OPENRA_UTILITY_EXPERIENCE_PROFILE = "world-war-iii"
+
 & $python -m py_compile (Join-Path $repositoryRoot "scripts\release.py") (Join-Path $repositoryRoot "scripts\ai_pack.py")
 if ($LASTEXITCODE -ne 0) { throw "Release framework compilation failed." }
 & $python (Join-Path $repositoryRoot "scripts\ai_pack.py") validate
@@ -129,6 +144,8 @@ try {
 }
 finally {
     Pop-Location
+    $env:SUPPORT_DIR = $originalSupportDir
+    $env:OPENRA_UTILITY_EXPERIENCE_PROFILE = $originalUtilityExperienceProfile
 }
 
 Write-Host "OpenRA AI local checks passed." -ForegroundColor Green

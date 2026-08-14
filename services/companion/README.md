@@ -5,8 +5,10 @@ interruptible responses.
 
 It owns relevance scoring, cooldowns, deduplication, conversation state,
 transcription, speech playback coordination, cancellation, and private AI-layer
-routing. The default stack is fully local: `local-coder`, `local-whisper`, and
-`local-kokoro` are selected through the BeTenshi router.
+routing. The default installed stack is fully local: `local-coder`,
+`local-whisper`, and `local-kokoro` are served through the bundled loopback
+gateway. Setup can instead configure that gateway to forward to an existing
+OpenAI-compatible endpoint.
 
 The companion can propose a bounded set of game orders, but every proposal
 requires a separate player confirmation. The OpenRA engine validates the
@@ -115,8 +117,9 @@ speech, mute/disable controls, notification priority, session cost estimates,
 immediate interruption, and proposal/confirmation endpoints under
 `/v1/actions`. OpenRA's native AI settings tab uses `/v1/state`,
 `/v1/usage`, and the diagnostic routes; users do not need the HTTP console. All model traffic
-uses the named AI-layer routes in the project `.env`; provider keys stay in
-the router and are never copied into this repository.
+uses named AI-layer routes. External provider keys are protected with Windows
+user encryption outside the install tree and are never copied into this
+repository or game settings.
 
 ## Autonomous MCP commander
 

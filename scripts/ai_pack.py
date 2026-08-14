@@ -17,6 +17,7 @@ from pathlib import Path, PurePosixPath
 
 REPOSITORY_ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_LOCK = REPOSITORY_ROOT / "packaging" / "ai-pack.lock.json"
+DEFAULT_RUNTIME_LOCK = REPOSITORY_ROOT / "packaging" / "ai-runtime.lock.json"
 DEFAULT_CACHE = REPOSITORY_ROOT / "artifacts" / "download-cache" / "ai-pack"
 DEFAULT_RELEASES = REPOSITORY_ROOT / "artifacts" / "releases"
 NOTICES = REPOSITORY_ROOT / "packaging" / "THIRD_PARTY_MODELS.md"
@@ -72,6 +73,36 @@ def validate_lock(lock: dict) -> None:
         if normalized in destinations:
             raise PackError(f"Duplicate AI component destination: {normalized}")
         destinations.add(normalized)
+
+
+def load_runtime_lock(path: Path, target: str) -> list[dict]:
+    try:
+        lock = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise PackError(f"Unable to read AI runtime lock {path}: {exc}") from exc
+    if lock.get("schema_version") != 1 or not isinstance(lock.get("targets"), dict):
+        raise PackError("AI runtime lock schema_version must be 1 and define targets")
+    if target not in lock["targets"]:
+        raise PackError(f"AI runtime lock does not define target {target}")
+    components = lock["targets"][target].get("components")
+    if not isinstance(components, list) or not components:
+        raise PackError(f"AI runtime target {target} requires components")
+    required = {"id", "license", "url", "sha256", "bytes", "destination", "archive"}
+    for component in components:
+        missing = required - set(component)
+        if missing:
+            raise PackError(f"AI runtime component is missing {', '.join(sorted(missing))}")
+        if component["archive"] != "zip":
+            raise PackError(f"Unsupported runtime archive for {component['id']}: {component['archive']}")
+        if not str(component["url"]).startswith("https://"):
+            raise PackError(f"Only HTTPS runtime sources are allowed: {component['id']}")
+        digest = str(component["sha256"]).lower()
+        if len(digest) != SHA256_LENGTH or any(character not in "0123456789abcdef" for character in digest):
+            raise PackError(f"Invalid runtime SHA-256 for {component['id']}")
+        destination = PurePosixPath(str(component["destination"]))
+        if destination.is_absolute() or ".." in destination.parts:
+            raise PackError(f"Unsafe runtime destination for {component['id']}: {destination}")
+    return components
 
 
 def sha256(path: Path) -> str:
@@ -179,9 +210,34 @@ def deterministic_zip(source_root: Path, output: Path) -> None:
     temporary.replace(output)
 
 
-def build(lock: dict, cache_root: Path, release_root: Path, release_version: str) -> Path:
+def extract_runtime(source: Path, destination: Path, component: dict) -> None:
+    strip_prefix = str(component.get("strip_prefix") or "").strip("/")
+    destination.mkdir(parents=True, exist_ok=True)
+    with zipfile.ZipFile(source) as archive:
+        for member in archive.infolist():
+            if member.is_dir():
+                continue
+            relative = PurePosixPath(member.filename)
+            if relative.is_absolute() or ".." in relative.parts:
+                raise PackError(f"Unsafe archive member in {component['id']}: {member.filename}")
+            parts = list(relative.parts)
+            if strip_prefix:
+                prefix_parts = list(PurePosixPath(strip_prefix).parts)
+                if parts[:len(prefix_parts)] != prefix_parts:
+                    continue
+                parts = parts[len(prefix_parts):]
+            if not parts:
+                continue
+            output = destination.joinpath(*parts)
+            output.parent.mkdir(parents=True, exist_ok=True)
+            with archive.open(member) as input_stream, output.open("wb") as output_stream:
+                shutil.copyfileobj(input_stream, output_stream, length=1024 * 1024)
+
+
+def build(lock: dict, runtime_components: list[dict], cache_root: Path, release_root: Path,
+          release_version: str, target: str) -> Path:
     cached = fetch(lock, cache_root)
-    release_name = f"OpenRA-AI-AI-Pack-{release_version}"
+    release_name = f"OpenRA-AI-AI-Pack-{release_version}-{target}"
     stage_root = REPOSITORY_ROOT / "artifacts" / "ai-pack" / release_name
     if stage_root.exists():
         shutil.rmtree(stage_root)
@@ -198,15 +254,28 @@ def build(lock: dict, cache_root: Path, release_root: Path, release_version: str
             if key in component
         })
 
+    packaged_runtimes: list[dict] = []
+    for component in runtime_components:
+        source = download_component(cache_root, component)
+        destination = stage_root / Path(*PurePosixPath(component["destination"]).parts)
+        extract_runtime(source, destination, component)
+        packaged_runtimes.append({
+            key: component[key]
+            for key in ("id", "license", "source_revision", "sha256", "bytes", "destination")
+            if key in component
+        })
+
     shutil.copy2(NOTICES, stage_root / "THIRD_PARTY_MODELS.md")
     pack_manifest = {
         "schema_version": 1,
         "name": lock["name"],
         "release_version": release_version,
         "pack_version": lock["pack_version"],
+        "target": target,
         "hardware_requirements": lock["hardware_requirements"],
         "payload_bytes": sum(component["bytes"] for component in lock["components"]),
         "components": packaged_components,
+        "runtimes": packaged_runtimes,
     }
     (stage_root / "pack.json").write_text(
         json.dumps(pack_manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8"
@@ -225,9 +294,11 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("command", choices=("validate", "fetch", "build"))
     parser.add_argument("--lock", type=Path, default=DEFAULT_LOCK)
+    parser.add_argument("--runtime-lock", type=Path, default=DEFAULT_RUNTIME_LOCK)
     parser.add_argument("--cache", type=Path, default=DEFAULT_CACHE)
     parser.add_argument("--release-root", type=Path, default=DEFAULT_RELEASES)
     parser.add_argument("--release-version")
+    parser.add_argument("--target", default="windows-x64")
     return parser.parse_args()
 
 
@@ -235,6 +306,7 @@ def main() -> int:
     args = parse_args()
     try:
         lock = load_lock(args.lock.resolve())
+        runtime_components = load_runtime_lock(args.runtime_lock.resolve(), args.target)
         total = sum(component["bytes"] for component in lock["components"])
         print(f"AI pack lock is valid: {len(lock['components'])} components, {total / 1024 / 1024:.1f} MiB")
         if args.command == "fetch":
@@ -242,7 +314,7 @@ def main() -> int:
         elif args.command == "build":
             if not args.release_version:
                 raise PackError("build requires --release-version")
-            build(lock, args.cache.resolve(), args.release_root.resolve(), args.release_version)
+            build(lock, runtime_components, args.cache.resolve(), args.release_root.resolve(), args.release_version, args.target)
     except PackError as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 1

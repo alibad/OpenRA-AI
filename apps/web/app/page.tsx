@@ -89,7 +89,7 @@ export default function Home() {
           <div className="download-actions">
             <a className="primary-action" href={windowsRelease.installerUrl}><Download size={17} /> Install for Windows x64</a>
             <a className="checksum-link" href={windowsRelease.portableUrl}>Portable ZIP</a>
-            <a className="checksum-link" href={windowsRelease.aiPackUrl}>Optional AI model pack</a>
+            <a className="checksum-link" href={windowsRelease.aiPackUrl}>{windowsRelease.localAiInstallerDefault ? "Manual local AI pack" : "Optional AI model pack"}</a>
             <a className="checksum-link" href={windowsRelease.releaseIndexUrl}>Checksums</a>
           </div>
         </div>
@@ -98,7 +98,14 @@ export default function Home() {
           <li><span>02</span><div><b>Launch OpenRA AI</b><p>Use the Start menu, or run Play-OpenRAAI.cmd from the portable ZIP. First launch downloads verified Red Alert content.</p></div></li>
           <li><span>03</span><div><b>Hold Ctrl+Space to ask</b><p>Release to hear the answer. Ctrl+Enter accepts; Ctrl+Backspace rejects; Ctrl+Shift+A toggles AUTO; Ctrl+Shift+M mutes.</p></div></li>
         </ol>
-        <div className="download-footnote"><FileArchive size={15} /><span>Windows 10/11 x64 alpha. The optional 1.7 GiB AI pack is a checksum-pinned model payload, not a bundled model server yet. Model-backed replies still expect a compatible local AI router; the game and native AI continue to run when it is offline.</span></div>
+        {windowsRelease.localAiInstallerDefault ? (
+          <div className="download-footnote"><FileArchive size={15} /><span>Windows 10/11 x64 alpha. The guided installer selects Local AI by default and downloads about 1.8 GB of checksum-verified models and CPU runtimes. Choose an external OpenAI-compatible endpoint to skip it. Minimum: 4-core AVX2 CPU, 8 GB RAM, 5 GB free disk. Recommended: recent 6-core CPU and 16 GB RAM. This pack is CPU-only.</span></div>
+        ) : (
+          <div className="download-footnote"><FileArchive size={15} /><span>Windows 10/11 x64 alpha. The optional 1.7 GiB AI pack is a checksum-pinned model payload, not a bundled model server yet. Model-backed replies still expect a compatible local AI router; the game and native AI continue to run when it is offline.</span></div>
+        )}
+        {windowsRelease.builtInExperiencePacksDisabledByDefault && (
+          <div className="download-footnote"><ShieldCheck size={15} /><span>Built-in Experience Manager capability and faction packs ship inside the game but start disabled under AI Assistant Only. Enabling one uses installed local data—no download. Separately imported community packs are validated and copied into your OpenRA user-data folder.</span></div>
+        )}
       </section>
 
       <section className="companion-section" id="companion">
