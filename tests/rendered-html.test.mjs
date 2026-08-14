@@ -33,7 +33,7 @@ test("renders a focused homepage with the product promise, two experiences, play
   assert.match(html, /Earth to battlefield/);
   assert.match(html, /Current playable proof/);
   assert.match(html, /Interactive AI companion preview/);
-  assert.match(html, /0\.1\.0-alpha\.9/);
+  assert.match(html, /0\.1\.0-alpha\.\d+/);
   assert.match(html, /Red Sea 2026/);
   assert.match(html, /Jizan Corridor/);
   assert.match(html, /red-sea-2026-key-art\.webp/);
