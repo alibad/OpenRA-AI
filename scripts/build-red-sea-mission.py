@@ -163,10 +163,12 @@ def build_mission(
         for name, data in sorted(files.items()):
             archive.writestr(zip_info(name), data)
 
-    install.parent.mkdir(parents=True, exist_ok=True)
-    shutil.copyfile(output, install)
+    if install != output:
+        install.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(output, install)
     print(f"Mission: {output}")
-    print(f"Installed: {install}")
+    if install != output:
+        print(f"Installed: {install}")
     print(f"SHA256: {hashlib.sha256(output.read_bytes()).hexdigest()}")
 
 
@@ -176,6 +178,7 @@ def main() -> int:
     parser.add_argument("--terrain-package", type=Path)
     parser.add_argument("--output", type=Path)
     parser.add_argument("--install", type=Path)
+    parser.add_argument("--skip-install", action="store_true")
     args = parser.parse_args()
     selected = list(MISSION_SPECS) if args.mission == "all" else [args.mission]
     if len(selected) > 1 and (args.output or args.install):
@@ -191,6 +194,8 @@ def main() -> int:
             terrain = DEFAULT_TERRAIN.resolve()
         output = (args.output or Path(spec["output"])).resolve()
         install = (args.install or Path(spec["install"])).resolve()
+        if args.skip_install:
+            install = output
         build_mission(mission_id, spec, terrain, output, install)
     return 0
 

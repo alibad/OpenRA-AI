@@ -43,6 +43,9 @@ try {
     git diff --check HEAD
     if ($LASTEXITCODE -ne 0) { throw "Git whitespace validation failed." }
 
+    & (Join-Path $PSScriptRoot "prepare-test-fixtures.ps1")
+    if ($LASTEXITCODE -ne 0) { throw "Test fixture preparation failed." }
+
     & $python -m unittest discover -s services\worldgen\tests -v
     if ($LASTEXITCODE -ne 0) { throw "Worldgen tests failed." }
     & $python -m unittest discover -s services\companion\tests -v

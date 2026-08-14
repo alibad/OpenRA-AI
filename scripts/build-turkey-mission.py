@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import argparse
 import hashlib
 import json
 import shutil
@@ -29,6 +30,9 @@ def source_bytes(path: Path) -> bytes:
 
 
 def main() -> int:
+	parser=argparse.ArgumentParser()
+	parser.add_argument("--skip-install",action="store_true")
+	args=parser.parse_args()
 	files={path.name:source_bytes(path) for path in sorted(SOURCE.iterdir()) if path.is_file() and path.name not in {"README.md"}}
 	files["map.bin"]=(TERRAIN/"map.bin").read_bytes(); files["map.png"]=(TERRAIN/"map.png").read_bytes()
 	manifest={
@@ -44,8 +48,11 @@ def main() -> int:
 	OUTPUT.parent.mkdir(parents=True,exist_ok=True)
 	with zipfile.ZipFile(OUTPUT,"w") as archive:
 		for name,data in sorted(files.items()): archive.writestr(info(name),data)
-	INSTALL.parent.mkdir(parents=True,exist_ok=True); shutil.copyfile(OUTPUT,INSTALL)
-	print(f"Mission: {OUTPUT}"); print(f"Installed: {INSTALL}"); print(f"SHA256: {hashlib.sha256(OUTPUT.read_bytes()).hexdigest()}")
+	if not args.skip_install:
+		INSTALL.parent.mkdir(parents=True,exist_ok=True); shutil.copyfile(OUTPUT,INSTALL)
+	print(f"Mission: {OUTPUT}")
+	if not args.skip_install: print(f"Installed: {INSTALL}")
+	print(f"SHA256: {hashlib.sha256(OUTPUT.read_bytes()).hexdigest()}")
 	return 0
 
 
