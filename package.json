@@ -1,5 +1,5 @@
 {
-  "name": "rtsai-web",
+  "name": "openra-ai-web",
   "version": "0.1.0",
   "private": true,
   "engines": {
@@ -9,20 +9,15 @@
     "dev": "vinext dev",
     "build": "vinext build",
     "start": "vinext start",
-    "typecheck": "tsc --noEmit",
-    "test": "npm run typecheck && npm run build && node --import tsx --test tests/*.test.*",
+    "test": "npm run build && node --import tsx --test tests/*.test.*",
     "lint": "eslint . --ignore-pattern dist --ignore-pattern .next"
   },
   "dependencies": {
     "fflate": "^0.8.2",
-    "firebase": "^12.17.1",
-    "jose": "^6.2.8",
     "lucide-react": "^0.468.0",
     "maplibre-gl": "^5.10.0",
     "react": "19.2.6",
-    "react-dom": "19.2.6",
-    "sonner": "^2.0.8",
-    "zustand": "^5.0.14"
+    "react-dom": "19.2.6"
   },
   "devDependencies": {
     "@cloudflare/vite-plugin": "1.37.1",

@@ -15,9 +15,6 @@ export type MissionPackage = {
   filename: string;
   previewUrl: string;
   sourceStatus: "live-openstreetmap" | "deterministic-fallback";
-  sourceFeatureCount: number;
-  roadFeatureCount: number;
-  waterFeatureCount: number;
   waterCells: number;
   roadCells: number;
   validation: string[];
@@ -31,7 +28,7 @@ export type MissionCore = {
   binary: Uint8Array;
 };
 
-export type EarthFeature = {
+type Feature = {
   kind: "water" | "road";
   points: Array<[number, number]>;
 };
@@ -39,6 +36,10 @@ export type EarthFeature = {
 const LAND = 0;
 const WATER = 1;
 const ROAD = 2;
+const overpassEndpoints = [
+  "https://overpass-api.de/api/interpreter",
+  "https://overpass.private.coffee/api/interpreter",
+] as const;
 
 function random(seed: number) {
   let state = seed >>> 0 || 1;
@@ -48,21 +49,46 @@ function random(seed: number) {
   };
 }
 
-async function acquireFeatures(selection: GeoSelection, signal?: AbortSignal, authToken?: string): Promise<EarthFeature[]> {
-  const response = await fetch("/api/earth-features", {
-    method: "POST",
-    headers: { "Content-Type": "application/json", ...(authToken ? { Authorization: `Bearer ${authToken}` } : {}) },
-    body: JSON.stringify({
-      latitude: selection.latitude,
-      longitude: selection.longitude,
-      radiusM: selection.radiusM,
-    }),
-    signal,
-  });
-  if (response.status === 401) throw new Error("Authentication required");
-  if (!response.ok) throw new Error("Earth data is temporarily unavailable");
-  const payload = (await response.json()) as { features?: EarthFeature[] };
-  return payload.features ?? [];
+async function acquireFeatures(selection: GeoSelection): Promise<Feature[]> {
+  const query = `[out:json][timeout:10];(
+way(around:${selection.radiusM},${selection.latitude},${selection.longitude})[natural~"water|coastline|bay"];
+way(around:${selection.radiusM},${selection.latitude},${selection.longitude})[waterway];
+way(around:${selection.radiusM},${selection.latitude},${selection.longitude})[highway~"motorway|trunk|primary|secondary|tertiary"];
+);out tags geom;`;
+  let lastError: unknown = new Error("No Overpass endpoint was available");
+  for (const endpoint of overpassEndpoints) {
+    const controller = new AbortController();
+    const timeout = window.setTimeout(() => controller.abort(), 9000);
+    try {
+      const response = await fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams({ data: query }),
+        signal: controller.signal,
+      });
+      if (!response.ok) throw new Error(`Overpass returned ${response.status}`);
+      const payload = (await response.json()) as {
+        elements?: Array<{
+          tags?: Record<string, string>;
+          geometry?: Array<{ lat: number; lon: number }>;
+        }>;
+      };
+      return (payload.elements ?? []).flatMap((element) => {
+        const tags = element.tags ?? {};
+        const geometry = element.geometry ?? [];
+        if (geometry.length < 2) return [];
+        const kind = tags.highway ? "road" : tags.waterway || tags.natural ? "water" : null;
+        return kind
+          ? [{ kind, points: geometry.map((point) => [point.lat, point.lon] as [number, number]) }]
+          : [];
+      });
+    } catch (error) {
+      lastError = error;
+    } finally {
+      window.clearTimeout(timeout);
+    }
+  }
+  throw lastError;
 }
 
 function line(a: [number, number], b: [number, number]) {
@@ -108,33 +134,17 @@ function project(point: [number, number], selection: GeoSelection, margin: numbe
   ];
 }
 
-function buildTerrain(selection: GeoSelection, features: EarthFeature[]) {
+function buildTerrain(selection: GeoSelection, features: Feature[]) {
   const margin = Math.max(4, selection.size / 16);
   const cells = Array.from({ length: selection.size }, () => Array(selection.size).fill(LAND));
   const rng = random(selection.seed);
   const hasWater = features.some((feature) => feature.kind === "water");
-  const hasRoad = features.some((feature) => feature.kind === "road");
 
-  if (!features.length && !hasWater) {
+  if (!hasWater) {
     const center = Math.floor(selection.size * (0.42 + rng() * 0.16));
-    const shouldAddWater = Math.abs(selection.latitude + selection.longitude) % 3 < 1.1;
-    if (shouldAddWater)
-      for (let y = margin; y < selection.size - margin; y++) {
-        const x = center + Math.round(Math.sin((y + selection.seed) / 7) * 4);
-        paint(cells, x, y, 1, WATER);
-      }
-  }
-
-  if (!features.length && !hasRoad) {
-    const routes = 3 + Math.floor(rng() * 3);
-    for (let index = 0; index < routes; index++) {
-      const horizontal = index % 2 === 0;
-      const offset = Math.round(margin + rng() * (selection.size - margin * 2 - 1));
-      const start: [number, number] = horizontal ? [margin, offset] : [offset, margin];
-      const end: [number, number] = horizontal
-        ? [selection.size - margin - 1, Math.max(margin, Math.min(selection.size - margin - 1, offset + Math.round((rng() - 0.5) * 20)))]
-        : [Math.max(margin, Math.min(selection.size - margin - 1, offset + Math.round((rng() - 0.5) * 20))), selection.size - margin - 1];
-      for (const [x, y] of line(start, end)) if (cells[y][x] !== WATER) paint(cells, x, y, 1, ROAD);
+    for (let y = margin; y < selection.size - margin; y++) {
+      const x = center + Math.round(Math.sin((y + selection.seed) / 7) * 4);
+      paint(cells, x, y, 1, WATER);
     }
   }
 
@@ -284,22 +294,15 @@ function dataUrlBytes(url: string) {
   return Uint8Array.from(binary, (character) => character.charCodeAt(0));
 }
 
-export async function generateEarthMission(
-  selection: GeoSelection,
-  options: { signal?: AbortSignal; authToken?: string; onStage?: (stage: "acquiring" | "compiling") => void } = {},
-): Promise<MissionPackage> {
-  let features: EarthFeature[] = [];
+export async function generateEarthMission(selection: GeoSelection): Promise<MissionPackage> {
+  let features: Feature[] = [];
   let sourceStatus: MissionPackage["sourceStatus"] = "live-openstreetmap";
-  options.onStage?.("acquiring");
   try {
-    features = await acquireFeatures(selection, options.signal, options.authToken);
+    features = await acquireFeatures(selection);
     if (!features.length) sourceStatus = "deterministic-fallback";
-  } catch (cause) {
-    if (options.signal?.aborted) throw cause;
-    if (cause instanceof Error && cause.message === "Authentication required") throw cause;
+  } catch {
     sourceStatus = "deterministic-fallback";
   }
-  options.onStage?.("compiling");
   const { cells, spawns, mines, yaml, binary } = compileMissionCore(selection, features);
   const previewUrl = renderPreview(cells, spawns, mines);
   const validation = [
@@ -338,16 +341,13 @@ export async function generateEarthMission(
     filename: `${slug}-${selection.seed}.oramap`,
     previewUrl,
     sourceStatus,
-    sourceFeatureCount: features.length,
-    roadFeatureCount: features.filter((feature) => feature.kind === "road").length,
-    waterFeatureCount: features.filter((feature) => feature.kind === "water").length,
     waterCells: cells.flat().filter((cell) => cell === WATER).length,
     roadCells: cells.flat().filter((cell) => cell === ROAD).length,
     validation,
   };
 }
 
-export function compileMissionCore(selection: GeoSelection, features: EarthFeature[] = []): MissionCore {
+export function compileMissionCore(selection: GeoSelection, features: Feature[] = []): MissionCore {
   const { cells, spawns, mines, margin } = buildTerrain(selection, features);
   return {
     cells,

@@ -1,86 +1,35 @@
 import type { Metadata, Viewport } from "next";
+import { headers } from "next/headers";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { AuthProvider } from "./components/AuthProvider";
 
 const geist = Geist({ variable: "--font-geist", subsets: ["latin"] });
 const mono = Geist_Mono({ variable: "--font-mono", subsets: ["latin"] });
 
-const canonicalOrigin = new URL("https://rtsai.net");
-const title = "RTS AI — An AI-Native RTS Platform Built on OpenRA";
-const description =
-  "Play with an interruptible AI companion, create validated missions from Earth, explore new OpenRA experiences, and advance game intelligence through autonomous agents.";
-
-export const metadata: Metadata = {
-  metadataBase: canonicalOrigin,
-  title,
-  description,
-  applicationName: "RTS AI",
-  category: "games",
-  keywords: [
-    "RTS AI",
-    "OpenRA AI",
-    "OpenRA companion",
-    "AI strategy game",
-    "Earth mission generator",
-    "real world strategy maps",
-    "OpenRA mod platform",
-    "AI game companion",
-    "autonomous game agent",
-  ],
-  alternates: { canonical: "/" },
-  manifest: "/manifest.webmanifest",
-  referrer: "origin-when-cross-origin",
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: {
-      index: true,
-      follow: true,
-      "max-image-preview": "large",
-      "max-snippet": -1,
-      "max-video-preview": -1,
+export async function generateMetadata(): Promise<Metadata> {
+  const requestHeaders = await headers();
+  const host = requestHeaders.get("x-forwarded-host") ?? requestHeaders.get("host") ?? "localhost:3000";
+  const protocol = requestHeaders.get("x-forwarded-proto") ?? (host.startsWith("localhost") ? "http" : "https");
+  const origin = new URL(`${protocol}://${host}`);
+  return {
+    metadataBase: origin,
+    title: "OpenRA AI — Your battlefield, now it talks back",
+    description: "An interruptible AI companion for OpenRA and an Earth-to-Mission generator for playable Red Alert maps.",
+    icons: { icon: "/favicon.svg", shortcut: "/favicon.svg" },
+    openGraph: {
+      title: "OpenRA AI — Your battlefield, now it talks back",
+      description: "A quiet AI companion and a map generator that turns any place on Earth into a playable skirmish.",
+      url: origin,
+      siteName: "OpenRA AI",
+      images: [{ url: "/og.png", width: 1731, height: 909, alt: "OpenRA AI tactical world map" }],
+      type: "website",
     },
-  },
-  icons: {
-    icon: [
-      { url: "/favicon.ico", sizes: "any" },
-      { url: "/favicon-32.png", type: "image/png", sizes: "32x32" },
-    ],
-    shortcut: "/favicon.ico",
-    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
-  },
-  appleWebApp: {
-    capable: true,
-    title: "RTS AI",
-    statusBarStyle: "black-translucent",
-  },
-  openGraph: {
-    title,
-    description,
-    url: "/",
-    siteName: "RTS AI",
-    locale: "en_US",
-    images: [
-      {
-        url: "/social-card.png",
-        width: 1200,
-        height: 630,
-        alt: "RTS AI — an AI-native RTS platform built on OpenRA",
-      },
-    ],
-    type: "website",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title,
-    description,
-    images: ["/social-card.png"],
-  },
-};
+    twitter: { card: "summary_large_image", title: "OpenRA AI", description: "Your battlefield, now it talks back.", images: ["/og.png"] },
+  };
+}
 
 export const viewport: Viewport = { themeColor: "#111411", colorScheme: "dark" };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return <html lang="en"><body className={`${geist.variable} ${mono.variable}`}><AuthProvider>{children}</AuthProvider></body></html>;
+  return <html lang="en"><body className={`${geist.variable} ${mono.variable}`}>{children}</body></html>;
 }
