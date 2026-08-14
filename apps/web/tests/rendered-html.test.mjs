@@ -24,8 +24,10 @@ test("renders the complete marketing and mission-creation surface", async () => 
   assert.match(html, /Point anywhere/);
   assert.match(html, /Download Windows alpha/);
   assert.match(html, /Play-OpenRAAI\.cmd/);
-  assert.match(html, /0\.1\.0-alpha\.10/);
-  assert.match(html, /OpenRA-AI-AI-Pack-0\.1\.0-alpha\.10\.zip/);
+  assert.match(html, /0\.1\.0-alpha\.11/);
+  assert.match(html, /OpenRA-AI-AI-Pack-0\.1\.0-alpha\.11-windows-x64\.zip/);
+  assert.match(html, /guided installer selects Local AI by default/);
+  assert.match(html, /Built-in Experience Manager capability and faction packs ship inside the game but start disabled/);
   assert.match(html, /AI layer/);
   assert.match(html, /OpenStreetMap contributors/);
   assert.doesNotMatch(html, /codex-preview|SkeletonPreview|react-loading-skeleton/);
