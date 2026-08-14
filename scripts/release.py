@@ -123,9 +123,9 @@ def build_index(plan: dict, version: str, require_target: str | None = None) -> 
             elif target_name == require_target:
                 missing_required.append(artifact_name)
 
-    ai_pack = RELEASE_ROOT / f"OpenRA-AI-AI-Pack-{version}.zip"
-    if ai_pack.is_file():
-        records.append(artifact_record(ai_pack, "platform-neutral"))
+    for ai_pack in RELEASE_ROOT.glob(f"OpenRA-AI-AI-Pack-{version}-*.zip"):
+        target = ai_pack.stem.removeprefix(f"OpenRA-AI-AI-Pack-{version}-")
+        records.append(artifact_record(ai_pack, target))
     if missing_required:
         raise ReleaseError("Expected release artifacts are missing: " + ", ".join(missing_required))
     if not records:
@@ -186,18 +186,21 @@ def build(args: argparse.Namespace, plan: dict) -> None:
         else:
             print("macOS validation is performed by package-macos.sh and the DMG smoke test.")
 
-    run_command(target["build"], args.version, args.dry_run)
-    if args.include_ai_pack:
+    include_ai_pack = args.include_ai_pack or target.get("include_ai_pack_by_default", False)
+    if include_ai_pack:
         command = [
             sys.executable,
             "scripts/ai_pack.py",
             "build",
             "--release-version",
             args.version,
+            "--target",
+            args.target,
         ]
         print("+ " + subprocess.list2cmdline(command), flush=True)
         if not args.dry_run:
             subprocess.run(command, cwd=REPOSITORY_ROOT, check=True)
+    run_command(target["build"], args.version, args.dry_run)
     if not args.skip_smoke:
         for command in target.get("smoke", []):
             run_command(command, args.version, args.dry_run)
@@ -212,6 +215,8 @@ def show_plan(args: argparse.Namespace, plan: dict) -> None:
     print(f"Required architectures: {', '.join(target.get('architectures', []))}")
     print(f"Current host: {host_name()} {normalized_architecture()}")
     print("Build: " + subprocess.list2cmdline(format_command(target["build"], args.version)))
+    if target.get("include_ai_pack_by_default", False):
+        print("Local AI pack: built by default")
     for command in target.get("smoke", []):
         print("Smoke: " + subprocess.list2cmdline(format_command(command, args.version)))
     print("Artifacts:")

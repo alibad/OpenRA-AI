@@ -18,6 +18,7 @@ $engineRoot = Join-Path $repositoryRoot "engine\openra"
 $python = Join-Path $repositoryRoot ".venv\Scripts\python.exe"
 $companion = Join-Path $repositoryRoot ".venv\Scripts\openra-ai-companion.exe"
 $bundledCompanion = Join-Path $repositoryRoot "bin\openra-ai-companion.exe"
+$bundledRuntime = Join-Path $repositoryRoot "bin\openra-ai-runtime.exe"
 $game = Join-Path $engineRoot "bin\OpenRA-AI.exe"
 $contentInstaller = Join-Path $PSScriptRoot "Install-OpenRAContent.ps1"
 
@@ -98,6 +99,39 @@ if (-not $NoSpeech -and -not $NoVoiceHotkeys) {
     Write-Host "AI controls: hold Ctrl+Space to ask, Ctrl+Enter accepts, Ctrl+Backspace rejects, Ctrl+Shift+A toggles AUTO, and Ctrl+Shift+M toggles voice. Remap them in Settings > Hotkeys > AI Assistant." -ForegroundColor Cyan
 }
 
+$runtimeProcess = $null
+if (Test-Path -LiteralPath $bundledRuntime) {
+    $runtimeOnline = $false
+    try {
+        $runtimeHealth = Invoke-WebRequest -Uri "http://127.0.0.1:4000/health/liveliness" -UseBasicParsing -TimeoutSec 1
+        $runtimeOnline = $runtimeHealth.StatusCode -lt 500
+    }
+    catch { }
+
+    if (-not $runtimeOnline) {
+        $runtimeProcess = Start-Process -FilePath $bundledRuntime `
+            -ArgumentList @("serve", "--root", "`"$repositoryRoot`"", "--parent-pid", "$PID") `
+            -WorkingDirectory $repositoryRoot -WindowStyle Hidden -PassThru `
+            -RedirectStandardOutput (Join-Path $logDirectory "runtime.out.log") `
+            -RedirectStandardError (Join-Path $logDirectory "runtime.err.log")
+        foreach ($attempt in 1..20) {
+            Start-Sleep -Milliseconds 250
+            try {
+                $runtimeHealth = Invoke-WebRequest -Uri "http://127.0.0.1:4000/health/liveliness" -UseBasicParsing -TimeoutSec 1
+                if ($runtimeHealth.StatusCode -lt 500) {
+                    $runtimeOnline = $true
+                    break
+                }
+            }
+            catch { }
+            if ($runtimeProcess.HasExited) { break }
+        }
+    }
+    if (-not $runtimeOnline) {
+        Write-Warning "The optional AI runtime did not start. OpenRA will continue with native AI and deterministic alerts. See artifacts\companion\runtime.err.log."
+    }
+}
+
 $gameStart = @{
     FilePath = $game
     ArgumentList = $arguments
@@ -156,5 +190,10 @@ finally {
     }
     if (-not $gameProcess.HasExited) {
         Stop-Process -Id $gameProcess.Id -Force -ErrorAction SilentlyContinue
+    }
+    if ($runtimeProcess -and -not $runtimeProcess.HasExited) {
+        if (-not $runtimeProcess.WaitForExit(2500)) {
+            Stop-Process -Id $runtimeProcess.Id -Force -ErrorAction SilentlyContinue
+        }
     }
 }

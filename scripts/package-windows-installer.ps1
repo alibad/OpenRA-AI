@@ -43,6 +43,7 @@ if (-not (Test-Path -LiteralPath $StageRoot)) {
 foreach ($required in @(
     (Join-Path $StageRoot "Play-OpenRAAI.cmd"),
     (Join-Path $StageRoot "bin\openra-ai-companion.exe"),
+    (Join-Path $StageRoot "bin\openra-ai-runtime.exe"),
     (Join-Path $StageRoot "engine\openra\bin\OpenRA-AI.exe")
 )) {
     if (-not (Test-Path -LiteralPath $required)) {
@@ -53,6 +54,16 @@ foreach ($required in @(
 $payloadBrand = Join-Path $StageRoot "assets\brand"
 New-Item -ItemType Directory -Path $payloadBrand -Force | Out-Null
 Copy-Item -LiteralPath $brandIcon -Destination (Join-Path $payloadBrand "rtsai.ico") -Force
+
+$aiPack = Join-Path $releaseRoot "OpenRA-AI-AI-Pack-$Version-windows-x64.zip"
+$aiPackChecksum = "$aiPack.sha256"
+foreach ($required in @($aiPack, $aiPackChecksum)) {
+    if (-not (Test-Path -LiteralPath $required)) {
+        throw "Build the Windows AI pack before the installer: $required"
+    }
+}
+$aiPackHash = (Get-Content -LiteralPath $aiPackChecksum -Raw).Split(" ")[0].Trim().ToLowerInvariant()
+$aiPackUrl = "https://github.com/alibad/OpenRA-AI/releases/download/v$Version/$([IO.Path]::GetFileName($aiPack))"
 
 $makensisCommand = Get-Command "makensis.exe" -ErrorAction SilentlyContinue
 $makensisPath = if ($makensisCommand) { $makensisCommand.Source } else { $null }
@@ -73,7 +84,8 @@ if (Test-Path -LiteralPath $installer) {
     Remove-Item -LiteralPath $installer
 }
 
-& $makensisPath /V2 "/DVERSION=$Version" "/DPAYLOAD=$StageRoot" "/DOUTFILE=$installer" "/DICON=$brandIcon" $installerScript
+& $makensisPath /V2 "/DVERSION=$Version" "/DPAYLOAD=$StageRoot" "/DOUTFILE=$installer" "/DICON=$brandIcon" `
+    "/DAIPACKURL=$aiPackUrl" "/DAIPACKSHA256=$aiPackHash" $installerScript
 if ($LASTEXITCODE -ne 0 -or -not (Test-Path -LiteralPath $installer)) {
     throw "NSIS did not produce the Windows setup executable."
 }

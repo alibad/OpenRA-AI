@@ -2,16 +2,20 @@
 
 ## Current routes
 
-OpenRA AI talks only to a private OpenAI-compatible AI layer. The application
-`.env` contains route names and a loopback URL, but no provider credential.
-The router maps capabilities to local backends by default:
+OpenRA AI talks to the bundled loopback gateway at `http://127.0.0.1:4000`.
+The gateway has two explicit modes. **Local** starts the models and CPU
+inference runtimes from the installed target AI pack. **External** forwards the
+same OpenAI-compatible contracts to the endpoint chosen during setup. The game
+itself receives route names and the loopback URL, never the provider key.
+
+Local mode maps capabilities to these bundled routes:
 
 - `local-coder` writes text responses and interprets proposed actions with tool calling;
 - `local-whisper` turns a push-to-talk WAV into the player question;
 - `local-kokoro` returns interruptible WAV speech.
 
 The autonomous headless game agent uses the Agents SDK against the same
-BeTenshi router so it can call the local gameplay MCP server. Local mode pins
+loopback gateway so it can call the local gameplay MCP server. Local mode pins
 the `local-coder` route, disables SDK tracing, and never loads a hosted-provider
 credential or silently falls back to a hosted model.
 
@@ -29,8 +33,21 @@ and enemies already visible to the local player. It does not receive hidden
 actors, unrestricted map state, a continuous frame stream, credentials, or a
 game-command tool.
 
-## Local operation
+## Installation and provider keys
 
-The game-facing contracts do not name a provider. The local text,
-speech-recognition, and speech-synthesis routes can be changed in BeTenshi
-without changing the engine, companion API, interruption model, or UI.
+The guided Windows installer selects Local AI by default. It downloads the
+matching checksum-pinned pack, verifies it before extraction, and configures
+the loopback gateway. The pack remains a separate release asset so portable
+users can install it manually and repeat installs can reuse a cached download.
+
+Choosing External during setup avoids the model download. The endpoint can be
+a hosted service or an existing local OpenAI-compatible server. A supplied key
+is encrypted with Windows DPAPI for the current user and stored outside the
+installation under `%APPDATA%/OpenRA-AI/provider.json`. Local endpoints may
+leave the key blank.
+
+The game-facing contracts do not name a provider, so text, vision,
+speech-recognition, and speech-synthesis backends can change without changing
+the engine, companion API, interruption model, or UI. External endpoints must
+implement the capabilities the player enables; unsupported voice routes fail
+softly while the game and deterministic alerts continue.
