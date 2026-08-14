@@ -213,7 +213,7 @@ export function MissionStudio() {
                   <span>4/4<small>checks</small></span>
                 </div>
                 <a className="download-button" href={mission.downloadUrl} download={mission.filename}><Download size={17} /> Download .oramap</a>
-                <small className="install-note">Already have the Windows alpha? Drag this file onto <b>Play-OpenRAAI.cmd</b>. <a href={windowsRelease.url}>Get the game bundle.</a></small>
+                <small className="install-note">Already have the Windows alpha? Drag this file onto <b>Play-OpenRAAI.cmd</b>. <a href={windowsRelease.portableUrl}>Get the game bundle.</a></small>
               </div>
             </div>
           ) : (
