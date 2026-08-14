@@ -9,7 +9,8 @@ param(
     [string]$OpponentBot = "normal",
     [int]$BridgePort = 9998,
     [int]$AIConsolePort = 8787,
-    [int]$WorldStudioPort = 8788
+    [int]$WorldStudioPort = 8788,
+    [string]$EncodedGameArguments
 )
 
 $ErrorActionPreference = "Stop"
@@ -21,6 +22,21 @@ $bundledCompanion = Join-Path $repositoryRoot "bin\openra-ai-companion.exe"
 $bundledRuntime = Join-Path $repositoryRoot "bin\openra-ai-runtime.exe"
 $game = Join-Path $engineRoot "bin\OpenRA-AI.exe"
 $contentInstaller = Join-Path $PSScriptRoot "Install-OpenRAContent.ps1"
+$forwardedGameArguments = @()
+
+if (-not [string]::IsNullOrWhiteSpace($EncodedGameArguments)) {
+    try {
+        $encodedBytes = [Convert]::FromBase64String($EncodedGameArguments)
+        $decodedJson = [Text.Encoding]::UTF8.GetString($encodedBytes)
+        $forwardedGameArguments = @($decodedJson | ConvertFrom-Json)
+        if ($forwardedGameArguments | Where-Object { $_ -isnot [string] }) {
+            throw "Every forwarded game argument must be a string."
+        }
+    }
+    catch {
+        throw "The branded launcher supplied invalid game arguments: $($_.Exception.Message)"
+    }
+}
 
 foreach ($required in @($game, $contentInstaller)) {
     if (-not (Test-Path -LiteralPath $required)) {
@@ -69,6 +85,7 @@ $logDirectory = Join-Path $repositoryRoot "artifacts\companion"
 New-Item -ItemType Directory -Path $logDirectory -Force | Out-Null
 $env:DOTNET_ROLL_FORWARD = "Major"
 $env:OPENRA_AI_COMPANION = "1"
+$env:OPENRA_AI_COMPANION_ENABLED = "1"
 $env:OPENRA_AI_GRPC_PORT = "$BridgePort"
 $env:OPENRA_AI_CONSOLE_URL = "http://127.0.0.1:$AIConsolePort/"
 $env:OPENRA_AI_WORLD_STUDIO_URL = "http://127.0.0.1:$WorldStudioPort/"
@@ -94,6 +111,7 @@ else {
 if ($mapArgument) {
     $arguments += $mapArgument
 }
+$arguments += $forwardedGameArguments
 
 if (-not $NoSpeech -and -not $NoVoiceHotkeys) {
     Write-Host "AI controls: hold Ctrl+Space to ask, Ctrl+Enter accepts, Ctrl+Backspace rejects, Ctrl+Shift+A toggles AUTO, and Ctrl+Shift+M toggles voice. Remap them in Settings > Hotkeys > AI Assistant." -ForegroundColor Cyan

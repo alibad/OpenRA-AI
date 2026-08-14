@@ -121,6 +121,9 @@ try {
         Pop-Location
     }
 
+    & (Join-Path $PSScriptRoot "test-windows-launcher-bootstrap.ps1")
+    if ($LASTEXITCODE -ne 0) { throw "Branded launcher companion bootstrap failed." }
+
     $checkOutput = Join-Path $repositoryRoot "artifacts\check"
     & $python -m openra_ai_worldgen.cli generate --lat 24.7136 --lon 46.6753 --title "Riyadh Crossing Check" --seed 42 --fixture services\worldgen\tests\fixtures\overpass-river.json --output $checkOutput
     if ($LASTEXITCODE -ne 0) { throw "Mission smoke generation failed." }

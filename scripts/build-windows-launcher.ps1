@@ -49,6 +49,7 @@ $publishArguments = @(
     "-p:ModID=ra",
     "-p:DisplayName=OpenRA AI",
     "-p:FaqUrl=https://github.com/alibad/OpenRA-AI",
+    "-p:CompanionBootstrap=true",
     "-p:PublishDir=$OutputDirectory"
 )
 

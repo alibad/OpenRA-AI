@@ -2225,6 +2225,15 @@ class CompanionTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 updated.with_updates({"router_url": "not-a-url"})
 
+    def test_product_launch_forces_companion_enabled_for_each_session(self) -> None:
+        with TemporaryDirectory() as directory, mock.patch.dict(
+            "os.environ",
+            {"APPDATA": directory, "OPENRA_AI_COMPANION_ENABLED": "1"},
+            clear=True,
+        ):
+            Settings(companion_enabled=False).save()
+            self.assertTrue(Settings.from_env().companion_enabled)
+
     def test_transcription_language_follows_app_language_and_falls_back_to_english(self) -> None:
         with TemporaryDirectory() as directory, mock.patch.dict(
             "os.environ",
