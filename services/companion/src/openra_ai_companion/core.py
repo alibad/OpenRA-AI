@@ -331,11 +331,12 @@ class Companion:
             tuple(sorted(building.actor_id for building in snapshot.visible_enemy_buildings)),
         )
 
-    def idle_status(self) -> tuple[str, str]:
+    def idle_status(self, snapshot: GameSnapshot | None = None) -> tuple[str, str]:
         if not self.enabled:
             return "disabled", "AI OFF  •  ENABLE THE COMPANION IN SETTINGS"
         if self.auto_act_enabled:
-            if self.latest_snapshot is not None and self.latest_snapshot.mission_mode:
+            active_snapshot = snapshot or self.latest_snapshot
+            if active_snapshot is not None and active_snapshot.mission_mode:
                 return f"auto-active:{self.native_profile}", "AUTO ASSISTANT ON  •  SCRIPTED MISSION BRAIN"
             name = strategy_contract(self.native_strategy)["name"].upper()
             profile = self.native_profile.upper()

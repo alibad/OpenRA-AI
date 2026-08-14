@@ -15,7 +15,7 @@ from openra_ai_worldgen.server import create_server as create_worldgen_server
 from .bridge import OpenRABridge
 from .core import Companion
 from .hotkeys import VoiceHotkeys, console_print, response_hud_state
-from .models import CompanionResponse
+from .models import CompanionResponse, GameSnapshot
 from .server import create_server as create_companion_server, serve
 from .strategy_contracts import strategy_contract
 from .strategy_director import StrategyDirector
@@ -135,6 +135,20 @@ def _restart_auto_deadlines(now: float, threat_level: str) -> tuple[float, float
 def _companion_action_loop_enabled(*, mission_mode: bool, native_brain_available: bool) -> bool:
     """Use scripted companion control in missions and native control in skirmishes."""
     return mission_mode or not native_brain_available
+
+
+def _match_started(
+    previous_signature: tuple[str, int, int] | None,
+    previous_tick: int,
+    snapshot: GameSnapshot,
+) -> bool:
+    """Detect the first actionable snapshot of every distinct match."""
+    signature = (snapshot.map_name, snapshot.map_width, snapshot.map_height)
+    return (
+        previous_signature is None
+        or signature != previous_signature
+        or snapshot.tick < previous_tick
+    )
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -293,6 +307,8 @@ def main(argv: list[str] | None = None) -> int:
         auto_planner_due_at = 0.0
         last_auto_message_at = -1_000_000.0
         strategy_review_due_at = 0.0
+        previous_match_signature: tuple[str, int, int] | None = None
+        previous_match_tick = -1
         try:
             while True:
                 if not _pid_alive(args.game_pid):
@@ -300,9 +316,17 @@ def main(argv: list[str] | None = None) -> int:
                     break
                 try:
                     snapshot = bridge.observe()
+                    reconnected = waiting_reported
                     if waiting_reported:
                         print("Connected to the live match.")
                         waiting_reported = False
+                    match_started = _match_started(
+                        previous_match_signature,
+                        previous_match_tick,
+                        snapshot,
+                    )
+                    previous_match_signature = (snapshot.map_name, snapshot.map_width, snapshot.map_height)
+                    previous_match_tick = snapshot.tick
                     if not capabilities_announced:
                         publish_status(
                             "capabilities",
@@ -310,7 +334,15 @@ def main(argv: list[str] | None = None) -> int:
                         )
                         capabilities_announced = True
                         time.sleep(0.15)
-                        continue
+                    if match_started or reconnected:
+                        # The pre-match AUTO status cannot reach a bridge that does not exist yet.
+                        # Resend it on the first live snapshot so native control starts immediately,
+                        # without waiting for an insight, strategy-model call, or periodic timer.
+                        publish_status(*companion.idle_status(snapshot))
+                        auto_routine_due_at = 0.0
+                        auto_planner_due_at = 0.0
+                    if match_started:
+                        strategy_review_due_at = 0.0
                 except RuntimeError:
                     if not waiting_reported:
                         print("Waiting for a match with the companion bridge enabled...")
@@ -331,6 +363,16 @@ def main(argv: list[str] | None = None) -> int:
                     event_context = None
                 else:
                     event_context = companion.take_event_context()
+                if match_started and event_context is None:
+                    event_context = {
+                        "type": "match_started",
+                        "tick": snapshot.tick,
+                        "fact": "The first live battlefield snapshot is ready.",
+                        "importance": "important",
+                        "threat": threat.as_dict(),
+                        "battlefield": snapshot.action_context(),
+                        "planner_instruction": "Begin the opening immediately; do not wait for another event or interval.",
+                    }
                 scheduled_planner_due_at = auto_planner_due_at
                 if companion.auto_act_enabled != last_auto_act_enabled:
                     last_auto_act_enabled = companion.auto_act_enabled

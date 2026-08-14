@@ -14,7 +14,7 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from unittest import mock
 
-from openra_ai_companion.cli import _companion_action_loop_enabled, _restart_auto_deadlines, _speak
+from openra_ai_companion.cli import _companion_action_loop_enabled, _match_started, _restart_auto_deadlines, _speak
 from openra_ai_companion.core import Companion
 from openra_ai_companion import game_mcp
 from openra_ai_companion.game_runtime import GameRuntime
@@ -160,6 +160,26 @@ def spatial_snapshot(width: int = 8, height: int = 8, **changes) -> GameSnapshot
 
 
 class CompanionTests(unittest.TestCase):
+    def test_first_live_snapshot_and_rematch_kick_off_the_match(self) -> None:
+        first = GameSnapshot(tick=12, map_name="Snow Pass", map_width=64, map_height=64)
+        later = GameSnapshot(tick=100, map_name="Snow Pass", map_width=64, map_height=64)
+        rematch = GameSnapshot(tick=4, map_name="Snow Pass", map_width=64, map_height=64)
+        signature = (first.map_name, first.map_width, first.map_height)
+
+        self.assertTrue(_match_started(None, -1, first))
+        self.assertFalse(_match_started(signature, first.tick, later))
+        self.assertTrue(_match_started(signature, later.tick, rematch))
+
+    def test_auto_status_uses_the_first_snapshot_before_it_is_committed(self) -> None:
+        companion = Companion(router=FakeRouter())
+        companion.configure(auto_act=True)
+        mission = GameSnapshot(tick=1, mission_mode=True)
+
+        state, message = companion.idle_status(mission)
+
+        self.assertEqual(state, "auto-active:normal")
+        self.assertIn("SCRIPTED MISSION BRAIN", message)
+
     def test_mission_snapshot_exposes_objectives_and_spy_capabilities(self) -> None:
         current = snapshot(
             mission_mode=True,
