@@ -114,11 +114,6 @@ rm -rf "$ICONSET"
   --specpath "$PACKAGE_ROOT/pyinstaller-spec-$RELEASE_ARCH" \
   "$REPOSITORY_ROOT/apps/launcher/companion_entry.py"
 
-"$RESOURCES/bin/openra-ai-companion" voice-check --dependencies-only || {
-  echo >&2 "Packaged companion is missing local microphone capture support."
-  exit 1
-}
-
 cp "$SAMPLE_MISSION" "$RESOURCES/generated/missions/"
 cp "$REPOSITORY_ROOT/.env.example" "$RESOURCES/"
 cp "$REPOSITORY_ROOT/README.md" "$REPOSITORY_ROOT/LICENSE" "$RESOURCES/"
@@ -127,12 +122,17 @@ cp "$AI_PACK_LOCK" "$MODEL_NOTICES" "$RESOURCES/packaging/"
 
 SIGNING_IDENTITY="${MACOS_DEVELOPER_IDENTITY:--}"
 if [ "$SIGNING_IDENTITY" = "-" ]; then
-  codesign --force --options runtime --timestamp=none --sign - "$RESOURCES/bin/openra-ai-companion"
-  codesign --force --deep --options runtime --timestamp=none --sign - "$APP_ROOT"
+  codesign --force --timestamp=none --sign - "$RESOURCES/bin/openra-ai-companion"
+  codesign --force --deep --timestamp=none --sign - "$APP_ROOT"
 else
   codesign --force --options runtime --timestamp --sign "$SIGNING_IDENTITY" "$RESOURCES/bin/openra-ai-companion"
   codesign --force --deep --options runtime --timestamp --sign "$SIGNING_IDENTITY" "$APP_ROOT"
 fi
+
+"$RESOURCES/bin/openra-ai-companion" voice-check --dependencies-only || {
+  echo >&2 "Signed companion is missing local microphone capture support."
+  exit 1
+}
 
 rm -f "$DMG" "$DMG.sha256"
 hdiutil create -volname "OpenRA AI" -srcfolder "$STAGE_ROOT" -format UDZO -ov "$DMG"

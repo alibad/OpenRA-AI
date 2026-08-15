@@ -69,6 +69,28 @@ def validate_package(path: Path) -> ValidationReport:
         resource_counts.append(count)
     metrics["spawn_resources"] = ",".join(map(str, resource_counts))
     checks["resource_data_present"] = len(resource_counts) == 2 and min(resource_counts) > 0
+    mission_files = {"rules.yaml", "earth-mission.lua", "map.ftl"}
+    if mission_files & names:
+        checks["mission_runtime_files"] = mission_files <= names
+        rules = re.search(r"^Rules:\s*(.*)$", yaml_text, re.MULTILINE)
+        fluent = re.search(r"^FluentMessages:\s*(.*)$", yaml_text, re.MULTILINE)
+        rule_sources = {value.strip() for value in rules.group(1).split(",")} if rules else set()
+        fluent_sources = {value.strip() for value in fluent.group(1).split(",")} if fluent else set()
+        checks["mission_rules_referenced"] = {
+            "ra|rules/campaign-rules.yaml",
+            "rules.yaml",
+        } <= rule_sources
+        checks["mission_fluent_referenced"] = {
+            "ra|fluent/lua.ftl",
+            "ra|fluent/campaign.ftl",
+            "map.ftl",
+        } <= fluent_sources
+        if not checks["mission_runtime_files"]:
+            warnings.append("mission runtime files are incomplete")
+        if not checks["mission_rules_referenced"]:
+            warnings.append("map.yaml does not activate the generated mission rules")
+        if not checks["mission_fluent_referenced"]:
+            warnings.append("map.yaml does not activate the generated mission text")
     if checks["required_files"] and "openra-ai-manifest.json" not in names:
         warnings.append("generation manifest is missing")
     return ValidationReport(all(checks.values()), checks, metrics, warnings)

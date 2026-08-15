@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
 from datetime import UTC, datetime
 from pathlib import Path
 from zipfile import ZIP_DEFLATED, ZipFile, ZipInfo
@@ -134,6 +135,39 @@ end
     }
 
 
+def _merge_map_sources(text: str, key: str, leading: tuple[str, ...], trailing: str) -> str:
+    pattern = re.compile(rf"^{re.escape(key)}:\s*(.*)$", re.MULTILINE)
+    match = pattern.search(text)
+    existing = [value.strip() for value in match.group(1).split(",") if value.strip()] if match else []
+    required = {*leading, trailing}
+    sources = [*leading, *(value for value in existing if value not in required), trailing]
+    replacement = f"{key}: {', '.join(sources)}"
+    if match:
+        return pattern.sub(replacement, text, count=1)
+    return f"{text.rstrip()}\n\n{replacement}\n"
+
+
+def _wire_mission_runtime(map_yaml: bytes) -> bytes:
+    text = map_yaml.decode("utf-8")
+    text = _merge_map_sources(
+        text,
+        "Rules",
+        (
+            "ra|rules/campaign-rules.yaml",
+            "ra|rules/campaign-tooltips.yaml",
+            "ra|rules/campaign-palettes.yaml",
+        ),
+        "rules.yaml",
+    )
+    text = _merge_map_sources(
+        text,
+        "FluentMessages",
+        ("ra|fluent/lua.ftl", "ra|fluent/campaign.ftl"),
+        "map.ftl",
+    )
+    return text.encode("utf-8")
+
+
 def finalize_native_package(
     selection: GeoSelection,
     plan: TerrainPlan,
@@ -151,7 +185,8 @@ def finalize_native_package(
         raise ValueError("native generator wrote an unexpected package path")
 
     with ZipFile(package_path, "r") as archive:
-        map_yaml = archive.read("map.yaml")
+        original_entries = [(info, archive.read(info.filename)) for info in archive.infolist()]
+        map_yaml = _wire_mission_runtime(archive.read("map.yaml"))
         map_binary = archive.read("map.bin")
         preview = archive.read("map.png")
 
@@ -232,13 +267,30 @@ def finalize_native_package(
     }
     manifest_bytes = json.dumps(manifest, indent=2, sort_keys=True).encode("utf-8")
 
-    with ZipFile(package_path, "a", compression=ZIP_DEFLATED) as archive:
-        archive.writestr(_zip_info("briefing.md"), briefing)
-        archive.writestr(_zip_info("openra-ai-manifest.json"), manifest_bytes)
-        for name, content in mission_files.items():
-            archive.writestr(_zip_info(name), content)
-        if terrain_view:
-            archive.writestr(_zip_info("earth-terrain.png"), terrain_view.image)
+    replaced_names = {
+        "map.yaml",
+        "briefing.md",
+        "openra-ai-manifest.json",
+        "earth-terrain.png",
+        *mission_files,
+    }
+    temporary_package = package_path.with_name(f".{package_path.name}.tmp")
+    try:
+        with ZipFile(temporary_package, "w", compression=ZIP_DEFLATED) as archive:
+            for info, content in original_entries:
+                if info.filename == "map.yaml":
+                    archive.writestr(info, map_yaml)
+                elif info.filename not in replaced_names:
+                    archive.writestr(info, content)
+            archive.writestr(_zip_info("briefing.md"), briefing)
+            archive.writestr(_zip_info("openra-ai-manifest.json"), manifest_bytes)
+            for name, content in mission_files.items():
+                archive.writestr(_zip_info(name), content)
+            if terrain_view:
+                archive.writestr(_zip_info("earth-terrain.png"), terrain_view.image)
+        temporary_package.replace(package_path)
+    finally:
+        temporary_package.unlink(missing_ok=True)
 
     preview_path.write_bytes(preview)
     manifest_path.write_bytes(manifest_bytes)

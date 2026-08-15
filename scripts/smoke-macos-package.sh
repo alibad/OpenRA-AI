@@ -42,5 +42,17 @@ for required in \
   [ -e "$required" ] || { echo >&2 "Mounted app is missing: $required"; exit 1; }
 done
 
+wrapper="$app/Contents/MacOS/OpenRAAI"
+/bin/bash -n "$wrapper"
+grep -F 'selected_map=""' "$wrapper" >/dev/null || {
+  echo >&2 "macOS launcher must open the main menu unless a map is selected."
+  exit 1
+}
+grep -F 'Launch.Bots=Multi1:normal' "$wrapper" >/dev/null || {
+  echo >&2 "macOS direct-map launch is missing its default opponent."
+  exit 1
+}
+
 codesign --verify --deep --strict "$app"
+"$app/Contents/Resources/bin/openra-ai-companion" voice-check --dependencies-only
 echo "macOS DMG smoke test passed."
