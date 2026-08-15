@@ -22,8 +22,12 @@ test("renders the complete marketing and mission-creation surface", async () => 
   assert.match(html, /Your battlefield/);
   assert.match(html, /Mission studio/);
   assert.match(html, /Point anywhere/);
-  assert.match(html, /Download Windows alpha/);
+  assert.match(html, /Download macOS alpha/);
+  assert.match(html, /Download for macOS/);
+  assert.match(html, /Developer ID signed, Apple notarized, and stapled/);
   assert.match(html, /Play-OpenRAAI\.cmd/);
+  assert.match(html, /0\.1\.0-alpha\.13/);
+  assert.match(html, /OpenRA-AI-0\.1\.0-alpha\.13-macos-arm64\.dmg/);
   assert.match(html, /0\.1\.0-alpha\.12/);
   assert.match(html, /OpenRA-AI-AI-Pack-0\.1\.0-alpha\.12-windows-x64\.zip/);
   assert.match(html, /guided installer selects Local AI by default/);

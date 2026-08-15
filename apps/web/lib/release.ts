@@ -7,3 +7,11 @@ export const windowsRelease = {
   aiPackUrl: "https://github.com/alibad/OpenRA-AI/releases/download/v0.1.0-alpha.12/OpenRA-AI-AI-Pack-0.1.0-alpha.12-windows-x64.zip",
   releaseIndexUrl: "https://github.com/alibad/OpenRA-AI/releases/download/v0.1.0-alpha.12/OpenRA-AI-0.1.0-alpha.12-release-index.json",
 } as const;
+
+export const macosRelease = {
+  version: "0.1.0-alpha.13",
+  architecture: "Apple Silicon",
+  dmgUrl: "https://github.com/alibad/OpenRA-AI/releases/download/v0.1.0-alpha.13/OpenRA-AI-0.1.0-alpha.13-macos-arm64.dmg",
+  checksumUrl: "https://github.com/alibad/OpenRA-AI/releases/download/v0.1.0-alpha.13/OpenRA-AI-0.1.0-alpha.13-macos-arm64.dmg.sha256",
+  releaseIndexUrl: "https://github.com/alibad/OpenRA-AI/releases/download/v0.1.0-alpha.13/OpenRA-AI-0.1.0-alpha.13-release-index.json",
+} as const;
