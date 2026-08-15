@@ -14,7 +14,7 @@ from zipfile import ZipFile
 
 from openra_ai_worldgen import GeoSelection, MissionGenerator
 from openra_ai_worldgen.models import TerrainAnalysis
-from openra_ai_worldgen.native import generation_options, terrain_profile
+from openra_ai_worldgen.native import NativeMapGenerator, generation_options, terrain_profile
 from openra_ai_worldgen.osm import fetch_features, parse_overpass
 from openra_ai_worldgen.raster import WATER, build_terrain
 from openra_ai_worldgen.scenarios import FACTIONS, scenario_manifest
@@ -25,6 +25,24 @@ from openra_ai_worldgen.validator import validate_package
 
 class WorldgenTests(unittest.TestCase):
     fixture = Path(__file__).parent / "fixtures" / "overpass-river.json"
+
+    def test_native_generator_accepts_a_packaged_utility_path(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            utility = Path(directory) / "published" / "OpenRA.Utility"
+            with mock.patch.dict("os.environ", {"OPENRA_AI_UTILITY": str(utility)}):
+                self.assertEqual(NativeMapGenerator(Path(directory)).utility, utility.resolve())
+
+    def test_native_generator_finds_the_host_runtime_utility(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            utility = Path(directory) / "bin" / "osx-arm64" / "OpenRA.Utility"
+            utility.parent.mkdir(parents=True)
+            utility.touch()
+            with (
+                mock.patch.dict("os.environ", {}, clear=True),
+                mock.patch("platform.system", return_value="Darwin"),
+                mock.patch("platform.machine", return_value="arm64"),
+            ):
+                self.assertEqual(NativeMapGenerator(Path(directory)).utility, utility.resolve())
 
     def test_red_sea_scenario_contract_is_source_dated(self) -> None:
         selection = GeoSelection(
