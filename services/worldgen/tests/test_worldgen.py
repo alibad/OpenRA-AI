@@ -64,14 +64,38 @@ class WorldgenTests(unittest.TestCase):
             result = MissionGenerator(self.fixture).generate(selection, Path(directory))
             self.assertTrue(result.validation.valid)
             with ZipFile(result.package_path) as archive:
-                self.assertTrue({"map.yaml", "map.bin", "map.png", "briefing.md", "openra-ai-manifest.json"} <= set(archive.namelist()))
-                self.assertIn("Author: OpenRA AI / OpenRA Classic Generator", archive.read("map.yaml").decode())
+                names = archive.namelist()
+                self.assertTrue(
+                    {
+                        "map.yaml",
+                        "map.bin",
+                        "map.png",
+                        "briefing.md",
+                        "openra-ai-manifest.json",
+                        "rules.yaml",
+                        "earth-mission.lua",
+                        "map.ftl",
+                    }
+                    <= set(names)
+                )
+                self.assertEqual(names.count("map.yaml"), 1)
+                map_yaml = archive.read("map.yaml").decode()
+                self.assertIn("Author: OpenRA AI / OpenRA Classic Generator", map_yaml)
+                self.assertIn("Rules: ra|rules/campaign-rules.yaml", map_yaml)
+                self.assertIn("rules.yaml", map_yaml)
+                self.assertIn("FluentMessages: ra|fluent/lua.ftl, ra|fluent/campaign.ftl, map.ftl", map_yaml)
                 manifest = json.loads(archive.read("openra-ai-manifest.json"))
                 self.assertTrue(manifest["validation"]["valid"])
+                self.assertEqual(manifest["checksums"]["map.yaml"], hashlib.sha256(map_yaml.encode()).hexdigest())
                 self.assertEqual(manifest["generator"]["engine_generator"], "classic")
                 self.assertTrue(manifest["generator"]["passability"]["valid"])
                 self.assertEqual(manifest["selection"]["location_name"], "Riyadh, Saudi Arabia")
                 self.assertIn("Riyadh, Saudi Arabia", archive.read("briefing.md").decode())
+            final_validation = validate_package(result.package_path)
+            self.assertTrue(final_validation.valid)
+            self.assertTrue(final_validation.checks["mission_runtime_files"])
+            self.assertTrue(final_validation.checks["mission_rules_referenced"])
+            self.assertTrue(final_validation.checks["mission_fluent_referenced"])
 
     def test_binary_and_package_are_deterministic(self) -> None:
         selection = GeoSelection(24.7136, 46.7219, "Repeatable", seed=99)

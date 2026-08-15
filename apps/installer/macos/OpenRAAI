@@ -53,12 +53,15 @@ install_content() {
 install_content
 mkdir -p "$map_directory" "$mission_output" "$log_directory"
 
-selected_map="$bundled_map"
-if [ "${1:-}" != "" ] && [[ "${1}" == *.oramap ]]; then
+selected_map=""
+if [ "${1:-}" = "--sample-map" ]; then
+  selected_map="$bundled_map"
+  shift
+elif [ "${1:-}" != "" ] && [[ "${1}" == *.oramap ]]; then
   selected_map="$1"
   shift
 fi
-if [ -f "$selected_map" ]; then
+if [ -n "$selected_map" ] && [ -f "$selected_map" ]; then
   installed_map="$map_directory/$(basename "$selected_map")"
   cp "$selected_map" "$installed_map"
   map_argument="Launch.Map=$(basename "$installed_map")"
@@ -79,6 +82,16 @@ export PYTHONIOENCODING=utf-8
 game_args=("$@")
 if [ -n "$map_argument" ]; then
   game_args+=("$map_argument")
+  has_launch_bots=""
+  for argument in "${game_args[@]}"; do
+    if [[ "$argument" == Launch.Bots=* ]]; then
+      has_launch_bots="yes"
+      break
+    fi
+  done
+  if [ -z "$has_launch_bots" ]; then
+    game_args+=("Launch.Bots=Multi1:normal")
+  fi
 fi
 
 "$macos_dir/GameLauncher" "${game_args[@]}" >>"$log_directory/game.out.log" 2>>"$log_directory/game.err.log" &
