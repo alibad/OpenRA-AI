@@ -45,21 +45,31 @@ for targets that do not opt in through the release plan.
 ## macOS release
 
 The final Mac artifact cannot be produced on Windows. The packager compiles
-AppKit launchers, creates an `.app` and DMG with `iconutil` and `hdiutil`, runs
-`codesign`, submits with `xcrun notarytool`, and staples the result. PyInstaller
-also creates executables only for its host operating system.
+AppKit launchers, creates an `.app` and DMG with `iconutil` and `hdiutil`, signs
+the companion, app, embedded runtime, and DMG with `codesign`, submits with
+`xcrun notarytool`, and staples the result. PyInstaller also creates executables
+only for its host operating system.
 
 Use an Apple Silicon Mac for the release host. Clone the same commit including
-submodules, run the local setup, then set Apple credentials outside the
-repository:
+submodules, run the local setup, then store notarization credentials in the
+login Keychain and set only the certificate identity and Keychain profile
+outside the repository:
 
 ```bash
+xcrun notarytool store-credentials OPENRA_AI_NOTARY \
+  --apple-id "release@example.com" \
+  --team-id "TEAMID" \
+  --keychain "$HOME/Library/Keychains/login.keychain-db"
 export MACOS_DEVELOPER_IDENTITY="Developer ID Application: Example (TEAMID)"
-export MACOS_DEVELOPER_TEAM_ID="TEAMID"
-export MACOS_DEVELOPER_USERNAME="release@example.com"
-export MACOS_DEVELOPER_PASSWORD="@keychain:OPENRA_AI_NOTARY"
+export MACOS_NOTARY_PROFILE="OPENRA_AI_NOTARY"
+export MACOS_NOTARY_KEYCHAIN="$HOME/Library/Keychains/login.keychain-db"
 python3 scripts/release.py build --version 0.1.0-alpha.11 --target macos-arm64
 ```
+
+The packager also accepts `MACOS_DEVELOPER_TEAM_ID`,
+`MACOS_DEVELOPER_USERNAME`, and `MACOS_DEVELOPER_PASSWORD` for legacy local
+setups, but the Keychain profile avoids exposing the app-specific password to
+the shell environment.
 
 Without those variables, the same command produces an ad-hoc-signed DMG for
 local testing. A public download should always be Developer-ID signed,

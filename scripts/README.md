@@ -19,9 +19,10 @@ live here. These scripts are the replacement for hosted workflows.
   temporary directory, verifies its game, companion, launcher, and icon, then
   uninstalls it.
 - `package-macos.sh` runs locally on macOS to produce the branded `.app` and
-  DMG. Set `MACOS_DEVELOPER_IDENTITY`, `MACOS_DEVELOPER_TEAM_ID`,
-  `MACOS_DEVELOPER_USERNAME`, and `MACOS_DEVELOPER_PASSWORD` locally to sign,
-  notarize, and staple the DMG; otherwise it creates an ad-hoc-signed test build.
+  DMG. Set `MACOS_DEVELOPER_IDENTITY` and `MACOS_NOTARY_PROFILE` locally to
+  sign, notarize, and staple the DMG using a validated `notarytool` Keychain
+  profile; otherwise it creates an ad-hoc-signed test build. Legacy Apple ID
+  environment variables remain supported for existing local setups.
 - `smoke-macos-package.sh` mounts the DMG read-only, verifies its checksum,
   required payload, and code signature, then detaches it.
 - `smoke-windows-package.ps1 -RequireAI` unpacks that ZIP, starts a real

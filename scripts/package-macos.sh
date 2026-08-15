@@ -106,15 +106,22 @@ cp "$BRAND_SOURCE" "$ICONSET/icon_512x512@2x.png"
 iconutil --convert icns "$ICONSET" --output "$RESOURCES/rtsai.icns"
 rm -rf "$ICONSET"
 
-"$PYTHON" -m PyInstaller --noconfirm --clean --onefile \
-  --name openra-ai-companion \
-  --paths "$REPOSITORY_ROOT/services/companion/src" \
-  --collect-all sounddevice \
-  --collect-data agents \
-  --distpath "$RESOURCES/bin" \
-  --workpath "$PACKAGE_ROOT/pyinstaller-work-$RELEASE_ARCH" \
-  --specpath "$PACKAGE_ROOT/pyinstaller-spec-$RELEASE_ARCH" \
-  "$REPOSITORY_ROOT/apps/launcher/companion_entry.py"
+SIGNING_IDENTITY="${MACOS_DEVELOPER_IDENTITY:--}"
+PYINSTALLER_ARGUMENTS=(
+  --noconfirm --clean --onefile
+  --name openra-ai-companion
+  --paths "$REPOSITORY_ROOT/services/companion/src"
+  --collect-all sounddevice
+  --collect-data agents
+  --distpath "$RESOURCES/bin"
+  --workpath "$PACKAGE_ROOT/pyinstaller-work-$RELEASE_ARCH"
+  --specpath "$PACKAGE_ROOT/pyinstaller-spec-$RELEASE_ARCH"
+)
+if [ "$SIGNING_IDENTITY" != "-" ]; then
+  PYINSTALLER_ARGUMENTS+=(--codesign-identity "$SIGNING_IDENTITY")
+fi
+PYINSTALLER_ARGUMENTS+=("$REPOSITORY_ROOT/apps/launcher/companion_entry.py")
+"$PYTHON" -m PyInstaller "${PYINSTALLER_ARGUMENTS[@]}"
 
 cp "$SAMPLE_MISSION" "$RESOURCES/generated/missions/"
 cp "$REPOSITORY_ROOT/.env.example" "$RESOURCES/"
@@ -122,7 +129,6 @@ cp "$REPOSITORY_ROOT/README.md" "$REPOSITORY_ROOT/LICENSE" "$RESOURCES/"
 mkdir -p "$RESOURCES/packaging"
 cp "$AI_PACK_LOCK" "$MODEL_NOTICES" "$RESOURCES/packaging/"
 
-SIGNING_IDENTITY="${MACOS_DEVELOPER_IDENTITY:--}"
 if [ "$SIGNING_IDENTITY" = "-" ]; then
   codesign --force --timestamp=none --sign - "$RESOURCES/bin/openra-ai-companion"
   codesign --force --deep --timestamp=none --sign - "$APP_ROOT"
@@ -138,13 +144,32 @@ fi
 
 rm -f "$DMG" "$DMG.sha256"
 hdiutil create -volname "OpenRA AI" -srcfolder "$STAGE_ROOT" -format UDZO -ov "$DMG"
+if [ "$SIGNING_IDENTITY" != "-" ]; then
+  codesign --force --timestamp --sign "$SIGNING_IDENTITY" "$DMG"
+  codesign --verify --strict "$DMG"
+fi
 
-if [ -n "${MACOS_DEVELOPER_IDENTITY:-}" ] && [ -n "${MACOS_DEVELOPER_TEAM_ID:-}" ] && [ -n "${MACOS_DEVELOPER_USERNAME:-}" ] && [ -n "${MACOS_DEVELOPER_PASSWORD:-}" ]; then
-  xcrun notarytool submit "$DMG" --wait \
-    --apple-id "$MACOS_DEVELOPER_USERNAME" \
-    --password "$MACOS_DEVELOPER_PASSWORD" \
-    --team-id "$MACOS_DEVELOPER_TEAM_ID"
-  xcrun stapler staple "$DMG"
+NOTARY_PROFILE="${MACOS_NOTARY_PROFILE:-}"
+if [ -n "$NOTARY_PROFILE" ] && [ "$SIGNING_IDENTITY" = "-" ]; then
+  echo >&2 "MACOS_NOTARY_PROFILE requires MACOS_DEVELOPER_IDENTITY so the submitted DMG is Developer-ID signed."
+  exit 1
+fi
+
+if [ -n "${MACOS_DEVELOPER_IDENTITY:-}" ]; then
+  if [ -n "$NOTARY_PROFILE" ]; then
+    NOTARY_ARGUMENTS=(--keychain-profile "$NOTARY_PROFILE")
+    if [ -n "${MACOS_NOTARY_KEYCHAIN:-}" ]; then
+      NOTARY_ARGUMENTS+=(--keychain "$MACOS_NOTARY_KEYCHAIN")
+    fi
+    xcrun notarytool submit "$DMG" --wait "${NOTARY_ARGUMENTS[@]}"
+    xcrun stapler staple "$DMG"
+  elif [ -n "${MACOS_DEVELOPER_TEAM_ID:-}" ] && [ -n "${MACOS_DEVELOPER_USERNAME:-}" ] && [ -n "${MACOS_DEVELOPER_PASSWORD:-}" ]; then
+    xcrun notarytool submit "$DMG" --wait \
+      --apple-id "$MACOS_DEVELOPER_USERNAME" \
+      --password "$MACOS_DEVELOPER_PASSWORD" \
+      --team-id "$MACOS_DEVELOPER_TEAM_ID"
+    xcrun stapler staple "$DMG"
+  fi
 fi
 
 shasum -a 256 "$DMG" | awk '{print $1}' > "$DMG.sha256"
