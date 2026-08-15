@@ -17,13 +17,28 @@ OpenRA project or Electronic Arts.
 | Platform | Status | Download |
 | --- | --- | --- |
 | Windows 10/11 x64 | Playable alpha | [Installer](https://github.com/alibad/OpenRA-AI/releases/download/v0.1.0-alpha.12/OpenRA-AI-0.1.0-alpha.12-windows-x64-setup.exe) · [Portable ZIP](https://github.com/alibad/OpenRA-AI/releases/download/v0.1.0-alpha.12/OpenRA-AI-0.1.0-alpha.12-windows-x64.zip) |
-| macOS | Not packaged yet | Planned after a signed and notarized build is ready |
+| macOS 10.15+ on Apple Silicon | Playable alpha | [Signed and notarized DMG](https://github.com/alibad/OpenRA-AI/releases/download/v0.1.0-alpha.13/OpenRA-AI-0.1.0-alpha.13-macos-arm64.dmg) · [SHA-256](https://github.com/alibad/OpenRA-AI/releases/download/v0.1.0-alpha.13/OpenRA-AI-0.1.0-alpha.13-macos-arm64.dmg.sha256) |
 
 [See every release and its checksum](https://github.com/alibad/OpenRA-AI/releases).
 The guided installer downloads the matching
 [local AI pack](https://github.com/alibad/OpenRA-AI/releases/download/v0.1.0-alpha.12/OpenRA-AI-AI-Pack-0.1.0-alpha.12-windows-x64.zip)
 by default. It contains the pinned models and Windows CPU runtimes; choose an
 external OpenAI-compatible provider during setup to skip it.
+
+### Start a match on macOS
+
+1. Open the DMG and copy **OpenRA AI.app** to Applications.
+2. Launch OpenRA AI. The Developer ID-signed, notarized, and stapled package
+   opens the main menu by default.
+3. Allow the first launch to download OpenRA's checksum-verified Red Alert
+   quick-install content from OpenRA's official mirror list.
+4. Start or load a match. The AI companion and Earth Mission Studio are built
+   into the game menus.
+
+The macOS alpha does not yet include the Windows-only local AI model pack. Use
+a compatible external OpenAI-compatible endpoint for model-backed companion
+replies; the game, native AI, map tools, and deterministic alerts remain
+available without one.
 
 ### Start a match on Windows
 

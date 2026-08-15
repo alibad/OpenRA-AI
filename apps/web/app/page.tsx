@@ -15,7 +15,7 @@ import {
   Zap,
 } from "lucide-react";
 import { MissionStudio } from "./components/MissionStudio";
-import { windowsRelease } from "../lib/release";
+import { macosRelease, windowsRelease } from "../lib/release";
 
 const github = "https://github.com/alibad/OpenRA-AI";
 
@@ -43,8 +43,8 @@ export default function Home() {
           <h1>Your battlefield.<br /><em>Now it talks back.</em></h1>
           <p className="hero-lede">A quiet AI companion for OpenRA—and a map generator that turns any place on Earth into a fictional, playable skirmish.</p>
           <div className="hero-actions">
-            <a className="primary-action" href="#download"><Download size={17} /> Download Windows alpha</a>
-            <a className="text-action" href="#mission-studio">Build a mission <ArrowRight size={17} /></a>
+            <a className="primary-action" href={macosRelease.dmgUrl}><Download size={17} /> Download macOS alpha</a>
+            <a className="text-action" href="#download">Windows options <ArrowRight size={17} /></a>
           </div>
           <div className="hero-proof">
             <span><ShieldCheck size={15} /> Observation-only</span>
@@ -83,21 +83,25 @@ export default function Home() {
 
       <section className="download-section" id="download" aria-labelledby="download-title">
         <div className="download-intro">
-          <span className="section-number">PLAYABLE BUILD / {windowsRelease.version}</span>
-          <h2 id="download-title">From a ZIP to a live match.</h2>
-          <p>The Windows alpha bundles the pinned engine, AI companion, launcher, and a generated Riyadh skirmish. Choose the guided installer or the portable ZIP.</p>
+          <span className="section-number">MACOS {macosRelease.version} / WINDOWS {windowsRelease.version}</span>
+          <h2 id="download-title">From a download to a live match.</h2>
+          <p>Choose the signed and notarized Apple Silicon DMG, the Windows guided installer, or the portable Windows ZIP. Every build includes the pinned engine, companion, launcher, and a generated Riyadh skirmish.</p>
           <div className="download-actions">
-            <a className="primary-action" href={windowsRelease.installerUrl}><Download size={17} /> Install for Windows x64</a>
-            <a className="checksum-link" href={windowsRelease.portableUrl}>Portable ZIP</a>
+            <a className="primary-action" href={macosRelease.dmgUrl}><Download size={17} /> Download for macOS</a>
+            <a className="checksum-link" href={macosRelease.checksumUrl}>macOS checksum</a>
+            <a className="checksum-link" href={macosRelease.releaseIndexUrl}>macOS release manifest</a>
+            <a className="checksum-link" href={windowsRelease.installerUrl}>Windows x64 installer</a>
+            <a className="checksum-link" href={windowsRelease.portableUrl}>Windows portable ZIP</a>
             <a className="checksum-link" href={windowsRelease.aiPackUrl}>{windowsRelease.localAiInstallerDefault ? "Manual local AI pack" : "Optional AI model pack"}</a>
-            <a className="checksum-link" href={windowsRelease.releaseIndexUrl}>Checksums</a>
+            <a className="checksum-link" href={windowsRelease.releaseIndexUrl}>Windows checksums</a>
           </div>
         </div>
         <ol className="play-steps">
-          <li><span>01</span><div><b>Install or extract</b><p>Use the guided installer, or keep all portable ZIP folders together.</p></div></li>
-          <li><span>02</span><div><b>Launch OpenRA AI</b><p>Use the Start menu, or run Play-OpenRAAI.cmd from the portable ZIP. First launch downloads verified Red Alert content.</p></div></li>
+          <li><span>01</span><div><b>Choose your build</b><p>Download the Apple Silicon DMG, Windows installer, or portable ZIP.</p></div></li>
+          <li><span>02</span><div><b>Launch OpenRA AI</b><p>On Mac, copy the app to Applications. On Windows, use the Start menu or Play-OpenRAAI.cmd. First launch downloads verified Red Alert content.</p></div></li>
           <li><span>03</span><div><b>Hold Ctrl+Space to ask</b><p>Release to hear the answer. Ctrl+Enter accepts; Ctrl+Backspace rejects; Ctrl+Shift+A toggles AUTO; Ctrl+Shift+M mutes.</p></div></li>
         </ol>
+        <div className="download-footnote"><ShieldCheck size={15} /><span>macOS 10.15 or newer on Apple Silicon. The DMG and app are Developer ID signed, Apple notarized, and stapled. A macOS local AI pack is not bundled yet; connect a compatible external OpenAI-compatible endpoint for model-backed replies.</span></div>
         {windowsRelease.localAiInstallerDefault ? (
           <div className="download-footnote"><FileArchive size={15} /><span>Windows 10/11 x64 alpha. The guided installer selects Local AI by default and downloads about 1.8 GB of checksum-verified models and CPU runtimes. Choose an external OpenAI-compatible endpoint to skip it. Minimum: 4-core AVX2 CPU, 8 GB RAM, 5 GB free disk. Recommended: recent 6-core CPU and 16 GB RAM. This pack is CPU-only.</span></div>
         ) : (
@@ -166,10 +170,10 @@ export default function Home() {
           <h2>Pick a place.<br />Start a story.</h2>
         </div>
         <div>
-          <p>Generate a mission now or download the tested Windows alpha. macOS packaging follows once a real signed artifact is ready.</p>
+          <p>Generate a mission now, or download the signed macOS alpha and tested Windows build.</p>
           <div className="hero-actions">
-            <a className="primary-action" href={windowsRelease.installerUrl}><Download size={17} /> Download Windows alpha</a>
-            <a className="text-action" href="#mission-studio">Open mission studio <ArrowRight size={17} /></a>
+            <a className="primary-action" href={macosRelease.dmgUrl}><Download size={17} /> Download macOS alpha</a>
+            <a className="text-action" href={windowsRelease.installerUrl}>Windows installer <ArrowRight size={17} /></a>
           </div>
         </div>
       </section>

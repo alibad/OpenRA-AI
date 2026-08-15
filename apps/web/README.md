@@ -5,7 +5,7 @@ OpenRA AI.
 
 Players can:
 
-- download a versioned Windows build and its SHA-256 checksum;
+- download versioned macOS and Windows builds and their SHA-256 checksums;
 - select a point on an OpenStreetMap basemap;
 - translate nearby roads and waterways into a validated Red Alert `.oramap`;
 - download the generated map without creating an account.
@@ -29,9 +29,9 @@ npm test
 ## Game downloads
 
 `lib/release.ts` is the single release manifest used by the page and mission
-studio. Update its version, ZIP URL, and checksum URL only after the matching
-package has passed the repository's local package smoke test and has been
-uploaded as a GitHub Release asset.
+studio. Update its versions, download URLs, and checksum URLs only after each
+matching package has passed the repository's local package smoke test and has
+been uploaded as a GitHub Release asset.
 
 Do not commit game ZIPs to the web app. Release assets belong in GitHub Releases
 or equivalent object storage so the website can remain a small, independently
