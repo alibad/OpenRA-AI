@@ -235,6 +235,7 @@ def detect_strategy_intent(text: str) -> tuple[str, str | None]:
         r"\bwhat(?: the hell )?is going on\b",
         r"\bnext (?:move|step|objective|priority)\b",
         r"\bwhat (?:are we|re we) (?:going to|gonna) do\b",
+        r"\bwhat should (?:we|i) do(?: next)?\b",
         r"\bwhat (?:is|s) (?:left|remaining)\b",
         r"\bwhat remains\b",
         r"\bremaining in (?:this|the) (?:game|match)\b",

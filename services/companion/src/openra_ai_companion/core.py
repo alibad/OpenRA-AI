@@ -1662,8 +1662,11 @@ class Companion:
         created_proposal: ActionProposal | None = None
         suggestion: tuple[str, str, list[dict]] | None = None
         if not self.auto_act_enabled and pending is None:
+            opening_mcv = any(
+                unit.kind.split(".", 1)[0] == "mcv" for unit in snapshot.units
+            ) and not snapshot.buildings
             briefing_insight = Insight(
-                "situation_update",
+                "opening_deploy" if opening_mcv else "situation_update",
                 80,
                 "Player requested the live strategic plan",
                 "Player requested the live strategic plan.",
@@ -1938,7 +1941,7 @@ class Companion:
             }
         if str(decoded.get("mode", "")).lower() != "action":
             answer = humanize_text(str(decoded.get("answer", "")).strip())
-            if _is_unhelpful_player_answer(answer):
+            if _is_unhelpful_player_answer(answer) or (progress_request and answer.endswith("?")):
                 if failure_followup:
                     return self._action_failure_followup_response(snapshot, generation)
                 if scout_request:

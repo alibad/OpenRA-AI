@@ -662,6 +662,28 @@ class CompanionTests(unittest.TestCase):
         self.assertIn("power +80", response.text)
         self.assertNotIn("assessing", response.text.lower())
 
+    def test_player_agent_replaces_a_progress_question_with_a_concrete_next_step(self) -> None:
+        companion = Companion(router=FakeRouter())
+        companion.update_snapshot(snapshot(units=[{
+            "actor_id": 21,
+            "type": "mcv",
+            "cell_x": 24,
+            "cell_y": 28,
+            "is_idle": True,
+        }]))
+        companion.set_action_planner(lambda _instruction: {
+            "message": "What should we prioritize after building the Mobile Construction Vehicle?",
+            "commands": [],
+            "mcp": {"connected": True, "tools": 28, "tool_calls": ["battlefield"]},
+        })
+
+        response = companion.handle_player_input("What should we do next?")
+
+        self.assertEqual(response.source, "strategy-next-step")
+        self.assertEqual(response.metadata["action"]["state"], "pending")
+        self.assertEqual(response.metadata["action"]["commands"][0]["action"], "deploy")
+        self.assertNotIn("what should we prioritize", response.text.lower())
+
     def test_interactive_agent_requires_battlefield_and_keeps_player_dialogue(self) -> None:
         settings = agent_model_settings(
             local=True,
