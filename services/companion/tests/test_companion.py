@@ -484,6 +484,106 @@ class CompanionTests(unittest.TestCase):
         self.assertIn("Active native profile: Fortified defense", explanation.text)
         self.assertEqual(explanation.metadata["strategy"]["active_native_profile"], "turtle")
 
+    def test_spoken_situation_prompts_return_live_facts_without_model_filler(self) -> None:
+        router = FakeRouter()
+        companion = Companion(router=router)
+        companion.auto_act_enabled = True
+        companion.update_snapshot(snapshot(
+            map_info={"map_name": "Snow Town", "width": 128, "height": 128},
+            power_provided=200,
+            power_drained=120,
+            harvester_count=3,
+            production=[{
+                "queue_type": "Building",
+                "item": "tent",
+                "progress": 0.84,
+            }],
+        ))
+
+        for prompt in (
+            "Why what is happening right now?",
+            "So what is the situation?",
+            "Is that all you have? Come on.",
+            "Tell me something useful, please.",
+        ):
+            with self.subTest(prompt=prompt):
+                response = companion.handle_player_input(prompt)
+                self.assertEqual(response.source, "strategy-next-step")
+                self.assertIn("Allied Barracks", response.text)
+                self.assertIn("power +80", response.text)
+                self.assertIn("3 harvesters", response.text)
+                self.assertIn("AUTO is executing this plan now", response.text)
+                self.assertNotIn("assessing", response.text.lower())
+                self.assertNotIn("analyzing", response.text.lower())
+
+        self.assertEqual(router.calls, 0)
+
+    def test_compound_barracks_scout_request_uses_ready_infantry_and_safe_routes(self) -> None:
+        router = FakeRouter()
+        companion = Companion(router=router)
+        companion.update_snapshot(spatial_snapshot(
+            width=64,
+            height=64,
+            harvester_count=3,
+            buildings=[
+                {"actor_id": 10, "type": "fact", "cell_x": 30, "cell_y": 30},
+                {"actor_id": 11, "type": "tent", "cell_x": 32, "cell_y": 30},
+            ],
+            units=[
+                {"actor_id": 21, "type": "e1", "cell_x": 30, "cell_y": 32,
+                 "is_idle": True, "can_attack": True, "armor_type": "None", "cost": 100},
+                {"actor_id": 22, "type": "cnrifle", "cell_x": 31, "cell_y": 32,
+                 "is_idle": True, "can_attack": True, "armor_type": "None", "cost": 130},
+            ],
+            production=[],
+            available_production=["e1", "cnrifle"],
+        ))
+        companion.set_action_planner(lambda _instruction: self.fail("deterministic scout planning should bypass the model"))
+
+        response = companion.handle_player_input("Can you create barracks and send around soldiers to scout?")
+
+        self.assertEqual(response.source, "action-proposal")
+        self.assertIn("Barracks is already ready", response.text)
+        commands = response.metadata["action"]["commands"]
+        self.assertEqual(len(commands), 2)
+        self.assertTrue(all(command["action"] == "attack_move" for command in commands))
+        self.assertEqual(len({(command["target_x"], command["target_y"]) for command in commands}), 2)
+        self.assertEqual(router.calls, 0)
+
+    def test_compound_scout_request_reports_existing_barracks_progress_instead_of_refusing(self) -> None:
+        router = FakeRouter()
+        companion = Companion(router=router)
+        companion.auto_act_enabled = True
+        companion.update_snapshot(snapshot(
+            map_info={"map_name": "Snow Town", "width": 128, "height": 128},
+            buildings=[{"actor_id": 10, "type": "fact", "cell_x": 60, "cell_y": 60}],
+            units=[],
+            production=[{
+                "queue_type": "Building",
+                "item": "tent",
+                "progress": 0.846,
+            }],
+            available_production=["tent"],
+        ))
+
+        response = companion.handle_player_input("Can you create barracks and send around soldiers to scout?")
+
+        self.assertEqual(response.source, "action-progress")
+        self.assertIn("already 85% complete", response.text)
+        self.assertIn("duplicate build would be wrong", response.text)
+        self.assertIn("AUTO", response.text)
+        self.assertIsNone(companion.pending_action())
+        self.assertEqual(router.calls, 0)
+
+        correction = companion.handle_player_input(
+            "What do you mean you couldn't form a safe action? What the hell?"
+        )
+        self.assertEqual(correction.source, "planner-correction")
+        self.assertIn("Your request was clear", correction.text)
+        self.assertIn("planning failure", correction.text)
+        self.assertIn("85% complete", correction.text)
+        self.assertEqual(router.calls, 0)
+
     def test_whats_next_returns_live_plan_and_accept_action_without_model_call(self) -> None:
         router = FakeRouter()
         executed = []

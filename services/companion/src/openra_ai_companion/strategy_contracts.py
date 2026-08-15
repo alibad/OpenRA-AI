@@ -230,6 +230,9 @@ def detect_strategy_intent(text: str) -> tuple[str, str | None]:
 
     progress_patterns = (
         r"\bwhat(?: is| s)? next\b",
+        r"\bwhat(?: is| s)? (?:the )?situation\b",
+        r"\bwhat(?: is| s)? happening(?: right now)?\b",
+        r"\bwhat(?: the hell )?is going on\b",
         r"\bnext (?:move|step|objective|priority)\b",
         r"\bwhat (?:are we|re we) (?:going to|gonna) do\b",
         r"\bwhat (?:is|s) (?:left|remaining)\b",
@@ -242,6 +245,9 @@ def detect_strategy_intent(text: str) -> tuple[str, str | None]:
         r"\bare we winning\b",
         r"\bwhere are we at\b",
         r"\bgame status\b",
+        r"\bstatus report\b",
+        r"\btell me something useful\b",
+        r"\bis that all you have\b",
     )
     if any(re.search(pattern, normalized) for pattern in progress_patterns):
         return "progress", None

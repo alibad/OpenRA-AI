@@ -55,7 +55,8 @@ Visible enemies are current contacts. Remembered enemy buildings are last-known 
 Explored percent is cumulative map knowledge. Power balance is the same net value shown beside the lightning icon; never invent or quote supply/usage totals.
 Treat production countdowns as transient: never quote raw tick counts or imply that an old countdown is still current.
 Never expose internal actor type IDs such as e1, proc, or 2tnk; use player-facing unit and building names.
-Prioritize an actionable observation. Never claim to control units. Never use markdown, greetings, or filler."""
+Prioritize an actionable observation. Never say you are assessing or analyzing; answer directly from the supplied state.
+Never claim to control units. Never use markdown, greetings, or filler."""
 
 MISSION_DESIGN_PROMPT = """You are an expert OpenRA mission designer working inside the native map editor.
 Return one vivid, playable mission direction under 34 words. Ground it in the supplied Earth location, map metrics, and requested archetype.
@@ -138,6 +139,28 @@ def _is_confirm_intent(text: str) -> bool:
     return bool(words & {"confirm", "confirmed", "execute", "proceed"}) or any(
         phrase in f" {normalized} " for phrase in (" do it ", " go ahead ")
     )
+
+
+def _is_scout_request(text: str) -> bool:
+    normalized = _normalized_action_intent(text)
+    return (
+        any(word in normalized.split() for word in ("scout", "scouts", "recon", "reconnaissance"))
+        and any(word in normalized.split() for word in (
+            "can", "create", "build", "make", "send", "move", "order", "train", "use", "please",
+        ))
+    )
+
+
+def _is_action_failure_followup(text: str) -> bool:
+    normalized = _normalized_action_intent(text)
+    return any(phrase in normalized for phrase in (
+        "couldn t form a safe action",
+        "could not form a safe action",
+        "what do you mean you couldn t",
+        "what do you mean you could not",
+        "why couldn t you do",
+        "why could not you do",
+    ))
 
 FULL_VISION_PROMPT = """Use the supplied visual views together with the structured snapshot.
 The rendered viewport is exactly what the player can currently see, including fog and UI.
@@ -1326,6 +1349,238 @@ class Companion:
         response.source = "contextual-action-suggestion"
         response.metadata["action"] = {"state": "pending", "contextual": True, **proposal.as_dict()}
 
+    @staticmethod
+    def _fallback_scout_targets(
+        snapshot: GameSnapshot,
+        origin: tuple[int, int],
+        count: int,
+    ) -> list[tuple[int, int]]:
+        """Choose bounded cardinal reconnaissance targets when no spatial grid is available."""
+        left = snapshot.map_bounds_x
+        top = snapshot.map_bounds_y
+        width = snapshot.map_bounds_width or snapshot.map_width
+        height = snapshot.map_bounds_height or snapshot.map_height
+        if width <= 2 or height <= 2:
+            return []
+        right = left + width - 1
+        bottom = top + height - 1
+        ox = min(max(origin[0], left + 1), right - 1)
+        oy = min(max(origin[1], top + 1), bottom - 1)
+        return [
+            (left + 1, oy),
+            (right - 1, oy),
+            (ox, top + 1),
+            (ox, bottom - 1),
+        ][:max(0, min(4, count))]
+
+    def _scout_request_response(
+        self,
+        snapshot: GameSnapshot,
+        instruction: str,
+        generation: int,
+    ) -> CompanionResponse:
+        """Turn a natural scouting request into the next legal, state-aware step."""
+        def base_type(value: object) -> str:
+            return str(value).lower().split("@", 1)[0].split(".", 1)[0]
+
+        barracks_types = {"tent", "barr"}
+        rifle_types = {"e1", "e2", "cnrifle"}
+        excluded_types = {"dog", "spy", "e6", "medi", "mech", "e7"}
+        building_types = {base_type(building.kind) for building in snapshot.buildings}
+        barracks_ready = bool(building_types & barracks_types)
+        queued_barracks = next((
+            item for item in snapshot.production
+            if base_type(item.get("item", "")) in barracks_types
+        ), None)
+
+        candidates = sorted(
+            (
+                unit for unit in snapshot.units
+                if unit.idle
+                and unit.can_attack
+                and base_type(unit.kind) not in excluded_types
+                and (
+                    base_type(unit.kind) in rifle_types
+                    or (unit.armor_type.lower() in {"", "none"} and 0 < unit.cost <= 400)
+                )
+            ),
+            key=lambda unit: (
+                base_type(unit.kind) not in rifle_types,
+                unit.cost,
+                unit.actor_id,
+            ),
+        )
+        quota = min(4, opening_scout_count(snapshot))
+        targets = scout_targets(snapshot, base_center(snapshot), min(quota, len(candidates)))
+        if not targets:
+            targets = self._fallback_scout_targets(
+                snapshot,
+                base_center(snapshot),
+                min(quota, len(candidates)),
+            )
+        assignments = list(zip(candidates, targets))
+        if assignments:
+            commands = self._validate_action_commands(snapshot, [
+                {
+                    "action": "attack_move",
+                    "actor_id": unit.actor_id,
+                    "target_x": target[0],
+                    "target_y": target[1],
+                }
+                for unit, target in assignments
+            ])
+            count = len(commands)
+            summary = f"Fan {count} infantry scout{'s' if count != 1 else ''} across unexplored approaches"
+            proposal = ActionProposal(
+                proposal_id=str(uuid.uuid4()),
+                instruction=instruction,
+                summary=summary,
+                expected_tick=snapshot.tick,
+                commands=commands,
+                created_at=time.monotonic(),
+            )
+            with self._action_lock:
+                self._pending_action = proposal
+            barracks_note = (
+                "The Barracks is already ready; " if barracks_ready
+                else "You already have scout-capable infantry, so another Barracks is unnecessary; "
+            )
+            return CompanionResponse(
+                f"{barracks_note}I can fan {count} infantry scout{'s' if count != 1 else ''} "
+                "toward different unexplored approaches. Say confirm.",
+                "action-proposal",
+                utterance_id=generation,
+                metadata={"deterministic": True, "action": {"state": "pending", **proposal.as_dict()}},
+            )
+
+        if queued_barracks is not None:
+            progress = max(0, min(100, round(float(queued_barracks.get("progress", 0)) * 100)))
+            if progress >= 100:
+                commands = self._validate_action_commands(snapshot, [{
+                    "action": "place_building",
+                    "item_type": str(queued_barracks.get("item", "")),
+                }])
+                proposal = ActionProposal(
+                    proposal_id=str(uuid.uuid4()),
+                    instruction=instruction,
+                    summary="Place the completed Barracks before training scouts",
+                    expected_tick=snapshot.tick,
+                    commands=commands,
+                    created_at=time.monotonic(),
+                )
+                with self._action_lock:
+                    self._pending_action = proposal
+                return CompanionResponse(
+                    "The Barracks is complete but not placed; I can place it now, then infantry production can begin. Say confirm.",
+                    "action-proposal",
+                    utterance_id=generation,
+                    metadata={"deterministic": True, "action": {"state": "pending", **proposal.as_dict()}},
+                )
+            authority = (
+                "AUTO is already finishing it and will re-evaluate reconnaissance when infantry deploy."
+                if self.auto_act_enabled else
+                "Let it finish; then I can train and fan out the scouts."
+            )
+            return CompanionResponse(
+                f"The Barracks is already {progress}% complete, so a duplicate build would be wrong. {authority}",
+                "action-progress",
+                utterance_id=generation,
+                metadata={"deterministic": True, "production": dict(queued_barracks)},
+            )
+
+        available = {base_type(item): item for item in snapshot.available_production}
+        queued_rifle = next((
+            item for item in snapshot.production
+            if base_type(item.get("item", "")) in rifle_types
+        ), None)
+        if barracks_ready and queued_rifle is not None:
+            progress = max(0, min(100, round(float(queued_rifle.get("progress", 0)) * 100)))
+            return CompanionResponse(
+                f"The Barracks is ready and infantry scouts are already {progress}% trained; I can fan them out when they deploy.",
+                "action-progress",
+                utterance_id=generation,
+                metadata={"deterministic": True, "production": dict(queued_rifle)},
+            )
+
+        if barracks_ready:
+            rifle_item = next((available[kind] for kind in ("e1", "cnrifle", "e2") if kind in available), None)
+            if rifle_item:
+                commands = self._validate_action_commands(snapshot, [
+                    {"action": "train", "item_type": rifle_item}
+                    for _ in range(quota)
+                ])
+                proposal = ActionProposal(
+                    proposal_id=str(uuid.uuid4()),
+                    instruction=instruction,
+                    summary=f"Train {quota} infantry scouts",
+                    expected_tick=snapshot.tick,
+                    commands=commands,
+                    created_at=time.monotonic(),
+                )
+                with self._action_lock:
+                    self._pending_action = proposal
+                return CompanionResponse(
+                    f"The Barracks is ready; I can train {quota} infantry scouts now, then fan them out as they deploy. Say confirm.",
+                    "action-proposal",
+                    utterance_id=generation,
+                    metadata={"deterministic": True, "action": {"state": "pending", **proposal.as_dict()}},
+                )
+
+        barracks_item = next((available[kind] for kind in ("tent", "barr") if kind in available), None)
+        if barracks_item:
+            commands = self._validate_action_commands(snapshot, [{"action": "build", "item_type": barracks_item}])
+            proposal = ActionProposal(
+                proposal_id=str(uuid.uuid4()),
+                instruction=instruction,
+                summary="Build a Barracks as the first step toward infantry scouting",
+                expected_tick=snapshot.tick,
+                commands=commands,
+                created_at=time.monotonic(),
+            )
+            with self._action_lock:
+                self._pending_action = proposal
+            return CompanionResponse(
+                "I can queue the Barracks now; once it is placed, infantry scouts become the next legal step. Say confirm.",
+                "action-proposal",
+                utterance_id=generation,
+                metadata={"deterministic": True, "action": {"state": "pending", **proposal.as_dict()}},
+            )
+
+        return CompanionResponse(
+            "Your scouting order is clear, but no scout-capable infantry or Barracks production is currently available.",
+            "action-unavailable",
+            utterance_id=generation,
+            metadata={"deterministic": True, "action": {"state": "unavailable"}},
+        )
+
+    def _action_failure_followup_response(
+        self,
+        snapshot: GameSnapshot,
+        generation: int,
+    ) -> CompanionResponse:
+        """Own a planner failure and explain the live blocker without blaming the player."""
+        def base_type(value: object) -> str:
+            return str(value).lower().split("@", 1)[0].split(".", 1)[0]
+
+        queued_barracks = next((
+            item for item in snapshot.production
+            if base_type(item.get("item", "")) in {"tent", "barr"}
+        ), None)
+        barracks_ready = any(base_type(building.kind) in {"tent", "barr"} for building in snapshot.buildings)
+        if queued_barracks is not None:
+            progress = max(0, min(100, round(float(queued_barracks.get("progress", 0)) * 100)))
+            detail = f"The Barracks was already {progress}% complete; the right response was to say that and continue with scouting afterward."
+        elif barracks_ready:
+            detail = "The Barracks is ready; I should have proposed available infantry and safe unexplored routes."
+        else:
+            detail = "I should have named the exact unavailable prerequisite or proposed the first legal step."
+        return CompanionResponse(
+            f"Your request was clear; that was my planning failure, not missing information. {detail}",
+            "planner-correction",
+            utterance_id=generation,
+            metadata={"deterministic": True, "planner_failure": True},
+        )
+
     def _mission_progress_response(self, snapshot: GameSnapshot, generation: int) -> CompanionResponse:
         plan = mission_plan(snapshot)
         next_step = str(plan.get("next_step") or "Follow the current mission objective.")
@@ -1584,6 +1839,10 @@ class Companion:
                 utterance_id=generation,
                 metadata={"degraded": True},
             )
+        if _is_action_failure_followup(instruction):
+            return self._action_failure_followup_response(snapshot, generation)
+        if _is_scout_request(instruction):
+            return self._scout_request_response(snapshot, instruction, generation)
 
         started = time.perf_counter()
         with self._action_lock:
