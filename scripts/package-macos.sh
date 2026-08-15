@@ -33,14 +33,6 @@ done
   exit 1
 }
 
-if [ ! -f "$SAMPLE_MISSION" ]; then
-  "$PYTHON" -m openra_ai_worldgen.cli generate \
-    --lat 24.7136 --lon 46.6753 \
-    --title "Riyadh Crossing" --location "Riyadh, Saudi Arabia" \
-    --imagery terrain --mode playability-first --seed 42 --offline
-fi
-"$PYTHON" -m openra_ai_worldgen.cli validate "$SAMPLE_MISSION"
-
 case "$(uname -m)" in
   arm64)
     RELEASE_ARCH="arm64"
@@ -73,6 +65,16 @@ mkdir -p "$MACOS/$ARCH_DIR" "$RESOURCES/bin" "$RESOURCES/generated/missions" "$R
 
 source "$ENGINE_ROOT/packaging/functions.sh"
 install_assemblies "$ENGINE_ROOT" "$MACOS/$ARCH_DIR" "$RUNTIME" "True" "True" "False"
+export OPENRA_AI_UTILITY="$ENGINE_ROOT/bin/$RUNTIME/OpenRA.Utility"
+
+if [ ! -f "$SAMPLE_MISSION" ]; then
+  "$PYTHON" -m openra_ai_worldgen.cli generate \
+    --lat 24.7136 --lon 46.6753 \
+    --title "Riyadh Crossing" --location "Riyadh, Saudi Arabia" \
+    --imagery terrain --mode playability-first --seed 42 --offline
+fi
+"$PYTHON" -m openra_ai_worldgen.cli validate "$SAMPLE_MISSION"
+
 install_data "$ENGINE_ROOT" "$RESOURCES" "ra"
 set_engine_version "$VERSION" "$RESOURCES"
 set_mod_version "$VERSION" "$RESOURCES/mods/ra/mod.yaml" "$RESOURCES/mods/ra-content/mod.yaml"

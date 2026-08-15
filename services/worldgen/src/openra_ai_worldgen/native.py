@@ -4,6 +4,7 @@ from dataclasses import dataclass
 import json
 import os
 from pathlib import Path
+import platform
 import subprocess
 from typing import Any
 
@@ -152,8 +153,21 @@ class NativeMapGenerator:
 
     @property
     def utility(self) -> Path:
-        windows = self.engine_root / "bin" / "OpenRA.Utility.exe"
-        return windows if windows.is_file() else self.engine_root / "bin" / "OpenRA.Utility"
+        configured = os.environ.get("OPENRA_AI_UTILITY", "").strip()
+        if configured:
+            return Path(configured).expanduser().resolve()
+
+        binary_name = "OpenRA.Utility.exe" if platform.system() == "Windows" else "OpenRA.Utility"
+        candidates = [
+            self.engine_root / "bin" / "OpenRA.Utility.exe",
+            self.engine_root / "bin" / "OpenRA.Utility",
+        ]
+        architecture = platform.machine().lower()
+        architecture = "arm64" if architecture in {"arm64", "aarch64"} else "x64"
+        runtime_prefix = {"Darwin": "osx", "Windows": "win", "Linux": "linux"}.get(platform.system())
+        if runtime_prefix:
+            candidates.append(self.engine_root / "bin" / f"{runtime_prefix}-{architecture}" / binary_name)
+        return next((candidate for candidate in candidates if candidate.is_file()), candidates[0])
 
     def generate(
         self,
