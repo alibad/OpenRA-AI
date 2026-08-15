@@ -83,12 +83,19 @@ def create_agent_model(
     )
 
 
-def agent_model_settings(*, local: bool, max_tokens: int, reasoning_effort: str) -> ModelSettings:
+def agent_model_settings(
+    *,
+    local: bool,
+    max_tokens: int,
+    reasoning_effort: str,
+    tool_choice: str | None = None,
+) -> ModelSettings:
     if local:
         # vLLM accepts the standard chat/tool surface but not OpenAI-only
         # reasoning or verbosity fields.
         return ModelSettings(
             temperature=0.1,
+            tool_choice=tool_choice,
             parallel_tool_calls=False,
             max_tokens=max_tokens,
             # The local router otherwise auto-truncates to one token beyond
@@ -99,6 +106,7 @@ def agent_model_settings(*, local: bool, max_tokens: int, reasoning_effort: str)
     return ModelSettings(
         reasoning=Reasoning(effort=reasoning_effort, summary="concise"),
         verbosity="low",
+        tool_choice=tool_choice,
         parallel_tool_calls=False,
         max_tokens=max_tokens,
     )

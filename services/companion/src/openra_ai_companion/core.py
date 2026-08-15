@@ -162,6 +162,20 @@ def _is_action_failure_followup(text: str) -> bool:
         "why could not you do",
     ))
 
+
+def _is_unhelpful_player_answer(text: str) -> bool:
+    normalized = _normalized_action_intent(text)
+    return not normalized or any(phrase in normalized for phrase in (
+        "i am assessing",
+        "i m assessing",
+        "analyzing battlefield",
+        "analysing battlefield",
+        "i need more information",
+        "i need a more specific objective",
+        "couldn t form a safe action",
+        "could not form a safe action",
+    ))
+
 FULL_VISION_PROMPT = """Use the supplied visual views together with the structured snapshot.
 The rendered viewport is exactly what the player can currently see, including fog and UI.
 The tactical overview covers the entire map: dark cells are hidden, cyan/blue are owned assets, red/orange are currently visible enemies, and gold is explored ore.
@@ -1762,18 +1776,6 @@ class Companion:
             return self.confirm_action()
 
         strategy_intent, requested_strategy = detect_strategy_intent(instruction)
-        if strategy_intent == "progress":
-            generation = self._begin()
-            if self.latest_snapshot is None:
-                return CompanionResponse(
-                    "I don't have a live game snapshot yet.",
-                    "deterministic-fallback",
-                    utterance_id=generation,
-                    metadata={"degraded": True},
-                )
-            if self.latest_snapshot.mission_mode:
-                return self._mission_progress_response(self.latest_snapshot, generation)
-            return self._strategy_progress_response(self.latest_snapshot, generation)
         if strategy_intent == "query":
             generation = self._begin()
             metadata_strategy = strategy_contract(requested_strategy or self.native_strategy)
@@ -1839,10 +1841,9 @@ class Companion:
                 utterance_id=generation,
                 metadata={"degraded": True},
             )
-        if _is_action_failure_followup(instruction):
-            return self._action_failure_followup_response(snapshot, generation)
-        if _is_scout_request(instruction):
-            return self._scout_request_response(snapshot, instruction, generation)
+        progress_request = strategy_intent == "progress"
+        failure_followup = _is_action_failure_followup(instruction)
+        scout_request = _is_scout_request(instruction)
 
         started = time.perf_counter()
         with self._action_lock:
@@ -1858,6 +1859,7 @@ class Companion:
                 if values:
                     decoded_plan = {
                         "mode": "action",
+                        "message": humanize_text(str(planned.get("message") or "")),
                         "summary": humanize_text(str(planned.get("summary") or planned.get("message") or "Proposed action")),
                         "commands": values,
                     }
@@ -1876,6 +1878,14 @@ class Companion:
                 planner_error = f"{type(exc).__name__}: {str(exc)[:240]}"
 
         if result is None:
+            if failure_followup:
+                return self._action_failure_followup_response(snapshot, generation)
+            if scout_request:
+                return self._scout_request_response(snapshot, instruction, generation)
+            if progress_request:
+                if snapshot.mission_mode:
+                    return self._mission_progress_response(snapshot, generation)
+                return self._strategy_progress_response(snapshot, generation)
             try:
                 images, views = self._vision_inputs(snapshot)
                 if images:
@@ -1928,6 +1938,15 @@ class Companion:
             }
         if str(decoded.get("mode", "")).lower() != "action":
             answer = humanize_text(str(decoded.get("answer", "")).strip())
+            if _is_unhelpful_player_answer(answer):
+                if failure_followup:
+                    return self._action_failure_followup_response(snapshot, generation)
+                if scout_request:
+                    return self._scout_request_response(snapshot, instruction, generation)
+                if progress_request:
+                    if snapshot.mission_mode:
+                        return self._mission_progress_response(snapshot, generation)
+                    return self._strategy_progress_response(snapshot, generation)
             if not answer:
                 answer = "Please make the requested units, task, and destination more specific."
             response = CompanionResponse(
@@ -1954,16 +1973,22 @@ class Companion:
                 with self._action_lock:
                     self._pending_action = proposal
                 created_proposal = proposal
+                message = humanize_text(str(decoded.get("message", "")).strip().rstrip("."))
+                lead = f"{message}. " if message else ""
+                order_count = len(commands)
+                order_label = "order" if order_count == 1 else "orders"
                 response = CompanionResponse(
-                    f"{summary}. Say confirm to execute, or cancel.",
+                    f"{lead}I prepared {order_count} validated {order_label}. Say confirm to execute, or cancel.",
                     "action-proposal",
                     utterance_id=generation,
                     latency_ms=result.latency_ms,
                     metadata={**result_metadata, "action": {"state": "pending", **proposal.as_dict()}},
                 )
             except ValueError as exc:
+                if scout_request:
+                    return self._scout_request_response(snapshot, instruction, generation)
                 response = CompanionResponse(
-                    "I couldn't form a safe action. Please name the units, task, and destination.",
+                    "The proposed order failed live safety validation, so nothing was sent. Ask me to retry or choose another move.",
                     "action-rejected",
                     utterance_id=generation,
                     latency_ms=result.latency_ms,

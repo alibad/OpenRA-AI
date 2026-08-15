@@ -15,10 +15,16 @@ from tempfile import TemporaryDirectory
 from unittest import mock
 
 from openra_ai_companion.cli import _companion_action_loop_enabled, _match_started, _restart_auto_deadlines, _speak
+from openra_ai_companion.agent_models import agent_model_settings
 from openra_ai_companion.core import Companion
 from openra_ai_companion import game_mcp
 from openra_ai_companion.game_runtime import GameRuntime
 from openra_ai_companion.hotkeys import VoiceHotkeys, console_print, response_hud_state
+from openra_ai_companion.interactive_agent import (
+    InteractiveMCPPlanner,
+    _proposed_tool_commands,
+    _requests_action,
+)
 from openra_ai_companion.insights import InsightEngine
 from openra_ai_companion.learning import LearningStore
 from openra_ai_companion.models import ActionCommand, ActionReceipt, GameSnapshot, Unit, VisionFrame
@@ -487,6 +493,7 @@ class CompanionTests(unittest.TestCase):
     def test_spoken_situation_prompts_return_live_facts_without_model_filler(self) -> None:
         router = FakeRouter()
         companion = Companion(router=router)
+        planner_calls = []
         companion.auto_act_enabled = True
         companion.update_snapshot(snapshot(
             map_info={"map_name": "Snow Town", "width": 128, "height": 128},
@@ -499,6 +506,19 @@ class CompanionTests(unittest.TestCase):
                 "progress": 0.84,
             }],
         ))
+        companion.set_action_planner(lambda instruction: {
+            "message": planner_calls.append(instruction) or (
+                "The Allied Barracks is 84% complete; power is +80 with 3 harvesters, then scouts are next."
+            ),
+            "commands": [],
+            "mcp": {
+                "connected": True,
+                "tools": 28,
+                "proposal_only": True,
+                "tool_calls": ["battlefield"],
+                "battlefield_read": True,
+            },
+        })
 
         for prompt in (
             "Why what is happening right now?",
@@ -508,14 +528,20 @@ class CompanionTests(unittest.TestCase):
         ):
             with self.subTest(prompt=prompt):
                 response = companion.handle_player_input(prompt)
-                self.assertEqual(response.source, "strategy-next-step")
+                self.assertEqual(response.source, "ai-layer")
                 self.assertIn("Allied Barracks", response.text)
-                self.assertIn("power +80", response.text)
+                self.assertIn("power is +80", response.text)
                 self.assertIn("3 harvesters", response.text)
-                self.assertIn("AUTO is executing this plan now", response.text)
+                self.assertTrue(response.metadata["mcp"]["battlefield_read"])
                 self.assertNotIn("assessing", response.text.lower())
                 self.assertNotIn("analyzing", response.text.lower())
 
+        self.assertEqual(planner_calls, [
+            "Why what is happening right now?",
+            "So what is the situation?",
+            "Is that all you have? Come on.",
+            "Tell me something useful, please.",
+        ])
         self.assertEqual(router.calls, 0)
 
     def test_compound_barracks_scout_request_uses_ready_infantry_and_safe_routes(self) -> None:
@@ -538,22 +564,41 @@ class CompanionTests(unittest.TestCase):
             production=[],
             available_production=["e1", "cnrifle"],
         ))
-        companion.set_action_planner(lambda _instruction: self.fail("deterministic scout planning should bypass the model"))
+        planner_calls = []
+        companion.set_action_planner(lambda instruction: {
+            "message": planner_calls.append(instruction) or "The Barracks is ready, and two Rifle Infantry can scout now.",
+            "summary": "Fan two infantry scouts across unexplored approaches",
+            "commands": [
+                {"action": "attack_move", "actor_id": 21, "target_x": 1, "target_y": 32},
+                {"action": "attack_move", "actor_id": 22, "target_x": 62, "target_y": 32},
+            ],
+            "mcp": {
+                "connected": True,
+                "tools": 28,
+                "proposal_only": True,
+                "tool_calls": ["battlefield", "attack_move"],
+                "battlefield_read": True,
+            },
+        })
 
         response = companion.handle_player_input("Can you create barracks and send around soldiers to scout?")
 
         self.assertEqual(response.source, "action-proposal")
-        self.assertIn("Barracks is already ready", response.text)
+        self.assertIn("Barracks is ready", response.text)
+        self.assertIn("2 validated orders", response.text)
         commands = response.metadata["action"]["commands"]
         self.assertEqual(len(commands), 2)
         self.assertTrue(all(command["action"] == "attack_move" for command in commands))
         self.assertEqual(len({(command["target_x"], command["target_y"]) for command in commands}), 2)
+        self.assertEqual(response.metadata["mcp"]["tool_calls"], ["battlefield", "attack_move"])
+        self.assertEqual(planner_calls, ["Can you create barracks and send around soldiers to scout?"])
         self.assertEqual(router.calls, 0)
 
     def test_compound_scout_request_reports_existing_barracks_progress_instead_of_refusing(self) -> None:
         router = FakeRouter()
         companion = Companion(router=router)
         companion.auto_act_enabled = True
+        planner_calls = []
         companion.update_snapshot(snapshot(
             map_info={"map_name": "Snow Town", "width": 128, "height": 128},
             buildings=[{"actor_id": 10, "type": "fact", "cell_x": 60, "cell_y": 60}],
@@ -565,12 +610,25 @@ class CompanionTests(unittest.TestCase):
             }],
             available_production=["tent"],
         ))
+        companion.set_action_planner(lambda instruction: {
+            "message": planner_calls.append(instruction) or (
+                "Your request is clear. The Barracks is already 85% complete; AUTO will finish it, "
+                "then I will use infantry to scout separate approaches."
+            ),
+            "commands": [],
+            "mcp": {
+                "connected": True,
+                "tools": 28,
+                "proposal_only": True,
+                "tool_calls": ["battlefield"],
+                "battlefield_read": True,
+            },
+        })
 
         response = companion.handle_player_input("Can you create barracks and send around soldiers to scout?")
 
-        self.assertEqual(response.source, "action-progress")
+        self.assertEqual(response.source, "ai-layer")
         self.assertIn("already 85% complete", response.text)
-        self.assertIn("duplicate build would be wrong", response.text)
         self.assertIn("AUTO", response.text)
         self.assertIsNone(companion.pending_action())
         self.assertEqual(router.calls, 0)
@@ -578,11 +636,118 @@ class CompanionTests(unittest.TestCase):
         correction = companion.handle_player_input(
             "What do you mean you couldn't form a safe action? What the hell?"
         )
-        self.assertEqual(correction.source, "planner-correction")
-        self.assertIn("Your request was clear", correction.text)
-        self.assertIn("planning failure", correction.text)
+        self.assertEqual(correction.source, "ai-layer")
+        self.assertIn("Your request is clear", correction.text)
         self.assertIn("85% complete", correction.text)
+        self.assertEqual(len(planner_calls), 2)
         self.assertEqual(router.calls, 0)
+
+    def test_player_agent_falls_back_only_when_tool_answer_is_process_filler(self) -> None:
+        companion = Companion(router=FakeRouter())
+        companion.auto_act_enabled = True
+        companion.update_snapshot(snapshot(
+            power_provided=200,
+            power_drained=120,
+            harvester_count=3,
+        ))
+        companion.set_action_planner(lambda _instruction: {
+            "message": "I am assessing the battlefield and need more information.",
+            "commands": [],
+            "mcp": {"connected": True, "tools": 28, "tool_calls": ["battlefield"]},
+        })
+
+        response = companion.handle_player_input("So what is the situation?")
+
+        self.assertEqual(response.source, "strategy-next-step")
+        self.assertIn("power +80", response.text)
+        self.assertNotIn("assessing", response.text.lower())
+
+    def test_interactive_agent_requires_battlefield_and_keeps_player_dialogue(self) -> None:
+        settings = agent_model_settings(
+            local=True,
+            max_tokens=900,
+            reasoning_effort="low",
+            tool_choice="battlefield",
+        )
+        self.assertEqual(settings.tool_choice, "battlefield")
+        self.assertEqual(InteractiveMCPPlanner.TOOL_COUNT, 28)
+        self.assertTrue(_requests_action("Can you build a Barracks and send scouts?"))
+        self.assertTrue(_requests_action("Do something useful about that."))
+        self.assertTrue(_requests_action("What should we do next?"))
+        self.assertFalse(_requests_action("What does a Barracks do?"))
+
+        planner = InteractiveMCPPlanner("127.0.0.1:9998")
+        seen_dialogue = []
+
+        async def fake_plan(instruction, dialogue=()):  # noqa: ANN001
+            seen_dialogue.append((instruction, dialogue))
+            return {"message": f"Answered: {instruction}", "commands": []}
+
+        planner._plan = fake_plan
+        planner.plan("What is happening?")
+        planner.plan("What should we do next?")
+        planner.plan("Autonomous commander mode is enabled. Act now.")
+
+        self.assertEqual(seen_dialogue[0][1], ())
+        self.assertEqual(seen_dialogue[1][1], (("What is happening?", "Answered: What is happening?"),))
+        self.assertEqual(seen_dialogue[2][1], ())
+
+    def test_interactive_agent_accepts_only_exact_action_tool_receipts(self) -> None:
+        from agents import Agent
+        from agents.items import ToolCallItem, ToolCallOutputItem
+
+        agent = Agent(name="test")
+        battlefield_call = ToolCallItem(agent=agent, raw_item={
+            "name": "battlefield",
+            "call_id": "battlefield-1",
+            "type": "function_call",
+            "arguments": "{}",
+        })
+        battlefield_output = ToolCallOutputItem(
+            agent=agent,
+            raw_item={
+                "call_id": "battlefield-1",
+                "type": "function_call_output",
+                "output": "{}",
+            },
+            output='{"snapshot": {"match_started": true}}',
+        )
+        move_call = ToolCallItem(agent=agent, raw_item={
+            "name": "move",
+            "call_id": "move-1",
+            "type": "function_call",
+            "arguments": "{}",
+        })
+        move_output = ToolCallOutputItem(
+            agent=agent,
+            raw_item={
+                "call_id": "move-1",
+                "type": "function_call_output",
+                "output": "{}",
+            },
+            output={
+                "type": "text",
+                "text": (
+                    '{"proposal_mode": true, "requires_confirmation": true, '
+                    '"proposed": [{"action": "move", "actor_id": 21, '
+                    '"target_x": 12, "target_y": 34}]}'
+                ),
+            },
+        )
+
+        result = type("Result", (), {"new_items": [
+            battlefield_call,
+            battlefield_output,
+            move_call,
+            move_output,
+        ]})()
+
+        self.assertEqual(_proposed_tool_commands(result), [{
+            "action": "move",
+            "actor_id": 21,
+            "target_x": 12,
+            "target_y": 34,
+        }])
 
     def test_whats_next_returns_live_plan_and_accept_action_without_model_call(self) -> None:
         router = FakeRouter()
