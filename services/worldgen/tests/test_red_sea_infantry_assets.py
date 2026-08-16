@@ -19,6 +19,7 @@ BITS = ENGINE / "mods" / "ra" / "bits"
 FRAMES = ROOT / "generated" / "red-sea-sprites"
 MISSION = ROOT / "generated" / "missions" / "jizan-corridor-2026.oramap"
 INFANTRY = ("sang", "sajtac", "saat", "falcon1", "ymr", "yrpg", "yspot", "wadighost")
+PACKED_INFANTRY_FRAMES = 713
 
 
 class RedSeaInfantryAssetTests(unittest.TestCase):
@@ -42,7 +43,7 @@ class RedSeaInfantryAssetTests(unittest.TestCase):
             self.assertGreater(sprite.stat().st_size, 10_000, name)
             self.assertGreater(icon.stat().st_size, 1_000, name)
             with sprite.open("rb") as stream:
-                self.assertEqual(struct.unpack("<H", stream.read(2))[0], 342, name)
+                self.assertEqual(struct.unpack("<H", stream.read(2))[0], PACKED_INFANTRY_FRAMES, name)
             with icon.open("rb") as stream:
                 self.assertEqual(struct.unpack("<H", stream.read(2))[0], 1, name)
 

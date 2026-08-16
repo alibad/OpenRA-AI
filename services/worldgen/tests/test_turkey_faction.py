@@ -20,6 +20,7 @@ RULES = ENGINE / "mods" / "ra" / "rules" / "turkey.yaml"
 FACTION_PACK = ENGINE / "mods" / "ra" / "experiences" / "factions" / "turkey.yaml"
 SEQUENCES = ENGINE / "mods" / "ra" / "sequences" / "turkey.yaml"
 MISSION = ROOT / "generated" / "missions" / "straits-shield-2026.oramap"
+PACKED_INFANTRY_FRAMES = 713
 
 
 class TurkeyFactionTests(unittest.TestCase):
@@ -99,8 +100,9 @@ class TurkeyFactionTests(unittest.TestCase):
 
     def test_packed_sprite_frame_counts(self) -> None:
         expected = {"bozkir": 64, "sancak": 64, "kuzgunm": 16, "turnaah": 32, "sahinx": 16,
-                    "marmara": 48, "ege": 48, "poyraz": 48, "trrifle": 378, "trat": 378,
-                    "trdroneop": 378, "greywolf": 378, "marmarasink": 96}
+                    "marmara": 48, "ege": 48, "poyraz": 48,
+                    **{name: PACKED_INFANTRY_FRAMES for name in ("trrifle", "trat", "trdroneop", "greywolf")},
+                    "marmarasink": 96}
         for name, count in expected.items():
             with (BITS / f"{name}.shp").open("rb") as stream:
                 self.assertEqual(count, struct.unpack("<H", stream.read(2))[0], name)
