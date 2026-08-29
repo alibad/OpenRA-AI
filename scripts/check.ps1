@@ -50,8 +50,8 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 # Faction and theater fixtures intentionally exercise the complete built-in
-# portfolio. Point OpenRA.Utility at disposable settings now that new installs
-# correctly default to AI Assistant Only.
+# portfolio. Point OpenRA.Utility at disposable settings so validation never
+# reads or changes a developer's selected Experience profile.
 $originalSupportDir = $env:SUPPORT_DIR
 $originalUtilityExperienceProfile = $env:OPENRA_UTILITY_EXPERIENCE_PROFILE
 $testSettingsDirectory = Join-Path $repositoryRoot "artifacts\check\support"

@@ -6,12 +6,17 @@ The Builder separates simulation-affecting capabilities from local presentation 
 
 ## Gameplay profiles
 
-The default **AI Assistant Only** profile enables no optional gameplay or
-faction packs. This gives a new player the standard base simulation plus the AI
-assistant. Players explicitly select a preset or enable individual capability
-and faction packs in Experience Builder. Dependencies are enabled
-automatically; disabling a dependency also disables components that require
-it.
+The default **World War III** profile enables the five completed built-in
+factions and the complete reusable capability portfolio. Players who want the
+standard base simulation plus the AI assistant can select **AI Assistant
+Only**, or they can choose another preset and customize individual capability
+and faction packs. Dependencies are enabled automatically; disabling a
+dependency also disables components that require it.
+
+The catalog does not include Red Alert 2 or Yuri's Revenge game content. A few
+modules cite or adapt GPL-compatible architecture from the separate OpenRA Red
+Alert 2 project; the original factions, maps, art, audio, and proprietary data
+are not shipped.
 
 Built-in packs are part of the OpenRA AI game package. Their manifests, rules,
 weapons, sequences, previews, and other declared data are copied into the

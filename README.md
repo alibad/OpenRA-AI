@@ -214,14 +214,21 @@ See the [Red Sea 2026 theater](docs/red-sea-2026.md).
 
 ### Experience and faction packs
 
-New installs use the **AI Assistant Only** profile: optional built-in gameplay,
-capability, and faction packs are installed but disabled. Enabling one in
-**Workshop > Experience Builder** activates files already shipped with the
-game, resolves its dependencies, and restarts the mod; it does not download the
-original source mod. External community packs are a separate import action.
-They are restricted to validated data, copied into the user's OpenRA support
-directory, and can be removed without changing the base installation. See the
+New installs use the **World War III** profile, which enables the five built-in
+modern factions and the complete reusable capability portfolio. Select
+**AI Assistant Only** in **Workshop > Experience Builder** to run the classic
+base simulation without those optional packs. Changing a profile activates
+files already shipped with the game, resolves dependencies, and restarts the
+mod; it does not download the original source mod. External community packs
+are a separate import action. They are restricted to validated data, copied
+into the user's OpenRA support directory, and can be removed without changing
+the base installation. See the
 [Experience Composer guide](docs/experience-composer/README.md).
+
+OpenRA AI does **not** bundle Red Alert 2, Yuri's Revenge, or their proprietary
+factions, maps, art, audio, or game data. Some capability modules adapt or cite
+GPL-compatible architecture from the separate OpenRA Red Alert 2 project, but
+those reusable mechanics are not a packaged Red Alert 2 game or mod.
 
 ## Build from source
 

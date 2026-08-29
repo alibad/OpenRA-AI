@@ -18,14 +18,18 @@ DOCS = ROOT / "docs" / "upstream-reuse"
 REFERENCES = ROOT.parent / "OpenRA-Upstreams"
 
 
-def composer_component_ids(path: Path) -> tuple[set[str], set[str]]:
+def composer_component_ids(path: Path) -> tuple[set[str], set[str], str]:
     """Read the small fixed-indent ExperienceCatalog without treating MiniYAML as YAML."""
     component_ids: set[str] = set()
     default_components: set[str] = set()
+    default_profile = ""
     section = None
     profile = None
     component_pattern = re.compile(r"^\t\t([a-z0-9]+(?:-[a-z0-9]+)*):$")
     for line in path.read_text(encoding="utf-8").splitlines():
+        if line.startswith("\tDefaultProfile:"):
+            default_profile = line.split(":", 1)[1].strip()
+            continue
         if line == "\tComponents:":
             section = "components"
             continue
@@ -42,7 +46,7 @@ def composer_component_ids(path: Path) -> tuple[set[str], set[str]]:
             value = line.split(":", 1)[1]
             default_components.update(part.strip() for part in value.split(",") if part.strip())
 
-    return component_ids, default_components
+    return component_ids, default_components, default_profile
 
 
 def load(path: Path):
@@ -141,7 +145,7 @@ def main() -> int:
         if item["status"] == "integrated" and item["id"] not in manifests:
             fail(errors, f"roadmap {item['id']}: integrated item has no component manifest")
 
-    composer_ids, default_components = composer_component_ids(
+    composer_ids, default_components, default_profile = composer_component_ids(
         ROOT / "engine" / "openra" / "mods" / "ra" / "experiences.yaml"
     )
     roadmap_set = set(roadmap_ids)
@@ -149,6 +153,8 @@ def main() -> int:
         fail(errors, f"Experience Composer IDs differ from roadmap: missing={sorted(roadmap_set - composer_ids)}, extra={sorted(composer_ids - roadmap_set)}")
     if default_components != roadmap_set:
         fail(errors, f"World War III profile does not enable the full roadmap: missing={sorted(roadmap_set - default_components)}, extra={sorted(default_components - roadmap_set)}")
+    if default_profile != "world-war-iii":
+        fail(errors, f"Fresh installs must select the populated World War III profile, found {default_profile!r}")
     if set(manifests) != roadmap_set:
         fail(errors, f"component manifest IDs differ from roadmap: missing={sorted(roadmap_set - set(manifests))}, extra={sorted(set(manifests) - roadmap_set)}")
 
