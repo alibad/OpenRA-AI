@@ -38,6 +38,10 @@ RequestExecutionLevel user
 SetCompressor /SOLID lzma
 BrandingText "RTS AI"
 
+!ifdef UNINSTALLSIGNER
+  !uninstfinalize 'powershell.exe -NoProfile -ExecutionPolicy Bypass -File "${UNINSTALLSIGNER}" -Paths "%1" -RequireSignatures' = 0
+!endif
+
 Var AIOptionsDialog
 Var RadioLocalAI
 Var RadioExternalAI

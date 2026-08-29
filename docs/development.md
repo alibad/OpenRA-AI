@@ -40,7 +40,8 @@ Release tooling will:
 1. verify a clean worktree and pinned submodules;
 2. run local tests;
 3. build and smoke-test the Windows package;
-4. sign and notarize future installer and macOS artifacts where applicable;
+4. require Authenticode signing for official Windows artifacts and Developer ID
+   signing plus notarization for official macOS artifacts;
 5. generate checksums and a release manifest;
 6. upload an explicit versioned GitHub release from the local machine.
 

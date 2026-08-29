@@ -7,6 +7,7 @@ import argparse
 import datetime as dt
 import hashlib
 import json
+import os
 import platform
 import re
 import subprocess
@@ -74,11 +75,14 @@ def format_command(command: dict, version: str) -> list[str]:
     ]]
 
 
-def run_command(command: dict, version: str, dry_run: bool) -> None:
+def run_command(command: dict, version: str, dry_run: bool, *, official: bool = False) -> None:
     arguments = format_command(command, version)
     print("+ " + subprocess.list2cmdline(arguments), flush=True)
     if not dry_run:
-        subprocess.run(arguments, cwd=REPOSITORY_ROOT, check=True)
+        environment = os.environ.copy()
+        if official:
+            environment["OPENRA_AI_OFFICIAL_RELEASE"] = "1"
+        subprocess.run(arguments, cwd=REPOSITORY_ROOT, check=True, env=environment)
 
 
 def selected_target(plan: dict, target_name: str, *, enforce_host: bool = True) -> dict:
@@ -182,7 +186,7 @@ def build(args: argparse.Namespace, plan: dict) -> None:
             run_command({
                 "program": "powershell.exe",
                 "arguments": ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", "scripts/check.ps1", "-FullEngine"],
-            }, args.version, args.dry_run)
+            }, args.version, args.dry_run, official=args.official)
         else:
             print("macOS validation is performed by package-macos.sh and the DMG smoke test.")
 
@@ -200,10 +204,10 @@ def build(args: argparse.Namespace, plan: dict) -> None:
         print("+ " + subprocess.list2cmdline(command), flush=True)
         if not args.dry_run:
             subprocess.run(command, cwd=REPOSITORY_ROOT, check=True)
-    run_command(target["build"], args.version, args.dry_run)
+    run_command(target["build"], args.version, args.dry_run, official=args.official)
     if not args.skip_smoke:
         for command in target.get("smoke", []):
-            run_command(command, args.version, args.dry_run)
+            run_command(command, args.version, args.dry_run, official=args.official)
     if not args.dry_run:
         build_index(plan, args.version, require_target=args.target)
 
@@ -237,6 +241,11 @@ def parse_args() -> argparse.Namespace:
             command.add_argument("--include-ai-pack", action="store_true")
             command.add_argument("--allow-dirty", action="store_true")
             command.add_argument("--dry-run", action="store_true")
+            command.add_argument(
+                "--official",
+                action="store_true",
+                help="enforce platform signing requirements; Windows artifacts must be Authenticode-signed",
+            )
     index = subparsers.add_parser("index")
     index.add_argument("--version", required=True)
     verify = subparsers.add_parser("verify")

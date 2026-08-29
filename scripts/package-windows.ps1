@@ -1,7 +1,8 @@
 [CmdletBinding()]
 param(
     [string]$Version = "0.1.0-alpha.1",
-    [switch]$SkipInstaller
+    [switch]$SkipInstaller,
+    [switch]$RequireSignatures
 )
 
 $ErrorActionPreference = "Stop"
@@ -20,6 +21,8 @@ $aiPackLock = Join-Path $repositoryRoot "packaging\ai-pack.lock.json"
 $aiRuntimeLock = Join-Path $repositoryRoot "packaging\ai-runtime.lock.json"
 $modelNotices = Join-Path $repositoryRoot "packaging\THIRD_PARTY_MODELS.md"
 $sampleMission = Join-Path $repositoryRoot "generated\missions\riyadh-crossing-42.oramap"
+$signingScript = Join-Path $PSScriptRoot "sign-windows-artifacts.ps1"
+$signaturesRequired = $RequireSignatures -or $env:OPENRA_AI_OFFICIAL_RELEASE -eq "1"
 
 foreach ($required in @($python, $brandIcon, $aiPackLock, $aiRuntimeLock, $modelNotices)) {
     if (-not (Test-Path -LiteralPath $required)) {
@@ -142,6 +145,16 @@ $brandTarget = Join-Path $stageRoot "assets\brand"
 New-Item -ItemType Directory -Path $brandTarget -Force | Out-Null
 Copy-Item -LiteralPath $brandIcon -Destination (Join-Path $brandTarget "rtsai.ico")
 
+$shippedExecutables = @(
+    (Join-Path $stageRoot "bin\openra-ai-companion.exe"),
+    (Join-Path $stageRoot "bin\openra-ai-runtime.exe"),
+    (Join-Path $stageRoot "engine\openra\bin\OpenRA-AI.exe"),
+    (Join-Path $stageRoot "engine\openra\bin\OpenRA.exe"),
+    (Join-Path $stageRoot "engine\openra\bin\OpenRA.Server.exe"),
+    (Join-Path $stageRoot "engine\openra\bin\OpenRA.Utility.exe")
+)
+& $signingScript -Paths $shippedExecutables -RequireSignatures:$signaturesRequired
+
 $manifest = [ordered]@{
     product = "OpenRA AI"
     version = $Version
@@ -171,7 +184,8 @@ $hash | Set-Content -LiteralPath "$releaseArchive.sha256" -Encoding ASCII
 
 $installerResult = $null
 if (-not $SkipInstaller) {
-    $installerResult = & (Join-Path $PSScriptRoot "package-windows-installer.ps1") -Version $Version -StageRoot $stageRoot
+    $installerResult = & (Join-Path $PSScriptRoot "package-windows-installer.ps1") `
+        -Version $Version -StageRoot $stageRoot -RequireSignatures:$signaturesRequired
 }
 
 [pscustomobject]@{

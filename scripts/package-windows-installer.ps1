@@ -1,7 +1,8 @@
 [CmdletBinding()]
 param(
     [string]$Version = "0.1.0-alpha.1",
-    [string]$StageRoot
+    [string]$StageRoot,
+    [switch]$RequireSignatures
 )
 
 $ErrorActionPreference = "Stop"
@@ -14,6 +15,8 @@ $installer = Join-Path $releaseRoot "$releaseName-setup.exe"
 $installerScript = Join-Path $repositoryRoot "apps\installer\windows\OpenRAAI.nsi"
 $brandIcon = Join-Path $repositoryRoot "assets\brand\rtsai.ico"
 $temporaryStage = $null
+$signingScript = Join-Path $PSScriptRoot "sign-windows-artifacts.ps1"
+$signaturesRequired = $RequireSignatures -or $env:OPENRA_AI_OFFICIAL_RELEASE -eq "1"
 
 foreach ($required in @($portableArchive, $installerScript, $brandIcon)) {
     if (-not (Test-Path -LiteralPath $required)) {
@@ -51,6 +54,18 @@ foreach ($required in @(
     }
 }
 
+$shippedExecutables = @(
+    (Join-Path $StageRoot "bin\openra-ai-companion.exe"),
+    (Join-Path $StageRoot "bin\openra-ai-runtime.exe"),
+    (Join-Path $StageRoot "engine\openra\bin\OpenRA-AI.exe"),
+    (Join-Path $StageRoot "engine\openra\bin\OpenRA.exe"),
+    (Join-Path $StageRoot "engine\openra\bin\OpenRA.Server.exe"),
+    (Join-Path $StageRoot "engine\openra\bin\OpenRA.Utility.exe")
+)
+if ($signaturesRequired) {
+    & $signingScript -Paths $shippedExecutables -RequireSignatures -VerifyOnly
+}
+
 $payloadBrand = Join-Path $StageRoot "assets\brand"
 New-Item -ItemType Directory -Path $payloadBrand -Force | Out-Null
 Copy-Item -LiteralPath $brandIcon -Destination (Join-Path $payloadBrand "rtsai.ico") -Force
@@ -84,11 +99,29 @@ if (Test-Path -LiteralPath $installer) {
     Remove-Item -LiteralPath $installer
 }
 
-& $makensisPath /V2 "/DVERSION=$Version" "/DPAYLOAD=$StageRoot" "/DOUTFILE=$installer" "/DICON=$brandIcon" `
-    "/DAIPACKURL=$aiPackUrl" "/DAIPACKSHA256=$aiPackHash" $installerScript
+$makensisArguments = @(
+    "/V2",
+    "/DVERSION=$Version",
+    "/DPAYLOAD=$StageRoot",
+    "/DOUTFILE=$installer",
+    "/DICON=$brandIcon",
+    "/DAIPACKURL=$aiPackUrl",
+    "/DAIPACKSHA256=$aiPackHash"
+)
+if ($signaturesRequired) {
+    # NSIS 3.08+ invokes this for the generated uninstaller before embedding it.
+    # The helper resolves the certificate from the Windows certificate store;
+    # no key material or password is passed through the compiler command line.
+    $makensisArguments += "/DUNINSTALLSIGNER=$signingScript"
+}
+$makensisArguments += $installerScript
+
+& $makensisPath @makensisArguments
 if ($LASTEXITCODE -ne 0 -or -not (Test-Path -LiteralPath $installer)) {
     throw "NSIS did not produce the Windows setup executable."
 }
+
+& $signingScript -Paths @($installer) -RequireSignatures:$signaturesRequired
 
 $hash = (Get-FileHash -LiteralPath $installer -Algorithm SHA256).Hash.ToLowerInvariant()
 $hash | Set-Content -LiteralPath "$installer.sha256" -Encoding ASCII

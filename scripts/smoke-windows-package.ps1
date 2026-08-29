@@ -5,6 +5,7 @@ param(
     [int]$AIConsolePort = 10039,
     [int]$WorldStudioPort = 10040,
     [switch]$RequireAI,
+    [switch]$RequireSignatures,
     [switch]$KeepExtracted
 )
 
@@ -16,6 +17,8 @@ $archive = Join-Path $artifactRoot "releases\$releaseName.zip"
 $checksumFile = "$archive.sha256"
 $python = Join-Path $repositoryRoot ".venv\Scripts\python.exe"
 $verify = Join-Path $PSScriptRoot "verify-live-match.py"
+$signingScript = Join-Path $PSScriptRoot "sign-windows-artifacts.ps1"
+$signaturesRequired = $RequireSignatures -or $env:OPENRA_AI_OFFICIAL_RELEASE -eq "1"
 
 foreach ($required in @($archive, $checksumFile, $python, $verify)) {
     if (-not (Test-Path -LiteralPath $required)) {
@@ -50,6 +53,17 @@ try {
         if (-not (Test-Path -LiteralPath $required)) {
             throw "Portable package is missing: $required"
         }
+    }
+
+    if ($signaturesRequired) {
+        & $signingScript -Paths @(
+            (Join-Path $packageRoot "bin\openra-ai-companion.exe"),
+            (Join-Path $packageRoot "bin\openra-ai-runtime.exe"),
+            (Join-Path $packageRoot "engine\openra\bin\OpenRA-AI.exe"),
+            (Join-Path $packageRoot "engine\openra\bin\OpenRA.exe"),
+            (Join-Path $packageRoot "engine\openra\bin\OpenRA.Server.exe"),
+            (Join-Path $packageRoot "engine\openra\bin\OpenRA.Utility.exe")
+        ) -RequireSignatures -VerifyOnly
     }
 
     $launcherArguments = @(

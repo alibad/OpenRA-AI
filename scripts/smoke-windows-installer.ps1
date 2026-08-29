@@ -1,5 +1,8 @@
 [CmdletBinding()]
-param([string]$Version = "0.1.0-alpha.1")
+param(
+    [string]$Version = "0.1.0-alpha.1",
+    [switch]$RequireSignatures
+)
 
 $ErrorActionPreference = "Stop"
 $repositoryRoot = Split-Path -Parent $PSScriptRoot
@@ -7,6 +10,8 @@ $artifactRoot = Join-Path $repositoryRoot "artifacts"
 $releaseName = "OpenRA-AI-$Version-windows-x64"
 $installer = Join-Path $artifactRoot "releases\$releaseName-setup.exe"
 $checksumFile = "$installer.sha256"
+$signingScript = Join-Path $PSScriptRoot "sign-windows-artifacts.ps1"
+$signaturesRequired = $RequireSignatures -or $env:OPENRA_AI_OFFICIAL_RELEASE -eq "1"
 
 foreach ($required in @($installer, $checksumFile)) {
     if (-not (Test-Path -LiteralPath $required)) {
@@ -18,6 +23,9 @@ $expected = (Get-Content -LiteralPath $checksumFile -Raw).Split(" ")[0].Trim().T
 $actual = (Get-FileHash -LiteralPath $installer -Algorithm SHA256).Hash.ToLowerInvariant()
 if ($actual -ne $expected) {
     throw "Installer SHA-256 does not match its checksum file."
+}
+if ($signaturesRequired) {
+    & $signingScript -Paths @($installer) -RequireSignatures -VerifyOnly
 }
 
 $artifactResolved = (Resolve-Path -LiteralPath $artifactRoot).Path
@@ -83,6 +91,18 @@ try {
         if (-not (Test-Path -LiteralPath $required)) {
             throw "Installed package is missing: $required"
         }
+    }
+
+    if ($signaturesRequired) {
+        & $signingScript -Paths @(
+            (Join-Path $testRoot "bin\openra-ai-companion.exe"),
+            (Join-Path $testRoot "bin\openra-ai-runtime.exe"),
+            (Join-Path $testRoot "engine\openra\bin\OpenRA-AI.exe"),
+            (Join-Path $testRoot "engine\openra\bin\OpenRA.exe"),
+            (Join-Path $testRoot "engine\openra\bin\OpenRA.Server.exe"),
+            (Join-Path $testRoot "engine\openra\bin\OpenRA.Utility.exe"),
+            (Join-Path $testRoot "Uninstall OpenRA AI.exe")
+        ) -RequireSignatures -VerifyOnly
     }
 
     foreach ($requiredShortcut in @($desktopShortcut, $startMenuShortcut)) {
