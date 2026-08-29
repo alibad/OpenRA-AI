@@ -12,7 +12,8 @@ human-versus-bot skirmish:
 ```
 
 Use `-NoSpeech` for text-only companion logs or `-NoVoiceHotkeys` to keep spoken
-alerts without push-to-talk. During a normal match, hold `Ctrl+Space` to ask a question,
+alerts without push-to-talk. During a normal match, hold `Ctrl+Space` on Windows
+or `Option+Space` on macOS to ask a question,
 press `Ctrl+Enter` to accept a proposal or `Ctrl+Backspace` to reject it, click the
 banner's voice control or press `Ctrl+Shift+M` to switch spoken audio off or on, and
 press `Ctrl+Shift+A` to toggle AUTO delegation. Remap these controls under
@@ -24,5 +25,5 @@ when OpenRA exits.
 The portable Windows release includes `Play-OpenRAAI.cmd`, the self-contained
 engine, the companion executable, and a sample generated map. Red Alert content
 is downloaded from OpenRA's mirror list on first launch and is not bundled in
-the release. A signed Windows UI and notarized macOS wrapper can replace this
-script later without changing the worldgen, companion, or engine contracts.
+the release. Official Windows installers require verified Authenticode signatures;
+the macOS wrapper and DMG require Developer ID signing and notarization.

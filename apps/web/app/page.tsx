@@ -99,7 +99,7 @@ export default function Home() {
         <ol className="play-steps">
           <li><span>01</span><div><b>Choose your build</b><p>Download the Apple Silicon DMG, Windows installer, or portable ZIP.</p></div></li>
           <li><span>02</span><div><b>Launch OpenRA AI</b><p>On Mac, copy the app to Applications. On Windows, use the Start menu or Play-OpenRAAI.cmd. First launch downloads verified Red Alert content.</p></div></li>
-          <li><span>03</span><div><b>Hold Ctrl+Space to ask</b><p>Release to hear the answer. Ctrl+Enter accepts; Ctrl+Backspace rejects; Ctrl+Shift+A toggles AUTO; Ctrl+Shift+M mutes.</p></div></li>
+          <li><span>03</span><div><b>Hold the Ask shortcut</b><p>Use Ctrl+Space on Windows or Option+Space on macOS. Release to hear the answer; every AI shortcut remains remappable in game.</p></div></li>
         </ol>
         <div className="download-footnote"><ShieldCheck size={15} /><span>macOS 10.15 or newer on Apple Silicon. The DMG and app are Developer ID signed, Apple notarized, and stapled. A macOS local AI pack is not bundled yet; connect a compatible external OpenAI-compatible endpoint for model-backed replies.</span></div>
         {windowsRelease.localAiInstallerDefault ? (

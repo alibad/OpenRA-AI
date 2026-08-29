@@ -94,23 +94,46 @@ if [ -n "$map_argument" ]; then
   fi
 fi
 
-"$macos_dir/GameLauncher" "${game_args[@]}" >>"$log_directory/game.out.log" 2>>"$log_directory/game.err.log" &
-game_pid=$!
+game_pid=""
+watcher_pid=""
 
 cleanup() {
-  if [ -n "${watcher_pid:-}" ] && kill -0 "$watcher_pid" 2>/dev/null; then
+  if [ -n "$watcher_pid" ] && kill -0 "$watcher_pid" 2>/dev/null; then
     kill "$watcher_pid" 2>/dev/null || true
     wait "$watcher_pid" 2>/dev/null || true
   fi
-  if kill -0 "$game_pid" 2>/dev/null; then
+  if [ -n "$game_pid" ] && kill -0 "$game_pid" 2>/dev/null; then
     kill "$game_pid" 2>/dev/null || true
+    wait "$game_pid" 2>/dev/null || true
   fi
 }
-trap cleanup EXIT INT TERM
+
+wait_for_companion_health() {
+  local timeout_seconds="${OPENRA_AI_STARTUP_TIMEOUT_SECONDS:-90}"
+  if ! [[ "$timeout_seconds" =~ ^[1-9][0-9]*$ ]]; then
+    echo >&2 "OPENRA_AI_STARTUP_TIMEOUT_SECONDS must be a positive integer."
+    return 1
+  fi
+
+  local deadline=$((SECONDS + timeout_seconds))
+  while [ "$SECONDS" -lt "$deadline" ]; do
+    if ! kill -0 "$watcher_pid" 2>/dev/null; then
+      echo >&2 "The OpenRA AI companion exited before its control server became ready. See $log_directory/companion.err.log."
+      return 1
+    fi
+    if curl --fail --silent --max-time 1 "${OPENRA_AI_CONSOLE_URL}health" >/dev/null 2>&1; then
+      return 0
+    fi
+    sleep 0.25
+  done
+
+  echo >&2 "The OpenRA AI companion did not become ready within ${timeout_seconds}s. See $log_directory/companion.err.log."
+  return 1
+}
 
 "$companion" watch \
   --bridge 127.0.0.1:9998 \
-  --game-pid "$game_pid" \
+  --parent-pid "$$" \
   --control-port 8787 \
   --worldgen-port 8788 \
   --mission-output "$mission_output" \
@@ -118,5 +141,15 @@ trap cleanup EXIT INT TERM
   --speak --voice-hotkeys \
   >>"$log_directory/companion.out.log" 2>>"$log_directory/companion.err.log" &
 watcher_pid=$!
+trap cleanup EXIT INT TERM
+
+wait_for_companion_health
+
+if [ "${#game_args[@]}" -eq 0 ]; then
+  "$macos_dir/GameLauncher" >>"$log_directory/game.out.log" 2>>"$log_directory/game.err.log" &
+else
+  "$macos_dir/GameLauncher" "${game_args[@]}" >>"$log_directory/game.out.log" 2>>"$log_directory/game.err.log" &
+fi
+game_pid=$!
 
 wait "$game_pid"

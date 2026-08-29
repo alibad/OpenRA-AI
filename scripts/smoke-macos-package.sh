@@ -13,7 +13,7 @@ if [[ "${OSTYPE:-}" != darwin* ]]; then
   exit 1
 fi
 
-for command in codesign hdiutil shasum; do
+for command in codesign hdiutil otool shasum; do
   command -v "$command" >/dev/null 2>&1 || { echo >&2 "macOS smoke testing requires $command."; exit 1; }
 done
 for required in "$DMG" "$CHECKSUM"; do
@@ -52,7 +52,34 @@ grep -F 'Launch.Bots=Multi1:normal' "$wrapper" >/dev/null || {
   echo >&2 "macOS direct-map launch is missing its default opponent."
   exit 1
 }
+companion_line="$(grep -n -m1 '^"$companion" watch' "$wrapper" | cut -d: -f1)"
+health_line="$(grep -n -m1 '^wait_for_companion_health$' "$wrapper" | cut -d: -f1)"
+game_line="$(grep -n -m1 '^"$macos_dir/GameLauncher"' "$wrapper" | cut -d: -f1)"
+if [ -z "$companion_line" ] || [ -z "$health_line" ] || [ -z "$game_line" ] || \
+  [ "$companion_line" -ge "$health_line" ] || [ "$health_line" -ge "$game_line" ]; then
+  echo >&2 "macOS launcher must start the companion, wait for health, and only then start the game."
+  exit 1
+fi
+grep -F -- '--parent-pid "$$"' "$wrapper" >/dev/null || {
+  echo >&2 "macOS companion lifecycle must be owned by the launcher wrapper."
+  exit 1
+}
 
 codesign --verify --deep --strict "$app"
+while IFS= read -r library; do
+  unsafe_dependencies="$(otool -L "$library" | awk 'NR > 2 && $1 ~ /^\// && $1 !~ /^\/(System\/Library|usr\/lib)\// { print $1 }')"
+  if [ -n "$unsafe_dependencies" ]; then
+    echo >&2 "Packaged runtime depends on release-host libraries: $library"
+    echo >&2 "$unsafe_dependencies"
+    exit 1
+  fi
+done < <(find "$app/Contents/MacOS/arm64" -type f -name '*.dylib' -print)
+if codesign -dv --verbose=4 "$app" 2>&1 | grep -q '^Authority=Developer ID Application:'; then
+  codesign -d --entitlements - "$app/Contents/MacOS/apphost-arm64" 2>&1 | \
+    grep -F 'com.apple.security.cs.allow-jit' >/dev/null || {
+      echo >&2 "Developer-ID apphost is missing the .NET JIT entitlement."
+      exit 1
+    }
+fi
 "$app/Contents/Resources/bin/openra-ai-companion" voice-check --dependencies-only
 echo "macOS DMG smoke test passed."

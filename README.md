@@ -87,7 +87,8 @@ keeps running normally.
 
 ### In-game controls
 
-- Hold `Ctrl+Space`, ask a question, and release to submit it.
+- Hold `Ctrl+Space` on Windows or `Option+Space` on macOS, ask a question,
+  and release to submit it.
 - Ask `What strategy are we using?` or `What does turtle strategy do?` for a
   concise doctrine and its next major phases.
 - Ask `What's next?`, `How are we doing?`, or `What's remaining in this game?`
@@ -109,7 +110,8 @@ keeps running normally.
   Contextual suggestions still require `confirm`.
 - Click `VOICE: ON`, or press `Ctrl+Shift+M`, to switch spoken audio off or on.
 - Press `Ctrl+Shift+A` to toggle AUTO delegation.
-- Remap every AI shortcut under **Settings > Hotkeys > AI Assistant**. Companion,
+- Remap every AI shortcut under **Settings > Hotkeys > AI Assistant**. Every
+  visible in-game instruction follows the configured binding. Companion,
   voice, model, and usage controls are grouped under four tabs in **Settings > AI**.
 - Drag any generated `.oramap` file onto `Play-OpenRAAI.cmd` to play it.
 

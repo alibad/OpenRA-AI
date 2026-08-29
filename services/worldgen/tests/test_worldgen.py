@@ -102,6 +102,12 @@ class WorldgenTests(unittest.TestCase):
                 self.assertIn("Rules: ra|rules/campaign-rules.yaml", map_yaml)
                 self.assertIn("rules.yaml", map_yaml)
                 self.assertIn("FluentMessages: ra|fluent/lua.ftl, ra|fluent/campaign.ftl, map.ftl", map_yaml)
+                mission_lua = archive.read("earth-mission.lua").decode()
+                self.assertIn("MissionStarted = false", mission_lua)
+                self.assertIn(
+                    "MissionStarted = not PlayerOne.HasNoRequiredUnits() and not PlayerTwo.HasNoRequiredUnits()",
+                    mission_lua,
+                )
                 manifest = json.loads(archive.read("openra-ai-manifest.json"))
                 self.assertTrue(manifest["validation"]["valid"])
                 self.assertEqual(manifest["checksums"]["map.yaml"], hashlib.sha256(map_yaml.encode()).hexdigest())

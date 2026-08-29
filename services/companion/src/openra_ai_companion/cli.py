@@ -40,6 +40,12 @@ def _parser() -> argparse.ArgumentParser:
     )
     watch.add_argument("--voice-hotkeys", action="store_true")
     watch.add_argument("--game-pid", type=int, default=0)
+    watch.add_argument(
+        "--parent-pid",
+        type=int,
+        default=0,
+        help="exit when the owning launcher exits (used when the control server starts before the game)",
+    )
     watch.add_argument("--control-port", type=int, default=8787)
     watch.add_argument("--worldgen-port", type=int, default=8788)
     watch.add_argument("--mission-output", type=Path, default=Path("generated/missions"))
@@ -321,8 +327,10 @@ def main(argv: list[str] | None = None) -> int:
         previous_match_tick = -1
         try:
             while True:
-                if not _pid_alive(args.game_pid):
-                    print("OpenRA exited; stopping companion.")
+                lifecycle_pid = args.parent_pid or args.game_pid
+                if not _pid_alive(lifecycle_pid):
+                    owner = "launcher" if args.parent_pid else "OpenRA"
+                    print(f"{owner} exited; stopping companion.")
                     break
                 try:
                     snapshot = bridge.observe()

@@ -83,6 +83,7 @@ PlayerOneObjective = nil
 PlayerTwoObjective = nil
 PlayerOneSurvival = nil
 PlayerTwoSurvival = nil
+MissionStarted = false
 MissionResolved = false
 
 CompleteFor = function(winner, objective, loser, loserObjective)
@@ -93,6 +94,11 @@ CompleteFor = function(winner, objective, loser, loserObjective)
 end
 
 Tick = function()
+	if PlayerOne == nil or PlayerTwo == nil then return end
+	if not MissionStarted then
+		MissionStarted = not PlayerOne.HasNoRequiredUnits() and not PlayerTwo.HasNoRequiredUnits()
+		return
+	end
 \tif MissionResolved then return end
 \tif PlayerOne.HasNoRequiredUnits() then
 \t\tCompleteFor(PlayerTwo, PlayerTwoObjective, PlayerOne, PlayerOneObjective)
