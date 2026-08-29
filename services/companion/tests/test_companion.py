@@ -1605,6 +1605,27 @@ class CompanionTests(unittest.TestCase):
             server.server_close()
             worker.join()
 
+    def test_health_identifies_build_and_waits_for_control_readiness(self) -> None:
+        with mock.patch.dict("os.environ", {"OPENRA_AI_VERSION": "0.1.0-alpha.14"}):
+            server = create_server("127.0.0.1", 0, Companion(router=FakeRouter()), FakePlayer())
+            worker = threading.Thread(target=server.serve_forever)
+            worker.start()
+            try:
+                base = f"http://127.0.0.1:{server.server_address[1]}"
+                with urllib.request.urlopen(base + "/health", timeout=3) as response:
+                    starting = json.loads(response.read())
+                self.assertEqual(starting["version"], "0.1.0-alpha.14")
+                self.assertFalse(starting["control_ready"])
+
+                server.control_ready = True
+                with urllib.request.urlopen(base + "/health", timeout=3) as response:
+                    ready = json.loads(response.read())
+                self.assertTrue(ready["control_ready"])
+            finally:
+                server.shutdown()
+                server.server_close()
+                worker.join()
+
     def test_model_called_only_for_salient_event(self) -> None:
         router = FakeRouter()
         companion = Companion(router=router)

@@ -64,6 +64,25 @@ grep -F -- '--parent-pid "$$"' "$wrapper" >/dev/null || {
   echo >&2 "macOS companion lifecycle must be owned by the launcher wrapper."
   exit 1
 }
+grep -F 'control_ready' "$wrapper" >/dev/null || {
+  echo >&2 "macOS launcher health must require explicit control readiness."
+  exit 1
+}
+for startup_state in \
+  OPENRA_AI_COMPANION_READY \
+  OPENRA_AI_STARTUP_ENABLED \
+  OPENRA_AI_STARTUP_MUTED \
+  OPENRA_AI_STARTUP_AUTO_ACT \
+  OPENRA_AI_STARTUP_STRATEGY; do
+  grep -F "$startup_state" "$wrapper" >/dev/null || {
+    echo >&2 "macOS launcher is missing verified startup state: $startup_state"
+    exit 1
+  }
+done
+grep -F 'OPENRA_AI_VERSION="$map_version"' "$wrapper" >/dev/null || {
+  echo >&2 "macOS companion must receive the exact packaged build version."
+  exit 1
+}
 
 codesign --verify --deep --strict "$app"
 while IFS= read -r library; do

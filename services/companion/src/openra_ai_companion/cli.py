@@ -313,6 +313,7 @@ def main(argv: list[str] | None = None) -> int:
             # OpenRA owns the remappable bindings and calls the local voice endpoints.
             hotkeys.start(global_listener=False)
             control_server.voice_controller = hotkeys
+        control_server.control_ready = True
         print("Watching OpenRA. Press Ctrl+C to stop.")
         waiting_reported = False
         capabilities_announced = False

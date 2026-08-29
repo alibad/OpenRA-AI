@@ -25,8 +25,12 @@ class LauncherStartupTests(unittest.TestCase):
         self.assertLess(health_wait, game_start)
         self.assertIn('--parent-pid "$$"', wrapper[companion_start:health_wait])
         self.assertNotIn("--game-pid", wrapper[companion_start:health_wait])
-        self.assertIn('trap cleanup EXIT INT TERM', wrapper[companion_start:health_wait])
+        self.assertIn('trap cleanup EXIT INT TERM', wrapper[:companion_start])
         self.assertIn('if [ "${#game_args[@]}" -eq 0 ]; then', wrapper[health_wait:])
+        self.assertIn("control_ready", wrapper[:health_wait])
+        self.assertIn("OPENRA_AI_COMPANION_READY=1", wrapper[health_wait:game_start])
+        self.assertIn("OPENRA_AI_STARTUP_AUTO_ACT", wrapper[health_wait:game_start])
+        self.assertIn('OPENRA_AI_VERSION="$map_version"', wrapper[:companion_start])
 
     def test_macos_apphost_has_dotnet_jit_entitlement(self) -> None:
         entitlements = (

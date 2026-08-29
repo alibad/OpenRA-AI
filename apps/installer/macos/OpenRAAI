@@ -74,6 +74,7 @@ export OPENRA_AI_GRPC_PORT=9998
 export OPENRA_AI_CONSOLE_URL=http://127.0.0.1:8787/
 export OPENRA_AI_WORLD_STUDIO_URL=http://127.0.0.1:8788/
 export OPENRA_AI_ENGINE_DIR="$resources_dir"
+export OPENRA_AI_VERSION="$map_version"
 export OPENRA_AI_APP_LANGUAGE="${OPENRA_AI_APP_LANGUAGE:-en}"
 export PYTHONUNBUFFERED=1
 export PYTHONUTF8=1
@@ -96,6 +97,7 @@ fi
 
 game_pid=""
 watcher_pid=""
+health_status_file=""
 
 cleanup() {
   if [ -n "$watcher_pid" ] && kill -0 "$watcher_pid" 2>/dev/null; then
@@ -106,10 +108,14 @@ cleanup() {
     kill "$game_pid" 2>/dev/null || true
     wait "$game_pid" 2>/dev/null || true
   fi
+  if [ -n "$health_status_file" ] && [ -f "$health_status_file" ]; then
+    rm -f "$health_status_file"
+  fi
 }
 
 wait_for_companion_health() {
   local timeout_seconds="${OPENRA_AI_STARTUP_TIMEOUT_SECONDS:-90}"
+  local control_ready
   if ! [[ "$timeout_seconds" =~ ^[1-9][0-9]*$ ]]; then
     echo >&2 "OPENRA_AI_STARTUP_TIMEOUT_SECONDS must be a positive integer."
     return 1
@@ -121,8 +127,12 @@ wait_for_companion_health() {
       echo >&2 "The OpenRA AI companion exited before its control server became ready. See $log_directory/companion.err.log."
       return 1
     fi
-    if curl --fail --silent --max-time 1 "${OPENRA_AI_CONSOLE_URL}health" >/dev/null 2>&1; then
-      return 0
+    if curl --fail --silent --max-time 1 "${OPENRA_AI_CONSOLE_URL}health" \
+      --output "$health_status_file" 2>/dev/null; then
+      control_ready="$(plutil -extract control_ready raw -o - "$health_status_file" 2>/dev/null || true)"
+      if [ "$control_ready" = "true" ]; then
+        return 0
+      fi
     fi
     sleep 0.25
   done
@@ -130,6 +140,24 @@ wait_for_companion_health() {
   echo >&2 "The OpenRA AI companion did not become ready within ${timeout_seconds}s. See $log_directory/companion.err.log."
   return 1
 }
+
+health_flag() {
+  local key="$1"
+  local fallback="$2"
+  local value
+  value="$(plutil -extract "$key" raw -o - "$health_status_file" 2>/dev/null || true)"
+  if [ -z "$value" ]; then
+    value="$fallback"
+  fi
+  case "$value" in
+    1|true|TRUE|yes|YES|on|ON) echo 1 ;;
+    *) echo 0 ;;
+  esac
+}
+
+temp_root="${TMPDIR:-/tmp}"
+health_status_file="$(mktemp "${temp_root%/}/openra-ai-health.XXXXXX")"
+trap cleanup EXIT INT TERM
 
 "$companion" watch \
   --bridge 127.0.0.1:9998 \
@@ -141,9 +169,15 @@ wait_for_companion_health() {
   --speak --voice-hotkeys \
   >>"$log_directory/companion.out.log" 2>>"$log_directory/companion.err.log" &
 watcher_pid=$!
-trap cleanup EXIT INT TERM
 
 wait_for_companion_health
+
+export OPENRA_AI_COMPANION_READY=1
+export OPENRA_AI_STARTUP_ENABLED="$(health_flag enabled true)"
+export OPENRA_AI_STARTUP_MUTED="$(health_flag muted false)"
+export OPENRA_AI_STARTUP_AUTO_ACT="$(health_flag auto_act_enabled false)"
+startup_strategy="$(plutil -extract strategy.active_native_profile raw -o - "$health_status_file" 2>/dev/null || true)"
+export OPENRA_AI_STARTUP_STRATEGY="${startup_strategy:-normal}"
 
 if [ "${#game_args[@]}" -eq 0 ]; then
   "$macos_dir/GameLauncher" >>"$log_directory/game.out.log" 2>>"$log_directory/game.err.log" &

@@ -124,7 +124,9 @@ class CompanionHandler(BaseHTTPRequestHandler):
         if path == "/":
             self._html(AI_CONSOLE_HTML)
         elif path == "/health":
-            self._json(HTTPStatus.OK, self.companion.status())
+            status = self.companion.status()
+            status["control_ready"] = bool(getattr(self.server, "control_ready", False))
+            self._json(HTTPStatus.OK, status)
         elif path == "/v1/config":
             self._json(HTTPStatus.OK, self.companion.router.settings.as_dict())
         elif path == "/v1/catalog":
@@ -355,6 +357,7 @@ def create_server(
     server.player = player or AudioPlayer()  # type: ignore[attr-defined]
     server.status_publisher = None  # type: ignore[attr-defined]
     server.voice_controller = None  # type: ignore[attr-defined]
+    server.control_ready = False  # type: ignore[attr-defined]
     return server
 
 

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 import re
 import threading
 import time
@@ -2265,7 +2266,7 @@ class Companion:
     def status(self) -> dict:
         return {
             "service": "companion",
-            "version": "0.1.0",
+            "version": os.environ.get("OPENRA_AI_VERSION", "development"),
             "enabled": self.enabled,
             "muted": self.muted,
             "auto_act_enabled": self.auto_act_enabled,
