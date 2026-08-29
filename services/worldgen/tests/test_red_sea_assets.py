@@ -27,7 +27,7 @@ HODEIDAH_PACKAGE = ROOT / "generated" / "missions" / "hodeidah-lifeline-2026.ora
 MANDAB_SOURCE = ROOT / "missions" / "red-sea-2026" / "bab-al-mandab-passage"
 MANDAB_PACKAGE = ROOT / "generated" / "missions" / "bab-al-mandab-passage-2026.oramap"
 ENGINE_ROOT = ROOT / "engine" / "openra"
-UTILITY = ENGINE_ROOT / "bin" / "OpenRA.Utility.exe"
+UTILITY = ENGINE_ROOT / "bin" / ("OpenRA.Utility.exe" if os.name == "nt" else "OpenRA.Utility")
 
 
 def _ttf_has_codepoint(data: bytes, codepoint: int) -> bool:

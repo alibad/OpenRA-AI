@@ -24,7 +24,7 @@ SEQUENCES = (RA / "sequences" / "china.yaml").read_text(encoding="utf-8")
 WORLD = (RA / "rules" / "world.yaml").read_text(encoding="utf-8")
 MISSION_SOURCE = ROOT / "missions" / "china-faction" / "haitan-network"
 MISSION = ROOT / "generated" / "missions" / "haitan-network-2026.oramap"
-UTILITY = ENGINE / "bin" / "OpenRA.Utility.exe"
+UTILITY = ENGINE / "bin" / ("OpenRA.Utility.exe" if os.name == "nt" else "OpenRA.Utility")
 
 
 def shp_frames(name: str) -> int:

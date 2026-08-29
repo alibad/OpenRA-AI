@@ -26,9 +26,13 @@ if (-not $SkipEngine) {
         $env:PATH = "$userDotnet;$env:PATH"
     }
     $env:DOTNET_ROLL_FORWARD = "Major"
+    $dotnetVersion = (& dotnet --version).Trim()
+    if ($LASTEXITCODE -ne 0 -or $dotnetVersion -notmatch '^(\d+)\.' -or [int]$Matches[1] -lt 10) {
+        throw "OpenRA main requires the .NET 10 SDK or newer. Install .NET 10 and rerun setup."
+    }
     Push-Location (Join-Path $repositoryRoot "engine\openra")
     try {
-        dotnet build OpenRA.sln -c Release --nologo -p:TargetPlatform=win-x64
+        dotnet build OpenRA.slnx -c Release --nologo -p:TargetPlatform=win-x64
     }
     finally {
         Pop-Location

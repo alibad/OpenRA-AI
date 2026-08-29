@@ -14,7 +14,7 @@ from PIL import Image
 
 ROOT = Path(__file__).resolve().parents[3]
 ENGINE = ROOT / "engine" / "openra"
-UTILITY = ENGINE / "bin" / "OpenRA.Utility.exe"
+UTILITY = ENGINE / "bin" / ("OpenRA.Utility.exe" if os.name == "nt" else "OpenRA.Utility")
 BITS = ENGINE / "mods" / "ra" / "bits"
 FRAMES = ROOT / "generated" / "red-sea-sprites"
 MISSION = ROOT / "generated" / "missions" / "jizan-corridor-2026.oramap"

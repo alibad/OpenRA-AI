@@ -109,10 +109,14 @@ try {
         $env:DOTNET_ROOT = $userDotnet
     }
     $env:DOTNET_ROLL_FORWARD = "Major"
+    $dotnetVersion = (& dotnet --version).Trim()
+    if ($LASTEXITCODE -ne 0 -or $dotnetVersion -notmatch '^(\d+)\.' -or [int]$Matches[1] -lt 10) {
+        throw "OpenRA main requires the .NET 10 SDK or newer."
+    }
 
     Push-Location engine\openra
     try {
-        dotnet build OpenRA.sln -c Release --nologo --no-restore -p:TargetPlatform=win-x64
+        dotnet build OpenRA.slnx -c Release --nologo --no-restore -p:TargetPlatform=win-x64
         if ($LASTEXITCODE -ne 0) { throw "OpenRA build failed." }
         dotnet test OpenRA.Test\OpenRA.Test.csproj -c Release --no-restore --nologo -p:TargetPlatform=win-x64
         if ($LASTEXITCODE -ne 0) { throw "OpenRA tests failed." }

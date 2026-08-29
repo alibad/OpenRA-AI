@@ -58,7 +58,7 @@ Result: exit 0. Bozkir, Aras-8, Yildirim, Gokkalkan, Sancak, and Deniz Kaplan ea
 Command (using the repository's configured local .NET SDK):
 
 ```powershell
-dotnet build OpenRA.sln -c Debug --nologo
+dotnet build OpenRA.slnx -c Debug --nologo
 ```
 
 Result on integrated `main`: exit 0 in 24.37 seconds; build succeeded with 75 analyzer warnings and 0 errors. The warnings are in unchanged pre-existing C# engine/AI bridge files; this faction commit adds no C# or custom engine code.
@@ -113,6 +113,6 @@ This repository uses `engine/openra` as a nested Git repository, so integrate in
 1. Merge or cherry-pick the Turkey commit from `engine/openra` into the intended OpenRA integration branch.
 2. Merge or cherry-pick the parent `OpenRA-AI` commit, which records that nested commit and adds source generators, mission sources, research, tests, and evidence.
 3. Initialize/update the nested repository to the recorded commit.
-4. Re-run `scripts\build-turkey-assets.ps1`, then `dotnet build OpenRA.sln -c Debug --nologo` from `engine/openra`.
+4. Re-run `scripts\build-turkey-assets.ps1`, then `dotnet build OpenRA.slnx -c Debug --nologo` from `engine/openra`.
 
 No remote push is required for local integration, and no deployment artifacts were created.
