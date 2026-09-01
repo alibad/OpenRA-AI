@@ -38,7 +38,11 @@ for required in \
   "$app/Contents/MacOS/OpenRAAI" \
   "$app/Contents/MacOS/GameLauncher" \
   "$app/Contents/Resources/bin/openra-ai-companion" \
-  "$app/Contents/Resources/packaging/ai-pack.lock.json"; do
+  "$app/Contents/Resources/bin/openra-ai-runtime" \
+  "$app/Contents/Resources/ai-runtime/llama/llama-server" \
+  "$app/Contents/Resources/ai-runtime/whisper/whisper-server" \
+  "$app/Contents/Resources/packaging/ai-pack.lock.json" \
+  "$app/Contents/Resources/packaging/ai-runtime.lock.json"; do
   [ -e "$required" ] || { echo >&2 "Mounted app is missing: $required"; exit 1; }
 done
 
@@ -83,6 +87,16 @@ grep -F 'OPENRA_AI_VERSION="$map_version"' "$wrapper" >/dev/null || {
   echo >&2 "macOS companion must receive the exact packaged build version."
   exit 1
 }
+for setup_variable in \
+  OPENRA_AI_PACK_LOCK \
+  OPENRA_AI_MODEL_ROOT \
+  OPENRA_AI_RUNTIME_EXECUTABLE \
+  OPENRA_AI_BUNDLED_RUNTIME; do
+  grep -F "$setup_variable" "$wrapper" >/dev/null || {
+    echo >&2 "macOS launcher is missing local AI setup input: $setup_variable"
+    exit 1
+  }
+done
 
 codesign --verify --deep --strict "$app"
 while IFS= read -r library; do
@@ -92,7 +106,15 @@ while IFS= read -r library; do
     echo >&2 "$unsafe_dependencies"
     exit 1
   fi
-done < <(find "$app/Contents/MacOS/arm64" -type f -name '*.dylib' -print)
+done < <(find "$app/Contents/MacOS/arm64" "$app/Contents/Resources/ai-runtime" -type f -name '*.dylib' -print)
+for runtime_server in \
+  "$app/Contents/Resources/ai-runtime/llama/llama-server" \
+  "$app/Contents/Resources/ai-runtime/whisper/whisper-server"; do
+  if otool -l "$runtime_server" | grep -E '/(var/folders|opt/homebrew|usr/local)/' >/dev/null; then
+    echo >&2 "Packaged local AI runtime has a release-host RPATH: $runtime_server"
+    exit 1
+  fi
+done
 if codesign -dv --verbose=4 "$app" 2>&1 | grep -q '^Authority=Developer ID Application:'; then
   codesign -d --entitlements - "$app/Contents/MacOS/apphost-arm64" 2>&1 | \
     grep -F 'com.apple.security.cs.allow-jit' >/dev/null || {
@@ -101,4 +123,5 @@ if codesign -dv --verbose=4 "$app" 2>&1 | grep -q '^Authority=Developer ID Appli
     }
 fi
 "$app/Contents/Resources/bin/openra-ai-companion" voice-check --dependencies-only
+"$app/Contents/Resources/bin/openra-ai-runtime" --help >/dev/null
 echo "macOS DMG smoke test passed."

@@ -14,6 +14,7 @@ WRAPPER_SOURCE="$REPOSITORY_ROOT/apps/installer/macos/OpenRAAI"
 ENTITLEMENTS="$REPOSITORY_ROOT/apps/installer/macos/OpenRAAI.entitlements"
 PYTHON="$REPOSITORY_ROOT/.venv/bin/python"
 AI_PACK_LOCK="$REPOSITORY_ROOT/packaging/ai-pack.lock.json"
+AI_RUNTIME_LOCK="$REPOSITORY_ROOT/packaging/ai-runtime.lock.json"
 MODEL_NOTICES="$REPOSITORY_ROOT/packaging/THIRD_PARTY_MODELS.md"
 BROTLI_LICENSE="$REPOSITORY_ROOT/packaging/BROTLI-LICENSE.txt"
 SAMPLE_MISSION="$REPOSITORY_ROOT/generated/missions/riyadh-crossing-42.oramap"
@@ -23,7 +24,7 @@ if [[ "${OSTYPE:-}" != darwin* ]]; then
   exit 1
 fi
 
-for command in clang dotnet hdiutil iconutil install_name_tool otool sips shasum; do
+for command in clang cmake dotnet hdiutil iconutil install_name_tool otool sips shasum; do
   command -v "$command" >/dev/null 2>&1 || { echo >&2 "macOS packaging requires $command."; exit 1; }
 done
 DOTNET_VERSION="$(dotnet --version)"
@@ -37,7 +38,7 @@ if [ -z "${DOTNET_ROOT:-}" ]; then
     export DOTNET_ROOT="${DOTNET_RUNTIME_PATH%%/shared/*}"
   fi
 fi
-for required in "$BRAND_SOURCE" "$PLIST_TEMPLATE" "$WRAPPER_SOURCE" "$ENTITLEMENTS" "$PYTHON" "$AI_PACK_LOCK" "$MODEL_NOTICES" "$BROTLI_LICENSE"; do
+for required in "$BRAND_SOURCE" "$PLIST_TEMPLATE" "$WRAPPER_SOURCE" "$ENTITLEMENTS" "$PYTHON" "$AI_PACK_LOCK" "$AI_RUNTIME_LOCK" "$MODEL_NOTICES" "$BROTLI_LICENSE"; do
   [ -f "$required" ] || { echo >&2 "macOS packaging input is missing: $required"; exit 1; }
 done
 
@@ -171,24 +172,68 @@ fi
 PYINSTALLER_ARGUMENTS+=("$REPOSITORY_ROOT/apps/launcher/companion_entry.py")
 "$PYTHON" -m PyInstaller "${PYINSTALLER_ARGUMENTS[@]}"
 
+RUNTIME_PYINSTALLER_ARGUMENTS=(
+  --noconfirm --clean --onefile
+  --name openra-ai-runtime
+  --paths "$REPOSITORY_ROOT/services/companion/src"
+  --collect-all kokoro_onnx
+  --collect-all espeakng_loader
+  --collect-all phonemizer
+  --collect-all language_tags
+  --distpath "$RESOURCES/bin"
+  --workpath "$PACKAGE_ROOT/pyinstaller-work-runtime-$RELEASE_ARCH"
+  --specpath "$PACKAGE_ROOT/pyinstaller-spec-runtime-$RELEASE_ARCH"
+)
+if [ "$SIGNING_IDENTITY" != "-" ]; then
+  RUNTIME_PYINSTALLER_ARGUMENTS+=(--codesign-identity "$SIGNING_IDENTITY")
+fi
+RUNTIME_PYINSTALLER_ARGUMENTS+=("$REPOSITORY_ROOT/apps/launcher/local_ai_entry.py")
+"$PYTHON" -m PyInstaller "${RUNTIME_PYINSTALLER_ARGUMENTS[@]}"
+
+"$PYTHON" "$REPOSITORY_ROOT/scripts/ai_pack.py" prepare-runtime \
+  --target "macos-$RELEASE_ARCH" \
+  --runtime-output "$RESOURCES/ai-runtime"
+
 cp "$SAMPLE_MISSION" "$RESOURCES/generated/missions/"
 cp "$REPOSITORY_ROOT/.env.example" "$RESOURCES/"
 cp "$REPOSITORY_ROOT/README.md" "$REPOSITORY_ROOT/LICENSE" "$RESOURCES/"
 mkdir -p "$RESOURCES/packaging"
-cp "$AI_PACK_LOCK" "$MODEL_NOTICES" "$BROTLI_LICENSE" "$RESOURCES/packaging/"
+cp "$AI_PACK_LOCK" "$AI_RUNTIME_LOCK" "$MODEL_NOTICES" "$BROTLI_LICENSE" "$RESOURCES/packaging/"
+
+sign_runtime_payload() {
+  local identity="$1"
+  local options=(--force)
+  if [ "$identity" = "-" ]; then
+    options+=(--timestamp=none)
+  else
+    options+=(--options runtime --timestamp)
+  fi
+  while IFS= read -r candidate; do
+    if file "$candidate" | grep -q 'Mach-O'; then
+      codesign "${options[@]}" --sign "$identity" "$candidate"
+    fi
+  done < <(find "$RESOURCES/ai-runtime" -type f -print)
+}
 
 if [ "$SIGNING_IDENTITY" = "-" ]; then
+  sign_runtime_payload -
   codesign --force --timestamp=none --sign - "$RESOURCES/bin/openra-ai-companion"
+  codesign --force --timestamp=none --sign - "$RESOURCES/bin/openra-ai-runtime"
   codesign --force --deep --timestamp=none --sign - "$APP_ROOT"
 else
+  sign_runtime_payload "$SIGNING_IDENTITY"
   codesign --force --options runtime --timestamp --sign "$SIGNING_IDENTITY" "$RESOURCES/bin/openra-ai-companion"
-  codesign --force --deep --options runtime --timestamp --sign "$SIGNING_IDENTITY" "$APP_ROOT"
+  codesign --force --options runtime --timestamp --sign "$SIGNING_IDENTITY" "$RESOURCES/bin/openra-ai-runtime"
   codesign --force --options runtime --timestamp --entitlements "$ENTITLEMENTS" --sign "$SIGNING_IDENTITY" "$MACOS/apphost-$ARCH_DIR"
-  codesign --force --options runtime --timestamp --sign "$SIGNING_IDENTITY" "$APP_ROOT"
+  codesign --force --deep --options runtime --timestamp --sign "$SIGNING_IDENTITY" "$APP_ROOT"
 fi
 
 "$RESOURCES/bin/openra-ai-companion" voice-check --dependencies-only || {
   echo >&2 "Signed companion is missing local microphone capture support."
+  exit 1
+}
+"$RESOURCES/bin/openra-ai-runtime" --help >/dev/null || {
+  echo >&2 "Signed local AI runtime did not start."
   exit 1
 }
 

@@ -8,6 +8,7 @@ from urllib.parse import parse_qs, urlparse
 
 from .core import Companion
 from .learning import LearningStore, learning_dashboard
+from .model_setup import LocalAISetupError
 from .models import GameSnapshot
 from .router import RouterError
 from .voice import AudioPlayer, record_question
@@ -70,7 +71,7 @@ class CompanionHandler(BaseHTTPRequestHandler):
                 pass
 
     def _state_payload(self) -> dict:
-        return {
+        state = {
             "enabled": self.companion.enabled,
             "voice_enabled": not self.companion.muted,
             "auto_act_enabled": self.companion.auto_act_enabled,
@@ -82,6 +83,10 @@ class CompanionHandler(BaseHTTPRequestHandler):
             "usage": self.companion.router.usage_summary(),
             "router": self.companion.router.health(),
         }
+        manager = getattr(self.server, "local_ai_manager", None)
+        if manager:
+            state["local_ai"] = manager.status()
+        return state
 
     def _war_room_payload(self) -> dict:
         store = LearningStore()
@@ -126,11 +131,29 @@ class CompanionHandler(BaseHTTPRequestHandler):
         elif path == "/health":
             status = self.companion.status()
             status["control_ready"] = bool(getattr(self.server, "control_ready", False))
+            manager = getattr(self.server, "local_ai_manager", None)
+            if manager:
+                status["local_ai"] = manager.status()
             self._json(HTTPStatus.OK, status)
         elif path == "/v1/config":
             self._json(HTTPStatus.OK, self.companion.router.settings.as_dict())
         elif path == "/v1/catalog":
-            self._json(HTTPStatus.OK, self.companion.router.catalogue())
+            catalogue = self.companion.router.catalogue()
+            manager = getattr(self.server, "local_ai_manager", None)
+            if manager:
+                catalogue["local_setup"] = manager.status()
+            self._json(HTTPStatus.OK, catalogue)
+        elif path == "/v1/local-ai":
+            manager = getattr(self.server, "local_ai_manager", None)
+            if manager:
+                self._json(HTTPStatus.OK, manager.status())
+            else:
+                self._json(HTTPStatus.OK, {
+                    "supported": False,
+                    "installed": False,
+                    "state": "unsupported",
+                    "detail": "Local AI installation is unavailable in this build.",
+                })
         elif path == "/v1/learning":
             self._json(HTTPStatus.OK, learning_dashboard())
         elif path == "/v1/learning/latest":
@@ -179,7 +202,14 @@ class CompanionHandler(BaseHTTPRequestHandler):
     def do_POST(self) -> None:  # noqa: N802
         path = urlparse(self.path).path
         try:
-            if path == "/v1/config":
+            if path in {"/v1/local-ai/install", "/v1/local-ai/retry"}:
+                self._payload()
+                manager = getattr(self.server, "local_ai_manager", None)
+                if manager is None:
+                    raise LocalAISetupError("Local AI installation is unavailable in this build.")
+                result = manager.install() if path.endswith("/install") else manager.retry()
+                self._json(HTTPStatus.ACCEPTED, result)
+            elif path == "/v1/config":
                 payload = json.loads(self._payload() or b"{}")
                 config = self.companion.router.configure(payload)
                 self.companion.apply_settings()
@@ -339,6 +369,8 @@ class CompanionHandler(BaseHTTPRequestHandler):
             self._json(HTTPStatus.BAD_REQUEST, {"error": "invalid_request", "detail": str(exc)})
         except RouterError as exc:
             self._json(HTTPStatus.BAD_GATEWAY, {"error": "ai_router_error", "detail": str(exc)})
+        except LocalAISetupError as exc:
+            self._json(HTTPStatus.SERVICE_UNAVAILABLE, {"error": "local_ai_setup", "detail": str(exc)})
         except Exception as exc:
             self._json(HTTPStatus.INTERNAL_SERVER_ERROR, {"error": "diagnostic_failed", "detail": str(exc)})
 
@@ -357,6 +389,7 @@ def create_server(
     server.player = player or AudioPlayer()  # type: ignore[attr-defined]
     server.status_publisher = None  # type: ignore[attr-defined]
     server.voice_controller = None  # type: ignore[attr-defined]
+    server.local_ai_manager = None  # type: ignore[attr-defined]
     server.control_ready = False  # type: ignore[attr-defined]
     return server
 

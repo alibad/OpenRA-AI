@@ -5,16 +5,17 @@
   "description": "Checksum-pinned model payload used by the platform-specific local OpenRA AI runtime.",
   "hardware_requirements": {
     "minimum": {
-      "cpu": "4-core x64 CPU with AVX2",
+      "os": "macOS 13.3 or newer, or Windows 10/11 x64",
+      "cpu": "Apple Silicon Mac or 4-core x64 CPU with AVX2",
       "ram_gb": 8,
-      "gpu": "Not required; this Windows pack is CPU-only",
+      "gpu": "Not required; Apple Silicon uses Metal and Windows can run CPU-only",
       "free_disk_gb": 5,
       "mode": "Lite mode with speech models loaded on demand"
     },
     "recommended": {
-      "cpu": "Recent 6-core x64 CPU",
+      "cpu": "Apple Silicon Mac or recent 6-core x64 CPU",
       "ram_gb": 16,
-      "gpu": "Not used by the Windows CPU runtime",
+      "gpu": "Apple Silicon integrated GPU or CPU-only Windows runtime",
       "free_disk_gb": 6,
       "mode": "Full local text, vision, transcription, and speech"
     }

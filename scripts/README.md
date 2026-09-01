@@ -8,7 +8,10 @@ live here. These scripts are the replacement for hosted workflows.
   one checksummed release index. See `docs/releasing.md`.
 - `ai_pack.py` validates, fetches, and assembles the platform-neutral local AI
   model pack from `packaging/ai-pack.lock.json`. Every input has a pinned source
-  revision, byte length, and SHA-256.
+  revision, byte length, and SHA-256. Its `prepare-runtime` command also stages
+  pinned platform inference binaries; the Mac target builds whisper.cpp from
+  its checksum-pinned source release because upstream does not publish a Mac
+  server executable.
 - `setup.ps1` installs local dependencies and builds the pinned engine.
 - `check.ps1 -FullEngine` runs product tests, web checks, engine tests, and map
   validation.

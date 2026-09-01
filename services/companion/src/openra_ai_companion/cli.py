@@ -16,6 +16,7 @@ from .bridge import OpenRABridge
 from .core import Companion
 from .hotkeys import VoiceHotkeys, console_print, response_hud_state
 from .models import CompanionResponse, GameSnapshot
+from .model_setup import LocalAIManager
 from .server import create_server as create_companion_server, serve
 from .strategy_contracts import strategy_contract
 from .strategy_director import StrategyDirector
@@ -249,6 +250,8 @@ def main(argv: list[str] | None = None) -> int:
 
     player = AudioPlayer() if args.speak else None
     control_server = create_companion_server("127.0.0.1", args.control_port, companion, player)
+    local_ai_manager = LocalAIManager(companion)
+    control_server.local_ai_manager = local_ai_manager
     worldgen_server = create_worldgen_server(
         "127.0.0.1",
         args.worldgen_port,
@@ -528,6 +531,7 @@ def main(argv: list[str] | None = None) -> int:
         except KeyboardInterrupt:
             companion.interrupt()
         finally:
+            local_ai_manager.stop()
             companion.set_action_planner(None)
             companion.set_strategy_controller(None)
             companion.set_action_executor(None)

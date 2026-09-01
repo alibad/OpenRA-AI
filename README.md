@@ -35,10 +35,12 @@ external OpenAI-compatible provider during setup to skip it.
 4. Start or load a match. The AI companion and Earth Mission Studio are built
    into the game menus.
 
-The macOS alpha does not yet include the Windows-only local AI model pack. Use
-a compatible external OpenAI-compatible endpoint for model-backed companion
-replies; the game, native AI, map tools, and deterministic alerts remain
-available without one.
+The published alpha.13 Mac build predates in-app model setup. Current builds
+show the configured Hold to Ask shortcut under **Settings > AI > Voice** and
+offer **Install 1.8 GB Pack** under **Settings > AI > Models**. The app verifies
+every pinned model before starting its bundled Apple Silicon runtime. The game,
+native AI, map tools, and deterministic alerts remain available while the pack
+is not installed.
 
 ### Start a match on Windows
 
@@ -59,12 +61,14 @@ first launch.
 
 The game, native map tools, and deterministic battlefield alerts work without
 a model provider. The guided Windows installer selects **Local AI
-(recommended)** by default and downloads a checksum-verified, platform-specific
-pack containing the text/vision model, speech recognition, speech synthesis,
-and their local CPU runtimes. It requires no API key or usage fees. The download
-is about 1.8 GB and needs a 4-core AVX2 x64 CPU, 8 GB RAM, and 5 GB free disk;
-a recent 6-core CPU and 16 GB RAM are recommended. This Windows pack is
-CPU-only and does not require or use a GPU.
+(recommended)** by default. On macOS, install the same capability set from
+**Settings > AI > Models**. Both paths download checksum-verified text/vision,
+speech-recognition, and speech-synthesis models and use a signed,
+platform-specific local runtime. No API key or provider usage fee is required.
+The download is about 1.8 GB and needs 8 GB RAM and 5 GB free disk; 16 GB RAM is
+recommended. Apple Silicon uses Metal, while the Windows runtime can run
+CPU-only on an AVX2 x64 processor. Local AI on Mac requires macOS 13.3 or
+newer; the base game remains available on the broader supported Mac range.
 
 During setup, users can instead choose **External or existing
 OpenAI-compatible provider**, then enter an endpoint, model name, and optional

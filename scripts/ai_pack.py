@@ -7,7 +7,10 @@ import argparse
 import hashlib
 import json
 import shutil
+import subprocess
 import sys
+import tarfile
+import tempfile
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -92,7 +95,7 @@ def load_runtime_lock(path: Path, target: str) -> list[dict]:
         missing = required - set(component)
         if missing:
             raise PackError(f"AI runtime component is missing {', '.join(sorted(missing))}")
-        if component["archive"] != "zip":
+        if component["archive"] not in {"zip", "tar.gz"}:
             raise PackError(f"Unsupported runtime archive for {component['id']}: {component['archive']}")
         if not str(component["url"]).startswith("https://"):
             raise PackError(f"Only HTTPS runtime sources are allowed: {component['id']}")
@@ -213,13 +216,36 @@ def deterministic_zip(source_root: Path, output: Path) -> None:
 def extract_runtime(source: Path, destination: Path, component: dict) -> None:
     strip_prefix = str(component.get("strip_prefix") or "").strip("/")
     destination.mkdir(parents=True, exist_ok=True)
-    with zipfile.ZipFile(source) as archive:
-        for member in archive.infolist():
-            if member.is_dir():
+    if component["archive"] == "zip":
+        with zipfile.ZipFile(source) as archive:
+            for member in archive.infolist():
+                if member.is_dir():
+                    continue
+                relative = PurePosixPath(member.filename)
+                if relative.is_absolute() or ".." in relative.parts:
+                    raise PackError(f"Unsafe archive member in {component['id']}: {member.filename}")
+                parts = list(relative.parts)
+                if strip_prefix:
+                    prefix_parts = list(PurePosixPath(strip_prefix).parts)
+                    if parts[:len(prefix_parts)] != prefix_parts:
+                        continue
+                    parts = parts[len(prefix_parts):]
+                if not parts:
+                    continue
+                output = destination.joinpath(*parts)
+                output.parent.mkdir(parents=True, exist_ok=True)
+                with archive.open(member) as input_stream, output.open("wb") as output_stream:
+                    shutil.copyfileobj(input_stream, output_stream, length=1024 * 1024)
+        return
+
+    with tarfile.open(source, "r:gz") as archive:
+        members = {member.name.rstrip("/"): member for member in archive.getmembers()}
+        for member in archive.getmembers():
+            if member.isdir():
                 continue
-            relative = PurePosixPath(member.filename)
+            relative = PurePosixPath(member.name)
             if relative.is_absolute() or ".." in relative.parts:
-                raise PackError(f"Unsafe archive member in {component['id']}: {member.filename}")
+                raise PackError(f"Unsafe archive member in {component['id']}: {member.name}")
             parts = list(relative.parts)
             if strip_prefix:
                 prefix_parts = list(PurePosixPath(strip_prefix).parts)
@@ -230,8 +256,65 @@ def extract_runtime(source: Path, destination: Path, component: dict) -> None:
                 continue
             output = destination.joinpath(*parts)
             output.parent.mkdir(parents=True, exist_ok=True)
-            with archive.open(member) as input_stream, output.open("wb") as output_stream:
+            source_member = member
+            followed_links: set[str] = set()
+            while source_member.issym():
+                if source_member.name in followed_links:
+                    raise PackError(f"Archive link cycle in {component['id']}: {member.name}")
+                followed_links.add(source_member.name)
+                link = PurePosixPath(source_member.linkname)
+                source_relative = PurePosixPath(source_member.name)
+                linked = (source_relative.parent / link).as_posix()
+                if link.is_absolute() or ".." in link.parts or linked not in members:
+                    raise PackError(f"Unsafe archive link in {component['id']}: {member.name}")
+                source_member = members[linked]
+            if not source_member.isfile():
+                raise PackError(f"Unsupported archive member in {component['id']}: {member.name}")
+            input_stream = archive.extractfile(source_member)
+            if input_stream is None:
+                raise PackError(f"Unable to extract archive member in {component['id']}: {member.name}")
+            with input_stream, output.open("wb") as output_stream:
                 shutil.copyfileobj(input_stream, output_stream, length=1024 * 1024)
+            output.chmod(source_member.mode & 0o777)
+
+
+def prepare_runtime(runtime_components: list[dict], cache_root: Path, output_root: Path) -> Path:
+    if output_root.exists():
+        shutil.rmtree(output_root)
+    output_root.mkdir(parents=True)
+    for component in runtime_components:
+        source = download_component(cache_root, component)
+        destination = output_root / Path(*PurePosixPath(component["destination"]).parts)
+        if component.get("build") != "whisper-cmake":
+            extract_runtime(source, destination, component)
+            continue
+
+        with tempfile.TemporaryDirectory(prefix="openra-ai-whisper-") as directory:
+            source_root = Path(directory) / "source"
+            build_root = Path(directory) / "build"
+            extract_runtime(source, source_root, component)
+            candidates = [path for path in source_root.iterdir() if path.is_dir()]
+            cmake_source = candidates[0] if len(candidates) == 1 else source_root
+            commands = [
+                [
+                    "cmake", "-S", str(cmake_source), "-B", str(build_root),
+                    "-DCMAKE_BUILD_TYPE=Release", "-DWHISPER_BUILD_TESTS=OFF",
+                    "-DWHISPER_BUILD_EXAMPLES=ON", "-DWHISPER_SDL2=OFF",
+                    "-DGGML_METAL=ON", "-DGGML_CCACHE=OFF", "-DBUILD_SHARED_LIBS=ON",
+                    "-DCMAKE_BUILD_RPATH=@loader_path", "-DCMAKE_INSTALL_RPATH=@loader_path",
+                    "-DCMAKE_BUILD_WITH_INSTALL_RPATH=ON",
+                    "-DCMAKE_OSX_DEPLOYMENT_TARGET=13.3",
+                ],
+                ["cmake", "--build", str(build_root), "--config", "Release", "--target", "whisper-server", "-j", "6"],
+            ]
+            for command in commands:
+                try:
+                    subprocess.run(command, check=True)
+                except (OSError, subprocess.CalledProcessError) as exc:
+                    raise PackError(f"Unable to build {component['id']}: {exc}") from exc
+            shutil.copytree(build_root / "bin", destination, symlinks=True)
+    print(f"AI runtime: {output_root}")
+    return output_root
 
 
 def build(lock: dict, runtime_components: list[dict], cache_root: Path, release_root: Path,
@@ -292,13 +375,14 @@ def build(lock: dict, runtime_components: list[dict], cache_root: Path, release_
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("command", choices=("validate", "fetch", "build"))
+    parser.add_argument("command", choices=("validate", "fetch", "fetch-runtime", "prepare-runtime", "build"))
     parser.add_argument("--lock", type=Path, default=DEFAULT_LOCK)
     parser.add_argument("--runtime-lock", type=Path, default=DEFAULT_RUNTIME_LOCK)
     parser.add_argument("--cache", type=Path, default=DEFAULT_CACHE)
     parser.add_argument("--release-root", type=Path, default=DEFAULT_RELEASES)
     parser.add_argument("--release-version")
     parser.add_argument("--target", default="windows-x64")
+    parser.add_argument("--runtime-output", type=Path)
     return parser.parse_args()
 
 
@@ -311,6 +395,13 @@ def main() -> int:
         print(f"AI pack lock is valid: {len(lock['components'])} components, {total / 1024 / 1024:.1f} MiB")
         if args.command == "fetch":
             fetch(lock, args.cache.resolve())
+        elif args.command == "fetch-runtime":
+            for component in runtime_components:
+                download_component(args.cache.resolve(), component)
+        elif args.command == "prepare-runtime":
+            if not args.runtime_output:
+                raise PackError("prepare-runtime requires --runtime-output")
+            prepare_runtime(runtime_components, args.cache.resolve(), args.runtime_output.resolve())
         elif args.command == "build":
             if not args.release_version:
                 raise PackError("build requires --release-version")

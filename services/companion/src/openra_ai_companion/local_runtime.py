@@ -156,17 +156,19 @@ def _merge_companion_settings(config: RuntimeConfig) -> None:
 
 
 class RuntimeProcesses:
-    def __init__(self, install_root: Path, config: RuntimeConfig):
+    def __init__(self, install_root: Path, config: RuntimeConfig, runtime_root: Path | None = None):
         self.install_root = install_root
         self.config = config
+        self.runtime_root = runtime_root or install_root / "ai" / "runtime"
         self.children: list[subprocess.Popen] = []
 
     def start(self) -> None:
         if self.config.mode != "local":
             return
         ai_root = self.install_root / "ai"
-        llama = ai_root / "runtime" / "llama" / "llama-server.exe"
-        whisper = ai_root / "runtime" / "whisper" / "whisper-server.exe"
+        executable_suffix = ".exe" if os.name == "nt" else ""
+        llama = self.runtime_root / "llama" / f"llama-server{executable_suffix}"
+        whisper = self.runtime_root / "whisper" / f"whisper-server{executable_suffix}"
         model = ai_root / "models" / "llm" / "Qwen3VL-2B-Instruct-Q4_K_M.gguf"
         projector = ai_root / "models" / "llm" / "mmproj-Qwen3VL-2B-Instruct-Q8_0.gguf"
         whisper_model = ai_root / "models" / "stt" / "ggml-base.en.bin"
@@ -175,16 +177,47 @@ class RuntimeProcesses:
             raise FileNotFoundError("Local AI is selected but its payload is incomplete: " + ", ".join(str(p) for p in missing))
 
         creation_flags = getattr(subprocess, "CREATE_NO_WINDOW", 0)
-        self.children.append(subprocess.Popen([
-            str(llama), "--model", str(model), "--mmproj", str(projector),
-            "--host", "127.0.0.1", "--port", str(LOCAL_CHAT_PORT),
-            "--ctx-size", "4096", "--threads", str(max(2, (os.cpu_count() or 4) - 1)),
-            "--jinja", "--no-webui",
-        ], cwd=llama.parent, creationflags=creation_flags))
-        self.children.append(subprocess.Popen([
-            str(whisper), "--model", str(whisper_model), "--host", "127.0.0.1",
-            "--port", str(LOCAL_TRANSCRIBE_PORT), "--language", "en", "--no-gpu",
-        ], cwd=whisper.parent, creationflags=creation_flags))
+        try:
+            self.children.append(subprocess.Popen([
+                str(llama), "--model", str(model), "--mmproj", str(projector),
+                "--host", "127.0.0.1", "--port", str(LOCAL_CHAT_PORT),
+                "--ctx-size", "4096", "--threads", str(max(2, (os.cpu_count() or 4) - 1)),
+                "--jinja", "--no-webui",
+            ], cwd=llama.parent, creationflags=creation_flags))
+            self.children.append(subprocess.Popen([
+                str(whisper), "--model", str(whisper_model), "--host", "127.0.0.1",
+                "--port", str(LOCAL_TRANSCRIBE_PORT), "--language", "en",
+                *(["--no-gpu"] if os.name == "nt" else []),
+            ], cwd=whisper.parent, creationflags=creation_flags))
+            self._wait_until_ready()
+        except Exception:
+            self.stop()
+            raise
+
+    def _wait_until_ready(self) -> None:
+        urls = (
+            f"http://127.0.0.1:{LOCAL_CHAT_PORT}/health",
+            f"http://127.0.0.1:{LOCAL_TRANSCRIBE_PORT}/health",
+        )
+        pending = set(urls)
+        deadline = time.monotonic() + 180
+        while pending and time.monotonic() < deadline:
+            for child in self.children:
+                if child.poll() is not None:
+                    self.stop()
+                    raise RuntimeError(f"Local AI model process exited with code {child.returncode}")
+            for url in tuple(pending):
+                try:
+                    with urllib.request.urlopen(url, timeout=1) as response:
+                        if response.status < 500:
+                            pending.remove(url)
+                except (OSError, TimeoutError, urllib.error.URLError):
+                    pass
+            if pending:
+                time.sleep(0.5)
+        if pending:
+            self.stop()
+            raise TimeoutError("Local AI models did not finish loading within three minutes")
 
     def stop(self) -> None:
         for child in reversed(self.children):
@@ -365,8 +398,9 @@ def configure(args: argparse.Namespace) -> int:
 
 def serve_runtime(args: argparse.Namespace) -> int:
     install_root = Path(args.root).resolve()
-    config = RuntimeConfig.load()
-    processes = RuntimeProcesses(install_root, config)
+    config = RuntimeConfig(mode=args.mode) if args.mode else RuntimeConfig.load()
+    runtime_root = Path(args.runtime_root).resolve() if args.runtime_root else None
+    processes = RuntimeProcesses(install_root, config, runtime_root)
     processes.start()
     atexit.register(processes.stop)
     server = GatewayServer((args.host, args.port), install_root, config)
@@ -395,6 +429,8 @@ def parser() -> argparse.ArgumentParser:
     commands = root.add_subparsers(dest="command", required=True)
     serve = commands.add_parser("serve")
     serve.add_argument("--root", required=True)
+    serve.add_argument("--runtime-root")
+    serve.add_argument("--mode", choices=("local", "external"))
     serve.add_argument("--host", default="127.0.0.1")
     serve.add_argument("--port", type=int, default=DEFAULT_PORT)
     serve.add_argument("--parent-pid", type=int, default=0)

@@ -25,6 +25,58 @@
           "destination": "runtime/whisper"
         }
       ]
+    },
+    "macos-arm64": {
+      "components": [
+        {
+          "id": "llama-cpp-b10516-macos-arm64",
+          "license": "MIT",
+          "source_revision": "b10516",
+          "url": "https://github.com/ggml-org/llama.cpp/releases/download/b10516/llama-b10516-bin-macos-arm64.tar.gz",
+          "sha256": "ee3324327d621026ae80c24031670e65fa62a0b23a3a027dbe2f65f240affd30",
+          "bytes": 11089823,
+          "archive": "tar.gz",
+          "strip_prefix": "llama-b10516",
+          "destination": "llama"
+        },
+        {
+          "id": "whisper-cpp-v1.9.2-source-macos-arm64",
+          "license": "MIT",
+          "source_revision": "v1.9.2",
+          "url": "https://github.com/ggml-org/whisper.cpp/archive/refs/tags/v1.9.2.tar.gz",
+          "sha256": "a6abd064fcca8b85e794d205abf328c522e9451db43a3eadc178b883b7d0e9cd",
+          "bytes": 9622263,
+          "archive": "tar.gz",
+          "build": "whisper-cmake",
+          "destination": "whisper"
+        }
+      ]
+    },
+    "macos-x64": {
+      "components": [
+        {
+          "id": "llama-cpp-b10516-macos-x64",
+          "license": "MIT",
+          "source_revision": "b10516",
+          "url": "https://github.com/ggml-org/llama.cpp/releases/download/b10516/llama-b10516-bin-macos-x64.tar.gz",
+          "sha256": "b7adecf7bd2cde577ddabee8357a72409165d8104f43b4acee9f1b98cc9c447a",
+          "bytes": 11395897,
+          "archive": "tar.gz",
+          "strip_prefix": "llama-b10516",
+          "destination": "llama"
+        },
+        {
+          "id": "whisper-cpp-v1.9.2-source-macos-x64",
+          "license": "MIT",
+          "source_revision": "v1.9.2",
+          "url": "https://github.com/ggml-org/whisper.cpp/archive/refs/tags/v1.9.2.tar.gz",
+          "sha256": "a6abd064fcca8b85e794d205abf328c522e9451db43a3eadc178b883b7d0e9cd",
+          "bytes": 9622263,
+          "archive": "tar.gz",
+          "build": "whisper-cmake",
+          "destination": "whisper"
+        }
+      ]
     }
   }
 }

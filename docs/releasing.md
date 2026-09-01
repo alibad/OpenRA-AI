@@ -79,7 +79,9 @@ for targets that do not opt in through the release plan.
 The final Mac artifact cannot be produced on Windows. The packager compiles
 AppKit launchers, gives the managed .NET apphost only the JIT entitlement
 required by the hardened runtime, creates an `.app` and DMG with `iconutil` and
-`hdiutil`, signs the companion, app, embedded runtime, and DMG with `codesign`,
+`hdiutil`, builds the pinned whisper.cpp server, stages the pinned llama.cpp
+Mac runtime, signs both model servers and their libraries along with the
+companion, app, embedded runtime, and DMG with `codesign`,
 submits with `xcrun notarytool`, and staples the result. PyInstaller also creates
 executables only for its host operating system. If the host uses Homebrew's
 .NET build, the packager bundles its Brotli dependency, rewrites it to an
