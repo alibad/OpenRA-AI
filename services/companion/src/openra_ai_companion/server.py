@@ -88,6 +88,49 @@ class CompanionHandler(BaseHTTPRequestHandler):
             state["local_ai"] = manager.status()
         return state
 
+    def _voice_readiness(self) -> dict:
+        model = self.companion.router.settings.transcribe_model.strip().lower()
+        if model != "local-whisper":
+            return {
+                "ready": True,
+                "model": model,
+                "action": "none",
+                "reason": "ready",
+            }
+
+        manager = getattr(self.server, "local_ai_manager", None)
+        if manager is None:
+            return {
+                "ready": False,
+                "model": model,
+                "action": "choose_cloud",
+                "reason": "local_ai_unsupported",
+                "local_ai": {
+                    "supported": False,
+                    "installed": False,
+                    "state": "unsupported",
+                    "detail": "Local AI installation is unavailable in this build.",
+                },
+            }
+
+        local_ai = manager.status()
+        state = str(local_ai.get("state", "unsupported"))
+        actions = {
+            "not_installed": "install",
+            "installing": "view_progress",
+            "ready": "start",
+            "starting": "wait",
+            "error": "retry",
+            "unsupported": "choose_cloud",
+        }
+        return {
+            "ready": state == "running",
+            "model": model,
+            "action": "none" if state == "running" else actions.get(state, "wait"),
+            "reason": "ready" if state == "running" else f"local_ai_{state}",
+            "local_ai": local_ai,
+        }
+
     def _war_room_payload(self) -> dict:
         store = LearningStore()
         dashboard = store.dashboard()
@@ -154,6 +197,8 @@ class CompanionHandler(BaseHTTPRequestHandler):
                     "state": "unsupported",
                     "detail": "Local AI installation is unavailable in this build.",
                 })
+        elif path == "/v1/voice/readiness":
+            self._json(HTTPStatus.OK, self._voice_readiness())
         elif path == "/v1/learning":
             self._json(HTTPStatus.OK, learning_dashboard())
         elif path == "/v1/learning/latest":
@@ -357,6 +402,15 @@ class CompanionHandler(BaseHTTPRequestHandler):
                     self.wfile.write(audio)
             elif path in {"/v1/voice/start", "/v1/voice/stop"}:
                 self._payload()
+                if path.endswith("/start"):
+                    readiness = self._voice_readiness()
+                    if not readiness["ready"]:
+                        self._json(HTTPStatus.PRECONDITION_REQUIRED, {
+                            "ok": False,
+                            "error": "voice_setup_required",
+                            **readiness,
+                        })
+                        return
                 controller = getattr(self.server, "voice_controller", None)
                 if controller is None:
                     self._json(HTTPStatus.SERVICE_UNAVAILABLE, {"ok": False, "error": "voice_controller_unavailable"})

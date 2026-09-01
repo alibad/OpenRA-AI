@@ -6,9 +6,11 @@ import tempfile
 import threading
 import time
 import unittest
+import urllib.error
 import urllib.request
 from io import BytesIO
 from pathlib import Path
+from unittest import mock
 from unittest.mock import patch
 
 from openra_ai_companion.core import Companion
@@ -123,6 +125,67 @@ class LocalAIManagerTests(unittest.TestCase):
                 self.assertEqual(response.status, 202)
                 self.assertEqual(json.loads(response.read())["state"], "installing")
             self.assertTrue(manager.started)
+        finally:
+            server.shutdown()
+            server.server_close()
+            worker.join()
+
+    def test_voice_readiness_invites_local_pack_install_before_recording(self) -> None:
+        class Manager:
+            def status(self):
+                return {
+                    "supported": True,
+                    "installed": False,
+                    "state": "not_installed",
+                    "total_bytes": 1_820_000_000,
+                    "progress_percent": 0,
+                }
+
+        server = create_server("127.0.0.1", 0, Companion())
+        server.local_ai_manager = Manager()
+        controller = mock.Mock()
+        server.voice_controller = controller
+        worker = threading.Thread(target=server.serve_forever)
+        worker.start()
+        try:
+            base = f"http://127.0.0.1:{server.server_port}"
+            with urllib.request.urlopen(base + "/v1/voice/readiness", timeout=3) as response:
+                readiness = json.loads(response.read())
+            self.assertFalse(readiness["ready"])
+            self.assertEqual(readiness["action"], "install")
+            self.assertEqual(readiness["local_ai"]["total_bytes"], 1_820_000_000)
+
+            request = urllib.request.Request(base + "/v1/voice/start", data=b"{}")
+            with self.assertRaises(urllib.error.HTTPError) as caught:
+                urllib.request.urlopen(request, timeout=3)
+            self.assertEqual(caught.exception.code, 428)
+            payload = json.loads(caught.exception.read())
+            self.assertEqual(payload["error"], "voice_setup_required")
+            self.assertEqual(payload["action"], "install")
+            controller.start_question.assert_not_called()
+        finally:
+            server.shutdown()
+            server.server_close()
+            worker.join()
+
+    def test_voice_readiness_allows_recording_when_local_models_are_running(self) -> None:
+        class Manager:
+            def status(self):
+                return {"supported": True, "installed": True, "state": "running"}
+
+        server = create_server("127.0.0.1", 0, Companion())
+        server.local_ai_manager = Manager()
+        controller = mock.Mock()
+        controller.start_question.return_value = True
+        server.voice_controller = controller
+        worker = threading.Thread(target=server.serve_forever)
+        worker.start()
+        try:
+            base = f"http://127.0.0.1:{server.server_port}"
+            request = urllib.request.Request(base + "/v1/voice/start", data=b"{}")
+            with urllib.request.urlopen(request, timeout=3) as response:
+                self.assertTrue(json.loads(response.read())["ok"])
+            controller.start_question.assert_called_once_with()
         finally:
             server.shutdown()
             server.server_close()

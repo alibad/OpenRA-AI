@@ -1581,6 +1581,9 @@ class CompanionTests(unittest.TestCase):
 
     def test_native_remappable_voice_hotkey_endpoints_forward_press_and_release(self) -> None:
         server = create_server("127.0.0.1", 0, Companion(router=FakeRouter()), FakePlayer())
+        manager = mock.Mock()
+        manager.status.return_value = {"supported": True, "installed": True, "state": "running"}
+        server.local_ai_manager = manager
         controller = mock.Mock()
         controller.start_question.return_value = True
         controller.stop_question.return_value = True
