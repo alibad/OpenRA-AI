@@ -58,7 +58,7 @@ grep -F 'Launch.Bots=Multi1:normal' "$wrapper" >/dev/null || {
 }
 companion_line="$(grep -n -m1 '^"$companion" watch' "$wrapper" | cut -d: -f1)"
 health_line="$(grep -n -m1 '^wait_for_companion_health$' "$wrapper" | cut -d: -f1)"
-game_line="$(grep -n -m1 '^"$macos_dir/GameLauncher"' "$wrapper" | cut -d: -f1)"
+game_line="$(grep -n -m1 '^[[:space:]]*"$macos_dir/GameLauncher"' "$wrapper" | cut -d: -f1)"
 if [ -z "$companion_line" ] || [ -z "$health_line" ] || [ -z "$game_line" ] || \
   [ "$companion_line" -ge "$health_line" ] || [ "$health_line" -ge "$game_line" ]; then
   echo >&2 "macOS launcher must start the companion, wait for health, and only then start the game."
@@ -110,7 +110,11 @@ done < <(find "$app/Contents/MacOS/arm64" "$app/Contents/Resources/ai-runtime" -
 for runtime_server in \
   "$app/Contents/Resources/ai-runtime/llama/llama-server" \
   "$app/Contents/Resources/ai-runtime/whisper/whisper-server"; do
-  if otool -l "$runtime_server" | grep -E '/(var/folders|opt/homebrew|usr/local)/' >/dev/null; then
+  runtime_rpaths="$(otool -l "$runtime_server" | awk '
+    /cmd LC_RPATH/ { reading_rpath = 1; next }
+    reading_rpath && /path / { print $2; reading_rpath = 0 }
+  ')"
+  if grep -E '/(var/folders|opt/homebrew|usr/local)/' <<<"$runtime_rpaths" >/dev/null; then
     echo >&2 "Packaged local AI runtime has a release-host RPATH: $runtime_server"
     exit 1
   fi
