@@ -54,7 +54,13 @@ class OpenRABridge:
         self.address = address
         self.session_id = session_id
         self.timeout = timeout
-        self.channel = grpc.insecure_channel(address)
+        local = address.startswith(("127.0.0.1:", "localhost:", "[::1]:"))
+        options = (
+            ("grpc.initial_reconnect_backoff_ms", 100),
+            ("grpc.min_reconnect_backoff_ms", 100),
+            ("grpc.max_reconnect_backoff_ms", 1000),
+        ) if local else ()
+        self.channel = grpc.insecure_channel(address, options=options)
         self.stub = rl_bridge_pb2_grpc.RLBridgeStub(self.channel)
 
     def observe(self) -> GameSnapshot:

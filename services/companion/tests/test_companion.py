@@ -22,8 +22,10 @@ from openra_ai_companion.game_runtime import GameRuntime
 from openra_ai_companion.hotkeys import VoiceHotkeys, console_print, response_hud_state
 from openra_ai_companion.interactive_agent import (
     InteractiveMCPPlanner,
+    _brief_battlefield,
     _proposed_tool_commands,
     _requests_action,
+    _structured_tool_output,
 )
 from openra_ai_companion.insights import InsightEngine
 from openra_ai_companion.learning import LearningStore
@@ -713,6 +715,29 @@ class CompanionTests(unittest.TestCase):
         self.assertEqual(seen_dialogue[0][1], ())
         self.assertEqual(seen_dialogue[1][1], (("What is happening?", "Answered: What is happening?"),))
         self.assertEqual(seen_dialogue[2][1], ())
+
+    def test_interactive_agent_prefetch_preserves_faction_and_bounds_live_context(self) -> None:
+        from mcp.types import CallToolResult, TextContent
+
+        battlefield = {
+            "mod_id": "ra2", "tick": 200, "map": "Heartland",
+            "strategy_profile": {"player_faction": "iraq", "enemy_faction": "russia"},
+            "counts": {"own_units": {"Conscript": 20}},
+            "own_units": [{"actor_id": i, "display_name": "Conscript", "extra": "omit"} for i in range(20)],
+            "own_buildings": [{"actor_id": 21, "display_name": "Power Plant"}],
+            "available_production_names": [{"id": "e2", "name": "Conscript"}],
+        }
+        result = CallToolResult(content=[TextContent(type="text", text=json.dumps(battlefield))])
+        decoded = _structured_tool_output(result)
+        self.assertEqual(decoded, battlefield)
+        brief = _brief_battlefield(decoded)
+        self.assertEqual(brief["factions"], {"player_faction": "iraq", "enemy_faction": "russia"})
+        self.assertEqual(brief["mod_id"], "ra2")
+        self.assertEqual(len(brief["own_units"]), 8)
+        self.assertEqual(brief["own_units_omitted"], 12)
+        self.assertNotIn("extra", brief["own_units"][0])
+        self.assertEqual(brief["counts"]["own_units"]["Conscript"], 20)
+        self.assertEqual(brief["available_production_names"][0]["name"], "Conscript")
 
     def test_interactive_agent_accepts_only_exact_action_tool_receipts(self) -> None:
         from agents import Agent

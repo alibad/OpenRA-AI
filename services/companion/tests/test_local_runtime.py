@@ -40,6 +40,13 @@ class _ProviderHandler(BaseHTTPRequestHandler):
 
 
 class LocalRuntimeTests(unittest.TestCase):
+    def test_bundled_profiles_fit_the_game_tool_prompt(self) -> None:
+        root = Path(__file__).resolve().parents[3]
+        manifest = json.loads((root / "packaging/ai-pack.lock.json").read_text())
+        self.assertTrue(manifest["model_profiles"])
+        for profile in manifest["model_profiles"]:
+            self.assertGreaterEqual(profile["context_length"], 8192)
+
     def test_lightweight_runtime_skips_images_and_caps_cpu(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

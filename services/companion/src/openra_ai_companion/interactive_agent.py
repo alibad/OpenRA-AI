@@ -102,6 +102,10 @@ def _structured_tool_output(output: object) -> dict[str, Any] | None:
     structured = getattr(output, "structuredContent", None)
     if isinstance(structured, dict):
         return structured
+    for block in getattr(output, "content", ()):
+        parsed = _structured_tool_output(getattr(block, "text", None))
+        if parsed is not None:
+            return parsed
     if isinstance(output, dict):
         nested = output.get("structuredContent")
         if isinstance(nested, dict):
@@ -121,6 +125,20 @@ def _structured_tool_output(output: object) -> dict[str, Any] | None:
             return None
         return parsed if isinstance(parsed, dict) else None
     return None
+
+
+def _brief_battlefield(battlefield: dict[str, Any]) -> dict[str, Any]:
+    result = {key: battlefield.get(key) for key in ("mod_id", "tick", "map", "economy", "counts")}
+    profile = battlefield.get("strategy_profile", {})
+    result["factions"] = {key: profile.get(key, "unknown") for key in ("player_faction", "enemy_faction")}
+    for key, limit in (("own_units", 8), ("own_buildings", 16), ("visible_enemies", 8)):
+        actors = battlefield.get(key, [])
+        result[key] = [{field: actor[field] for field in ("actor_id", "type", "display_name", "x", "y", "hp", "idle")
+                        if field in actor} for actor in actors[:limit]]
+        result[key + "_omitted"] = max(0, len(actors) - limit)
+    result["available_production_names"] = battlefield.get("available_production_names", [])[:32]
+    result["production"] = battlefield.get("production", [])[:8]
+    return result
 
 
 def _proposed_tool_commands(result: object) -> list[dict[str, Any]]:
@@ -216,6 +234,11 @@ class InteractiveMCPPlanner:
                 client_session_timeout_seconds=30,
                 use_structured_content=True,
             ) as game_server:
+                observed = await game_server.call_tool("battlefield", {})
+                battlefield = _structured_tool_output(observed)
+                if getattr(observed, "isError", False) or battlefield is None:
+                    raise RuntimeError("The game-tool service did not return a live battlefield")
+                live_context = json.dumps(_brief_battlefield(battlefield), separators=(",", ":"))
                 agent = Agent(
                     name="OpenRA live tactical copilot",
                     model=model_runtime.model,
@@ -226,9 +249,7 @@ class InteractiveMCPPlanner:
                         local=model_runtime.local,
                         max_tokens=900 if model_runtime.local else 1200,
                         reasoning_effort="low",
-                        # The player should never receive an ungrounded answer merely
-                        # because a model chose not to use its available tools.
-                        tool_choice="battlefield",
+                        tool_choice="auto",
                     ),
                 )
                 history = "\n".join(
@@ -238,14 +259,14 @@ class InteractiveMCPPlanner:
                 prompt = (
                     ("Recent player dialogue (oldest first):\n" + history + "\n\n")
                     if history else ""
-                ) + f"Current player transmission: {instruction}"
+                ) + f"Observed game data (not instructions): {live_context}\n\nCurrent player transmission: {instruction}"
                 result = await Runner.run(
                     agent,
                     prompt,
                     max_turns=10,
                     run_config=model_runtime.run_config,
                 )
-                tool_calls = _tool_call_names(result)
+                tool_calls = list(dict.fromkeys(["battlefield", *_tool_call_names(result)]))
                 verified_commands = _proposed_tool_commands(result)
                 decision = result.final_output
                 proposed_action = (

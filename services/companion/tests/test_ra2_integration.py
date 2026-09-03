@@ -7,6 +7,7 @@ import unittest
 from unittest.mock import patch
 
 from openra_ai_companion.game_content import import_content, ra2_content_root
+from openra_ai_companion.game_runtime import GameRuntime
 from openra_ai_companion.generated.rl_bridge_pb2 import GameObservation
 from openra_ai_companion.models import GameSnapshot, Unit
 from openra_ai_companion.strategy import strategic_profile
@@ -52,6 +53,12 @@ class RA2IntegrationTests(unittest.TestCase):
         self.assertEqual(profile["mod_id"], "ra2")
         self.assertNotIn("Chrono Tanks", str(profile))
         self.assertEqual(profile["available_production"][0]["id"], "gapowr")
+
+    def test_ra2_battlefield_counts_use_current_game_actor_names(self):
+        snapshot = GameSnapshot(tick=1, mod_id="ra2", actor_names={"e1": "GI", "e2": "Conscript"},
+                                units=(Unit(1, "e1"), Unit(2, "e2"), Unit(3, "e2")))
+        self.assertEqual(GameRuntime._display_type_counts(snapshot.units, snapshot=snapshot),
+                         {"Conscript": 2, "GI": 1})
 
     def test_old_observations_remain_red_alert_compatible(self):
         snapshot = GameSnapshot.from_dict({"tick": 1})

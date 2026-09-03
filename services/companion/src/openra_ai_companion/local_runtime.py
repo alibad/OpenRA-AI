@@ -184,7 +184,7 @@ class RuntimeProcesses:
                 str(llama), "--model", str(model),
                 *(["--mmproj", str(projector)] if projector else []),
                 "--host", "127.0.0.1", "--port", str(LOCAL_CHAT_PORT),
-                "--ctx-size", str(self.profile.get("context_length", 4096)),
+                "--ctx-size", str(self.profile.get("context_length", 8192)),
                 "--threads", str(max(1, min(4, (os.cpu_count() or 4) // 2))),
                 "--threads-batch", str(max(1, min(4, (os.cpu_count() or 4) // 2))),
                 "--alias", "local-coder",

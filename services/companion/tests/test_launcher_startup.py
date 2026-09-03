@@ -12,12 +12,25 @@ from unittest.mock import patch
 
 from openra_ai_companion.cli import _parser
 from openra_ai_companion.process_entrypoints import game_mcp_command
+from openra_ai_companion.bridge import OpenRABridge
 
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[3]
 
 
 class LauncherStartupTests(unittest.TestCase):
+
+    def test_local_game_bridge_caps_reconnect_backoff_after_menu_wait(self) -> None:
+        for address in ("127.0.0.1:9998", "localhost:9998", "[::1]:9998"):
+            with self.subTest(address=address), patch("grpc.insecure_channel") as channel:
+                bridge = OpenRABridge(address)
+                options = dict(channel.call_args.kwargs["options"])
+                self.assertEqual(options["grpc.max_reconnect_backoff_ms"], 1000)
+                bridge.close()
+        with patch("grpc.insecure_channel") as channel:
+            bridge = OpenRABridge("example.invalid:9998")
+            self.assertEqual(channel.call_args.kwargs["options"], ())
+            bridge.close()
 
     @unittest.skipUnless(Path("/bin/bash").exists(), "requires bash")
     def test_default_game_selection_accepts_no_launch_arguments(self) -> None:

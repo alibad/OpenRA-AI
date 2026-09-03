@@ -9,7 +9,7 @@ from pathlib import Path
 from typing import Any
 
 from .bridge import DEFAULT_INTERRUPTS, OpenRABridge
-from .labels import building_name, production_name, unit_name
+from .labels import building_name, unit_name
 from .models import ActionCommand, GameSnapshot
 from .settings import Settings
 from .strategy import (
@@ -151,8 +151,9 @@ class GameRuntime:
         return ""
 
     @staticmethod
-    def _display_type_counts(actors: tuple[Any, ...], *, buildings: bool = False) -> dict[str, int]:
-        label = building_name if buildings else unit_name
+    def _display_type_counts(actors: tuple[Any, ...], *, buildings: bool = False,
+                             snapshot: GameSnapshot | None = None) -> dict[str, int]:
+        label = snapshot.actor_name if snapshot is not None else building_name if buildings else unit_name
         return dict(sorted(Counter(label(actor.kind) for actor in actors).items()))
 
     @staticmethod
@@ -298,17 +299,17 @@ class GameRuntime:
         ]
         result["available_production"] = safe_production[:64]
         result["available_production_names"] = [
-            {"id": item, "name": production_name(item)} for item in safe_production[:64]
+            {"id": item, "name": snapshot.actor_name(item)} for item in safe_production[:64]
         ]
         for building in result["own_buildings"]:
             building["can_produce"] = [
                 item for item in building["can_produce"] if not item.lower().endswith("f")
             ]
         result["counts"] = {
-            "own_units": self._display_type_counts(snapshot.units),
-            "own_buildings": self._display_type_counts(snapshot.buildings, buildings=True),
-            "visible_enemy_units": self._display_type_counts(snapshot.visible_enemies),
-            "visible_enemy_buildings": self._display_type_counts(snapshot.visible_enemy_buildings, buildings=True),
+            "own_units": self._display_type_counts(snapshot.units, snapshot=snapshot),
+            "own_buildings": self._display_type_counts(snapshot.buildings, buildings=True, snapshot=snapshot),
+            "visible_enemy_units": self._display_type_counts(snapshot.visible_enemies, snapshot=snapshot),
+            "visible_enemy_buildings": self._display_type_counts(snapshot.visible_enemy_buildings, buildings=True, snapshot=snapshot),
         }
         result["harvesters"] = snapshot.harvester_count
         result["explored_percent"] = round(snapshot.explored_percent, 1)
@@ -609,8 +610,8 @@ class GameRuntime:
                 },
                 "production": list(self._snapshot.production[:12]),
                 "counts": {
-                    "own_units": self._display_type_counts(self._snapshot.units),
-                    "own_buildings": self._display_type_counts(self._snapshot.buildings, buildings=True),
+                    "own_units": self._display_type_counts(self._snapshot.units, snapshot=self._snapshot),
+                    "own_buildings": self._display_type_counts(self._snapshot.buildings, buildings=True, snapshot=self._snapshot),
                 },
             }
             self._write_evidence("commands", payload)
