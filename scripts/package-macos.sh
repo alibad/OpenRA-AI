@@ -224,8 +224,13 @@ else
   sign_runtime_payload "$SIGNING_IDENTITY"
   codesign --force --options runtime --timestamp --sign "$SIGNING_IDENTITY" "$RESOURCES/bin/openra-ai-companion"
   codesign --force --options runtime --timestamp --sign "$SIGNING_IDENTITY" "$RESOURCES/bin/openra-ai-runtime"
-  codesign --force --options runtime --timestamp --entitlements "$ENTITLEMENTS" --sign "$SIGNING_IDENTITY" "$MACOS/apphost-$ARCH_DIR"
   codesign --force --deep --options runtime --timestamp --sign "$SIGNING_IDENTITY" "$APP_ROOT"
+  codesign --force --options runtime --timestamp --entitlements "$ENTITLEMENTS" --sign "$SIGNING_IDENTITY" "$MACOS/apphost-$ARCH_DIR"
+  codesign --force --options runtime --timestamp --sign "$SIGNING_IDENTITY" "$APP_ROOT"
+  codesign -d --entitlements - "$MACOS/apphost-$ARCH_DIR" 2>/dev/null | grep -F 'com.apple.security.cs.allow-jit' >/dev/null || {
+    echo >&2 "The final apphost signature lost the .NET JIT entitlement."
+    exit 1
+  }
 fi
 
 "$RESOURCES/bin/openra-ai-companion" voice-check --dependencies-only || {

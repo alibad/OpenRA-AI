@@ -10,6 +10,16 @@ REPOSITORY_ROOT = Path(__file__).resolve().parents[3]
 
 
 class LauncherStartupTests(unittest.TestCase):
+
+    def test_final_macos_signature_preserves_apphost_entitlements(self) -> None:
+        root = Path(__file__).resolve().parents[3]
+        script = (root / "scripts" / "package-macos.sh").read_text()
+        deep = script.rindex('codesign --force --deep')
+        apphost = script.rindex('--entitlements "$ENTITLEMENTS"')
+        final = script.rindex('codesign --force --options runtime --timestamp --sign "$SIGNING_IDENTITY" "$APP_ROOT"')
+        self.assertLess(deep, apphost)
+        self.assertLess(apphost, final)
+
     def test_watch_accepts_wrapper_lifecycle_pid(self) -> None:
         args = _parser().parse_args(["watch", "--parent-pid", "42"])
         self.assertEqual(args.parent_pid, 42)
