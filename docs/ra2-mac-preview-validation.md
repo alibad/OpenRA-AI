@@ -6,21 +6,23 @@ complete requested RA2/custom-faction experience.
 ## Installed build
 
 - Application: `/Applications/OpenRA AI RA2 Preview.app`
-- In-game version: `0.1.0-alpha.18-ra2-preview.3`
-- Product snapshot: `6e07985d2c5e6323bc8b441494ae3862875bfdbb`
+- In-game version: `0.1.0-alpha.18-ra2-preview.5`
+- Product snapshot: `d87bf56995b7183a1af9f12b4566933c417a119a`
 - Engine: `c84262d9b2ab82da8a1d12a146c6dbc7b72e2922`
 - OpenRA RA2 source: `61e24e3c1d7b586aa55a86096d29e1559aa9b994`
-- Artifact: `artifacts/releases/OpenRA-AI-0.1.0-alpha.18-ra2-preview.3-macos-arm64.dmg`
-- SHA-256: `efe41003c9375a88c268b736567c7c4f0e211dfb49bf03585b53927cde5a507b`
+- Artifact: `artifacts/releases/OpenRA-AI-0.1.0-alpha.18-ra2-preview.5-macos-arm64.dmg`
+- SHA-256: `677b25561f883d310d77eb005c6eaf7e9173f870e31a55f29764b8ad9cf57f1d`
 - Signer: `Developer ID Application: HUMAN QUEST LLC (75E8FZ9444)`
 - Apple notarization: **Accepted**, submission
-  `651fc5ed-41a4-4dd7-8b26-fac21adb8757`.
+  `ab23bb4f-cd1c-43c8-a26c-dbbf1c074330`.
 - DMG checksum, deep/strict app signature, stapled DMG ticket and installed-app
   ticket validated. Gatekeeper accepted the installed copy as
   `Notarized Developer ID`. The app was copied from this exact read-only DMG.
 
 The existing OpenRA AI, alpha.17 and standalone Red Alert 2 Preview apps were
 not replaced. Owned RA2 game archives remain outside the application bundle.
+The broken preview.3 install was moved, not deleted, to
+`artifacts/ra2-integrated/superseded-installed-preview.3.app` before replacement.
 Finder's bundle metadata still reports `0.1.0`; the full preview identifier is
 shown in-game and recorded in `Resources/VERSION` and `RA2-BUILD.json`.
 
@@ -36,7 +38,7 @@ shown in-game and recorded in `Resources/VERSION` and `RA2-BUILD.json`.
 
 ## Verification
 
-- 515 engine tests passed; two pre-existing skips. 192 companion tests passed.
+- 515 engine tests passed; two pre-existing skips. 199 companion tests passed.
 - Shell syntax, whitespace and diff checks passed.
 - All 27 playable RA2 maps passed startup/AUTO deployment after the GI crash
   correction. The final signed package additionally passed Heartland,
@@ -50,22 +52,34 @@ shown in-game and recorded in `Resources/VERSION` and `RA2-BUILD.json`.
   The previous integrated package's World War III rules validation passed with
   11,543 warnings. Native engine builds had no compiler warnings; the bundled
   Whisper build emitted upstream C++ deprecation warnings.
-- Live packaged launches waited for companion readiness and showed AUTO active
-  in a fresh match, deploying the MCV and constructing power/refinery buildings.
+- Normal no-argument launch from Applications and the signed package passed.
+  The launcher waits for companion readiness before starting the game and
+  cleans up the game, companion and model runtime on exit.
+- After an extended menu wait, preview.5 received its first companion snapshot
+  1.453 seconds after the live bridge began listening, at tick 20. AUTO was
+  already enabled; the two-second screenshot shows the deployed Construction
+  Yard and power production underway. Earlier runs reached power/refinery
+  construction. The local bridge backoff is capped at one second.
 - In-process game switching preserved the companion and showed the original
   World War III factions. The final build changes RA2's misleading zero-packs
   start message to distinguish native countries/shared AI from custom packs.
-- A live local-model buildings question was answered correctly in 782 ms.
+- The final frozen companion successfully started its bundled game-tool
+  service (28 tools). A live question correctly identified Iraq and its
+  Construction Yard in 3578 ms, with `mcp.connected` and `battlefield_read`
+  both true, matching the independently read bridge state. Compact live
+  context is fetched explicitly and uses RA2 actor names. Bundled local
+  profiles provide 8192 context tokens for the tool instructions.
 - Local Whisper readiness and bundled microphone-device availability passed.
 - Ctrl+Shift+A switched AUTO off; Ctrl+Shift+M muted voice in the game. Original
   AUTO-on/voice-on preferences were restored after testing.
 - Exiting the controlled test games cleaned up their game/companion processes.
 
-Evidence is retained under `artifacts/ra2-integrated/`. The first signed build
-was not installed because live play found the GI crash. The second was
-superseded by the final UI/intent corrections. Pre-sign attempts to execute
-self-contained binaries were killed by macOS; all three checks passed after
-signing. None of these earlier builds is the installed preview.
+Evidence is retained under `artifacts/ra2-integrated/`. Preview.1 was rejected
+during testing because of the GI crash. Preview.2 was superseded by UI/intent
+corrections. Preview.3 exposed a normal-launch Bash error and missing frozen
+game-tool dispatch; both were fixed and regression-tested in preview.4.
+Preview.5 adds grounded local prompts, adequate context and prompt bridge
+reconnection. Only preview.5 is the current installed integrated preview.
 
 ## Still incomplete / release blockers
 
@@ -77,13 +91,11 @@ signing. None of these earlier builds is the installed preview.
 - Accept/reject shortcuts and unmuting were not fully verified end to end.
 - A Soviet AUTO run stayed active through tick 6240 but did not produce a
   Conscript within 260 seconds. Early production pacing needs tuning.
-- The frozen companion cannot currently launch its `game_mcp` module through
-  its Python-style subprocess entry point. Text/vision fallback works, but full
-  tool-backed assistant operation remains a release blocker.
 - Natural-language orders are not yet consistently reliable: a power-plant
-  request proposed placement before production and was safely rejected.
-  The final model also confused the map name with the country in a country
-  question. Fixing intent routing did not by itself fix answer accuracy.
+  request previously proposed placement before production and was safely
+  rejected; a later small-model request produced repetitive malformed output
+  and no accepted action. Correct grounded answers do not prove arbitrary
+  spoken/text commands are release-ready. Native AUTO is a separate system.
 - No Windows RA2 artifact was built, signed or validated. No public release,
   download upload, website deployment or GitHub Actions change was made.
 
