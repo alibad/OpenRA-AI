@@ -255,7 +255,9 @@ def detect_strategy_intent(text: str) -> tuple[str, str | None]:
 
     strategy_words = {word for word in STRATEGY_ALIASES if re.search(rf"\b{re.escape(word)}\b", normalized)}
     is_question = normalized.startswith(("what", "which", "why", "how", "tell", "explain", "describe")) or "?" in text
-    if is_question and any(term in normalized for term in ("strategy", "plan", "doctrine", "playing")):
+    strategy_question = re.search(r"\b(?:strategy|strategies|plan|plans|doctrine)\b", normalized)
+    play_style_question = re.search(r"\bhow (?:are we|am i) playing\b", normalized)
+    if is_question and (strategy_question or play_style_question):
         profile = STRATEGY_ALIASES[next(iter(sorted(strategy_words)))] if strategy_words else None
         return "query", profile
 

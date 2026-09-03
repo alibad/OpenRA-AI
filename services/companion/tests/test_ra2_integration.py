@@ -13,6 +13,7 @@ from openra_ai_companion.strategy import strategic_profile
 from openra_ai_companion.core import Companion
 from openra_ai_companion.router import AIRouter
 from openra_ai_companion.settings import Settings
+from openra_ai_companion.strategy_contracts import detect_strategy_intent
 
 ROOT = Path(__file__).resolve().parents[3]
 SPEC = importlib.util.spec_from_file_location("prepare_ra2", ROOT / "scripts/prepare-ra2.py")
@@ -21,6 +22,14 @@ SPEC.loader.exec_module(prepare)
 
 
 class RA2IntegrationTests(unittest.TestCase):
+    def test_game_identity_and_power_plant_questions_are_not_strategy_queries(self):
+        for question in ("What country am I playing?", "Which faction am I playing?",
+                         "What game am I playing?", "Which power plants do I own?"):
+            with self.subTest(question=question):
+                self.assertEqual(detect_strategy_intent(question), ("", None))
+        self.assertEqual(detect_strategy_intent("What strategy are we playing?"), ("query", None))
+        self.assertEqual(detect_strategy_intent("How are we playing?"), ("query", None))
+
     def test_wire_schema_identifies_base_game_and_actor_names(self):
         snapshot = GameObservation(mod_id="ra2", actor_names={"e1": "GI", "e2": "Conscript"})
         decoded = GameObservation.FromString(snapshot.SerializeToString())
