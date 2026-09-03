@@ -1,0 +1,8 @@
+{
+  "repository": "https://github.com/OpenRA/ra2",
+  "commit": "61e24e3c1d7b586aa55a86096d29e1559aa9b994",
+  "archive_url": "https://codeload.github.com/OpenRA/ra2/tar.gz/61e24e3c1d7b586aa55a86096d29e1559aa9b994",
+  "archive_sha256": "267e38ba03769c404fb179d28224b61236798e75e2e4dabce36d83c0c9e8c6ce",
+  "engine_commit": "2da194ae01ba6180537816d817ceb1fe07b2de21",
+  "version": "0.1.0-ra2-preview.1"
+}

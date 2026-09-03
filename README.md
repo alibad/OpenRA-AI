@@ -12,6 +12,36 @@ OpenRA project or Electronic Arts.
 
 ## Download and play
 
+### Native Red Alert 2 preview on Mac
+
+RA2 is now available as a separate, locally built Apple Silicon preview using
+the [OpenRA RA2 mod](https://github.com/OpenRA/ra2) and your own original game files.
+It is **not** the RA2-inspired Experience Builder pack, and it does not require
+CrossOver, Wine, or a Windows virtual machine.
+
+With Python 3.11+, .NET 10 and the pinned engine checkout, run:
+
+```sh
+python3 scripts/build-ra2-preview.py --install --launch
+```
+
+This detects the already-downloaded Steam RA2 base/English depots on macOS.
+For another legitimate installation, supply `--base-content /path/to/base`
+and `--language-content /path/to/english`. The importer requires `ra2.mix`
+and `language.mix`, verifies the copies, and never overwrites different
+existing content. Proprietary game files stay in your private Application
+Support folder, outside the app bundle and Git.
+
+Open **Red Alert 2 Preview** in Applications, choose **Singleplayer → Skirmish**,
+pick your country, then start. Select your MCV and press **F** to deploy.
+The version is `0.1.0-ra2-preview.1`; the app has separate settings/saves and
+does not replace OpenRA AI. Move an older preview aside before reinstalling.
+
+This is an early OpenRA recreation, not the original executable or a
+feature-complete RA2 release. AI companion/voice/AUTO, original campaigns,
+and Yuri’s Revenge are not included in this preview. The app is locally
+ad-hoc signed, not notarized or published on the download website.
+
 ### Supported builds
 
 | Platform | Status | Download |

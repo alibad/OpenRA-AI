@@ -1,0 +1,2736 @@
+--- a/OpenRA.Mods.RA2/FileSystem/BagFile.cs
++++ b/OpenRA.Mods.RA2/FileSystem/BagFile.cs
+@@ -50,19 +50,19 @@
+ 				if ((entry.Flags & 2) > 0)
+ 				{
+ 					// PCM
+-					waveHeaderMemoryStream.WriteArray(Encoding.ASCII.GetBytes("RIFF"));
+-					waveHeaderMemoryStream.WriteArray(BitConverter.GetBytes(entry.Length + 36));
+-					waveHeaderMemoryStream.WriteArray(Encoding.ASCII.GetBytes("WAVE"));
+-					waveHeaderMemoryStream.WriteArray(Encoding.ASCII.GetBytes("fmt "));
+-					waveHeaderMemoryStream.WriteArray(BitConverter.GetBytes(16));
+-					waveHeaderMemoryStream.WriteArray(BitConverter.GetBytes((short)1));
+-					waveHeaderMemoryStream.WriteArray(BitConverter.GetBytes((short)channels));
+-					waveHeaderMemoryStream.WriteArray(BitConverter.GetBytes(entry.SampleRate));
+-					waveHeaderMemoryStream.WriteArray(BitConverter.GetBytes(2 * channels * entry.SampleRate));
+-					waveHeaderMemoryStream.WriteArray(BitConverter.GetBytes((short)(2 * channels)));
+-					waveHeaderMemoryStream.WriteArray(BitConverter.GetBytes((short)16));
+-					waveHeaderMemoryStream.WriteArray(Encoding.ASCII.GetBytes("data"));
+-					waveHeaderMemoryStream.WriteArray(BitConverter.GetBytes(entry.Length));
++					waveHeaderMemoryStream.Write(Encoding.ASCII.GetBytes("RIFF"));
++					waveHeaderMemoryStream.Write(BitConverter.GetBytes(entry.Length + 36));
++					waveHeaderMemoryStream.Write(Encoding.ASCII.GetBytes("WAVE"));
++					waveHeaderMemoryStream.Write(Encoding.ASCII.GetBytes("fmt "));
++					waveHeaderMemoryStream.Write(BitConverter.GetBytes(16));
++					waveHeaderMemoryStream.Write(BitConverter.GetBytes((short)1));
++					waveHeaderMemoryStream.Write(BitConverter.GetBytes((short)channels));
++					waveHeaderMemoryStream.Write(BitConverter.GetBytes(entry.SampleRate));
++					waveHeaderMemoryStream.Write(BitConverter.GetBytes(2 * channels * entry.SampleRate));
++					waveHeaderMemoryStream.Write(BitConverter.GetBytes((short)(2 * channels)));
++					waveHeaderMemoryStream.Write(BitConverter.GetBytes((short)16));
++					waveHeaderMemoryStream.Write(Encoding.ASCII.GetBytes("data"));
++					waveHeaderMemoryStream.Write(BitConverter.GetBytes(entry.Length));
+ 				}
+ 
+ 				if ((entry.Flags & 8) > 0)
+@@ -72,24 +72,24 @@
+ 					var bytesPerSec = (int)Math.Floor((double)(2 * entry.ChunkSize) / samplesPerChunk * ((double)entry.SampleRate / 2));
+ 					var chunkSize = entry.ChunkSize > entry.Length ? entry.Length : entry.ChunkSize;
+ 
+-					waveHeaderMemoryStream.WriteArray(Encoding.ASCII.GetBytes("RIFF"));
+-					waveHeaderMemoryStream.WriteArray(BitConverter.GetBytes(entry.Length + 52));
+-					waveHeaderMemoryStream.WriteArray(Encoding.ASCII.GetBytes("WAVE"));
+-					waveHeaderMemoryStream.WriteArray(Encoding.ASCII.GetBytes("fmt "));
+-					waveHeaderMemoryStream.WriteArray(BitConverter.GetBytes(20));
+-					waveHeaderMemoryStream.WriteArray(BitConverter.GetBytes((short)17));
+-					waveHeaderMemoryStream.WriteArray(BitConverter.GetBytes((short)channels));
+-					waveHeaderMemoryStream.WriteArray(BitConverter.GetBytes(entry.SampleRate));
+-					waveHeaderMemoryStream.WriteArray(BitConverter.GetBytes(bytesPerSec));
+-					waveHeaderMemoryStream.WriteArray(BitConverter.GetBytes((short)chunkSize));
+-					waveHeaderMemoryStream.WriteArray(BitConverter.GetBytes((short)4));
+-					waveHeaderMemoryStream.WriteArray(BitConverter.GetBytes((short)2));
+-					waveHeaderMemoryStream.WriteArray(BitConverter.GetBytes((short)samplesPerChunk));
+-					waveHeaderMemoryStream.WriteArray(Encoding.ASCII.GetBytes("fact"));
+-					waveHeaderMemoryStream.WriteArray(BitConverter.GetBytes(4));
+-					waveHeaderMemoryStream.WriteArray(BitConverter.GetBytes(4 * entry.Length));
+-					waveHeaderMemoryStream.WriteArray(Encoding.ASCII.GetBytes("data"));
+-					waveHeaderMemoryStream.WriteArray(BitConverter.GetBytes(entry.Length));
++					waveHeaderMemoryStream.Write(Encoding.ASCII.GetBytes("RIFF"));
++					waveHeaderMemoryStream.Write(BitConverter.GetBytes(entry.Length + 52));
++					waveHeaderMemoryStream.Write(Encoding.ASCII.GetBytes("WAVE"));
++					waveHeaderMemoryStream.Write(Encoding.ASCII.GetBytes("fmt "));
++					waveHeaderMemoryStream.Write(BitConverter.GetBytes(20));
++					waveHeaderMemoryStream.Write(BitConverter.GetBytes((short)17));
++					waveHeaderMemoryStream.Write(BitConverter.GetBytes((short)channels));
++					waveHeaderMemoryStream.Write(BitConverter.GetBytes(entry.SampleRate));
++					waveHeaderMemoryStream.Write(BitConverter.GetBytes(bytesPerSec));
++					waveHeaderMemoryStream.Write(BitConverter.GetBytes((short)chunkSize));
++					waveHeaderMemoryStream.Write(BitConverter.GetBytes((short)4));
++					waveHeaderMemoryStream.Write(BitConverter.GetBytes((short)2));
++					waveHeaderMemoryStream.Write(BitConverter.GetBytes((short)samplesPerChunk));
++					waveHeaderMemoryStream.Write(Encoding.ASCII.GetBytes("fact"));
++					waveHeaderMemoryStream.Write(BitConverter.GetBytes(4));
++					waveHeaderMemoryStream.Write(BitConverter.GetBytes(4 * entry.Length));
++					waveHeaderMemoryStream.Write(Encoding.ASCII.GetBytes("data"));
++					waveHeaderMemoryStream.Write(BitConverter.GetBytes(entry.Length));
+ 				}
+ 
+ 				waveHeaderMemoryStream.Seek(0, SeekOrigin.Begin);
+--- a/OpenRA.Mods.RA2/Projectiles/ArcLaserZap.cs
++++ b/OpenRA.Mods.RA2/Projectiles/ArcLaserZap.cs
+@@ -74,14 +74,14 @@
+ 		readonly Animation hitanim;
+ 		readonly Color color;
+ 
+-		[Sync]
++		[VerifySync]
+ 		readonly WPos source;
+ 
+ 		int ticks = 0;
+ 		bool doneDamage;
+ 		bool animationComplete;
+ 
+-		[Sync]
++		[VerifySync]
+ 		WPos target;
+ 
+ 		public ArcLaserZap(ArcLaserZapInfo info, ProjectileArgs args, Color color)
+@@ -107,7 +107,7 @@
+ 		{
+ 			// Beam tracks target
+ 			if (info.TrackTarget && args.GuidedTarget.IsValidFor(args.SourceActor))
+-				target = args.Weapon.TargetActorCenter ? args.GuidedTarget.CenterPosition : args.GuidedTarget.Positions.PositionClosestTo(source);
++				target = args.Weapon.TargetActorCenter ? args.GuidedTarget.CenterPosition : args.GuidedTarget.Positions.MinBy(p => (p - source).LengthSquared);
+ 
+ 			// Check for blocking actors
+ 			if (info.Blockable && BlocksProjectiles.AnyBlockingActorsBetween(world, args.SourceActor.Owner, source, target,
+--- a/OpenRA.Mods.RA2/Projectiles/ElectricBolt.cs
++++ b/OpenRA.Mods.RA2/Projectiles/ElectricBolt.cs
+@@ -79,7 +79,7 @@
+ 		readonly bool hasLaunchEffect;
+ 		readonly HashSet<(Color Color, WPos[] Offsets)> zaps;
+ 
+-		[Sync]
++		[VerifySync]
+ 		readonly WPos target, source;
+ 
+ 		int ticks = 0;
+--- a/OpenRA.Mods.RA2/Traits/ChronoResourceDelivery.cs
++++ b/OpenRA.Mods.RA2/Traits/ChronoResourceDelivery.cs
+@@ -46,7 +46,7 @@
+ 		public override object Create(ActorInitializer init) { return new ChronoResourceDelivery(this); }
+ 	}
+ 
+-	public class ChronoResourceDelivery : INotifyHarvesterAction, ITick
++	public class ChronoResourceDelivery : INotifyHarvestAction, INotifyDockClientMoving, ITick
+ 	{
+ 		readonly ChronoResourceDeliveryInfo info;
+ 
+@@ -76,15 +76,14 @@
+ 				ticksTillCheck--;
+ 		}
+ 
+-		void INotifyHarvesterAction.MovingToResources(Actor self, CPos targetCell)
++		void INotifyHarvestAction.MovingToResources(Actor self, CPos targetCell)
+ 		{
+ 			Reset();
+ 		}
+ 
+-		void INotifyHarvesterAction.MovingToRefinery(Actor self, Actor refineryActor)
++		void INotifyDockClientMoving.MovingToDock(Actor self, Actor refineryActor, IDockHost host)
+ 		{
+-			var iao = refineryActor.Trait<IAcceptResources>();
+-			var targetCell = self.World.Map.CellContaining(iao.DeliveryPosition);
++			var targetCell = self.World.Map.CellContaining(host.DockPosition);
+ 			if (destination != null && destination.Value != targetCell)
+ 				ticksTillCheck = 0;
+ 
+@@ -96,6 +95,8 @@
+ 		{
+ 			Reset();
+ 		}
++
++		void INotifyDockClientMoving.MovementCancelled(Actor self) { Reset(); }
+ 
+ 		public void Harvested(Actor self, string resourceType) { }
+ 		public void Docked() { }
+@@ -119,8 +120,8 @@
+ 				self.QueueActivity(new ChronoResourceTeleport(dest, info));
+ 
+ 				// HACK: Manually queue a delivery and new find since we just cancelled all activities
+-				self.QueueActivity(new DeliverResources(self, refinery));
+-				self.QueueActivity(new FindAndDeliverResources(self, refinery));
++				self.QueueActivity(new MoveToDock(self, refinery));
++				self.QueueActivity(new FindAndDeliverResources(self));
+ 				Reset();
+ 			}
+ 		}
+--- a/OpenRA.Mods.RA2/Traits/Conditions/GrantTimedConditionOnDeploy.cs
++++ b/OpenRA.Mods.RA2/Traits/Conditions/GrantTimedConditionOnDeploy.cs
+@@ -89,7 +89,7 @@
+ 		WithSpriteBody[] wsbs;
+ 		TimedDeployState deployState;
+ 
+-		[Sync]
++		[VerifySync]
+ 		int ticks;
+ 
+ 		public GrantTimedConditionOnDeploy(ActorInitializer init, GrantTimedConditionOnDeployInfo info)
+--- a/OpenRA.Mods.RA2/Traits/DamagedByTintedCells.cs
++++ b/OpenRA.Mods.RA2/Traits/DamagedByTintedCells.cs
+@@ -61,7 +61,7 @@
+ 	{
+ 		readonly TintedCellsLayer tintedCellLayer;
+ 
+-		[Sync]
++		[VerifySync]
+ 		int damageTicks;
+ 
+ 		public DamagedByTintedCells(Actor self, DamagedByTintedCellsInfo info)
+--- a/OpenRA.Mods.RA2/Traits/Mirage.cs
++++ b/OpenRA.Mods.RA2/Traits/Mirage.cs
+@@ -95,11 +95,11 @@
+ 	}
+ 
+ 	public class Mirage : PausableConditionalTrait<MirageInfo>, INotifyDamage, IEffectiveOwner, INotifyDemolition, INotifyInfiltration,
+-		INotifyAttack, ITick, INotifyCreated
++		INotifyAttack, ITick, INotifyCreated, ISync
+ 	{
+ 		readonly Actor self;
+ 
+-		[Sync]
++		[VerifySync]
+ 		int remainingTime;
+ 
+ 		CPos? lastPos;
+--- a/OpenRA.Mods.RA2/Traits/Render/WithVoxelHelicopterBody.cs
++++ b/OpenRA.Mods.RA2/Traits/Render/WithVoxelHelicopterBody.cs
+@@ -34,10 +34,10 @@
+ 
+ 		public override object Create(ActorInitializer init) { return new WithVoxelHelicopterBody(init.Self, this); }
+ 
+-		public IEnumerable<ModelAnimation> RenderPreviewVoxels(
++		public IEnumerable<ModelAnimation> RenderPreviewVoxels(IModelCache cache,
+ 			ActorPreviewInitializer init, RenderVoxelsInfo rv, string image, Func<WRot> orientation, int facings, PaletteReference p)
+ 		{
+-			var voxel = init.World.ModelCache.GetModelSequence(image, Sequence);
++			var voxel = cache.GetModelSequence(image, Sequence);
+ 			var body = init.Actor.TraitInfo<BodyOrientationInfo>();
+ 			var frame = init.GetValue<BodyAnimationFrameInit, uint>(this, 0);
+ 
+@@ -63,7 +63,7 @@
+ 			var body = self.Trait<BodyOrientation>();
+ 			rv = self.Trait<RenderVoxels>();
+ 
+-			var voxel = self.World.ModelCache.GetModelSequence(rv.Image, info.Sequence);
++			var voxel = rv.Renderer.ModelCache.GetModelSequence(rv.Image, info.Sequence);
+ 			frames = voxel.Frames;
+ 			modelAnimation = new ModelAnimation(voxel, () => WVec.Zero,
+ 				() => body.QuantizeOrientation(self.Orientation),
+--- a/OpenRA.Mods.RA2/Traits/SpawnSurvivors.cs
++++ b/OpenRA.Mods.RA2/Traits/SpawnSurvivors.cs
+@@ -67,7 +67,8 @@
+ 
+ 					var unit = w.CreateActor(true, actorType.ToLowerInvariant(), td);
+ 					var mobile = unit.TraitOrDefault<Mobile>();
+-					mobile?.Nudge(unit);
++					if (mobile != null)
++						unit.QueueActivity(false, new Nudge(unit));
+ 				}
+ 			});
+ 		}
+--- a/OpenRA.Mods.RA2/UtilityCommands/ImportRA2MapCommand.cs
++++ b/OpenRA.Mods.RA2/UtilityCommands/ImportRA2MapCommand.cs
+@@ -365,7 +365,7 @@
+ 			if (!utility.ModData.DefaultTerrainInfo.TryGetValue(tileset, out var terrainInfo))
+ 				throw new InvalidDataException($"Unknown tileset {tileset}");
+ 
+-			var map = new Map(Game.ModData, terrainInfo, size.Width, size.Height)
++			var map = new Map(Game.ModData, terrainInfo, size)
+ 			{
+ 				Title = basic.GetValue("Name", Path.GetFileNameWithoutExtension(filename)),
+ 				Author = "Westwood Studios",
+@@ -544,7 +544,7 @@
+ 							ar.Add(new HealthInit(health));
+ 					}
+ 
+-					map.ActorDefinitions.Add(new MiniYamlNode("Actor" + map.ActorDefinitions.Count, ar.Save()));
++					map.ActorDefinitions = [.. map.ActorDefinitions, new MiniYamlNode("Actor" + map.ActorDefinitions.Count, ar.Save())];
+ 
+ 					continue;
+ 				}
+@@ -582,7 +582,7 @@
+ 					new OwnerInit("Neutral")
+ 				};
+ 
+-				map.ActorDefinitions.Add(new MiniYamlNode("Actor" + map.ActorDefinitions.Count, ar.Save()));
++				map.ActorDefinitions = [.. map.ActorDefinitions, new MiniYamlNode("Actor" + map.ActorDefinitions.Count, ar.Save())];
+ 			}
+ 		}
+ 
+@@ -611,7 +611,7 @@
+ 				if (!map.Rules.Actors.ContainsKey(name))
+ 					Console.WriteLine($"Ignoring unknown actor type: `{name}`");
+ 				else
+-					map.ActorDefinitions.Add(new MiniYamlNode("Actor" + map.ActorDefinitions.Count, ar.Save()));
++					map.ActorDefinitions = [.. map.ActorDefinitions, new MiniYamlNode("Actor" + map.ActorDefinitions.Count, ar.Save())];
+ 			}
+ 		}
+ 
+@@ -665,7 +665,7 @@
+ 				if (!map.Rules.Actors.ContainsKey(name))
+ 					Console.WriteLine($"Ignoring unknown actor type: `{name}`");
+ 				else
+-					map.ActorDefinitions.Add(new MiniYamlNode("Actor" + map.ActorDefinitions.Count, ar.Save()));
++					map.ActorDefinitions = [.. map.ActorDefinitions, new MiniYamlNode("Actor" + map.ActorDefinitions.Count, ar.Save())];
+ 			}
+ 		}
+ 
+--- a/OpenRA.Mods.RA2/Warheads/CreateTintedCellsWarhead.cs
++++ b/OpenRA.Mods.RA2/Warheads/CreateTintedCellsWarhead.cs
+@@ -67,7 +67,7 @@
+ 				if (devMode != null && devMode.CombatGeometry)
+ 				{
+ 					var range = Exts.MakeArray(Range.Length, i => WDist.FromCells(Range[i].Length));
+-					world.WorldActor.Trait<WarheadDebugOverlay>().AddImpact(pos, range, DebugOverlayColor);
++					world.WorldActor.Trait<WarheadDebugOverlay>().AddImpact(pos, [.. range], DebugOverlayColor);
+ 				}
+ 			}
+ 
+--- a/mods/ra2/chrome/ingame-debug.yaml
++++ b/mods/ra2/chrome/ingame-debug.yaml
+@@ -1,15 +1,15 @@
+ Container@DEBUG_PANEL:
+ 	Logic: DebugMenuLogic
+ 	Y: 10
+-	Width: PARENT_RIGHT
+-	Height: PARENT_BOTTOM
++	Width: PARENT_WIDTH
++	Height: PARENT_HEIGHT
+ 	Children:
+ 		Label@TITLE:
+ 			Y: 26
+ 			Font: Bold
+ 			Text: Debug Options
+ 			Align: Center
+-			Width: PARENT_RIGHT
++			Width: PARENT_WIDTH
+ 		Checkbox@INSTANT_BUILD:
+ 			X: 45
+ 			Y: 45
+@@ -85,7 +85,7 @@
+ 			Font: Bold
+ 			Text: Visualizations
+ 			Align: Center
+-			Width: PARENT_RIGHT
++			Width: PARENT_WIDTH
+ 		Checkbox@SHOW_UNIT_PATHS:
+ 			X: 45
+ 			Y: 275
+--- a/mods/ra2/chrome/ingame-observer.yaml
++++ b/mods/ra2/chrome/ingame-observer.yaml
+@@ -14,12 +14,12 @@
+ 			DisableWorldSounds: true
+ 		Container@GAME_TIMER_BLOCK:
+ 			Logic: GameTimerLogic
+-			X: (WINDOW_RIGHT - WIDTH) / 2
++			X: (WINDOW_WIDTH - WIDTH) / 2
+ 			Width: 100
+ 			Height: 55
+ 			Children:
+ 				LabelWithTooltip@GAME_TIMER:
+-					Width: PARENT_RIGHT
++					Width: PARENT_WIDTH
+ 					Height: 30
+ 					Align: Center
+ 					Font: Title
+@@ -28,13 +28,13 @@
+ 					TooltipTemplate: SIMPLE_TOOLTIP
+ 				Label@GAME_TIMER_STATUS:
+ 					Y: 32
+-					Width: PARENT_RIGHT
++					Width: PARENT_WIDTH
+ 					Height: 15
+ 					Align: Center
+ 					Font: Bold
+ 					Contrast: true
+ 		Background@RADAR_BG:
+-			X: WINDOW_RIGHT - 255
++			X: WINDOW_WIDTH - 255
+ 			Y: 5
+ 			Width: 250
+ 			Height: 250
+@@ -42,17 +42,17 @@
+ 				Radar@INGAME_RADAR:
+ 					X: 10
+ 					Y: 10
+-					Width: PARENT_RIGHT - 19
+-					Height: PARENT_BOTTOM - 19
++					Width: PARENT_WIDTH - 19
++					Height: PARENT_HEIGHT - 19
+ 					WorldInteractionController: INTERACTION_CONTROLLER
+ 				VideoPlayer@PLAYER:
+ 					X: 10
+ 					Y: 10
+-					Width: PARENT_RIGHT - 20
+-					Height: PARENT_BOTTOM - 20
++					Width: PARENT_WIDTH - 20
++					Height: PARENT_HEIGHT - 20
+ 					Skippable: false
+ 		Background@OBSERVER_CONTROL_BG:
+-			X: WINDOW_RIGHT - 255
++			X: WINDOW_WIDTH - 255
+ 			Y: 260
+ 			Width: 250
+ 			Height: 55
+@@ -75,12 +75,12 @@
+ 							Y: 2
+ 						Label@LABEL:
+ 							X: 34
+-							Width: PARENT_RIGHT
++							Width: PARENT_WIDTH
+ 							Height: 25
+ 							Shadow: True
+ 						Label@NOFLAG_LABEL:
+ 							X: 5
+-							Width: PARENT_RIGHT
++							Width: PARENT_WIDTH
+ 							Height: 25
+ 							Shadow: True
+ 				Container@REPLAY_PLAYER:
+@@ -187,33 +187,33 @@
+ 				Container@GRAPH_BG:
+ 					Y: 30
+ 					X: 0
+-					Width: PARENT_RIGHT
++					Width: PARENT_WIDTH
+ 					Height: 25
+ 					Children:
+ 						Container@BASIC_STATS_HEADERS:
+ 							X: 0
+ 							Y: 0
+ 							Width: 700
+-							Height: PARENT_BOTTOM
++							Height: PARENT_HEIGHT
+ 							Children:
+ 								ColorBlock@HEADER_COLOR:
+ 									X: 0
+ 									Y: 0
+ 									Color: 00000090
+-									Width: PARENT_RIGHT - 200
+-									Height: PARENT_BOTTOM
++									Width: PARENT_WIDTH - 200
++									Height: PARENT_HEIGHT
+ 								GradientColorBlock@HEADER_GRADIENT:
+-									X: PARENT_RIGHT - 200
++									X: PARENT_WIDTH - 200
+ 									Y: 0
+ 									TopLeftColor: 00000090
+ 									BottomLeftColor: 00000090
+ 									Width: 200
+-									Height: PARENT_BOTTOM
++									Height: PARENT_HEIGHT
+ 								Label@PLAYER_HEADER:
+ 									X: 35
+ 									Y: 0
+ 									Width: 120
+-									Height: PARENT_BOTTOM
++									Height: PARENT_HEIGHT
+ 									Font: Bold
+ 									Text: Player
+ 									Align: Left
+@@ -222,7 +222,7 @@
+ 									X: 155
+ 									Y: 0
+ 									Width: 80
+-									Height: PARENT_BOTTOM
++									Height: PARENT_HEIGHT
+ 									Font: Bold
+ 									Text: Cash
+ 									Align: Right
+@@ -231,7 +231,7 @@
+ 									X: 235
+ 									Y: 0
+ 									Width: 80
+-									Height: PARENT_BOTTOM
++									Height: PARENT_HEIGHT
+ 									Font: Bold
+ 									Text: Power
+ 									Align: Center
+@@ -240,7 +240,7 @@
+ 									X: 315
+ 									Y: 0
+ 									Width: 40
+-									Height: PARENT_BOTTOM
++									Height: PARENT_HEIGHT
+ 									Font: Bold
+ 									Text: Kills
+ 									Align: Right
+@@ -249,7 +249,7 @@
+ 									X: 355
+ 									Y: 0
+ 									Width: 60
+-									Height: PARENT_BOTTOM
++									Height: PARENT_HEIGHT
+ 									Font: Bold
+ 									Text: Deaths
+ 									Align: Right
+@@ -258,7 +258,7 @@
+ 									X: 415
+ 									Y: 0
+ 									Width: 80
+-									Height: PARENT_BOTTOM
++									Height: PARENT_HEIGHT
+ 									Font: Bold
+ 									Text: Destroyed
+ 									Align: Right
+@@ -267,7 +267,7 @@
+ 									X: 495
+ 									Y: 0
+ 									Width: 80
+-									Height: PARENT_BOTTOM
++									Height: PARENT_HEIGHT
+ 									Font: Bold
+ 									Text: Lost
+ 									Align: Right
+@@ -276,7 +276,7 @@
+ 									X: 575
+ 									Y: 0
+ 									Width: 60
+-									Height: PARENT_BOTTOM
++									Height: PARENT_HEIGHT
+ 									Font: Bold
+ 									Text: Score
+ 									Align: Right
+@@ -285,7 +285,7 @@
+ 									X: 635
+ 									Y: 0
+ 									Width: 60
+-									Height: PARENT_BOTTOM
++									Height: PARENT_HEIGHT
+ 									Font: Bold
+ 									Text: APM
+ 									Align: Right
+@@ -294,32 +294,32 @@
+ 							X: 0
+ 							Y: 0
+ 							Width: 640
+-							Height: PARENT_BOTTOM
++							Height: PARENT_HEIGHT
+ 							Children:
+ 								ColorBlock@HEADER_COLOR:
+ 									X: 0
+ 									Y: 0
+ 									Color: 00000090
+-									Width: PARENT_RIGHT - 200
+-									Height: PARENT_BOTTOM
++									Width: PARENT_WIDTH - 200
++									Height: PARENT_HEIGHT
+ 								GradientColorBlock@HEADER_GRADIENT:
+-									X: PARENT_RIGHT - 200
++									X: PARENT_WIDTH - 200
+ 									Y: 0
+ 									TopLeftColor: 00000090
+ 									BottomLeftColor: 00000090
+ 									Width: 200
+-									Height: PARENT_BOTTOM
++									Height: PARENT_HEIGHT
+ 								Label@PLAYER_HEADER:
+ 									X: 35
+ 									Width: 120
+-									Height: PARENT_BOTTOM
++									Height: PARENT_HEIGHT
+ 									Font: Bold
+ 									Text: Player
+ 									Shadow: True
+ 								Label@CASH_HEADER:
+ 									X: 155
+ 									Width: 80
+-									Height: PARENT_BOTTOM
++									Height: PARENT_HEIGHT
+ 									Font: Bold
+ 									Text: Cash
+ 									Align: Right
+@@ -327,7 +327,7 @@
+ 								Label@INCOME_HEADER:
+ 									X: 235
+ 									Width: 80
+-									Height: PARENT_BOTTOM
++									Height: PARENT_HEIGHT
+ 									Font: Bold
+ 									Text: Income
+ 									Align: Right
+@@ -335,7 +335,7 @@
+ 								Label@ASSETS_HEADER:
+ 									X: 315
+ 									Width: 80
+-									Height: PARENT_BOTTOM
++									Height: PARENT_HEIGHT
+ 									Font: Bold
+ 									Text: Assets
+ 									Align: Right
+@@ -343,7 +343,7 @@
+ 								Label@EARNED_HEADER:
+ 									X: 395
+ 									Width: 80
+-									Height: PARENT_BOTTOM
++									Height: PARENT_HEIGHT
+ 									Font: Bold
+ 									Text: Earned
+ 									Align: Right
+@@ -351,7 +351,7 @@
+ 								Label@SPENT_HEADER:
+ 									X: 475
+ 									Width: 80
+-									Height: PARENT_BOTTOM
++									Height: PARENT_HEIGHT
+ 									Font: Bold
+ 									Text: Spent
+ 									Align: Right
+@@ -359,7 +359,7 @@
+ 								Label@HARVESTERS_HEADER:
+ 									X: 555
+ 									Width: 80
+-									Height: PARENT_BOTTOM
++									Height: PARENT_HEIGHT
+ 									Font: Bold
+ 									Text: Harvesters
+ 									Align: Right
+@@ -368,26 +368,26 @@
+ 							X: 0
+ 							Y: 0
+ 							Width: 400
+-							Height: PARENT_BOTTOM
++							Height: PARENT_HEIGHT
+ 							Children:
+ 								ColorBlock@HEADER_COLOR:
+ 									X: 0
+ 									Y: 0
+ 									Color: 00000090
+-									Width: PARENT_RIGHT - 200
+-									Height: PARENT_BOTTOM
++									Width: PARENT_WIDTH - 200
++									Height: PARENT_HEIGHT
+ 								GradientColorBlock@HEADER_GRADIENT:
+-									X: PARENT_RIGHT - 200
++									X: PARENT_WIDTH - 200
+ 									Y: 0
+ 									TopLeftColor: 00000090
+ 									BottomLeftColor: 00000090
+ 									Width: 200
+-									Height: PARENT_BOTTOM
++									Height: PARENT_HEIGHT
+ 								Label@PLAYER_HEADER:
+ 									X: 35
+ 									Y: 0
+ 									Width: 120
+-									Height: PARENT_BOTTOM
++									Height: PARENT_HEIGHT
+ 									Font: Bold
+ 									Text: Player
+ 									Align: Left
+@@ -396,7 +396,7 @@
+ 									X: 155
+ 									Y: 0
+ 									Width: 100
+-									Height: PARENT_BOTTOM
++									Height: PARENT_HEIGHT
+ 									Font: Bold
+ 									Text: Production
+ 									Shadow: True
+@@ -404,26 +404,26 @@
+ 							X: 0
+ 							Y: 0
+ 							Width: 400
+-							Height: PARENT_BOTTOM
++							Height: PARENT_HEIGHT
+ 							Children:
+ 								ColorBlock@HEADER_COLOR:
+ 									X: 0
+ 									Y: 0
+ 									Color: 00000090
+-									Width: PARENT_RIGHT - 200
+-									Height: PARENT_BOTTOM
++									Width: PARENT_WIDTH - 200
++									Height: PARENT_HEIGHT
+ 								GradientColorBlock@HEADER_GRADIENT:
+-									X: PARENT_RIGHT - 200
++									X: PARENT_WIDTH - 200
+ 									Y: 0
+ 									TopLeftColor: 00000090
+ 									BottomLeftColor: 00000090
+ 									Width: 200
+-									Height: PARENT_BOTTOM
++									Height: PARENT_HEIGHT
+ 								Label@PLAYER_HEADER:
+ 									X: 35
+ 									Y: 0
+ 									Width: 120
+-									Height: PARENT_BOTTOM
++									Height: PARENT_HEIGHT
+ 									Font: Bold
+ 									Text: Player
+ 									Align: Left
+@@ -432,7 +432,7 @@
+ 									X: 155
+ 									Y: 0
+ 									Width: 100
+-									Height: PARENT_BOTTOM
++									Height: PARENT_HEIGHT
+ 									Font: Bold
+ 									Text: Support Powers
+ 									Shadow: True
+@@ -440,26 +440,26 @@
+ 							X: 0
+ 							Y: 0
+ 							Width: 400
+-							Height: PARENT_BOTTOM
++							Height: PARENT_HEIGHT
+ 							Children:
+ 								ColorBlock@HEADER_COLOR:
+ 									X: 0
+ 									Y: 0
+ 									Color: 00000090
+-									Width: PARENT_RIGHT - 200
+-									Height: PARENT_BOTTOM
++									Width: PARENT_WIDTH - 200
++									Height: PARENT_HEIGHT
+ 								GradientColorBlock@HEADER_GRADIENT:
+-									X: PARENT_RIGHT - 200
++									X: PARENT_WIDTH - 200
+ 									Y: 0
+ 									TopLeftColor: 00000090
+ 									BottomLeftColor: 00000090
+ 									Width: 200
+-									Height: PARENT_BOTTOM
++									Height: PARENT_HEIGHT
+ 								Label@PLAYER_HEADER:
+ 									X: 40
+ 									Y: 0
+ 									Width: 120
+-									Height: PARENT_BOTTOM
++									Height: PARENT_HEIGHT
+ 									Font: Bold
+ 									Text: Player
+ 									Align: Left
+@@ -468,7 +468,7 @@
+ 									X: 160
+ 									Y: 0
+ 									Width: 100
+-									Height: PARENT_BOTTOM
++									Height: PARENT_HEIGHT
+ 									Font: Bold
+ 									Text: Army
+ 									Shadow: True
+@@ -476,26 +476,26 @@
+ 							X: 0
+ 							Y: 0
+ 							Width: 760
+-							Height: PARENT_BOTTOM
++							Height: PARENT_HEIGHT
+ 							Children:
+ 								ColorBlock@HEADER_COLOR:
+ 									X: 0
+ 									Y: 0
+ 									Color: 00000090
+-									Width: PARENT_RIGHT - 200
+-									Height: PARENT_BOTTOM
++									Width: PARENT_WIDTH - 200
++									Height: PARENT_HEIGHT
+ 								GradientColorBlock@HEADER_GRADIENT:
+-									X: PARENT_RIGHT - 200
++									X: PARENT_WIDTH - 200
+ 									Y: 0
+ 									TopLeftColor: 00000090
+ 									BottomLeftColor: 00000090
+ 									Width: 200
+-									Height: PARENT_BOTTOM
++									Height: PARENT_HEIGHT
+ 								Label@PLAYER_HEADER:
+ 									X: 35
+ 									Y: 0
+ 									Width: 120
+-									Height: PARENT_BOTTOM
++									Height: PARENT_HEIGHT
+ 									Font: Bold
+ 									Text: Player
+ 									Align: Left
+@@ -504,7 +504,7 @@
+ 									X: 155
+ 									Y: 0
+ 									Width: 75
+-									Height: PARENT_BOTTOM
++									Height: PARENT_HEIGHT
+ 									Font: Bold
+ 									Text: Destroyed
+ 									Align: Right
+@@ -513,7 +513,7 @@
+ 									X: 230
+ 									Y: 0
+ 									Width: 75
+-									Height: PARENT_BOTTOM
++									Height: PARENT_HEIGHT
+ 									Font: Bold
+ 									Text: Lost
+ 									Align: Right
+@@ -522,7 +522,7 @@
+ 									X: 310
+ 									Y: 0
+ 									Width: 75
+-									Height: PARENT_BOTTOM
++									Height: PARENT_HEIGHT
+ 									Font: Bold
+ 									Text: U. Killed
+ 									Align: Right
+@@ -531,7 +531,7 @@
+ 									X: 385
+ 									Y: 0
+ 									Width: 75
+-									Height: PARENT_BOTTOM
++									Height: PARENT_HEIGHT
+ 									Font: Bold
+ 									Text: U. Lost
+ 									Align: Right
+@@ -540,7 +540,7 @@
+ 									X: 460
+ 									Y: 0
+ 									Width: 75
+-									Height: PARENT_BOTTOM
++									Height: PARENT_HEIGHT
+ 									Font: Bold
+ 									Text: B. Killed
+ 									Align: Right
+@@ -549,7 +549,7 @@
+ 									X: 535
+ 									Y: 0
+ 									Width: 75
+-									Height: PARENT_BOTTOM
++									Height: PARENT_HEIGHT
+ 									Font: Bold
+ 									Text: B. Lost
+ 									Align: Right
+@@ -558,7 +558,7 @@
+ 									X: 610
+ 									Y: 0
+ 									Width: 90
+-									Height: PARENT_BOTTOM
++									Height: PARENT_HEIGHT
+ 									Font: Bold
+ 									Text: Army Value
+ 									Align: Right
+@@ -567,7 +567,7 @@
+ 									X: 700
+ 									Y: 0
+ 									Width: 60
+-									Height: PARENT_BOTTOM
++									Height: PARENT_HEIGHT
+ 									Font: Bold
+ 									Text: Vision
+ 									Align: Right
+@@ -575,7 +575,7 @@
+ 				ScrollPanel@PLAYER_STATS_PANEL:
+ 					X: 0
+ 					Y: 55
+-					Width: PARENT_RIGHT
++					Width: PARENT_WIDTH
+ 					Height: 250
+ 					TopBottomSpacing: 0
+ 					BorderWidth: 0
+@@ -593,20 +593,20 @@
+ 									X: 0
+ 									Y: 0
+ 									Color: 00000090
+-									Width: PARENT_RIGHT - 200
+-									Height: PARENT_BOTTOM
++									Width: PARENT_WIDTH - 200
++									Height: PARENT_HEIGHT
+ 								GradientColorBlock@TEAM_GRADIENT:
+-									X: PARENT_RIGHT - 200
++									X: PARENT_WIDTH - 200
+ 									Y: 0
+ 									TopLeftColor: 00000090
+ 									BottomLeftColor: 00000090
+ 									Width: 200
+-									Height: PARENT_BOTTOM
++									Height: PARENT_HEIGHT
+ 								Label@TEAM:
+ 									X: 10
+ 									Y: 0
+-									Width: PARENT_RIGHT
+-									Height: PARENT_BOTTOM
++									Width: PARENT_WIDTH
++									Height: PARENT_HEIGHT
+ 									Font: Bold
+ 									Shadow: True
+ 						ScrollItem@BASIC_PLAYER_TEMPLATE:
+@@ -619,13 +619,13 @@
+ 								ColorBlock@PLAYER_COLOR:
+ 									X: 0
+ 									Y: 0
+-									Width: PARENT_RIGHT - 200
+-									Height: PARENT_BOTTOM
++									Width: PARENT_WIDTH - 200
++									Height: PARENT_HEIGHT
+ 								GradientColorBlock@PLAYER_GRADIENT:
+-									X: PARENT_RIGHT - 200
+-									Y: 0
+-									Width: 200
+-									Height: PARENT_BOTTOM
++									X: PARENT_WIDTH - 200
++									Y: 0
++									Width: 200
++									Height: PARENT_HEIGHT
+ 								Image@FLAG:
+ 									X: 2
+ 									Y: 2
+@@ -635,63 +635,63 @@
+ 									X: 35
+ 									Y: 0
+ 									Width: 120
+-									Height: PARENT_BOTTOM
++									Height: PARENT_HEIGHT
+ 									Font: Bold
+ 									Shadow: True
+ 								Label@CASH:
+ 									X: 155
+ 									Y: 0
+ 									Width: 80
+-									Height: PARENT_BOTTOM
++									Height: PARENT_HEIGHT
+ 									Align: Right
+ 									Shadow: True
+ 								Label@POWER:
+ 									X: 235
+ 									Y: 0
+ 									Width: 80
+-									Height: PARENT_BOTTOM
++									Height: PARENT_HEIGHT
+ 									Align: Center
+ 									Shadow: True
+ 								Label@KILLS:
+ 									X: 315
+ 									Y: 0
+ 									Width: 40
+-									Height: PARENT_BOTTOM
++									Height: PARENT_HEIGHT
+ 									Align: Right
+ 									Shadow: True
+ 								Label@DEATHS:
+ 									X: 355
+ 									Y: 0
+ 									Width: 60
+-									Height: PARENT_BOTTOM
++									Height: PARENT_HEIGHT
+ 									Align: Right
+ 									Shadow: True
+ 								Label@ASSETS_DESTROYED:
+ 									X: 415
+ 									Y: 0
+ 									Width: 80
+-									Height: PARENT_BOTTOM
++									Height: PARENT_HEIGHT
+ 									Align: Right
+ 									Shadow: True
+ 								Label@ASSETS_LOST:
+ 									X: 495
+ 									Y: 0
+ 									Width: 80
+-									Height: PARENT_BOTTOM
++									Height: PARENT_HEIGHT
+ 									Align: Right
+ 									Shadow: True
+ 								Label@EXPERIENCE:
+ 									X: 575
+ 									Y: 0
+ 									Width: 60
+-									Height: PARENT_BOTTOM
++									Height: PARENT_HEIGHT
+ 									Align: Right
+ 									Shadow: True
+ 								Label@ACTIONS_MIN:
+ 									X: 635
+ 									Y: 0
+ 									Width: 60
+-									Height: PARENT_BOTTOM
++									Height: PARENT_HEIGHT
+ 									Align: Right
+ 									Shadow: True
+ 						ScrollItem@ECONOMY_PLAYER_TEMPLATE:
+@@ -704,13 +704,13 @@
+ 								ColorBlock@PLAYER_COLOR:
+ 									X: 0
+ 									Y: 0
+-									Width: PARENT_RIGHT - 200
+-									Height: PARENT_BOTTOM
++									Width: PARENT_WIDTH - 200
++									Height: PARENT_HEIGHT
+ 								GradientColorBlock@PLAYER_GRADIENT:
+-									X: PARENT_RIGHT - 200
+-									Y: 0
+-									Width: 200
+-									Height: PARENT_BOTTOM
++									X: PARENT_WIDTH - 200
++									Y: 0
++									Width: 200
++									Height: PARENT_HEIGHT
+ 								Image@FLAG:
+ 									X: 2
+ 									Y: 2
+@@ -720,49 +720,49 @@
+ 									X: 35
+ 									Y: 0
+ 									Width: 120
+-									Height: PARENT_BOTTOM
++									Height: PARENT_HEIGHT
+ 									Font: Bold
+ 									Shadow: True
+ 								Label@CASH:
+ 									X: 155
+ 									Y: 0
+ 									Width: 80
+-									Height: PARENT_BOTTOM
++									Height: PARENT_HEIGHT
+ 									Align: Right
+ 									Shadow: True
+ 								Label@INCOME:
+ 									X: 235
+ 									Y: 0
+ 									Width: 80
+-									Height: PARENT_BOTTOM
++									Height: PARENT_HEIGHT
+ 									Align: Right
+ 									Shadow: True
+ 								Label@ASSETS:
+ 									X: 315
+ 									Y: 0
+ 									Width: 80
+-									Height: PARENT_BOTTOM
++									Height: PARENT_HEIGHT
+ 									Align: Right
+ 									Shadow: True
+ 								Label@EARNED:
+ 									X: 395
+ 									Y: 0
+ 									Width: 80
+-									Height: PARENT_BOTTOM
++									Height: PARENT_HEIGHT
+ 									Align: Right
+ 									Shadow: True
+ 								Label@SPENT:
+ 									X: 475
+ 									Y: 0
+ 									Width: 80
+-									Height: PARENT_BOTTOM
++									Height: PARENT_HEIGHT
+ 									Align: Right
+ 									Shadow: True
+ 								Label@HARVESTERS:
+ 									X: 555
+ 									Y: 0
+ 									Width: 80
+-									Height: PARENT_BOTTOM
++									Height: PARENT_HEIGHT
+ 									Align: Right
+ 									Shadow: True
+ 						ScrollItem@PRODUCTION_PLAYER_TEMPLATE:
+@@ -775,13 +775,13 @@
+ 								ColorBlock@PLAYER_COLOR:
+ 									X: 0
+ 									Y: 0
+-									Width: PARENT_RIGHT - 200
+-									Height: PARENT_BOTTOM
++									Width: PARENT_WIDTH - 200
++									Height: PARENT_HEIGHT
+ 								GradientColorBlock@PLAYER_GRADIENT:
+-									X: PARENT_RIGHT - 200
+-									Y: 0
+-									Width: 200
+-									Height: PARENT_BOTTOM
++									X: PARENT_WIDTH - 200
++									Y: 0
++									Width: 200
++									Height: PARENT_HEIGHT
+ 								Image@FLAG:
+ 									X: 2
+ 									Y: 2
+@@ -791,14 +791,14 @@
+ 									X: 35
+ 									Y: 0
+ 									Width: 120
+-									Height: PARENT_BOTTOM
++									Height: PARENT_HEIGHT
+ 									Font: Bold
+ 									Shadow: True
+ 								ObserverProductionIcons@PRODUCTION_ICONS:
+ 									X: 155
+ 									Y: 0
+ 									Width: 0
+-									Height: PARENT_BOTTOM
++									Height: PARENT_HEIGHT
+ 									TooltipContainer: TOOLTIP_CONTAINER
+ 						ScrollItem@SUPPORT_POWERS_PLAYER_TEMPLATE:
+ 							X: 0
+@@ -810,13 +810,13 @@
+ 								ColorBlock@PLAYER_COLOR:
+ 									X: 0
+ 									Y: 0
+-									Width: PARENT_RIGHT - 200
+-									Height: PARENT_BOTTOM
++									Width: PARENT_WIDTH - 200
++									Height: PARENT_HEIGHT
+ 								GradientColorBlock@PLAYER_GRADIENT:
+-									X: PARENT_RIGHT - 200
+-									Y: 0
+-									Width: 200
+-									Height: PARENT_BOTTOM
++									X: PARENT_WIDTH - 200
++									Y: 0
++									Width: 200
++									Height: PARENT_HEIGHT
+ 								Image@FLAG:
+ 									X: 2
+ 									Y: 2
+@@ -826,14 +826,14 @@
+ 									X: 35
+ 									Y: 0
+ 									Width: 120
+-									Height: PARENT_BOTTOM
++									Height: PARENT_HEIGHT
+ 									Font: Bold
+ 									Shadow: True
+ 								ObserverSupportPowerIcons@SUPPORT_POWER_ICONS:
+ 									X: 155
+ 									Y: 0
+ 									Width: 0
+-									Height: PARENT_BOTTOM
++									Height: PARENT_HEIGHT
+ 									TooltipContainer: TOOLTIP_CONTAINER
+ 						ScrollItem@ARMY_PLAYER_TEMPLATE:
+ 							X: 0
+@@ -845,32 +845,32 @@
+ 								ColorBlock@PLAYER_COLOR:
+ 									X: 0
+ 									Y: 0
+-									Width: PARENT_RIGHT - 200
+-									Height: PARENT_BOTTOM
++									Width: PARENT_WIDTH - 200
++									Height: PARENT_HEIGHT
+ 								GradientColorBlock@PLAYER_GRADIENT:
+-									X: PARENT_RIGHT - 200
+-									Y: 0
+-									Width: 200
+-									Height: PARENT_BOTTOM
++									X: PARENT_WIDTH - 200
++									Y: 0
++									Width: 200
++									Height: PARENT_HEIGHT
+ 								Image@FLAG:
+ 									X: 5
+ 									Y: 4
+ 									Width: 35
+-									Height: PARENT_BOTTOM - 4
++									Height: PARENT_HEIGHT - 4
+ 									ImageName: random
+ 									ImageCollection: flags
+ 								Label@PLAYER:
+ 									X: 35
+ 									Y: 0
+ 									Width: 120
+-									Height: PARENT_BOTTOM
++									Height: PARENT_HEIGHT
+ 									Font: Bold
+ 									Shadow: True
+ 								ObserverArmyIcons@ARMY_ICONS:
+ 									X: 155
+ 									Y: 0
+ 									Width: 0
+-									Height: PARENT_BOTTOM
++									Height: PARENT_HEIGHT
+ 									TooltipContainer: TOOLTIP_CONTAINER
+ 						ScrollItem@COMBAT_PLAYER_TEMPLATE:
+ 							X: 0
+@@ -882,13 +882,13 @@
+ 								ColorBlock@PLAYER_COLOR:
+ 									X: 0
+ 									Y: 0
+-									Width: PARENT_RIGHT - 200
+-									Height: PARENT_BOTTOM
++									Width: PARENT_WIDTH - 200
++									Height: PARENT_HEIGHT
+ 								GradientColorBlock@PLAYER_GRADIENT:
+-									X: PARENT_RIGHT - 200
+-									Y: 0
+-									Width: 200
+-									Height: PARENT_BOTTOM
++									X: PARENT_WIDTH - 200
++									Y: 0
++									Width: 200
++									Height: PARENT_HEIGHT
+ 								Image@FLAG:
+ 									X: 2
+ 									Y: 2
+@@ -898,83 +898,83 @@
+ 									X: 35
+ 									Y: 0
+ 									Width: 120
+-									Height: PARENT_BOTTOM
++									Height: PARENT_HEIGHT
+ 									Font: Bold
+ 									Shadow: True
+ 								Label@ASSETS_DESTROYED:
+ 									X: 155
+ 									Y: 0
+ 									Width: 75
+-									Height: PARENT_BOTTOM
++									Height: PARENT_HEIGHT
+ 									Align: Right
+ 									Shadow: True
+ 								Label@ASSETS_LOST:
+ 									X: 230
+ 									Y: 0
+ 									Width: 75
+-									Height: PARENT_BOTTOM
++									Height: PARENT_HEIGHT
+ 									Align: Right
+ 									Shadow: True
+ 								Label@UNITS_KILLED:
+ 									X: 310
+ 									Y: 0
+ 									Width: 75
+-									Height: PARENT_BOTTOM
++									Height: PARENT_HEIGHT
+ 									Align: Right
+ 									Shadow: True
+ 								Label@UNITS_DEAD:
+ 									X: 385
+ 									Y: 0
+ 									Width: 75
+-									Height: PARENT_BOTTOM
++									Height: PARENT_HEIGHT
+ 									Align: Right
+ 									Shadow: True
+ 								Label@BUILDINGS_KILLED:
+ 									X: 460
+ 									Y: 0
+ 									Width: 75
+-									Height: PARENT_BOTTOM
++									Height: PARENT_HEIGHT
+ 									Align: Right
+ 									Shadow: True
+ 								Label@BUILDINGS_DEAD:
+ 									X: 535
+ 									Y: 0
+ 									Width: 75
+-									Height: PARENT_BOTTOM
++									Height: PARENT_HEIGHT
+ 									Align: Right
+ 									Shadow: True
+ 								Label@ARMY_VALUE:
+ 									X: 610
+ 									Y: 0
+ 									Width: 90
+-									Height: PARENT_BOTTOM
++									Height: PARENT_HEIGHT
+ 									Align: Right
+ 									Shadow: True
+ 								Label@VISION:
+ 									X: 700
+ 									Y: 0
+ 									Width: 60
+-									Height: PARENT_BOTTOM
++									Height: PARENT_HEIGHT
+ 									Align: Right
+ 									Shadow: True
+ 				Container@INCOME_GRAPH_CONTAINER:
+ 					X: 0
+ 					Y: 30
+-					Width: PARENT_RIGHT
+-					Height: PARENT_BOTTOM
++					Width: PARENT_WIDTH
++					Height: PARENT_HEIGHT
+ 					Visible: False
+ 					Children:
+ 						ColorBlock@GRAPH_BACKGROUND:
+ 							X: 0
+ 							Y: 0
+-							Width: PARENT_RIGHT
+-							Height: PARENT_BOTTOM
++							Width: PARENT_WIDTH
++							Height: PARENT_HEIGHT
+ 							Color: 00000090
+ 						LineGraph@INCOME_GRAPH:
+ 							X: 0
+ 							Y: 0
+-							Width: PARENT_RIGHT - 5
+-							Height: PARENT_BOTTOM
++							Width: PARENT_WIDTH - 5
++							Height: PARENT_HEIGHT
+ 							ValueFormat: ${0}
+ 							YAxisValueFormat: ${0:F0}
+ 							XAxisSize: 40
+@@ -986,21 +986,21 @@
+ 				Container@ARMY_VALUE_GRAPH_CONTAINER:
+ 					X: 0
+ 					Y: 30
+-					Width: PARENT_RIGHT
+-					Height: PARENT_BOTTOM
++					Width: PARENT_WIDTH
++					Height: PARENT_HEIGHT
+ 					Visible: False
+ 					Children:
+ 						ColorBlock@GRAPH_BACKGROUND:
+ 							X: 0
+ 							Y: 0
+-							Width: PARENT_RIGHT
+-							Height: PARENT_BOTTOM
++							Width: PARENT_WIDTH
++							Height: PARENT_HEIGHT
+ 							Color: 00000090
+ 						LineGraph@ARMY_VALUE_GRAPH:
+ 							X: 0
+ 							Y: 0
+-							Width: PARENT_RIGHT - 5
+-							Height: PARENT_BOTTOM
++							Width: PARENT_WIDTH - 5
++							Height: PARENT_HEIGHT
+ 							ValueFormat: ${0}
+ 							YAxisValueFormat: ${0:F0}
+ 							XAxisSize: 40
+--- a/mods/ra2/chrome/ingame-player.yaml
++++ b/mods/ra2/chrome/ingame-player.yaml
+@@ -43,7 +43,7 @@
+ 		Image@COMMAND_BAR_BACKGROUND:
+ 			Logic: AddFactionSuffixLogic
+ 			X: 5
+-			Y: WINDOW_BOTTOM - HEIGHT - 5
++			Y: WINDOW_HEIGHT - HEIGHT - 5
+ 			Width: 459
+ 			Height: 31
+ 			ImageCollection: sidebar
+@@ -53,7 +53,7 @@
+ 			Logic: CommandBarLogic
+ 				HighlightOnButtonPress: True
+ 			X: 36
+-			Y: WINDOW_BOTTOM - HEIGHT - 10
++			Y: WINDOW_HEIGHT - HEIGHT - 10
+ 			Width: 270
+ 			Height: 26
+ 			Children:
+@@ -208,7 +208,7 @@
+ 		Container@STANCE_BAR:
+ 			Logic: StanceSelectorLogic
+ 			X: 324
+-			Y: WINDOW_BOTTOM - HEIGHT - 10
++			Y: WINDOW_HEIGHT - HEIGHT - 10
+ 			Width: 101
+ 			Height: 21
+ 			Children:
+@@ -289,7 +289,7 @@
+ 							ImageName: hold-fire
+ 		Image@SIDEBAR_BACKGROUND_TOP:
+ 			Logic: AddFactionSuffixLogic
+-			X: WINDOW_RIGHT - 234
++			X: WINDOW_WIDTH - 234
+ 			Y: 0
+ 			Width: 234
+ 			Height: 275
+@@ -406,7 +406,7 @@
+ 					Logic: GameTimerLogic
+ 					X: 0
+ 					Y: 0
+-					Width: PARENT_RIGHT
++					Width: PARENT_WIDTH
+ 					Height: 23
+ 					Align: Center
+ 					Font: TinyBold
+@@ -429,7 +429,7 @@
+ 							ImageName: cash-normal
+ 				LabelWithTooltip@POWER:
+ 					Logic: IngamePowerCounterLogic
+-					X: PARENT_RIGHT - WIDTH - 34
++					X: PARENT_WIDTH - WIDTH - 34
+ 					Y: 0
+ 					Width: 50
+ 					Height: 23
+@@ -441,13 +441,13 @@
+ 					Children:
+ 						Image@POWER_ICON:
+ 							Logic: AddFactionSuffixLogic
+-							X: PARENT_RIGHT + 3
++							X: PARENT_WIDTH + 3
+ 							Y: 3
+ 							ImageCollection: power-icons
+ 							ImageName: power-normal
+ 		Container@SIDEBAR_PRODUCTION:
+ 			Logic: ClassicProductionLogic
+-			X: WINDOW_RIGHT - 234
++			X: WINDOW_WIDTH - 234
+ 			Y: 275
+ 			Width: 234
+ 			Height: 250
+@@ -469,7 +469,7 @@
+ 							ImageCollection: sidebar
+ 							ImageName: background-bottom
+ 				PowerMeter:
+-					X: WINDOW_RIGHT - 230
++					X: WINDOW_WIDTH - 230
+ 					Y: 270
+ 					MeterAlongside: ROW_TEMPLATE
+ 					ParentContainer: PALETTE_BACKGROUND
+@@ -606,7 +606,7 @@
+ 						Button@SCROLL_UP_BUTTON:
+ 							Logic: AddFactionSuffixLogic
+ 							X: 89
+-							Y: PARENT_BOTTOM + 305
++							Y: PARENT_HEIGHT + 305
+ 							Width: 77
+ 							Height: 27
+ 							VisualHeight: 0
+@@ -616,7 +616,7 @@
+ 						Button@SCROLL_DOWN_BUTTON:
+ 							Logic: AddFactionSuffixLogic
+ 							X: 12
+-							Y: PARENT_BOTTOM + 305
++							Y: PARENT_HEIGHT + 305
+ 							Width: 77
+ 							Height: 27
+ 							VisualHeight: 0
+@@ -625,20 +625,19 @@
+ 							TooltipContainer: TOOLTIP_CONTAINER
+ 		Container@HPF_OVERLAY:
+ 			Logic: HierarchicalPathFinderOverlayLogic
+-			X: WINDOW_RIGHT - WIDTH - 260
++			X: WINDOW_WIDTH - WIDTH - 260
+ 			Y: 40
+ 			Width: 175
+ 			Height: 60
+ 			Children:
+ 				DropDownButton@HPF_OVERLAY_LOCOMOTOR:
+-					Y: PARENT_TOP
+-					Width: PARENT_RIGHT
++					Width: PARENT_WIDTH
+ 					Height: 25
+ 					Text: Select Locomotor
+ 					Font: Regular
+ 				DropDownButton@HPF_OVERLAY_CHECK:
+-					Y: PARENT_TOP + 35
+-					Width: PARENT_RIGHT
++					Y: 0 + 35
++					Width: PARENT_WIDTH
+ 					Height: 25
+ 					Text: Select BlockedByActor
+ 					Font: Regular
+--- a/mods/ra2/chrome/mainmenu-prerelease-notification.yaml
++++ b/mods/ra2/chrome/mainmenu-prerelease-notification.yaml
+@@ -1,12 +1,12 @@
+ Background@MAINMENU_PRERELEASE_NOTIFICATION:
+ 	Logic: PreReleaseWarningPrompt
+-	X: (WINDOW_RIGHT - WIDTH) / 2
+-	Y: (WINDOW_BOTTOM - HEIGHT) / 2
++	X: (WINDOW_WIDTH - WIDTH) / 2
++	Y: (WINDOW_HEIGHT - HEIGHT) / 2
+ 	Width: 520
+ 	Height: 195
+ 	Children:
+ 		Label@PROMPT_TITLE:
+-			Width: PARENT_RIGHT
++			Width: PARENT_WIDTH
+ 			Y: 20
+ 			Height: 25
+ 			Font: Bold
+@@ -15,40 +15,40 @@
+ 		Label@PROMPT_TEXT_A:
+ 			X: 15
+ 			Y: 50
+-			Width: PARENT_RIGHT - 30
++			Width: PARENT_WIDTH - 30
+ 			Height: 16
+ 			Align: Center
+ 			Text: This pre-alpha build of OpenRA's Red Alert 2 mod is made available
+ 		Label@PROMPT_TEXT_B:
+ 			X: 15
+ 			Y: 68
+-			Width: PARENT_RIGHT - 30
++			Width: PARENT_WIDTH - 30
+ 			Height: 16
+ 			Align: Center
+ 			Text: for the community to follow development and as example for modders.
+ 		Label@PROMPT_TEXT_C:
+ 			X: 15
+ 			Y: 104
+-			Width: PARENT_RIGHT - 30
++			Width: PARENT_WIDTH - 30
+ 			Height: 16
+ 			Align: Center
+ 			Text: Many features are missing or incomplete, performance has not been
+ 		Label@PROMPT_TEXT_D:
+ 			X: 15
+ 			Y: 122
+-			Width: PARENT_RIGHT - 30
++			Width: PARENT_WIDTH - 30
+ 			Height: 16
+ 			Align: Center
+ 			Text: optimized, and balance will not be addressed until a future beta.
+ 		Label@PROMPT_TEXT_E:
+ 			X: 15
+ 			Y: 140
+-			Width: PARENT_RIGHT - 30
++			Width: PARENT_WIDTH - 30
+ 			Height: 16
+ 			Align: Center
+ 		Button@CONTINUE_BUTTON:
+-			X: PARENT_RIGHT - WIDTH - 20
+-			Y: PARENT_BOTTOM - 45
++			X: PARENT_WIDTH - WIDTH - 20
++			Y: PARENT_HEIGHT - 45
+ 			Width: 120
+ 			Height: 25
+ 			Text: I Understand
+--- a/mods/ra2/chrome/native-mainmenu.yaml
++++ b/mods/ra2/chrome/native-mainmenu.yaml
+@@ -0,0 +1,353 @@
++Container@MAINMENU:
++	Logic: MainMenuLogic
++	Children:
++		Label@NATIVE_PREVIEW_NOTE:
++			X: 20
++			Y: WINDOW_HEIGHT - 64
++			Width: WINDOW_WIDTH - 40
++			Height: 44
++			Font: Small
++			Shadow: true
++			Text: ra2-preview-note
++		LogicKeyListener@GLOBAL_KEYHANDLER:
++			Logic: MusicHotkeyLogic, ScreenshotHotkeyLogic, MuteHotkeyLogic
++				StopMusicKey: StopMusic
++				PauseMusicKey: PauseMusic
++				PrevMusicKey: PrevMusic
++				NextMusicKey: NextMusic
++				TakeScreenshotKey: TakeScreenshot
++				MuteAudioKey: ToggleMute
++		Background@BORDER:
++			Background: mainmenu-border
++			X: 0 - 15
++			Y: 0 - 15
++			Width: WINDOW_WIDTH + 30
++			Height: WINDOW_HEIGHT + 30
++		Image@LOGO:
++			X: WINDOW_WIDTH - 296
++			Y: 30
++			ImageCollection: logos
++			ImageName: logo
++		Label@VERSION_LABEL:
++			Logic: VersionLabelLogic
++			X: WINDOW_WIDTH - 296
++			Y: 296 - 20
++			Width: 296 - 20
++			Height: 25
++			Align: Center
++			Font: Regular
++			Shadow: true
++		Background@ACTIVE_EXPERIENCE:
++			X: WINDOW_WIDTH - 380
++			Y: WINDOW_HEIGHT - 160
++			Width: 350
++			Height: 130
++			Children:
++				Label@ACTIVE_EXPERIENCE_TITLE:
++					X: 12
++					Y: 10
++					Width: PARENT_WIDTH - 24
++					Height: 22
++					Font: Bold
++				Label@ACTIVE_EXPERIENCE_DETAIL:
++					X: 12
++					Y: 35
++					Width: PARENT_WIDTH - 24
++					Height: 48
++					Font: Tiny
++				Button@CHANGE_EXPERIENCE:
++					X: 12
++					Y: 92
++					Width: PARENT_WIDTH - 24
++					Height: 25
++					Text: button-main-menu-experience
++					Font: Bold
++		Container@MENUS:
++			X: 13 + (WINDOW_WIDTH - 522) / 4 - WIDTH / 2
++			Y: WINDOW_HEIGHT / 2 - HEIGHT / 2
++			Width: 200
++			Height: 390
++			Children:
++				Background@MAIN_MENU:
++					Width: PARENT_WIDTH
++					Height: PARENT_HEIGHT
++					Children:
++						Label@MAINMENU_LABEL_TITLE:
++							X: 0
++							Y: 22
++							Width: 200
++							Height: 30
++							Text: label-main-menu-title
++							Align: Center
++							Font: Bold
++						Button@SINGLEPLAYER_BUTTON:
++							X: PARENT_WIDTH / 2 - WIDTH / 2
++							Y: 55
++							Width: 140
++							Height: 30
++							Text: label-singleplayer-title
++							Font: Bold
++						Button@MULTIPLAYER_BUTTON:
++							X: PARENT_WIDTH / 2 - WIDTH / 2
++							Y: 95
++							Width: 140
++							Height: 30
++							Text: label-multiplayer-title
++							Font: Bold
++						Button@WORLD_TOOLS_BUTTON:
++							Visible: false
++							X: PARENT_WIDTH / 2 - WIDTH / 2
++							Y: 135
++							Width: 140
++							Height: 30
++							Text: button-main-menu-workshop
++							Font: Bold
++						Button@SETTINGS_BUTTON:
++							X: PARENT_WIDTH / 2 - WIDTH / 2
++							Y: 175
++							Width: 140
++							Height: 30
++							Text: button-settings-title
++							Font: Bold
++						Button@EXTRAS_BUTTON:
++							X: PARENT_WIDTH / 2 - WIDTH / 2
++							Y: 215
++							Width: 140
++							Height: 30
++							Text: button-extras-title
++							Font: Bold
++						Button@CONTENT_BUTTON:
++							X: PARENT_WIDTH / 2 - WIDTH / 2
++							Y: 255
++							Width: 140
++							Height: 30
++							Text: button-main-menu-content
++							Font: Bold
++						Button@QUIT_BUTTON:
++							X: PARENT_WIDTH / 2 - WIDTH / 2
++							Y: 295
++							Width: 140
++							Height: 30
++							Text: button-quit
++							Font: Bold
++				Background@SINGLEPLAYER_MENU:
++					Width: PARENT_WIDTH
++					Height: PARENT_HEIGHT
++					Children:
++						Label@SINGLEPLAYER_MENU_TITLE:
++							X: 0
++							Y: 20
++							Width: 200
++							Height: 30
++							Text: label-singleplayer-title
++							Align: Center
++							Font: Bold
++						Button@SKIRMISH_BUTTON:
++							X: PARENT_WIDTH / 2 - WIDTH / 2
++							Y: 60
++							Width: 140
++							Height: 30
++							Text: button-singleplayer-menu-skirmish
++							Font: Bold
++						Button@MISSIONS_BUTTON:
++							X: PARENT_WIDTH / 2 - WIDTH / 2
++							Y: 100
++							Width: 140
++							Height: 30
++							Text: label-missions-title
++							Font: Bold
++						Button@LOAD_BUTTON:
++							X: PARENT_WIDTH / 2 - WIDTH / 2
++							Y: 140
++							Width: 140
++							Height: 30
++							Text: button-singleplayer-menu-load
++							Font: Bold
++						Button@BACK_BUTTON:
++							X: PARENT_WIDTH / 2 - WIDTH / 2
++							Key: escape
++							Y: 335
++							Width: 140
++							Height: 30
++							Text: button-back
++							Font: Bold
++				Background@EXTRAS_MENU:
++					Width: PARENT_WIDTH
++					Height: PARENT_HEIGHT
++					Children:
++						Label@EXTRAS_MENU_TITLE:
++							X: 0
++							Y: 20
++							Width: 200
++							Height: 30
++							Text: button-extras-title
++							Align: Center
++							Font: Bold
++						Button@REPLAYS_BUTTON:
++							X: PARENT_WIDTH / 2 - WIDTH / 2
++							Y: 60
++							Width: 140
++							Height: 30
++							Text: button-extras-menu-replays
++							Font: Bold
++						Button@MUSIC_BUTTON:
++							X: PARENT_WIDTH / 2 - WIDTH / 2
++							Y: 100
++							Width: 140
++							Height: 30
++							Text: label-music-title
++							Font: Bold
++						Button@CREDITS_BUTTON:
++							X: PARENT_WIDTH / 2 - WIDTH / 2
++							Y: 140
++							Width: 140
++							Height: 30
++							Text: label-credits-title
++							Font: Bold
++						Button@BACK_BUTTON:
++							X: PARENT_WIDTH / 2 - WIDTH / 2
++							Key: escape
++							Y: 335
++							Width: 140
++							Height: 30
++							Text: button-back
++							Font: Bold
++				Background@MAP_EDITOR_MENU:
++					Width: PARENT_WIDTH
++					Height: PARENT_HEIGHT
++					Children:
++						Label@MAP_EDITOR_MENU_TITLE:
++							X: 0
++							Y: 20
++							Width: 200
++							Height: 30
++							Text: label-map-editor-title
++							Align: Center
++							Font: Bold
++						Button@NEW_MAP_BUTTON:
++							X: PARENT_WIDTH / 2 - WIDTH / 2
++							Y: 60
++							Width: 140
++							Height: 30
++							Text: button-map-editor-new-map
++							Font: Bold
++						Button@LOAD_MAP_BUTTON:
++							X: PARENT_WIDTH / 2 - WIDTH / 2
++							Y: 100
++							Width: 140
++							Height: 30
++							Text: button-map-editor-load-map
++							Font: Bold
++						Button@BACK_BUTTON:
++							X: PARENT_WIDTH / 2 - WIDTH / 2
++							Key: escape
++							Y: 335
++							Width: 140
++							Height: 30
++							Text: button-back
++							Font: Bold
++				Background@WORLD_TOOLS_MENU:
++					Width: PARENT_WIDTH
++					Height: PARENT_HEIGHT
++					Children:
++						Label@WORLD_TOOLS_MENU_TITLE:
++							Y: 20
++							Width: PARENT_WIDTH
++							Height: 30
++							Text: button-main-menu-workshop
++							Align: Center
++							Font: Bold
++						Button@EXPERIENCE_BUTTON:
++							X: PARENT_WIDTH / 2 - WIDTH / 2
++							Y: 60
++							Width: 150
++							Height: 30
++							Text: button-workshop-experience
++							Font: Bold
++						Button@EARTH_STUDIO_BUTTON:
++							X: PARENT_WIDTH / 2 - WIDTH / 2
++							Y: 100
++							Width: 150
++							Height: 30
++							Text: button-world-tools-earth-studio
++							Font: Bold
++						Button@NATIVE_EDITOR_BUTTON:
++							X: PARENT_WIDTH / 2 - WIDTH / 2
++							Y: 140
++							Width: 150
++							Height: 30
++							Text: button-world-tools-native-editor
++							Font: Bold
++						Button@ASSET_LIBRARY_BUTTON:
++							X: PARENT_WIDTH / 2 - WIDTH / 2
++							Y: 180
++							Width: 150
++							Height: 30
++							Text: button-workshop-asset-library
++							Font: Bold
++						Button@BACK_BUTTON:
++							X: PARENT_WIDTH / 2 - WIDTH / 2
++							Key: escape
++							Y: 335
++							Width: 140
++							Height: 30
++							Text: button-back
++							Font: Bold
++		Container@PERFORMANCE_INFO:
++			Logic: PerfDebugLogic
++			Children:
++				Label@PERF_TEXT:
++					X: 30
++					Y: WINDOW_HEIGHT - 70
++					Width: 170
++					Height: 40
++					Contrast: true
++				Background@GRAPH_BG:
++					ClickThrough: true
++					Background: dialog4
++					X: WINDOW_WIDTH - 240
++					Y: WINDOW_HEIGHT - 240
++					Width: 210
++					Height: 210
++					Children:
++						PerfGraph@GRAPH:
++							X: 5
++							Y: 5
++							Width: 200
++							Height: 200
++		Background@NEWS_BG:
++			X: (WINDOW_WIDTH - WIDTH) / 2
++			Y: 35
++			Width: 430
++			Height: 55
++			Children:
++				DropDownButton@NEWS_BUTTON:
++					Background: newsbutton
++					X: 15
++					Y: 15
++					Width: 400
++					Height: 25
++					Text: dropdownbutton-news-bg-button
++					Font: Bold
++		Container@UPDATE_NOTICE:
++			X: (WINDOW_WIDTH - WIDTH) / 2
++			Y: 95
++			Width: 128
++			Children:
++				Label@A:
++					Width: PARENT_WIDTH
++					Height: 25
++					Align: Center
++					Shadow: true
++					Text: label-update-notice-a
++				Label@B:
++					Y: 20
++					Width: PARENT_WIDTH
++					Height: 25
++					Align: Center
++					Shadow: true
++					Text: label-update-notice-b
++		Container@PLAYER_PROFILE_CONTAINER:
++			Logic: LoadLocalPlayerProfileLogic
++			X: 25
++			Y: 25
+--- a/mods/ra2/chrome/native-settings.yaml
++++ b/mods/ra2/chrome/native-settings.yaml
+@@ -0,0 +1,57 @@
++Background@SETTINGS_PANEL:
++	Logic: SettingsLogic
++		ButtonStride: 0, 35
++		Panels:
++			GAMEPLAY_PANEL: button-panel-gameplay
++			INPUT_PANEL: button-panel-input
++			DISPLAY_PANEL: button-panel-display
++			AUDIO_PANEL: button-panel-audio
++			HOTKEYS_PANEL: button-panel-hotkeys
++			ADVANCED_PANEL: button-panel-advanced
++	X: (WINDOW_WIDTH - WIDTH) / 2
++	Y: (WINDOW_HEIGHT -  HEIGHT) / 2
++	Width: 900
++	Height: 600
++	Children:
++		Label@SETTINGS_LABEL_TITLE:
++			Y: 20
++			Width: PARENT_WIDTH
++			Height: 25
++			Text: button-settings-title
++			Align: Center
++			Font: Bold
++		Button@RESET_BUTTON:
++			X: 20 + 10 + WIDTH
++			Y: PARENT_HEIGHT - 45
++			Width: 160
++			Height: 25
++			Text: button-settings-panel-reset
++			Font: Bold
++		Button@BACK_BUTTON:
++			Key: escape
++			X: PARENT_WIDTH - 180
++			Y: PARENT_HEIGHT - 45
++			Width: 160
++			Height: 25
++			Text: button-back
++			Font: Bold
++		Container@SETTINGS_TAB_CONTAINER:
++			X: 20
++			Y: 50
++			Width: PARENT_WIDTH
++			Height: 25
++			Children:
++				Button@BUTTON_TEMPLATE:
++					Width: 160
++					Height: 25
++					Font: Bold
++		Container@PANEL_CONTAINER:
++			Width: PARENT_WIDTH
++			Height: PARENT_HEIGHT
++			Children:
++				Container@PANEL_TEMPLATE:
++					X: 190
++					Y: 50
++					Width: PARENT_WIDTH - 190 - 20
++					Height: PARENT_HEIGHT - 105
++		TooltipContainer@SETTINGS_TOOLTIP_CONTAINER:
+--- a/mods/ra2/chrome.yaml
++++ b/mods/ra2/chrome.yaml
+@@ -1546,23 +1546,24 @@
+ 		power-meter-disabled: 298, 522, 12, 2
+ 
+ lobby-bits:
+-	Image: spawnpoints.png
+-	Regions:
+-		spawn-unclaimed: 37, 5, 22, 22
+-		spawn-claimed: 5, 5, 22, 22
+-		spawn-disabled: 5, 5, 22, 22 # TODO: Needs new artwork!
+-		admin: 64, 5, 7, 5
+-		colorpicker: 5, 5, 22, 22
+-		huepicker: 71, 0, 7, 15
+-		kick: 134, 0, 11, 11
+-		protected: 79, 0, 10, 13
+-		protected-disabled: 90, 0, 10, 13
+-		authentication: 77, 16, 12, 13
+-		authentication-disabled: 90, 16, 12, 13
+-		admin-registered: 102, 0, 16, 16
+-		admin-anonymous: 118, 0, 16, 16
+-		player-registered: 102, 16, 16, 16
+-		player-anonymous: 118, 16, 16, 16
++	Image: common|native-ra2-glyphs.png
++	Regions:
++		spawn-unclaimed: 50, 119, 22, 22
++		spawn-claimed: 27, 119, 22, 22
++		spawn-disabled: 73, 119, 22, 22
++		admin: 170, 0, 6, 5
++		colorpicker: 27, 119, 22, 22
++		huepicker: 136, 0, 7, 15
++		kick: 153, 0, 11, 11
++		protected: 0, 17, 12, 13
++		protected-disabled: 17, 17, 12, 13
++		authentication: 34, 17, 12, 13
++		authentication-disabled: 51, 17, 12, 13
++		admin-registered: 0, 51, 16, 16
++		admin-anonymous: 34, 51, 16, 16
++		player-registered: 17, 51, 16, 16
++		player-anonymous: 51, 51, 16, 16
++		bot: 170, 51, 16, 16
+ 
+ strategic:
+ 	Image: strategic.png
+--- a/mods/ra2/languages/native-preview.ftl
++++ b/mods/ra2/languages/native-preview.ftl
+@@ -0,0 +1,3 @@
++ra2-preview-window-title = Red Alert 2 — Native Preview
++ra2-preview-note = Native RA2 skirmish preview • Uses your own game files.
++    AI assistant, voice, original campaigns and Yuri’s Revenge are not included in this preview.
+--- a/mods/ra2/maps/defcon-6/map.yaml
++++ b/mods/ra2/maps/defcon-6/map.yaml
+@@ -1748,7 +1748,7 @@
+ 
+ Rules:
+ 	World:
+-		GlobalLightingPaletteEffect:
++		TintPostProcessEffect:
+ 			Ambient: 0.85
+ 			Green: 0.92
+ 			Blue: 0.75
+--- a/mods/ra2/maps/roundhouse-kick/map.yaml
++++ b/mods/ra2/maps/roundhouse-kick/map.yaml
+@@ -868,6 +868,6 @@
+ 
+ Rules:
+ 	World:
+-		GlobalLightingPaletteEffect:
++		TintPostProcessEffect:
+ 			Ambient: 0.68
+ 			Green: 0.75
+--- a/mods/ra2/maps/tournament-2A/map.yaml
++++ b/mods/ra2/maps/tournament-2A/map.yaml
+@@ -964,5 +964,5 @@
+ 
+ Rules:
+ 	World:
+-		GlobalLightingPaletteEffect:
++		TintPostProcessEffect:
+ 			Ambient: 0.68
+--- a/mods/ra2/mod.yaml
++++ b/mods/ra2/mod.yaml
+@@ -1,8 +1,7 @@
+ Metadata:
+ 	Title: Red Alert 2
+-	Description: The Soviet Union is back!\nThis time to conquer the United States...
++	WindowTitle: ra2-preview-window-title
+ 	Version: {DEV_VERSION}
+-	Author: the RA2 mod team
+ 
+ ModCredits:
+ 	ModTabTitle: Red Alert 2
+@@ -10,42 +9,43 @@
+ 
+ PackageFormats: Mix, AudioBag
+ 
+-Packages:
+-	~^SupportDir|Content/ra2
+-	^EngineDir
+-	$ra2: ra2
+-	^EngineDir|mods/common: common
+-	~ra2.mix
+-	~language.mix
+-	~multi.mix
+-	~audio.mix
+-	~cache.mix
+-	~cameo.mix
+-	~conquer.mix: conquer
+-	~generic.mix
+-	~isogen.mix
+-	~isosnow.mix
+-	~isotemp.mix
+-	~isourb.mix
+-	~load.mix
+-	~local.mix
+-	~neutral.mix
+-	~sidec01.mix
+-	~sidec02.mix
+-	~sno.mix
+-	~snow.mix
+-	~tem.mix
+-	~temperat.mix
+-	~theme.mix
+-	~urb.mix
+-	~urban.mix
+-	~audio.bag
+-	ra2|bits
+-	ra2|bits/cameos
+-	ra2|bits/structures
+-	ra2|bits/animations
+-	ra2|bits/projectiles
+-	ra2|uibits
++FileSystem: DefaultFileSystem
++	Packages:
++		~^SupportDir|Content/ra2
++		^EngineDir
++		$ra2: ra2
++		^EngineDir|mods/common: common
++		~ra2.mix
++		~language.mix
++		~multi.mix
++		~audio.mix
++		~cache.mix
++		~cameo.mix
++		~conquer.mix: conquer
++		~generic.mix
++		~isogen.mix
++		~isosnow.mix
++		~isotemp.mix
++		~isourb.mix
++		~load.mix
++		~local.mix
++		~neutral.mix
++		~sidec01.mix
++		~sidec02.mix
++		~sno.mix
++		~snow.mix
++		~tem.mix
++		~temperat.mix
++		~theme.mix
++		~urb.mix
++		~urban.mix
++		~audio.bag
++		ra2|bits
++		ra2|bits/cameos
++		ra2|bits/structures
++		ra2|bits/animations
++		ra2|bits/projectiles
++		ra2|uibits
+ 
+ MapFolders:
+ 	ra2|maps: System
+@@ -104,15 +104,12 @@
+ Chrome:
+ 	ra2|chrome.yaml
+ 
+-Assemblies:
+-	^BinDir|OpenRA.Mods.Common.dll
+-	^BinDir|OpenRA.Mods.Cnc.dll
+-	^BinDir|OpenRA.Mods.RA2.dll
++Assemblies: OpenRA.Mods.Common.dll, OpenRA.Mods.Cnc.dll, OpenRA.Mods.RA2.dll
+ 
+ ChromeLayout:
+ 	common|chrome/assetbrowser.yaml
+ 	ra2|chrome/ingame-player.yaml
+-	common|chrome/mainmenu.yaml
++	ra2|chrome/native-mainmenu.yaml
+ 	common|chrome/mainmenu-prompts.yaml
+ 	ra2|chrome/mainmenu-prerelease-notification.yaml
+ 	common|chrome/ingame-infoobjectives.yaml
+@@ -132,7 +129,8 @@
+ 	ra2|chrome/ingame-debug.yaml
+ 	common|chrome/ingame-perf.yaml
+ 	common|chrome/ingame-infochat.yaml
+-	common|chrome/settings.yaml
++	ra2|chrome/native-settings.yaml
++	common|chrome/settings-gameplay.yaml
+ 	common|chrome/settings-display.yaml
+ 	common|chrome/settings-audio.yaml
+ 	common|chrome/settings-input.yaml
+@@ -188,19 +186,22 @@
+ 
+ MapGrid:
+ 	Type: RectangularIsometric
+-	TileSize: 60,30
+ 	EnableDepthBuffer: true
+-	SubCellsOffsets: 0,0,0, -256,128,0, 0,-128,0, 256,128,0
++	SubCellOffsets: 0,0,0, -256,128,0, 0,-128,0, 256,128,0
+ 	DefaultSubCell: 2
+ 	MaximumTerrainHeight: 16
+ 
+ Music:
+ 	ra2|audio/music.yaml
+ 
+-Translations:
+-	common|languages/en.ftl
+-	common|languages/rules/en.ftl
++FluentMessages:
++	common|fluent/common.ftl
++	common|fluent/chrome.ftl
++	common|fluent/ingame-debug.ftl
++	common|fluent/hotkeys.ftl
++	common|fluent/rules.ftl
+ 	ra2|languages/rules/en.ftl
++	ra2|languages/native-preview.ftl
+ 
+ Hotkeys:
+ 	common|hotkeys/game.yaml
+@@ -219,9 +220,9 @@
+ 
+ ServerTraits:
+ 	LobbyCommands
++	SkirmishLogic
+ 	PlayerPinger
+ 	MasterServerPinger
+-	LobbySettingsNotification
+ 
+ ChromeMetrics:
+ 	common|metrics.yaml
+@@ -286,7 +287,6 @@
+ 	TilesetSuffixes:
+ 		SNOW: a
+ 
+-ModelSequenceFormat: VoxelModelSequence
+ 
+ AssetBrowser:
+ 	SpriteExtensions: .shp, .tem, .urb, .sno
+@@ -323,6 +323,7 @@
+ 			OrderLatency: 6
+ 
+ ModContent:
++	Mod: ra2
+ 	InstallPromptMessage: Red Alert 2 requires artwork and audio from the original game.
+ 	HeaderMessage: The original game content must be copied from an original game disc.
+ 	Packages:
+--- a/mods/ra2/rules/ai.yaml
++++ b/mods/ra2/rules/ai.yaml
+@@ -44,8 +44,6 @@
+ 		ConstructionYardTypes: gacnst, nacnst
+ 		RefineryTypes: garefn, narefn
+ 		PowerTypes: gapowr, napowr, nanrct
+-		BarracksTypes: gapile, nahand
+-		VehiclesFactoryTypes: gaweap, naweap
+ 		ProductionTypes: gapile, nahand, gaweap, naweap, gaairc, amradr
+ 		NavalProductionTypes: nayard, gayard
+ 		MaxBaseRadius: 50
+--- a/mods/ra2/rules/aircraft.yaml
++++ b/mods/ra2/rules/aircraft.yaml
+@@ -130,7 +130,7 @@
+ 	WithVoxelBody:
+ 	Hovers:
+ 		BobDistance: -10
+-	Explodes:
++	FireWarheadsOnDeath:
+ 		Weapon: UnitExplode
+ 		Chance: 75
+ 	VoiceAnnouncement:
+--- a/mods/ra2/rules/allied-naval.yaml
++++ b/mods/ra2/rules/allied-naval.yaml
+@@ -32,7 +32,7 @@
+ 		UnloadTerrainTypes: Clear, Rough, Rail, Road, DirtRoad, Beach, Ore, Gems
+ 		UnloadVoice: Move
+ 		LoadingCondition: notmobile
+-	Explodes:
++	FireWarheadsOnDeath:
+ 		Weapon: UnitExplode
+ 		EmptyWeapon: UnitExplode
+ 	WithVoxelBody:
+@@ -115,7 +115,7 @@
+ 		DetectionTypes: Underwater
+ 		Range: 4c0
+ 	RenderDetectionCircle:
+-	Explodes:
++	FireWarheadsOnDeath:
+ 		Weapon: UnitExplode
+ 		EmptyWeapon: UnitExplode
+ 	WithVoxelBody@FULL:
+@@ -160,7 +160,7 @@
+ 		Voice: Attack
+ 		FacingTolerance: 512
+ 	AutoTarget:
+-	Explodes:
++	FireWarheadsOnDeath:
+ 		Weapon: UnitExplode
+ 		EmptyWeapon: UnitExplode
+ 	WithVoxelBody:
+@@ -285,7 +285,7 @@
+ 	AttackFrontal:
+ 		Voice: Attack
+ 		FacingTolerance: 512
+-	Explodes:
++	FireWarheadsOnDeath:
+ 		Weapon: UnitExplode
+ 		EmptyWeapon: UnitExplode
+ 	WithVoxelBody:
+--- a/mods/ra2/rules/allied-structures.yaml
++++ b/mods/ra2/rules/allied-structures.yaml
+@@ -232,12 +232,8 @@
+ 	RevealsShroud:
+ 		Range: 6c0
+ 	Refinery:
+-		DockOffset: 3,1
+ 		ShowTicks: True
+-		TickLifetime: 30
+-		TickVelocity: 1
+ 		TickRate: 10
+-		DockAngle: 640
+ 		UseStorage: false
+ 	CustomSellValue:
+ 		Value: 300
+@@ -265,6 +261,10 @@
+ 	SpawnSurvivors:
+ 		DeathTypes: ExplosionDeath, BulletDeath
+ 		Actors: e1, e1
++	DockHost:
++		Type: Unload
++		DockAngle: 640
++		DockOffset: 1086,1086,0
+ 
+ gaairc:
+ 	Inherits: ^BaseBuilding
+@@ -1139,31 +1139,26 @@
+ 		Type: prismcannon
+ 
+ power:
+-	AlwaysVisible:
+ 	Interactable:
+ 	Tooltip:
+ 		Name: Power Plant
+ 
+ refinery:
+-	AlwaysVisible:
+ 	Interactable:
+ 	Tooltip:
+ 		Name: Ore Refinery
+ 
+ barracks:
+-	AlwaysVisible:
+ 	Interactable:
+ 	Tooltip:
+ 		Name: Infantry Production
+ 
+ radar:
+-	AlwaysVisible:
+ 	Interactable:
+ 	Tooltip:
+ 		Name: Radar
+ 
+ repairpad:
+-	AlwaysVisible:
+ 	Interactable:
+ 	Tooltip:
+ 		Name: Service Depot
+--- a/mods/ra2/rules/allied-vehicles.yaml
++++ b/mods/ra2/rules/allied-vehicles.yaml
+@@ -57,13 +57,11 @@
+ 		Priority: 7
+ 		Bounds: 1544, 2509, 0, -289
+ 	Harvester:
+-		Capacity: 20
+ 		Resources: Ore, Gems
+ 		BaleUnloadDelay: 1
+ 		SearchFromProcRadius: 24
+ 		SearchFromHarvesterRadius: 12
+ 		HarvestVoice: Move
+-		DeliverVoice: Move
+ 	ChronoResourceDelivery:
+ 		WarpInSequence: warpout
+ 		WarpInSound: vchrtele.wav
+@@ -91,7 +89,7 @@
+ 	Voiced:
+ 		VoiceSet: ChronoMinerVoice
+ 	HitShape:
+-	WithHarvesterPipsDecoration:
++	WithStoresResourcesPipsDecoration:
+ 		Position: BottomLeft
+ 		RequiresSelection: true
+ 		PipCount: 7
+@@ -99,6 +97,11 @@
+ 		ResourceSequences:
+ 			Ore: pip-yellow
+ 			Gems: pip-red
++	StoresResources:
++		Capacity: 20
++		Resources: Ore, Gems
++	DockClientManager:
++		Voice: Move
+ 
+ mtnk:
+ 	Inherits: ^Vehicle
+@@ -325,9 +328,9 @@
+ 	RenderSprites:
+ 	RenderVoxels:
+ 	WithVoxelBody:
+-	Explodes:
++	FireWarheadsOnDeath:
+ 		RequiresCondition: !ifv-demo
+-	Explodes@demo:
++	FireWarheadsOnDeath@demo:
+ 		Weapon: CRNuke
+ 		EmptyWeapon: CRNuke
+ 		RequiresCondition: ifv-demo
+@@ -399,7 +402,7 @@
+ 	AttackTurreted:
+ 		Voice: Attack
+ 	AutoTarget:
+-	Explodes:
++	FireWarheadsOnDeath:
+ 		Weapon: UnitExplodeSmall
+ 		EmptyWeapon: UnitExplodeSmall
+ 	RenderSprites:
+@@ -485,7 +488,7 @@
+ 	WithMuzzleOverlay:
+ 	AutoTarget:
+ 		AllowMovement: false
+-	Explodes:
++	FireWarheadsOnDeath:
+ 		Weapon: UnitExplodeSmall
+ 		EmptyWeapon: UnitExplodeSmall
+ 	RenderSprites:
+--- a/mods/ra2/rules/bridges.yaml
++++ b/mods/ra2/rules/bridges.yaml
+@@ -19,7 +19,6 @@
+ 	Interactable:
+ 
+ ^LowBridgeRamp:
+-	AlwaysVisible:
+ 	RenderSprites:
+ 		Palette: terrain
+ 	WithSpriteBody:
+@@ -299,7 +298,6 @@
+ 		Name: Bridge Ramp
+ 
+ ^ElevatedBridgePlaceholder:
+-	AlwaysVisible:
+ 	RenderSprites:
+ 		Palette: terrain
+ 	WithSpriteBody:
+--- a/mods/ra2/rules/civilian-props.yaml
++++ b/mods/ra2/rules/civilian-props.yaml
+@@ -10,7 +10,7 @@
+ 		DamagedSounds: bmetdama.wav, bmetdamb.wav, bmetdamc.wav
+ 	MapEditorData:
+ 		Categories: Decoration
+-	Explodes:
++	FireWarheadsOnDeath:
+ 		Weapon: LargeBarrelExplode
+ 
+ camisc02:
+@@ -25,7 +25,7 @@
+ 		DamagedSounds: bmetdama.wav, bmetdamb.wav, bmetdamc.wav
+ 	MapEditorData:
+ 		Categories: Decoration
+-	Explodes:
++	FireWarheadsOnDeath:
+ 		Weapon: SmallBarrelExplode
+ 
+ camisc03:
+@@ -86,7 +86,7 @@
+ 		HP: 10
+ 	Armor:
+ 		Type: Concrete
+-	Explodes:
++	FireWarheadsOnDeath:
+ 		Type: Footprint
+ 		Weapon: V3AmmunitionExplode
+ 	SoundOnDamageTransition:
+--- a/mods/ra2/rules/defaults.yaml
++++ b/mods/ra2/rules/defaults.yaml
+@@ -355,7 +355,7 @@
+ 		DamagedSounds: gdamag1a.wav, gdamag1b.wav, gdamag1c.wav, gdamag1d.wav, gdamag1e.wav
+ 		DestroyedSounds: bgendiea.wav, bgendieb.wav, bgendiec.wav, bgendied.wav, bgendiee.wav, bgendief.wav
+ 	WithSpriteBody:
+-	Explodes:
++	FireWarheadsOnDeath:
+ 		Type: Footprint
+ 		Weapon: BuildingExplode
+ 	RepairableBuilding:
+@@ -868,7 +868,7 @@
+ 		QuantizedFacings: 0
+ 		CameraPitch: 85
+ 		UseClassicPerspectiveFudge: false
+-	Explodes:
++	FireWarheadsOnDeath:
+ 		Weapon: UnitExplodeSmall
+ 		EmptyWeapon: UnitExplodeSmall
+ 	RenderVoxels:
+@@ -1082,7 +1082,7 @@
+ 		UseClassicPerspectiveFudge: false
+ 	Tooltip:
+ 		GenericName: Ship
+-	Explodes:
++	FireWarheadsOnDeath:
+ 		Weapon: UnitExplodeSmall
+ 		EmptyWeapon: UnitExplodeSmall
+ 	RenderVoxels:
+--- a/mods/ra2/rules/misc.yaml
++++ b/mods/ra2/rules/misc.yaml
+@@ -6,7 +6,6 @@
+ 		OccupiesSpace: false
+ 	BodyOrientation:
+ 		QuantizedFacings: 1
+-	AlwaysVisible:
+ 	RenderSpritesEditorOnly:
+ 	WithSpriteBody:
+ 	MapEditorData:
+@@ -22,7 +21,6 @@
+ 		OccupiesSpace: false
+ 	BodyOrientation:
+ 		QuantizedFacings: 1
+-	AlwaysVisible:
+ 	RenderSpritesEditorOnly:
+ 	WithSpriteBody:
+ 	MapEditorData:
+@@ -99,7 +97,6 @@
+ 	Inherits: ^Rock
+ 
+ CAMERA:
+-	AlwaysVisible:
+ 	Interactable:
+ 	Immobile:
+ 		OccupiesSpace: false
+@@ -145,7 +142,6 @@
+ 	Interactable:
+ 	EditorOnlyTooltip:
+ 		Name: (Invisible Light Post)
+-	AlwaysVisible:
+ 	Immobile:
+ 		OccupiesSpace: false
+ 	RenderSpritesEditorOnly:
+--- a/mods/ra2/rules/palettes.yaml
++++ b/mods/ra2/rules/palettes.yaml
+@@ -163,12 +163,12 @@
+ 	VoxelNormalsPalette@ts-normals:
+ 		Name: ts-normals
+ 		Type: TiberianSun
+-	MenuPaletteEffect:
++	MenuPostProcessEffect:
+ 	PaletteFromPaletteWithAlpha@effect75alpha:
+ 		Name: effect75alpha
+ 		BasePalette: ra
+ 		Alpha: 0.75
+-	FlashPaletteEffect@NUKE:
++	FlashPostProcessEffect@NUKE:
+ 		Type: Nuke
+ 		Length: 90
+ 	WeatherPaletteEffect@LIGHTNINGSTORM:
+--- a/mods/ra2/rules/player.yaml
++++ b/mods/ra2/rules/player.yaml
+@@ -1,5 +1,4 @@
+ ^BasePlayer:
+-	AlwaysVisible:
+ 	Shroud:
+ 	PlayerResources:
+ 		ResourceValues:
+@@ -103,8 +102,10 @@
+ 		DisplayOrder: 7
+ 		Prerequisites: global-factundeploy
+ 	FrozenActorLayer:
+-	BaseAttackNotifier:
++	DamageNotifier:
+ 		AllyNotification: OurAllyIsUnderAttack
++		ValidTargets: BaseBuilding
++		Notification: BaseAttack
+ 	HarvesterAttackNotifier:
+ 		Notification: OreMinerUnderAttack
+ 	PlayerStatistics:
+--- a/mods/ra2/rules/proxy-actors.yaml
++++ b/mods/ra2/rules/proxy-actors.yaml
+@@ -1,15 +1,11 @@
+ barracks.infiltrated:
+-	AlwaysVisible:
+ 	ProvidesPrerequisite:
+ 
+ warfactory.infiltrated:
+-	AlwaysVisible:
+ 	ProvidesPrerequisite:
+ 
+ allies.tech.infiltrated:
+-	AlwaysVisible:
+ 	ProvidesPrerequisite:
+ 
+ soviets.tech.infiltrated:
+-	AlwaysVisible:
+ 	ProvidesPrerequisite:
+--- a/mods/ra2/rules/soviet-infantry.yaml
++++ b/mods/ra2/rules/soviet-infantry.yaml
+@@ -201,7 +201,7 @@
+ 		Type: Flak
+ 	Passenger:
+ 		CustomPipType: red
+-	Explodes:
++	FireWarheadsOnDeath:
+ 		Weapon: TerrorBomb
+ 		EmptyWeapon: TerrorBomb
+ 	AttackFrontal:
+@@ -328,7 +328,7 @@
+ 		Type: None
+ 	Passenger:
+ 		CustomPipType: red
+-	Explodes:
++	FireWarheadsOnDeath:
+ 		Weapon: IvanDeath
+ 		EmptyWeapon: IvanDeath
+ 	Armament@primary:
+@@ -374,7 +374,7 @@
+ 		Voice: Move
+ 		ChargeDelay: 300
+ 		TargetCursor: chronosphere
+-	-Explodes:
++	-FireWarheadsOnDeath:
+ 
+ yuri:
+ 	Inherits: ^Infantry
+--- a/mods/ra2/rules/soviet-naval.yaml
++++ b/mods/ra2/rules/soviet-naval.yaml
+@@ -32,7 +32,7 @@
+ 		UnloadTerrainTypes: Clear, Rough, Rail, Road, DirtRoad, Beach, Ore, Gems
+ 		UnloadVoice: Move
+ 		LoadingCondition: notmobile
+-	Explodes:
++	FireWarheadsOnDeath:
+ 		Weapon: UnitExplode
+ 		EmptyWeapon: UnitExplode
+ 	WithVoxelBody:
+@@ -107,7 +107,7 @@
+ 		DetectionTypes: Underwater
+ 		Range: 4c0
+ 	RenderDetectionCircle:
+-	Explodes:
++	FireWarheadsOnDeath:
+ 		Weapon: UnitExplode
+ 		EmptyWeapon: UnitExplode
+ 	-MustBeDestroyed:
+@@ -156,7 +156,7 @@
+ 		LocalOffset: 256,0,1408
+ 		MuzzleSequence: muzzle
+ 	WithMuzzleOverlay:
+-	Explodes:
++	FireWarheadsOnDeath:
+ 		Weapon: UnitExplode
+ 		EmptyWeapon: UnitExplode
+ 	WithVoxelBody:
+--- a/mods/ra2/rules/soviet-structures.yaml
++++ b/mods/ra2/rules/soviet-structures.yaml
+@@ -247,12 +247,8 @@
+ 	RevealsShroud:
+ 		Range: 6c0
+ 	Refinery:
+-		DockOffset: 3, 1
+ 		ShowTicks: True
+-		TickLifetime: 30
+-		TickVelocity: 1
+ 		TickRate: 10
+-		DockAngle: 640
+ 		UseStorage: false
+ 	CustomSellValue:
+ 		Value: 300
+@@ -280,6 +276,10 @@
+ 	SpawnSurvivors:
+ 		DeathTypes: ExplosionDeath, BulletDeath
+ 		Actors: e2, e2, e2
++	DockHost:
++		Type: Unload
++		DockAngle: 640
++		DockOffset: 1086,1086,0
+ 
+ naradr:
+ 	Inherits: ^BaseBuilding
+@@ -637,7 +637,7 @@
+ 	WithIdleOverlay@lights:
+ 		Sequence: idle-lights
+ 		RequiresCondition: !build-incomplete
+-	Explodes:
++	FireWarheadsOnDeath:
+ 		Type: CenterPosition
+ 		Weapon: NukePayload
+ 		EmptyWeapon: NukePayload
+@@ -857,6 +857,7 @@
+ 		PauseOnCondition: lowpower
+ 		Dimensions: 3, 3
+ 		Footprint: xxx xxx xxx
++		BlockedCursor: move-blocked
+ 	SupportPowerChargeBar:
+ 	InfiltrateForSupportPowerReset:
+ 		Types: SpyInfiltrate
+--- a/mods/ra2/rules/soviet-vehicles.yaml
++++ b/mods/ra2/rules/soviet-vehicles.yaml
+@@ -60,13 +60,11 @@
+ 		Priority: 7
+ 		Bounds: 1544, 2509, 0, -289
+ 	Harvester:
+-		Capacity: 40
+ 		Resources: Ore, Gems
+ 		BaleUnloadDelay: 1
+ 		SearchFromProcRadius: 24
+ 		SearchFromHarvesterRadius: 12
+ 		HarvestVoice: Move
+-		DeliverVoice: Move
+ 	Health:
+ 		HP: 1000
+ 	Armor:
+@@ -106,7 +104,7 @@
+ 	Voiced:
+ 		VoiceSet: SovietVehicleVoice
+ 	HitShape:
+-	WithHarvesterPipsDecoration:
++	WithStoresResourcesPipsDecoration:
+ 		Position: BottomLeft
+ 		RequiresSelection: true
+ 		PipCount: 7
+@@ -114,6 +112,11 @@
+ 		ResourceSequences:
+ 			Ore: pip-yellow
+ 			Gems: pip-red
++	StoresResources:
++		Capacity: 40
++		Resources: Ore, Gems
++	DockClientManager:
++		Voice: Move
+ 
+ dron:
+ 	Inherits: ^Vehicle
+@@ -337,7 +340,7 @@
+ 	WithVoxelBody:
+ 	WithVoxelTurret:
+ 	WithVoxelBarrel:
+-	Explodes:
++	FireWarheadsOnDeath:
+ 		Weapon: ApocExplode
+ 		EmptyWeapon: ApocExplode
+ 	Voiced:
+@@ -421,7 +424,7 @@
+ 		Locomotor: heavytracked
+ 	RevealsShroud:
+ 		Range: 4c0
+-	Explodes:
++	FireWarheadsOnDeath:
+ 		Weapon: demobomb
+ 		EmptyWeapon: demobomb
+ 	AttackFrontal:
+--- a/mods/ra2/rules/tech-structures.yaml
++++ b/mods/ra2/rules/tech-structures.yaml
+@@ -25,7 +25,7 @@
+ 		Offset: 1000,0,0
+ 	GivesCashOnCapture:
+ 		Amount: 1000
+-	Explodes:
++	FireWarheadsOnDeath:
+ 		Weapon: DerrickExplode
+ 	SpawnActorOnDeath:
+ 		Actor: caoild.rubble
+--- a/mods/ra2/rules/world.yaml
++++ b/mods/ra2/rules/world.yaml
+@@ -1,10 +1,11 @@
+ ^BaseWorld:
+ 	Inherits: ^Palettes
+-	AlwaysVisible:
+ 	MusicPlaylist:
+ 		VictoryMusic: score
+ 		DefeatMusic: score
+ 	ActorMap:
++	VoxelCache:
++	ModelRenderer:
+ 	ScreenMap:
+ 	TerrainGeometryOverlay:
+ 	TerrainRenderer:
+@@ -393,8 +394,8 @@
+ 				TerrainType: Gems
+ 				AllowedTerrainTypes: Clear, Rough, Road
+ 				MaxDensity: 12
+-	EditorSelectionLayer:
+ 	LoadWidgetAtGameStart:
+ 	EditorActionManager:
+ 	BuildableTerrainOverlay:
+ 		AllowedTerrainTypes: Clear, Rough, Road
++	MarkerLayerOverlay:
+--- a/mods/ra2/tilesets/snow.yaml
++++ b/mods/ra2/tilesets/snow.yaml
+@@ -1,4 +1,5 @@
+ General:
++	TileSize: 60, 30
+ 	Name: Snow
+ 	Id: SNOW
+ 	Extensions: .sno, .shp
+--- a/mods/ra2/tilesets/temperat.yaml
++++ b/mods/ra2/tilesets/temperat.yaml
+@@ -1,4 +1,5 @@
+ General:
++	TileSize: 60, 30
+ 	Name: Temperate
+ 	Id: TEMPERATE
+ 	Extensions: .tem, .shp
+--- a/mods/ra2/tilesets/urban.yaml
++++ b/mods/ra2/tilesets/urban.yaml
+@@ -1,4 +1,5 @@
+ General:
++	TileSize: 60, 30
+ 	Name: Urban
+ 	Id: URBAN
+ 	Extensions: .urb, .shp
+--- a/mods/ra2/weapons/explosions.yaml
++++ b/mods/ra2/weapons/explosions.yaml
+@@ -232,7 +232,7 @@
+ 		Duration: 20
+ 		Intensity: 5
+ 		Multiplier: 1,1
+-	Warhead@7FlashEffect: FlashPaletteEffect
++	Warhead@7FlashEffect: FlashEffect
+ 		Duration: 20
+ 		FlashType: Nuke
+ 
