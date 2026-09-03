@@ -277,10 +277,11 @@ into the user's OpenRA support directory, and can be removed without changing
 the base installation. See the
 [Experience Composer guide](docs/experience-composer/README.md).
 
-OpenRA AI does **not** bundle Red Alert 2, Yuri's Revenge, or their proprietary
-factions, maps, art, audio, or game data. Some capability modules adapt or cite
-GPL-compatible architecture from the separate OpenRA Red Alert 2 project, but
-those reusable mechanics are not a packaged Red Alert 2 game or mod.
+World War III capability packs are not the Red Alert 2 game: they adapt reusable
+mechanics while retaining the original OpenRA-based simulation. The integrated
+Mac preview described above separately includes the open-source RA2 mod and
+requires the player's owned game archives. No proprietary RA2 archives or
+Yuri's Revenge payload are distributed with it.
 
 ## Build from source
 

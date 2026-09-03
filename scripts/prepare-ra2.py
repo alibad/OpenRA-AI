@@ -68,7 +68,7 @@ def integrate(source: Path, engine: Path, version: str) -> None:
         rules = ai.replace("@testai", "@" + profile).replace("@test", "@" + profile)
         rules = rules.replace("enable-test-ai", f"enable-{profile}-ai")
         rules = rules.replace("Type: test", f"Type: {profile}").replace("Bots: test", f"Bots: {profile}")
-        rules = rules.replace("Name: Test AI", f"Name: RA2 {profile.title()} AI")
+        rules = rules.replace("Name: Test AI", f"Name: ra2-bot-{profile}")
         for module in ("HarvesterBotModule", "BuildingRepairBotModule"):
             rules = rules.replace(f"\t{module}:\n", f"\t{module}@{profile}:\n")
         if profile == "rush":
@@ -87,6 +87,7 @@ def integrate(source: Path, engine: Path, version: str) -> None:
     (mod / "languages/native-preview.ftl").write_text(
         "ra2-preview-window-title = OpenRA AI — Red Alert 2\n"
         "ra2-preview-note = Red Alert 2 with the shared AI assistant. Original campaigns and Yuri’s Revenge are not included.\n"
+        + "".join(f"ra2-bot-{profile} = RA2 {profile.title()} AI\n" for profile in ("normal", "medium", "rush", "turtle", "naval"))
     )
     for path in (mod / "maps").glob("*/map.yaml"):
         path.write_text(trim_off_map_fences(path.read_text()))
