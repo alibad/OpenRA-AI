@@ -4,7 +4,6 @@ import asyncio
 import json
 import os
 import re
-import sys
 import threading
 import time
 from collections import deque
@@ -23,6 +22,7 @@ from .agent_models import (
     default_agent_router_url,
 )
 from .autonomous import _game_child_environment, _reuse_project_key, _workspace_root
+from .process_entrypoints import game_mcp_command
 
 
 INTERACTIVE_INSTRUCTIONS = """You are the live tactical copilot for a human playing OpenRA.
@@ -200,15 +200,10 @@ class InteractiveMCPPlanner:
             model=self.model,
             router_url=self.router_url,
         )
+        command = game_mcp_command("--bridge", self.bridge, "--proposal-mode")
         mcp_params = {
-            "command": sys.executable,
-            "args": [
-                "-m",
-                "openra_ai_companion.game_mcp",
-                "--bridge",
-                self.bridge,
-                "--proposal-mode",
-            ],
+            "command": command[0],
+            "args": command[1:],
             "cwd": str(_workspace_root()),
             "env": _game_child_environment(),
         }

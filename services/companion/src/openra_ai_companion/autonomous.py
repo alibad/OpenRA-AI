@@ -5,7 +5,6 @@ import json
 import os
 import socket
 import subprocess
-import sys
 import time
 from dataclasses import asdict, dataclass
 from pathlib import Path
@@ -23,6 +22,7 @@ from .agent_models import (
     create_agent_model,
 )
 from .bridge import OpenRABridge
+from .process_entrypoints import game_mcp_command
 from .controller import TacticalController
 from .game_runtime import GameRuntime
 from .learning import LearningStore
@@ -680,18 +680,11 @@ async def autoplay(
         if latest.done:
             state = bridge.state()
 
+        command = game_mcp_command("--bridge", f"127.0.0.1:{port}", "--session-id", session_id,
+                                   "--evidence-log", str(tool_log))
         mcp_params = {
-            "command": sys.executable,
-            "args": [
-                "-m",
-                "openra_ai_companion.game_mcp",
-                "--bridge",
-                f"127.0.0.1:{port}",
-                "--session-id",
-                session_id,
-                "--evidence-log",
-                str(tool_log),
-            ],
+            "command": command[0],
+            "args": command[1:],
             "cwd": str(_workspace_root()),
             "env": _game_child_environment(),
         }

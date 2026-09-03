@@ -85,7 +85,6 @@ export PYTHONUNBUFFERED=1
 export PYTHONUTF8=1
 export PYTHONIOENCODING=utf-8
 
-game_args=("$@")
 selected_game="ra"
 if [ -f "$support_root/openra-ai-game.txt" ]; then
   requested_game="$(tr -d '\r\n' < "$support_root/openra-ai-game.txt")"
@@ -94,7 +93,7 @@ if [ -f "$support_root/openra-ai-game.txt" ]; then
     selected_game="ra2"
   fi
 fi
-game_args=("Game.Mod=$selected_game" "${game_args[@]}")
+game_args=("Game.Mod=$selected_game" "$@")
 if [ -n "$map_argument" ]; then
   game_args+=("Game.Mod=ra" "$map_argument")
   has_launch_bots=""

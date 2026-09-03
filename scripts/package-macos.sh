@@ -239,6 +239,10 @@ fi
   echo >&2 "Signed companion is missing local microphone capture support."
   exit 1
 }
+"$RESOURCES/bin/openra-ai-companion" game-mcp --help >/dev/null || {
+  echo >&2 "Signed companion cannot start its bundled game-tool service."
+  exit 1
+}
 "$RESOURCES/bin/openra-ai-runtime" --help >/dev/null || {
   echo >&2 "Signed local AI runtime did not start."
   exit 1
