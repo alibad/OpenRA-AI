@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from collections import Counter
 
-from .labels import building_name, production_name, unit_name
 from .models import GameSnapshot, Insight, ThreatAssessment
 from .strategy import maximum_silo_count
 
@@ -119,7 +118,7 @@ class InsightEngine:
     def _situation_fact(snapshot: GameSnapshot) -> str:
         if snapshot.production:
             counts = Counter(
-                production_name(str(item.get("item", "")))
+                snapshot.actor_name(str(item.get("item", "")))
                 for item in snapshot.production[:6]
             )
             items = ", ".join(
@@ -192,9 +191,9 @@ class InsightEngine:
                     snapshot.tick,
                     "routine",
                 ))
-        undeployed_mcv = next((unit for unit in snapshot.units if unit.kind.split(".", 1)[0] == "mcv"), None)
+        undeployed_mcv = next((unit for unit in snapshot.units if unit.kind.split(".", 1)[0] in {"mcv", "amcv", "smcv"}), None)
         if previous is None and undeployed_mcv is not None and not snapshot.buildings:
-            name = unit_name(undeployed_mcv.kind)
+            name = snapshot.actor_name(undeployed_mcv.kind)
             candidates.append(Insight(
                 "opening_deploy",
                 85,
@@ -206,10 +205,10 @@ class InsightEngine:
         new_structures = [u for u in snapshot.visible_enemy_buildings if u.actor_id not in self.previous_enemy_building_ids]
 
         if new_enemies and self._ready("enemy_spotted", snapshot.tick):
-            kinds = ", ".join(dict.fromkeys(unit_name(u.kind) for u in new_enemies[:4]))
+            kinds = ", ".join(dict.fromkeys(snapshot.actor_name(u.kind) for u in new_enemies[:4]))
             candidates.append(Insight("enemy_spotted", 96, f"New enemy units visible: {kinds}", f"New contact: {kinds}. Check the visible approach.", snapshot.tick, "important"))
         if new_structures and self._ready("structure_spotted", snapshot.tick):
-            kinds = ", ".join(dict.fromkeys(building_name(u.kind) for u in new_structures[:3]))
+            kinds = ", ".join(dict.fromkeys(snapshot.actor_name(u.kind) for u in new_structures[:3]))
             candidates.append(Insight("structure_spotted", 88, f"New enemy structures visible: {kinds}", f"Enemy structure identified: {kinds}.", snapshot.tick, "important"))
         power_deficit_started = (
             snapshot.power_drained > snapshot.power_provided
@@ -288,7 +287,7 @@ class InsightEngine:
             ))
         for key in sorted(_completed_production_keys(snapshot) - self.acknowledged_completed_production):
             item = key.split(":", 1)[1]
-            name = production_name(item)
+            name = snapshot.actor_name(item)
             candidates.append(Insight(
                 key,
                 98,
@@ -318,7 +317,7 @@ class InsightEngine:
                 item = completed[0]
                 key = f"production_complete:{item}"
                 if self._ready(key, snapshot.tick):
-                    name = production_name(item)
+                    name = snapshot.actor_name(item)
                     candidates.append(Insight(
                         key,
                         98,
@@ -330,11 +329,11 @@ class InsightEngine:
         if snapshot.cash < 350 and not snapshot.production and snapshot.tick > 600 and self._ready("economy_idle", snapshot.tick):
             candidates.append(Insight("economy_idle", 68, f"Cash is {snapshot.cash} with no active production", "Cash is low and every production queue is idle.", snapshot.tick, "important"))
         critical = [
-            (unit, unit_name(unit.kind))
+            (unit, snapshot.actor_name(unit.kind))
             for unit in snapshot.units
             if unit.hp_percent <= 0.22
         ] + [
-            (building, building_name(building.kind))
+            (building, snapshot.actor_name(building.kind))
             for building in snapshot.buildings
             if building.hp_percent <= 0.22
         ]

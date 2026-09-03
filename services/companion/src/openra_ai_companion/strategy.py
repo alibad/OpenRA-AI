@@ -485,6 +485,23 @@ def hybrid_force_plan(snapshot: GameSnapshot, batch_size: int = 3) -> dict[str, 
 def strategic_profile(snapshot: GameSnapshot, state: dict[str, Any] | None = None) -> dict[str, Any]:
     state = state or {}
     faction = str(state.get("player_faction", "")).lower()
+    if snapshot.mod_id == "ra2":
+        return {
+            "mod_id": "ra2",
+            "player_faction": faction or "unknown",
+            "enemy_faction": str(state.get("enemy_faction", "unknown")),
+            "map_scale": map_scale(snapshot.map_width, snapshot.map_height),
+            "target_harvesters": desired_harvester_count(snapshot),
+            "opening_order": ["deploy the Allied or Soviet MCV", "power", "refinery and miners", "infantry and vehicle production"],
+            "available_production": [
+                {"id": item, "name": snapshot.actor_name(item)} for item in snapshot.available_production
+            ],
+            "doctrine": {
+                "identity": "Red Alert 2 combined arms",
+                "priorities": ["protect miners", "maintain power", "scout", "counter visible enemies"],
+                "base_guidance": "Use RA2's current build list and observed unit names. Do not apply Red Alert 1 country bonuses, tech prerequisites or actor IDs. AUTO uses RA2-native production and squad rules.",
+            },
+        }
     doctrine = FACTION_DOCTRINES.get(faction, {
         "side": "unknown",
         "identity": "adaptive combined arms",
@@ -561,12 +578,16 @@ def tactical_plan(snapshot: GameSnapshot) -> dict[str, Any]:
     """Return deterministic micro constraints and formation anchors from visible state only."""
     own = _live(snapshot.units)
     enemies = _live(snapshot.visible_enemies)
-    tanks = [unit for unit in own if _actor_type(unit) in {"1tnk", "2tnk", "3tnk", "4tnk", "ctnk", "ttnk"}]
-    siege = [unit for unit in own if _actor_type(unit) in {"v2rl", "arty"}]
-    screen = [unit for unit in own if _actor_type(unit) in {"e1", "e2", "e3", "e4", "shok", "jeep"}]
+    ra2 = snapshot.mod_id == "ra2"
+    tank_types = {"mtnk", "htnk", "gtnk", "ttnk", "tnkd"} if ra2 else {"1tnk", "2tnk", "3tnk", "4tnk", "ctnk", "ttnk"}
+    siege_types = {"v3", "sref"} if ra2 else {"v2rl", "arty"}
+    screen_types = {"e1", "e2", "shock", "flakt"} if ra2 else {"e1", "e2", "e3", "e4", "shok", "jeep"}
+    tanks = [unit for unit in own if _actor_type(unit) in tank_types]
+    siege = [unit for unit in own if _actor_type(unit) in siege_types]
+    screen = [unit for unit in own if _actor_type(unit) in screen_types]
     spies = [unit for unit in own if _actor_type(unit) == "spy"]
-    dogs = [unit for unit in enemies if _actor_type(unit) == "dog"]
-    depot = next((building for building in snapshot.buildings if _actor_type(building) == "fix"), None)
+    dogs = [unit for unit in enemies if _actor_type(unit) in {"dog", "adog"}]
+    depot = next((building for building in snapshot.buildings if _actor_type(building) in ({"gadept", "nadept"} if ra2 else {"fix"})), None)
     home = (depot.cell_x, depot.cell_y) if depot is not None else base_center(snapshot)
     frontline = _mean_cell(tanks or screen, home)
     enemy_center = _mean_cell(enemies, frontline)
@@ -680,9 +701,9 @@ def tactical_plan(snapshot: GameSnapshot) -> dict[str, Any]:
             "standoff_or_safe_hold": list(hold),
         })
 
-    heavy_types = {"2tnk", "3tnk", "4tnk", "ttnk", "ctnk"}
-    light_types = {"1tnk", "jeep", "apc", "ftrk", "v2rl", "arty", "harv"}
-    air_types = {"yak", "mig", "heli", "hind", "tran", "badr", "u2"}
+    heavy_types = tank_types if ra2 else {"2tnk", "3tnk", "4tnk", "ttnk", "ctnk"}
+    light_types = {"fv", "htk", "v3", "sref", "harv", "cmin"} if ra2 else {"1tnk", "jeep", "apc", "ftrk", "v2rl", "arty", "harv"}
+    air_types = {"harrier", "beag", "zep", "shad", "orca"} if ra2 else {"yak", "mig", "heli", "hind", "tran", "badr", "u2"}
 
     def armor_groups(actors: list[Unit]) -> dict[str, list[int]]:
         return {
@@ -726,7 +747,7 @@ def tactical_plan(snapshot: GameSnapshot) -> dict[str, Any]:
         }
 
     aircraft = [enemy for enemy in enemies if _actor_type(enemy) in air_types]
-    anti_air_types = {"e3", "ftrk", "4tnk", "sam", "agun"}
+    anti_air_types = {"fv", "flakt", "htk", "aegis", "nasam", "naflak"} if ra2 else {"e3", "ftrk", "4tnk", "sam", "agun"}
     anti_air_actors = [
         actor.actor_id for actor in (*snapshot.units, *snapshot.buildings)
         if _actor_type(actor) in anti_air_types and ".husk" not in actor.kind.lower()
@@ -769,7 +790,7 @@ def tactical_plan(snapshot: GameSnapshot) -> dict[str, Any]:
             "visible_enemy": armor_groups(enemies),
             "counter_rules": [
                 "use rockets and durable tanks against heavy armor",
-                "use Grenadiers/flame/splash against unarmored infantry",
+                "use anti-infantry weapons against unarmored infantry" if ra2 else "use Grenadiers/flame/splash against unarmored infantry",
                 "do not expose light siege or transports to direct tank fire",
             ],
         },
@@ -1384,7 +1405,7 @@ def scout_targets(snapshot: GameSnapshot, origin: tuple[int, int], count: int) -
 
 def base_center(snapshot: GameSnapshot) -> tuple[int, int]:
     construction_yard = next(
-        (building for building in snapshot.buildings if building.kind.lower().split(".", 1)[0] == "fact"),
+        (building for building in snapshot.buildings if building.kind.lower().split(".", 1)[0] in {"fact", "gacnst", "nacnst"}),
         None,
     )
     if construction_yard is not None:

@@ -7,6 +7,7 @@ from pathlib import Path
 from urllib.parse import parse_qs, urlparse
 
 from .core import Companion
+from .game_content import import_owned_ra2
 from .learning import LearningStore, learning_dashboard
 from .model_setup import LocalAISetupError
 from .lm_studio import discover as discover_lm_studio
@@ -255,7 +256,10 @@ class CompanionHandler(BaseHTTPRequestHandler):
     def do_POST(self) -> None:  # noqa: N802
         path = urlparse(self.path).path
         try:
-            if path in {"/v1/local-ai/install", "/v1/local-ai/retry"}:
+            if path == "/v1/content/ra2/import":
+                self._payload()
+                self._json(HTTPStatus.OK, import_owned_ra2())
+            elif path in {"/v1/local-ai/install", "/v1/local-ai/retry"}:
                 self._payload()
                 manager = getattr(self.server, "local_ai_manager", None)
                 if manager is None:

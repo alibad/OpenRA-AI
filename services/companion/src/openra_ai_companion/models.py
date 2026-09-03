@@ -247,6 +247,8 @@ class GameSnapshot:
     mission_briefing: str = ""
     objectives: tuple[MissionObjective, ...] = ()
     support_powers: tuple[dict[str, Any], ...] = ()
+    mod_id: str = "ra"
+    actor_names: dict[str, str] = field(default_factory=dict)
 
     @classmethod
     def from_dict(cls, value: dict[str, Any]) -> "GameSnapshot":
@@ -297,6 +299,8 @@ class GameSnapshot:
             mission_briefing=str(value.get("mission_briefing", "")),
             objectives=tuple(MissionObjective.from_dict(item) for item in value.get("objectives", [])),
             support_powers=tuple(dict(item) for item in value.get("support_powers", [])),
+            mod_id=str(value.get("mod_id") or "ra"),
+            actor_names={str(key): str(name) for key, name in (value.get("actor_names") or {}).items()},
         )
 
     @staticmethod
@@ -311,6 +315,8 @@ class GameSnapshot:
             return b""
 
     def contains_cell(self, x: int, y: int) -> bool:
+        if self.mod_id == "ra2":
+            return 0 <= x < self.map_width and 0 <= y < self.map_height
         width = self.map_bounds_width or self.map_width
         height = self.map_bounds_height or self.map_height
         return (
@@ -318,8 +324,17 @@ class GameSnapshot:
             and self.map_bounds_y <= y < self.map_bounds_y + height
         )
 
+    def actor_name(self, kind: str) -> str:
+        return self.actor_names.get(kind, production_name(kind) if self.mod_id == "ra" else kind)
+
+    def humanize_text(self, text: str) -> str:
+        from .labels import humanize_text
+        return humanize_text(text, self.actor_names if self.mod_id != "ra" else None)
+
     def compact(self) -> dict[str, Any]:
         return {
+            "mod_id": self.mod_id,
+            "actor_names": self.actor_names,
             "tick": self.tick,
             "map": self.map_name,
             "mission": {
@@ -347,19 +362,19 @@ class GameSnapshot:
             },
             "explored_percent": round(self.explored_percent, 1),
             "own_units": len(self.units),
-            "own_unit_types": [unit_name(unit.kind) for unit in self.units[:16]],
-            "own_buildings": [building_name(building.kind) for building in self.buildings[:16]],
+            "own_unit_types": [self.actor_name(unit.kind) for unit in self.units[:16]],
+            "own_buildings": [self.actor_name(building.kind) for building in self.buildings[:16]],
             "visible_enemies": [
-                {"type": unit_name(unit.kind), "x": unit.cell_x, "y": unit.cell_y, "hp": round(unit.hp_percent, 2)}
+                {"type": self.actor_name(unit.kind), "x": unit.cell_x, "y": unit.cell_y, "hp": round(unit.hp_percent, 2)}
                 for unit in self.visible_enemies[:12]
             ],
-            "visible_enemy_buildings": [building_name(unit.kind) for unit in self.visible_enemy_buildings[:8]],
+            "visible_enemy_buildings": [self.actor_name(unit.kind) for unit in self.visible_enemy_buildings[:8]],
             "remembered_enemy_buildings": [
-                {"type": building_name(unit.kind), "x": unit.cell_x, "y": unit.cell_y, "hp_last_seen": round(unit.hp_percent, 2)}
+                {"type": self.actor_name(unit.kind), "x": unit.cell_x, "y": unit.cell_y, "hp_last_seen": round(unit.hp_percent, 2)}
                 for unit in self.remembered_enemy_buildings[:16]
             ],
             "production": [
-                {**item, "display_name": production_name(str(item.get("item", "")))}
+                {**item, "display_name": self.actor_name(str(item.get("item", "")))}
                 for item in self.production[:6]
             ],
             "support_powers": [
@@ -383,9 +398,12 @@ class GameSnapshot:
         units = sorted(self.units, key=lambda unit: (not unit.idle, unit.kind, unit.actor_id))[:48]
         buildings = sorted(self.buildings, key=lambda building: (building.hp_percent, building.kind, building.actor_id))[:32]
         return {
+            "mod_id": self.mod_id,
+            "actor_names": self.actor_names,
             "tick": self.tick,
             "map": {
                 "name": self.map_name,
+                "coordinate_space": "map_storage",
                 "width": self.map_width,
                 "height": self.map_height,
                 "playable_bounds": [
@@ -415,7 +433,7 @@ class GameSnapshot:
                 {
                     "actor_id": unit.actor_id,
                     "type": unit.kind,
-                    "display_name": unit_name(unit.kind),
+                    "display_name": self.actor_name(unit.kind),
                     "x": unit.cell_x,
                     "y": unit.cell_y,
                     "hp": round(unit.hp_percent, 2),
@@ -456,7 +474,7 @@ class GameSnapshot:
                 {
                     "actor_id": building.actor_id,
                     "type": building.kind,
-                    "display_name": building_name(building.kind),
+                    "display_name": self.actor_name(building.kind),
                     "x": building.cell_x,
                     "y": building.cell_y,
                     "hp": round(building.hp_percent, 2),
@@ -484,7 +502,7 @@ class GameSnapshot:
                 {
                     "actor_id": unit.actor_id,
                     "type": unit.kind,
-                    "display_name": unit_name(unit.kind),
+                    "display_name": self.actor_name(unit.kind),
                     "x": unit.cell_x,
                     "y": unit.cell_y,
                     "hp": round(unit.hp_percent, 2),
@@ -509,7 +527,7 @@ class GameSnapshot:
                 {
                     "actor_id": building.actor_id,
                     "type": building.kind,
-                    "display_name": building_name(building.kind),
+                    "display_name": self.actor_name(building.kind),
                     "x": building.cell_x,
                     "y": building.cell_y,
                     "hp": round(building.hp_percent, 2),
@@ -529,7 +547,7 @@ class GameSnapshot:
             "remembered_enemy_buildings": [
                 {
                     "type": building.kind,
-                    "display_name": building_name(building.kind),
+                    "display_name": self.actor_name(building.kind),
                     "x": building.cell_x,
                     "y": building.cell_y,
                     "hp_last_seen": round(building.hp_percent, 2),
@@ -539,11 +557,11 @@ class GameSnapshot:
             ],
             "available_production": list(self.available_production[:64]),
             "available_production_names": [
-                {"id": item, "name": production_name(item)}
+                {"id": item, "name": self.actor_name(item)}
                 for item in self.available_production[:64]
             ],
             "production": [
-                {**item, "display_name": production_name(str(item.get("item", "")))}
+                {**item, "display_name": self.actor_name(str(item.get("item", "")))}
                 for item in self.production[:12]
             ],
             "support_powers": [dict(power) for power in self.support_powers],

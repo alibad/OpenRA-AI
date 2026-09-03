@@ -1,7 +1,11 @@
 from __future__ import annotations
 
 import unittest
+import os
 from pathlib import Path
+import shutil
+import subprocess
+import time
 
 from openra_ai_companion.cli import _parser
 
@@ -10,6 +14,33 @@ REPOSITORY_ROOT = Path(__file__).resolve().parents[3]
 
 
 class LauncherStartupTests(unittest.TestCase):
+
+    @unittest.skipUnless(shutil.which("bash") and shutil.which("pgrep"), "requires process-tree tools")
+    def test_wrapper_cleanup_stops_the_game_child(self) -> None:
+        wrapper = (REPOSITORY_ROOT / "apps/installer/macos/OpenRAAI").read_text()
+        function = wrapper[wrapper.index("stop_process_tree() {"):wrapper.index("\ncleanup() {")]
+        process = subprocess.Popen(["bash", "-c", 'sleep 30 & echo "$!"; wait'], stdout=subprocess.PIPE, text=True)
+        child = int(process.stdout.readline())
+        try:
+            subprocess.run(["bash", "-c", function + '\nstop_process_tree "$1"', "test", str(process.pid)], check=True, timeout=5)
+            process.wait(timeout=5)
+            for _ in range(20):
+                try:
+                    os.kill(child, 0)
+                except ProcessLookupError:
+                    break
+                time.sleep(0.05)
+            else:
+                self.fail("The game child survived wrapper cleanup")
+        finally:
+            process.stdout.close()
+            if process.poll() is None:
+                process.terminate()
+                process.wait(timeout=5)
+            try:
+                os.kill(child, 15)
+            except ProcessLookupError:
+                pass
 
     def test_final_macos_signature_preserves_apphost_entitlements(self) -> None:
         root = Path(__file__).resolve().parents[3]

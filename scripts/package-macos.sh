@@ -127,6 +127,8 @@ fi
 install_data "$ENGINE_ROOT" "$RESOURCES" "ra"
 set_engine_version "$VERSION" "$RESOURCES"
 set_mod_version "$VERSION" "$RESOURCES/mods/ra/mod.yaml" "$RESOURCES/mods/ra-content/mod.yaml"
+"$PYTHON" "$REPOSITORY_ROOT/scripts/prepare-ra2.py" --resources "$RESOURCES" \
+  --binaries "$MACOS/$ARCH_DIR" --version "$VERSION" --runtime "$RUNTIME"
 
 clang "$ENGINE_ROOT/packaging/macos/apphost.c" -o "$MACOS/apphost-$ARCH_DIR" -framework AppKit -target "$CLANG_TARGET"
 clang "$ENGINE_ROOT/packaging/macos/launcher.m" -o "$MACOS/GameLauncher" -framework AppKit -target "$CLANG_TARGET"

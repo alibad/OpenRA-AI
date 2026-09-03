@@ -74,6 +74,7 @@ export OPENRA_AI_GRPC_PORT=9998
 export OPENRA_AI_CONSOLE_URL=http://127.0.0.1:8787/
 export OPENRA_AI_WORLD_STUDIO_URL=http://127.0.0.1:8788/
 export OPENRA_AI_ENGINE_DIR="$resources_dir"
+export OPENRA_AI_SUPPORT_DIR="$support_root"
 export OPENRA_AI_VERSION="$map_version"
 export OPENRA_AI_PACK_LOCK="$resources_dir/packaging/ai-pack.lock.json"
 export OPENRA_AI_MODEL_ROOT="$runtime_root"
@@ -85,8 +86,17 @@ export PYTHONUTF8=1
 export PYTHONIOENCODING=utf-8
 
 game_args=("$@")
+selected_game="ra"
+if [ -f "$support_root/openra-ai-game.txt" ]; then
+  requested_game="$(tr -d '\r\n' < "$support_root/openra-ai-game.txt")"
+  if [ "$requested_game" = "ra2" ] && [ -f "$resources_dir/mods/ra2/mod.yaml" ] &&
+    [ -f "$support_root/Content/ra2/ra2.mix" ] && [ -f "$support_root/Content/ra2/language.mix" ]; then
+    selected_game="ra2"
+  fi
+fi
+game_args=("Game.Mod=$selected_game" "${game_args[@]}")
 if [ -n "$map_argument" ]; then
-  game_args+=("$map_argument")
+  game_args+=("Game.Mod=ra" "$map_argument")
   has_launch_bots=""
   for argument in "${game_args[@]}"; do
     if [[ "$argument" == Launch.Bots=* ]]; then
@@ -103,13 +113,31 @@ game_pid=""
 watcher_pid=""
 health_status_file=""
 
+stop_process_tree() {
+  local process_id="$1"
+  local child
+  while IFS= read -r child; do
+    [ -n "$child" ] && stop_process_tree "$child"
+  done < <(pgrep -P "$process_id" || true)
+  kill "$process_id" 2>/dev/null || true
+  local attempt
+  for attempt in {1..20}; do
+    kill -0 "$process_id" 2>/dev/null || return 0
+    case "$(ps -p "$process_id" -o stat= 2>/dev/null)" in
+      Z*) return 0 ;;
+    esac
+    sleep 0.1
+  done
+  kill -KILL "$process_id" 2>/dev/null || true
+}
+
 cleanup() {
   if [ -n "$watcher_pid" ] && kill -0 "$watcher_pid" 2>/dev/null; then
-    kill "$watcher_pid" 2>/dev/null || true
+    stop_process_tree "$watcher_pid"
     wait "$watcher_pid" 2>/dev/null || true
   fi
   if [ -n "$game_pid" ] && kill -0 "$game_pid" 2>/dev/null; then
-    kill "$game_pid" 2>/dev/null || true
+    stop_process_tree "$game_pid"
     wait "$game_pid" 2>/dev/null || true
   fi
   if [ -n "$health_status_file" ] && [ -f "$health_status_file" ]; then

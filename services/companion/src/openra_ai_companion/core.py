@@ -11,7 +11,6 @@ from collections.abc import Callable
 from .brain import BrainArbiter, BrainOwner, GoalBlackboard, default_blackboard_path
 from .controller import TacticalController, controller_state
 from .insights import InsightEngine
-from .labels import building_name, humanize_text, production_name, unit_name
 from .models import (
     ACTOR_ACTIONS,
     ITEM_ACTIONS,
@@ -98,6 +97,7 @@ Allowed command objects:
 - {"action":"use_support_power","item_type":"exact ready support_powers key","target_x":int,"target_y":int}
 
 Use only actor ids and facts supplied in the snapshot. Coordinates must be inside the map. Never target remembered or hidden enemies.
+The mod_id identifies the game. Use its supplied actor_names and available_production; never substitute Red Alert 1 rules or country bonuses into Red Alert 2.
 Create one command per actor or production item, with at most 12 commands. Never sell, surrender, cancel production, power down,
 attack a specific actor, spend resources speculatively, or invent an actor or item id. Use support powers only when explicitly requested by the player.
 An action is only a proposal; never say it already happened. Never expose internal type IDs in the answer or summary.
@@ -389,6 +389,7 @@ class Companion:
         previous = self.latest_snapshot
         match_changed = previous is not None and (
             snapshot.tick < previous.tick
+            or snapshot.mod_id != previous.mod_id
             or snapshot.map_name != previous.map_name
             or snapshot.map_width != previous.map_width
             or snapshot.map_height != previous.map_height
@@ -498,7 +499,7 @@ class Companion:
                     "views": views,
                     "fallback": None if result.vision_used else "structured-context",
                 }
-            response = CompanionResponse(humanize_text(result.text), "ai-layer", utterance_id=generation, insight=insight, latency_ms=result.latency_ms, metadata=metadata)
+            response = CompanionResponse(snapshot.humanize_text(result.text), "ai-layer", utterance_id=generation, insight=insight, latency_ms=result.latency_ms, metadata=metadata)
         except RouterError as exc:
             response = CompanionResponse(insight.fallback_text, "deterministic-fallback", utterance_id=generation, insight=insight, latency_ms=round((time.perf_counter() - started) * 1000), metadata={"degraded": True, "reason": str(exc)})
         if self._interrupted(generation):
@@ -618,7 +619,7 @@ class Companion:
                     "views": views,
                     "fallback": None if result.vision_used else "structured-context",
                 }
-            response = CompanionResponse(humanize_text(result.text), "ai-layer", utterance_id=generation, latency_ms=result.latency_ms, metadata=metadata)
+            response = CompanionResponse(snapshot.humanize_text(result.text), "ai-layer", utterance_id=generation, latency_ms=result.latency_ms, metadata=metadata)
         except RouterError as exc:
             response = CompanionResponse("The AI router is unavailable; I can still watch for critical deterministic alerts.", "deterministic-fallback", utterance_id=generation, latency_ms=round((time.perf_counter() - started) * 1000), metadata={"degraded": True, "reason": str(exc)})
         if self._interrupted(generation):
@@ -885,7 +886,7 @@ class Companion:
         if completed_building is not None:
             item = str(completed_building.get("item", "")).strip().lower()
             if item:
-                name = production_name(item)
+                name = snapshot.actor_name(item)
                 return (
                     f"Place the completed {name}",
                     f"The {name} is ready; I can place it near the base. Say confirm.",
@@ -893,9 +894,9 @@ class Companion:
                 )
 
         if insight.key == "opening_deploy":
-            mcv = next((unit for unit in snapshot.units if unit.kind.split(".", 1)[0] == "mcv"), None)
+            mcv = next((unit for unit in snapshot.units if unit.kind.split(".", 1)[0] in {"mcv", "amcv", "smcv"}), None)
             if mcv:
-                name = unit_name(mcv.kind)
+                name = snapshot.actor_name(mcv.kind)
                 return (
                     f"Deploy the starting {name}",
                     f"I suggest deploying your {name} now. Say confirm to establish the base.",
@@ -903,8 +904,8 @@ class Companion:
                 )
 
         if insight.key == "low_power":
-            item = next((item for item in available if item == "powr"), None)
-            item = item or next((item for item in available if item == "apwr"), None)
+            item = next((item for item in available if item in {"powr", "gapowr", "napowr"}), None)
+            item = item or next((item for item in available if item in {"apwr", "nanrct"}), None)
             if item:
                 return (
                     "Queue a power plant",
@@ -934,7 +935,7 @@ class Companion:
                 recon_commands = force_plan["recon"]["commands"]
                 commands = [*production_commands, *recon_commands]
                 if commands:
-                    labels = [production_name(command["item_type"]) for command in production_commands]
+                    labels = [snapshot.actor_name(command["item_type"]) for command in production_commands]
                     force = ", ".join(labels)
                     if production_commands and recon_commands:
                         title = f"Produce a mixed batch and fan out {len(recon_commands)} scouts"
@@ -952,7 +953,7 @@ class Companion:
                     )
 
         if insight.key == "no_harvester":
-            item = next((item for item in available if item.split(".", 1)[0] == "harv"), None)
+            item = next((item for item in available if item.split(".", 1)[0] in {"harv", "cmin"}), None)
             if item:
                 return (
                     "Queue a harvester",
@@ -963,7 +964,7 @@ class Companion:
         if insight.key == "critical_damage":
             building = next((building for building in snapshot.buildings if building.hp_percent <= 0.22), None)
             if building:
-                name = building_name(building.kind)
+                name = snapshot.actor_name(building.kind)
                 return (
                     f"Repair the damaged {name}",
                     f"Your {name} is critically damaged; I can start repairs. Say confirm.",
@@ -979,7 +980,7 @@ class Companion:
             ), None)
             target = rally_target(snapshot, producer) if producer is not None else None
             if producer is not None and target is not None:
-                name = building_name(producer.kind)
+                name = snapshot.actor_name(producer.kind)
                 return (
                     f"Set a clear outward rally point for the {name}",
                     f"I can route new units from the {name} into open staging space. Say confirm.",
@@ -993,7 +994,8 @@ class Companion:
 
         if insight.key == "opening_scout":
             quota = opening_scout_count(snapshot)
-            riflemen = [unit for unit in snapshot.units if unit.kind.lower().split(".", 1)[0] == "e1"]
+            scout_types = {"e1", "e2"} if snapshot.mod_id == "ra2" else {"e1"}
+            riflemen = [unit for unit in snapshot.units if unit.kind.lower().split(".", 1)[0] in scout_types]
             unassigned = [
                 unit for unit in riflemen
                 if unit.idle and unit.actor_id not in self._opening_scout_ids
@@ -1006,8 +1008,8 @@ class Companion:
             if assignments:
                 count = len(assignments)
                 return (
-                    f"Send {count} Rifle Infantry scout{'s' if count != 1 else ''} in different directions",
-                    f"I can fan {count} Rifle Infantry scout{'s' if count != 1 else ''} across unexplored approaches. Say confirm.",
+                    f"Send {count} infantry scout{'s' if count != 1 else ''} in different directions",
+                    f"I can fan {count} infantry scout{'s' if count != 1 else ''} across unexplored approaches. Say confirm.",
                     [
                         {
                             "action": "attack_move",
@@ -1020,15 +1022,15 @@ class Companion:
                 )
 
             queued_riflemen = sum(
-                str(item.get("item", "")).lower().split(".", 1)[0] == "e1"
+                str(item.get("item", "")).lower().split(".", 1)[0] in scout_types
                 for item in snapshot.production
             )
             accounted = max(self._opening_scouts_committed, len(riflemen) + queued_riflemen)
-            rifle_item = next((item for item in available if item.split(".", 1)[0] == "e1"), None)
+            rifle_item = next((item for item in available if item.split(".", 1)[0] in scout_types), None)
             if rifle_item and accounted < quota and queued_riflemen == 0:
                 count = quota - accounted
                 return (
-                    f"Train {count} Rifle Infantry scout{'s' if count != 1 else ''}",
+                    f"Train {count} infantry scout{'s' if count != 1 else ''}",
                     f"This {snapshot.map_width}×{snapshot.map_height} map calls for {quota} opening scouts. Say confirm to train them.",
                     [{"action": "train", "item_type": rifle_item} for _ in range(count)],
                 )
@@ -1091,7 +1093,7 @@ class Companion:
             next_production = force_plan["next_production"]
             if next_production and combat_count < combat_cap:
                 item = next_production[0]["item_type"]
-                label = production_name(item)
+                label = snapshot.actor_name(item)
                 return (
                     f"Train one {label} for the mixed force",
                     f"OpenRA's weighted mix currently needs one {label}. Say confirm to train it.",
@@ -1400,7 +1402,7 @@ class Companion:
         def base_type(value: object) -> str:
             return str(value).lower().split("@", 1)[0].split(".", 1)[0]
 
-        barracks_types = {"tent", "barr"}
+        barracks_types = {"gapile", "nahand"} if snapshot.mod_id == "ra2" else {"tent", "barr"}
         rifle_types = {"e1", "e2", "cnrifle"}
         excluded_types = {"dog", "spy", "e6", "medi", "mech", "e7"}
         building_types = {base_type(building.kind) for building in snapshot.buildings}
@@ -1543,7 +1545,7 @@ class Companion:
                     metadata={"deterministic": True, "action": {"state": "pending", **proposal.as_dict()}},
                 )
 
-        barracks_item = next((available[kind] for kind in ("tent", "barr") if kind in available), None)
+        barracks_item = next((available[kind] for kind in sorted(barracks_types) if kind in available), None)
         if barracks_item:
             commands = self._validate_action_commands(snapshot, [{"action": "build", "item_type": barracks_item}])
             proposal = ActionProposal(
@@ -1581,9 +1583,9 @@ class Companion:
 
         queued_barracks = next((
             item for item in snapshot.production
-            if base_type(item.get("item", "")) in {"tent", "barr"}
+            if base_type(item.get("item", "")) in {"tent", "barr", "gapile", "nahand"}
         ), None)
-        barracks_ready = any(base_type(building.kind) in {"tent", "barr"} for building in snapshot.buildings)
+        barracks_ready = any(base_type(building.kind) in {"tent", "barr", "gapile", "nahand"} for building in snapshot.buildings)
         if queued_barracks is not None:
             progress = max(0, min(100, round(float(queued_barracks.get("progress", 0)) * 100)))
             detail = f"The Barracks was already {progress}% complete; the right response was to say that and continue with scouting afterward."
@@ -1712,7 +1714,7 @@ class Companion:
             objective = "reconfirm the last-known enemy base and prepare a concentrated assault"
         elif snapshot.production:
             names = list(dict.fromkeys(
-                production_name(str(item.get("item", ""))) for item in snapshot.production[:3]
+                snapshot.actor_name(str(item.get("item", ""))) for item in snapshot.production[:3]
             ))
             objective = f"finish {', '.join(names)}, then reassess the next attack threshold"
         elif snapshot.explored_percent < 90:
@@ -1865,14 +1867,14 @@ class Companion:
                 if values:
                     decoded_plan = {
                         "mode": "action",
-                        "message": humanize_text(str(planned.get("message") or "")),
-                        "summary": humanize_text(str(planned.get("summary") or planned.get("message") or "Proposed action")),
+                        "message": snapshot.humanize_text(str(planned.get("message") or "")),
+                        "summary": snapshot.humanize_text(str(planned.get("summary") or planned.get("message") or "Proposed action")),
                         "commands": values,
                     }
                 else:
                     decoded_plan = {
                         "mode": "answer",
-                        "answer": humanize_text(str(planned.get("message") or "I need a more specific objective.")),
+                        "answer": snapshot.humanize_text(str(planned.get("message") or "I need a more specific objective.")),
                     }
                 planner_metadata = dict(planned.get("mcp", {}))
                 result = RouterResult(
@@ -1943,7 +1945,7 @@ class Companion:
                 "fallback": None if result.vision_used else "structured-context",
             }
         if str(decoded.get("mode", "")).lower() != "action":
-            answer = humanize_text(str(decoded.get("answer", "")).strip())
+            answer = snapshot.humanize_text(str(decoded.get("answer", "")).strip())
             if _is_unhelpful_player_answer(answer) or (progress_request and answer.endswith("?")):
                 if failure_followup:
                     return self._action_failure_followup_response(snapshot, generation)
@@ -1965,7 +1967,7 @@ class Companion:
         else:
             try:
                 commands = self._validate_action_commands(snapshot, decoded.get("commands"))
-                summary = humanize_text(str(decoded.get("summary", "")).strip().rstrip("."))
+                summary = snapshot.humanize_text(str(decoded.get("summary", "")).strip().rstrip("."))
                 if not summary or len(summary) > 180:
                     raise ValueError("the proposal summary is missing or too long")
                 proposal = ActionProposal(
@@ -1979,7 +1981,7 @@ class Companion:
                 with self._action_lock:
                     self._pending_action = proposal
                 created_proposal = proposal
-                message = humanize_text(str(decoded.get("message", "")).strip().rstrip("."))
+                message = snapshot.humanize_text(str(decoded.get("message", "")).strip().rstrip("."))
                 lead = f"{message}. " if message else ""
                 order_count = len(commands)
                 order_label = "order" if order_count == 1 else "orders"
@@ -2134,10 +2136,10 @@ class Companion:
 
         self.goal_blackboard.apply_receipt(receipt)
         state = "executed" if receipt.accepted else "rejected"
-        if receipt.accepted and "Rifle Infantry scout" in proposal.summary:
+        if receipt.accepted and "infantry scout" in proposal.summary.lower():
             trained = [
                 command for command in commands
-                if command.action == "train" and command.item_type.split(".", 1)[0] == "e1"
+                if command.action == "train" and command.item_type.split(".", 1)[0] in {"e1", "e2"}
             ]
             self._opening_scouts_committed += len(trained)
             for command in commands:

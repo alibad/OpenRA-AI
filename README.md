@@ -12,7 +12,25 @@ OpenRA project or Electronic Arts.
 
 ## Download and play
 
-### Native Red Alert 2 preview on Mac
+### Integrated Red Alert 2 on Mac (development)
+
+The Mac package now includes a **World War III / Red Alert 2** selector with
+shared AI settings, AUTO, voice controls and the local model library. In RA2,
+choose **Singleplayer → Skirmish** and one of its nine countries. The HUD shows
+the configured Ask shortcut (Option+Space by default on Mac).
+
+Your existing custom factions and capabilities remain in World War III;
+they have not yet been ported to RA2. Original campaigns and Yuri's Revenge
+are not included. This is an early OpenRA recreation, not the original RA2
+executable or a feature-complete release. Existing website downloads do not
+gain this integration until a new package is explicitly published.
+
+The normal `scripts/package-macos.sh VERSION` command prepares the pinned
+RA2 source before signing. It requires a clean, pinned engine and never bundles
+proprietary RA2 archives. The in-app import uses your previously downloaded
+Steam base/English depots or the private preview content library.
+
+### Standalone RA2 preview for developers
 
 RA2 is now available as a separate, locally built Apple Silicon preview using
 the [OpenRA RA2 mod](https://github.com/OpenRA/ra2) and your own original game files.

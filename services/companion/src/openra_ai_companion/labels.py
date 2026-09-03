@@ -92,10 +92,10 @@ def production_name(value: str) -> str:
     return display_name(value, "Production item")
 
 
-def humanize_text(text: str) -> str:
+def humanize_text(text: str, names: dict[str, str] | None = None) -> str:
     """Replace any leaked actor type IDs in player-facing model text."""
     result = text
-    for internal_id, name in sorted(actor_names().items(), key=lambda item: len(item[0]), reverse=True):
+    for internal_id, name in sorted((actor_names() if names is None else names).items(), key=lambda item: len(item[0]), reverse=True):
         result = re.sub(
             rf"(?<![A-Za-z0-9]){re.escape(internal_id)}(?![A-Za-z0-9])",
             name,
