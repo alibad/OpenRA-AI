@@ -9,6 +9,7 @@ from urllib.parse import parse_qs, urlparse
 from .core import Companion
 from .learning import LearningStore, learning_dashboard
 from .model_setup import LocalAISetupError
+from .lm_studio import discover as discover_lm_studio
 from .models import GameSnapshot
 from .router import RouterError
 from .voice import AudioPlayer, record_question
@@ -197,6 +198,13 @@ class CompanionHandler(BaseHTTPRequestHandler):
                     "state": "unsupported",
                     "detail": "Local AI installation is unavailable in this build.",
                 })
+        elif path == "/v1/lm-studio":
+            try:
+                self._json(HTTPStatus.OK, discover_lm_studio())
+            except (OSError, ValueError, TypeError, KeyError):
+                self._json(HTTPStatus.SERVICE_UNAVAILABLE, {
+                    "error": "Start LM Studio's local server on port 1234. Token-protected servers are not supported by discovery yet."
+                })
         elif path == "/v1/voice/readiness":
             self._json(HTTPStatus.OK, self._voice_readiness())
         elif path == "/v1/learning":
@@ -264,7 +272,7 @@ class CompanionHandler(BaseHTTPRequestHandler):
                 config_values = dict(payload.get("config") or {})
                 for key in (
                     "router_url", "model_provider", "text_model", "vision_model", "transcribe_model", "transcribe_language",
-                    "speech_model", "speech_voice",
+                    "speech_model", "speech_voice", "model_selection",
                     "notification_pace", "voice_priority", "companion_enabled", "voice_enabled", "auto_act_enabled", "native_strategy",
                 ):
                     if key in payload:

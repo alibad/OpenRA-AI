@@ -3,6 +3,35 @@
   "pack_version": "2026.08.1",
   "name": "OpenRA AI Local AI Pack",
   "description": "Checksum-pinned model payload used by the platform-specific local OpenRA AI runtime.",
+  "catalogue_version": "2026.09.02",
+  "model_profiles": [
+    {
+      "id": "recommended",
+      "label": "Balanced on-device AI",
+      "model_name": "Qwen3-VL 2B (Q4)",
+      "validated": true,
+      "priority": 20,
+      "memory_bytes": 4294967296,
+      "prefers_acceleration": true,
+      "context_length": 4096,
+      "model": "models/llm/Qwen3VL-2B-Instruct-Q4_K_M.gguf",
+      "projector": "models/llm/mmproj-Qwen3VL-2B-Instruct-Q8_0.gguf",
+      "components": ["qwen3-vl-2b-q4", "qwen3-vl-2b-mmproj-q8", "whisper-base-en", "kokoro-82m-int8", "kokoro-voices-v1"]
+    },
+    {
+      "id": "lightweight",
+      "label": "Lightweight on-device AI",
+      "model_name": "Qwen3-VL 2B (Q4, text mode)",
+      "validated": true,
+      "priority": 10,
+      "memory_bytes": 3221225472,
+      "prefers_acceleration": false,
+      "context_length": 4096,
+      "model": "models/llm/Qwen3VL-2B-Instruct-Q4_K_M.gguf",
+      "projector": null,
+      "components": ["qwen3-vl-2b-q4", "whisper-base-en", "kokoro-82m-int8", "kokoro-voices-v1"]
+    }
+  ],
   "hardware_requirements": {
     "minimum": {
       "os": "macOS 13.3 or newer, or Windows 10/11 x64",

@@ -50,8 +50,11 @@ class AIRouter:
 
     def _request(self, path: str, body: bytes, content_type: str) -> tuple[bytes, int, str]:
         started = time.perf_counter()
+        local_audio = ((path == "/v1/audio/transcriptions" and self.settings.transcribe_model == "local-whisper") or
+                       (path == "/v1/audio/speech" and self.settings.speech_model == "local-kokoro"))
+        base_url = "http://127.0.0.1:4000" if local_audio and self.settings.model_provider == "custom" else self.settings.router_url
         request = urllib.request.Request(
-            f"{self.settings.router_url}{path}",
+            f"{base_url}{path}",
             data=body,
             headers={"Content-Type": content_type, "Accept": "application/json, audio/wav"},
             method="POST",
@@ -91,8 +94,7 @@ class AIRouter:
             {"id": "claude-haiku", "label": "Claude Haiku", "provider": "anthropic", "mode": "chat", "local": False},
             {"id": "gemini-pro", "label": "Gemini Pro", "provider": "gemini", "mode": "chat", "local": False},
             {"id": "gemini-flash", "label": "Gemini Flash", "provider": "gemini", "mode": "chat", "local": False},
-            {"id": "local-small", "label": "Local Small", "provider": "local", "mode": "chat", "local": True},
-            {"id": "local-coder", "label": "Local Coder", "provider": "local", "mode": "chat", "local": True},
+            {"id": "local-coder", "label": "On-device assistant", "provider": "local", "mode": "chat", "local": True},
             {"id": "openai-transcribe", "label": "OpenAI Transcription", "provider": "openai", "mode": "audio_transcription", "local": False},
             {"id": "local-whisper", "label": "Local Whisper", "provider": "local", "mode": "audio_transcription", "local": True},
             {"id": "openai-tts", "label": "OpenAI Voice", "provider": "openai", "mode": "audio_speech", "local": False},
@@ -118,8 +120,8 @@ class AIRouter:
             "claude-haiku": "Claude Haiku",
             "gemini-pro": "Gemini Pro",
             "gemini-flash": "Gemini Flash",
-            "local-small": "Local Small",
-            "local-coder": "Local Coder",
+            "local-small": "Legacy local route",
+            "local-coder": "On-device assistant",
             "openai-transcribe": "OpenAI Transcription",
             "local-whisper": "Local Whisper",
             "openai-tts": "OpenAI Voice",
@@ -127,10 +129,11 @@ class AIRouter:
         }
         return {
             "id": model_id,
-            "label": labels.get(model_id, model_id.replace("-", " ").title()),
+            "label": info.get("display_name") or labels.get(model_id, model_id.replace("-", " ").title()),
             "provider": provider,
             "mode": str(info.get("mode") or "chat"),
             "local": local,
+            "supports_vision": info.get("supports_vision", False),
         }
 
     def catalogue(self) -> dict:
@@ -215,9 +218,16 @@ class AIRouter:
         return self._chat(messages, self.settings.text_model)
 
     def vision(self, prompt: str, image: bytes, media_type: str = "image/png") -> RouterResult:
+        if self.settings.vision_model == "local-no-vision":
+            raise RouterError("The lightweight AI profile uses game state, not map images. Choose Balanced for image analysis.")
         return self._vision_many(prompt, [(image, media_type)])
 
     def vision_many(self, prompt: str, images: list[tuple[bytes, str]]) -> RouterResult:
+        if self.settings.vision_model == "local-no-vision":
+            return self.chat([
+                {"role": "system", "content": "Use only the structured game state below. No images are available; do not invent visual details."},
+                {"role": "user", "content": prompt},
+            ])
         try:
             return self._vision_many(prompt, images)
         except RouterError as exc:
@@ -358,7 +368,8 @@ class AIRouter:
         }
 
     def health(self) -> dict[str, str | bool]:
-        request = urllib.request.Request(f"{self.settings.router_url}/health/liveliness", method="GET")
+        endpoint = "/v1/models" if self.settings.model_provider == "custom" else "/health/liveliness"
+        request = urllib.request.Request(f"{self.settings.router_url}{endpoint}", method="GET")
         try:
             with urllib.request.urlopen(request, timeout=2) as response:
                 return {"reachable": response.status < 500, "url": self.settings.router_url}

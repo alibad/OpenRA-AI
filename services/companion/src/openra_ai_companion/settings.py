@@ -46,6 +46,7 @@ def _load_user_settings() -> dict[str, str | float | bool]:
 class Settings:
     router_url: str = "http://127.0.0.1:4000"
     model_provider: str = "local"
+    model_selection: str = "auto"
     text_model: str = "local-coder"
     vision_model: str = "local-coder"
     transcribe_model: str = "local-whisper"
@@ -69,6 +70,7 @@ class Settings:
             field_name = {
                 "OPENRA_AI_ROUTER_URL": "router_url",
                 "OPENRA_AI_MODEL_PROVIDER": "model_provider",
+                "OPENRA_AI_MODEL_SELECTION": "model_selection",
                 "OPENRA_AI_TEXT_MODEL": "text_model",
                 "OPENRA_AI_VISION_MODEL": "vision_model",
                 "OPENRA_AI_TRANSCRIBE_MODEL": "transcribe_model",
@@ -91,6 +93,7 @@ class Settings:
         return cls(
             router_url=get("OPENRA_AI_ROUTER_URL", cls.router_url).rstrip("/"),
             model_provider=get("OPENRA_AI_MODEL_PROVIDER", cls.model_provider),
+            model_selection=get("OPENRA_AI_MODEL_SELECTION", cls.model_selection),
             text_model=get("OPENRA_AI_TEXT_MODEL", cls.text_model),
             vision_model=get("OPENRA_AI_VISION_MODEL", cls.vision_model),
             transcribe_model=get("OPENRA_AI_TRANSCRIBE_MODEL", cls.transcribe_model),
@@ -115,6 +118,8 @@ class Settings:
             raise ValueError("AI Layer URL must be an absolute http or https URL")
         if self.model_provider not in {"openai", "anthropic", "gemini", "local", "custom"}:
             raise ValueError("model_provider must be openai, anthropic, gemini, local, or custom")
+        if self.model_selection not in {"auto", "recommended", "lightweight", "manual"}:
+            raise ValueError("model_selection must be auto, recommended, lightweight, or manual")
         for name in ("text_model", "vision_model", "transcribe_model", "speech_model", "speech_voice"):
             value = str(getattr(self, name)).strip()
             if not value or len(value) > 160:
@@ -142,6 +147,7 @@ class Settings:
         allowed = {
             "router_url",
             "model_provider",
+            "model_selection",
             "text_model",
             "vision_model",
             "transcribe_model",

@@ -14,6 +14,7 @@ from unittest.mock import patch
 from openra_ai_companion.local_runtime import (
     GatewayServer,
     RuntimeConfig,
+    RuntimeProcesses,
     configure,
     protect_secret,
     unprotect_secret,
@@ -39,6 +40,22 @@ class _ProviderHandler(BaseHTTPRequestHandler):
 
 
 class LocalRuntimeTests(unittest.TestCase):
+    def test_lightweight_runtime_skips_images_and_caps_cpu(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            for name in ("ai/runtime/llama/llama-server", "ai/runtime/whisper/whisper-server",
+                         "ai/models/text.gguf", "ai/models/stt/ggml-base.en.bin"):
+                path = root / name
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.touch()
+            runtime = RuntimeProcesses(root, RuntimeConfig(), profile={"model": "models/text.gguf", "projector": None, "context_length": 4096})
+            with patch("subprocess.Popen") as process, patch.object(runtime, "_wait_until_ready"), patch("os.cpu_count", return_value=16):
+                runtime.start()
+                args = process.call_args_list[0].args[0]
+            self.assertNotIn("--mmproj", args)
+            self.assertEqual(args[args.index("--threads") + 1], "4")
+            self.assertEqual(args[args.index("--parallel") + 1], "1")
+
     def test_secret_round_trip(self) -> None:
         protected = protect_secret("test-secret")
         self.assertNotIn("test-secret", protected)

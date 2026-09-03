@@ -84,7 +84,7 @@ For a clear request to control the player's army, return:
 Allowed command objects:
 - {"action":"train"|"build","item_type":"exact available_production id"}
 - {"action":"stop"|"harvest"|"deploy"|"unload"|"set_stance","actor_id":owned_unit_id}
-- {"action":"repair"|"sell"|"power_down"|"set_primary","actor_id":owned_building_id}
+- {"action":"repair"|"set_primary","actor_id":owned_building_id}
 - {"action":"move"|"attack_move","actor_id":owned_unit_id,"target_x":int,"target_y":int,"queued":false}
 - {"action":"attack","actor_id":owned_attacker_id,"target_actor_id":visible_enemy_actor_id}
 - {"action":"guard","actor_id":owned_unit_id,"target_actor_id":owned_actor_id}
@@ -95,14 +95,16 @@ Allowed command objects:
 - {"action":"capture","actor_id":owned_engineer_id,"target_actor_id":valid_capture_target_id}
 - {"action":"set_rally_point","actor_id":owned_building_id,"target_x":int,"target_y":int}
 - {"action":"place_building","item_type":"exact completed production id","target_x":optional_int,"target_y":optional_int}
-- {"action":"cancel_production","item_type":"exact queued production id"}
 - {"action":"use_support_power","item_type":"exact ready support_powers key","target_x":int,"target_y":int}
 
 Use only actor ids and facts supplied in the snapshot. Coordinates must be inside the map. Never target remembered or hidden enemies.
 Create one command per actor or production item, with at most 12 commands. Never sell, surrender, cancel production, power down,
 attack a specific actor, spend resources speculatively, or invent an actor or item id. Use support powers only when explicitly requested by the player.
 An action is only a proposal; never say it already happened. Never expose internal type IDs in the answer or summary.
-Use player-facing `display_name` values. If the requested target or units are unclear, ask one concise question."""
+Use player-facing `display_name` values. If the requested target or units are unclear, ask one concise question.
+Build and train commands contain only action and item_type; do not add coordinates.
+Requests to sell, cancel production, power down, or attack hidden enemies MUST use mode answer, with no commands.
+Explain that the requested action cannot be proposed; do not repeat it as advice."""
 
 CONFIRM_WORDS = frozenset({"confirm", "confirmed", "yes", "do it", "execute", "go ahead", "proceed"})
 CANCEL_WORDS = frozenset({"cancel", "never mind", "nevermind", "stop", "discard"})

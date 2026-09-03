@@ -1,5 +1,42 @@
 # Model routing
 
+## Automatic selection
+
+Mac local setup defaults to **Automatic — recommended**. A committed catalogue
+inside `packaging/ai-pack.lock.json` selects only explicitly validated profiles.
+It reserves 4 GiB of total memory and 2 GiB of currently available memory for
+the game/OS, caps the model budget at 8 GiB, and limits inference to four CPU
+threads and one request slot. Selection happens once at companion launch.
+Changing the preference applies on the next launch, not during a match.
+
+The initial catalogue has two profiles using the same pinned Qwen3-VL 2B model:
+
+- Balanced: approximately 1.82 GB, including the image projector.
+- Lightweight: approximately 1.38 GB, skipping image processing and relying on
+  structured battlefield state. Preferred on CPU-only and memory-constrained
+  machines. Unknown hardware also gets this conservative default.
+
+Both include Whisper base.en (English transcription) and Kokoro spoken replies.
+Voice is not assumed to be supported by a detected chat model. The game shows
+download/model readiness separately from microphone permission and on-demand
+speech loading. Legacy `local-small` is not offered as an installed model.
+
+Advanced settings can explicitly detect an LM Studio server on loopback port
+1234. Discovery uses its reported tool/vision capabilities and size, preferring
+an already loaded model within the memory budget. This fills a proposed custom
+configuration; the player must select **Apply Now**. It never starts LM Studio,
+downloads models, or changes the live configuration by itself. Token-protected
+discovery is not supported yet. Local speech stays on the bundled gateway.
+
+Catalogue updates are deliberately reviewed and shipped with an app update;
+there is no unverified internet `latest` alias or background model upgrade.
+Maintainers must pin a candidate's exact revision, size, and SHA-256, verify
+runtime/license compatibility, and run `scripts/validate-local-model.py`
+against an isolated server plus the companion guardrail tests before promotion.
+The focused prompt check is a regression gate, not a general model benchmark.
+Qwen3.5 0.8B was evaluated on 2026-09-02 and rejected after malformed and
+disallowed command responses; it is not part of the downloadable catalogue.
+
 ## Current routes
 
 OpenRA AI talks to the bundled loopback gateway at `http://127.0.0.1:4000`.

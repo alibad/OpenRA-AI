@@ -15,6 +15,8 @@ import urllib.request
 from pathlib import Path, PurePosixPath
 from typing import TYPE_CHECKING
 
+from .model_selection import Hardware, choose_profile, selected_components, selection_status, validate_profiles
+
 if TYPE_CHECKING:
     from .core import Companion
 
@@ -70,10 +72,13 @@ class LocalAIManager:
         self._total_bytes = 0
         self._active_component = ""
         self._manifest: dict | None = None
+        self._profile: dict = {}
+        self._hardware = Hardware.detect()
+        self._preference = companion.router.settings.model_selection
         self._load_manifest()
         atexit.register(self.stop)
 
-        if not self.supported:
+        if not self.supported and self._state != "unsupported":
             self._state = "unsupported"
             self._detail = (
                 "Local AI requires macOS 13.3 or newer."
@@ -83,7 +88,9 @@ class LocalAIManager:
         elif self.installed:
             self._state = "ready"
             self._detail = "Local AI Pack is installed."
-            if auto_start and self.companion.router.settings.model_provider == "local":
+            if auto_start and (self.companion.router.settings.model_provider == "local" or
+                               self.companion.router.settings.transcribe_model == "local-whisper" or
+                               self.companion.router.settings.speech_model == "local-kokoro"):
                 self._start_worker(self._start_runtime_safely)
 
     @staticmethod
@@ -99,7 +106,7 @@ class LocalAIManager:
             components = value.get("components")
             if value.get("schema_version") != 1 or not isinstance(components, list) or not components:
                 raise ValueError("invalid local AI pack manifest")
-            for component in components:
+            for component in [*components, *value.get("optional_components", [])]:
                 destination = PurePosixPath(str(component.get("destination", "")))
                 digest = str(component.get("sha256", "")).lower()
                 if (
@@ -112,9 +119,13 @@ class LocalAIManager:
                     or int(component.get("bytes", 0)) <= 0
                 ):
                     raise ValueError(f"invalid component {component.get('id', 'unknown')}")
+            validate_profiles(value)
+            self._profile = choose_profile(value, self._hardware, self._preference)
+            components = selected_components(value, self._profile)
+            value = {**value, "components": components}
             self._manifest = value
             self._total_bytes = sum(int(component["bytes"]) for component in components)
-        except (OSError, ValueError, TypeError, json.JSONDecodeError) as exc:
+        except (OSError, ValueError, TypeError, KeyError, json.JSONDecodeError) as exc:
             self._state = "unsupported"
             self._detail = f"The bundled Local AI Pack manifest is invalid: {exc}"
 
@@ -200,6 +211,16 @@ class LocalAIManager:
                 "progress_percent": max(0, min(100, progress)),
                 "active_component": self._active_component,
                 "hardware_requirements": requirements,
+                "selection": selection_status(self._profile, self._hardware, self._preference),
+                "catalogue_version": str((self._manifest or {}).get("catalogue_version", "")),
+                "pending_restart": self.companion.router.settings.model_selection != self._preference,
+                "capabilities": {
+                    "assistant": "ready" if state == "running" else state,
+                    "map_images": ("ready" if state == "running" else state) if self._profile.get("projector") else "not_in_profile",
+                    "voice_input": "ready" if state == "running" else state,
+                    "spoken_replies": "available_on_demand" if state == "running" else state,
+                    "voice_language": "English",
+                },
             }
 
     def install(self) -> dict[str, object]:
@@ -253,6 +274,7 @@ class LocalAIManager:
                 "schema_version": 1,
                 "name": self._manifest.get("name", "OpenRA AI Local AI Pack"),
                 "pack_version": self._manifest["pack_version"],
+                "profile": self._profile,
                 "installed_at": int(time.time()),
                 "components": [
                     {
@@ -362,6 +384,7 @@ class LocalAIManager:
                     "local",
                     "--parent-pid",
                     str(os.getpid()),
+                    "--model-profile", json.dumps(self._profile),
                 ],
                 cwd=self.runtime_executable.parent,
                 stdout=output,
@@ -384,12 +407,14 @@ class LocalAIManager:
         raise LocalAISetupError("Local models did not finish loading within three minutes. Select Retry.")
 
     def _configure_local_route(self) -> None:
+        if self.companion.router.settings.model_provider != "local":
+            return
         self.companion.router.configure(
             {
                 "router_url": LOCAL_ROUTER_URL,
                 "model_provider": "local",
                 "text_model": "local-coder",
-                "vision_model": "local-coder",
+                "vision_model": "local-coder" if not self._profile or self._profile.get("projector") else "local-no-vision",
                 "transcribe_model": "local-whisper",
                 "speech_model": "local-kokoro",
             }

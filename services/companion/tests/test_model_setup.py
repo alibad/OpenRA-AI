@@ -37,6 +37,30 @@ class _TestManager(LocalAIManager):
 
 
 class LocalAIManagerTests(unittest.TestCase):
+    def test_profile_selection_is_fixed_until_relaunch(self) -> None:
+        from openra_ai_companion.model_selection import Hardware, GIB
+        from openra_ai_companion.router import AIRouter
+        from openra_ai_companion.settings import Settings
+
+        root = Path(__file__).resolve().parents[3]
+        companion = Companion(router=AIRouter(Settings()))
+        with patch("openra_ai_companion.model_setup.Hardware.detect", return_value=Hardware(8 * GIB, 5 * GIB, 8, True)):
+            manager = LocalAIManager(companion, lock_path=root / "packaging/ai-pack.lock.json", auto_start=False)
+        self.assertEqual(manager.status()["selection"]["profile"], "lightweight")
+        self.assertLess(manager.status()["total_bytes"], 1_400_000_000)
+        companion.router.configure({"model_selection": "recommended"}, persist=False)
+        self.assertEqual(manager.status()["selection"]["profile"], "lightweight")
+        self.assertTrue(manager.status()["pending_restart"])
+
+    def test_starting_local_speech_preserves_an_external_assistant(self) -> None:
+        from openra_ai_companion.router import AIRouter
+        from openra_ai_companion.settings import Settings
+
+        companion = Companion(router=AIRouter(Settings(model_provider="custom", router_url="http://127.0.0.1:1234")))
+        manager = LocalAIManager(companion, auto_start=False)
+        manager._configure_local_route()
+        self.assertEqual(companion.router.settings.router_url, "http://127.0.0.1:1234")
+
     def test_setup_downloads_verifies_and_activates_the_local_pack(self) -> None:
         payload = b"pinned-model-payload"
         digest = hashlib.sha256(payload).hexdigest()

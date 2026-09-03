@@ -156,11 +156,12 @@ def _merge_companion_settings(config: RuntimeConfig) -> None:
 
 
 class RuntimeProcesses:
-    def __init__(self, install_root: Path, config: RuntimeConfig, runtime_root: Path | None = None):
+    def __init__(self, install_root: Path, config: RuntimeConfig, runtime_root: Path | None = None, profile: dict | None = None):
         self.install_root = install_root
         self.config = config
         self.runtime_root = runtime_root or install_root / "ai" / "runtime"
         self.children: list[subprocess.Popen] = []
+        self.profile = profile or {}
 
     def start(self) -> None:
         if self.config.mode != "local":
@@ -169,19 +170,26 @@ class RuntimeProcesses:
         executable_suffix = ".exe" if os.name == "nt" else ""
         llama = self.runtime_root / "llama" / f"llama-server{executable_suffix}"
         whisper = self.runtime_root / "whisper" / f"whisper-server{executable_suffix}"
-        model = ai_root / "models" / "llm" / "Qwen3VL-2B-Instruct-Q4_K_M.gguf"
-        projector = ai_root / "models" / "llm" / "mmproj-Qwen3VL-2B-Instruct-Q8_0.gguf"
+        model = ai_root / self.profile.get("model", "models/llm/Qwen3VL-2B-Instruct-Q4_K_M.gguf")
+        projector_path = self.profile.get("projector") if self.profile else "models/llm/mmproj-Qwen3VL-2B-Instruct-Q8_0.gguf"
+        projector = ai_root / projector_path if projector_path else None
         whisper_model = ai_root / "models" / "stt" / "ggml-base.en.bin"
-        missing = [path for path in (llama, whisper, model, projector, whisper_model) if not path.is_file()]
+        missing = [path for path in (llama, whisper, model, projector, whisper_model) if path and not path.is_file()]
         if missing:
             raise FileNotFoundError("Local AI is selected but its payload is incomplete: " + ", ".join(str(p) for p in missing))
 
         creation_flags = getattr(subprocess, "CREATE_NO_WINDOW", 0)
         try:
             self.children.append(subprocess.Popen([
-                str(llama), "--model", str(model), "--mmproj", str(projector),
+                str(llama), "--model", str(model),
+                *(["--mmproj", str(projector)] if projector else []),
                 "--host", "127.0.0.1", "--port", str(LOCAL_CHAT_PORT),
-                "--ctx-size", "4096", "--threads", str(max(2, (os.cpu_count() or 4) - 1)),
+                "--ctx-size", str(self.profile.get("context_length", 4096)),
+                "--threads", str(max(1, min(4, (os.cpu_count() or 4) // 2))),
+                "--threads-batch", str(max(1, min(4, (os.cpu_count() or 4) // 2))),
+                "--alias", "local-coder",
+                "--parallel", "1",
+                "--chat-template-kwargs", '{"enable_thinking":false}',
                 "--jinja", "--no-webui",
             ], cwd=llama.parent, creationflags=creation_flags))
             self.children.append(subprocess.Popen([
@@ -250,10 +258,11 @@ def _pid_alive(pid: int) -> bool:
 class GatewayServer(ThreadingHTTPServer):
     daemon_threads = True
 
-    def __init__(self, address: tuple[str, int], install_root: Path, config: RuntimeConfig):
+    def __init__(self, address: tuple[str, int], install_root: Path, config: RuntimeConfig, profile: dict | None = None):
         super().__init__(address, GatewayHandler)
         self.install_root = install_root
         self.config = config
+        self.profile = profile or {}
         self._kokoro = None
         self._tts_lock = threading.Lock()
 
@@ -315,7 +324,11 @@ class GatewayHandler(BaseHTTPRequestHandler):
             self._json(HTTPStatus.OK, {"data": [{
                 "model_name": model,
                 "litellm_params": {"model": model, "api_base": endpoint},
-                "model_info": {"mode": mode, "litellm_provider": provider},
+                "model_info": {
+                    "mode": mode, "litellm_provider": provider,
+                    "display_name": self.server.profile.get("model_name") if mode == "chat" else None,
+                    "supports_vision": bool(self.server.profile.get("projector")) if self.server.profile else True,
+                },
             } for model, mode in models]})
             return
         self._json(HTTPStatus.NOT_FOUND, {"error": "not_found"})
@@ -327,6 +340,13 @@ class GatewayHandler(BaseHTTPRequestHandler):
             if self.server.config.mode == "external":
                 self._proxy(self._external_url(self.path), body, self.headers.get("Content-Type", "application/json"))
             elif self.path == "/v1/chat/completions":
+                request = json.loads(body)
+                has_images = any(isinstance(message.get("content"), list) and
+                                 any(part.get("type") == "image_url" for part in message["content"] if isinstance(part, dict))
+                                 for message in request.get("messages", []))
+                if has_images and self.server.profile and not self.server.profile.get("projector"):
+                    self._json(HTTPStatus.BAD_REQUEST, {"error": "This lightweight profile does not support map images."})
+                    return
                 self._proxy(f"http://127.0.0.1:{LOCAL_CHAT_PORT}{self.path}", body, "application/json")
             elif self.path == "/v1/audio/transcriptions":
                 self._proxy(
@@ -400,10 +420,11 @@ def serve_runtime(args: argparse.Namespace) -> int:
     install_root = Path(args.root).resolve()
     config = RuntimeConfig(mode=args.mode) if args.mode else RuntimeConfig.load()
     runtime_root = Path(args.runtime_root).resolve() if args.runtime_root else None
-    processes = RuntimeProcesses(install_root, config, runtime_root)
+    profile = json.loads(getattr(args, "model_profile", "{}"))
+    processes = RuntimeProcesses(install_root, config, runtime_root, profile)
     processes.start()
     atexit.register(processes.stop)
-    server = GatewayServer((args.host, args.port), install_root, config)
+    server = GatewayServer((args.host, args.port), install_root, config, profile)
 
     if args.parent_pid:
         def watch_parent() -> None:
@@ -434,6 +455,7 @@ def parser() -> argparse.ArgumentParser:
     serve.add_argument("--host", default="127.0.0.1")
     serve.add_argument("--port", type=int, default=DEFAULT_PORT)
     serve.add_argument("--parent-pid", type=int, default=0)
+    serve.add_argument("--model-profile", default="{}")
     config = commands.add_parser("configure")
     config.add_argument("--mode", choices=("local", "external"))
     config.add_argument("--input-ini")
