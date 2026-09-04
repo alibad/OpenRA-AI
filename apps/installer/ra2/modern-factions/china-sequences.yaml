@@ -1,0 +1,21 @@
+r2qilin:
+	Inherits@MC: ^MindControllable
+	Inherits@Muzzle: ^WithCannonMuzzle
+	icon:
+		Filename: ra2|modern-factions/icons/r2qilin.png
+
+r2lynx:
+	Inherits@MC: ^MindControllable
+	Inherits@Muzzle: ^WithCannonMuzzle
+	icon:
+		Filename: ra2|modern-factions/icons/r2lynx.png
+
+r2mantis:
+	Inherits@MC: ^MindControllable
+	Inherits@Muzzle: ^WithCannonMuzzle
+	icon:
+		Filename: ra2|modern-factions/icons/r2mantis.png
+
+r2cloud:
+	icon:
+		Filename: ra2|modern-factions/icons/r2cloud.png

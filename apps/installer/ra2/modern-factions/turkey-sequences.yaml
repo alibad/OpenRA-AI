@@ -1,0 +1,21 @@
+r2bozkir:
+	Inherits@MC: ^MindControllable
+	Inherits@Muzzle: ^WithCannonMuzzle
+	icon:
+		Filename: ra2|modern-factions/icons/r2bozkir.png
+
+r2yildirim:
+	Inherits@MC: ^MindControllable
+	Inherits@Muzzle: ^WithCannonMuzzle
+	icon:
+		Filename: ra2|modern-factions/icons/r2yildirim.png
+
+r2sancak:
+	Inherits@MC: ^MindControllable
+	Inherits@Muzzle: ^WithCannonMuzzle
+	icon:
+		Filename: ra2|modern-factions/icons/r2sancak.png
+
+r2kuzgun:
+	icon:
+		Filename: ra2|modern-factions/icons/r2kuzgun.png

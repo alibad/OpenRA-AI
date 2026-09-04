@@ -1,0 +1,91 @@
+Player:
+	BaseBuilderBotModule@naval:
+		InitialBuildOrder: gapowr, napowr, garefn, narefn, gapile, nahand, gaweap, naweap, gaairc, naradr
+		BuildingFractions:
+			garefn: 20
+			narefn: 20
+			gapowr: 20
+			napowr: 20
+			gapile: 12
+			nahand: 12
+			gaweap: 16
+			naweap: 16
+			gaairc: 8
+			amradr: 8
+			naradr: 8
+			gatech: 5
+			natech: 5
+	BaseBuilderBotModule@turtle:
+		InitialBuildOrder: gapowr, napowr, garefn, narefn, gapile, nahand, gaweap, naweap, gaairc, naradr
+		BuildingFractions:
+			garefn: 20
+			narefn: 20
+			gapowr: 20
+			napowr: 20
+			gapile: 12
+			nahand: 12
+			gaweap: 16
+			naweap: 16
+			gaairc: 8
+			amradr: 8
+			naradr: 8
+			gatech: 5
+			natech: 5
+	BaseBuilderBotModule@rush:
+		InitialBuildOrder: gapowr, napowr, garefn, narefn, gapile, nahand, gaweap, naweap, gaairc, naradr
+		BuildingFractions:
+			garefn: 20
+			narefn: 20
+			gapowr: 20
+			napowr: 20
+			gapile: 12
+			nahand: 12
+			gaweap: 16
+			naweap: 16
+			gaairc: 8
+			amradr: 8
+			naradr: 8
+			gatech: 5
+			natech: 5
+	BaseBuilderBotModule@medium:
+		InitialBuildOrder: gapowr, napowr, garefn, narefn, gapile, nahand, gaweap, naweap, gaairc, naradr
+		BuildingFractions:
+			garefn: 20
+			narefn: 20
+			gapowr: 20
+			napowr: 20
+			gapile: 12
+			nahand: 12
+			gaweap: 16
+			naweap: 16
+			gaairc: 8
+			amradr: 8
+			naradr: 8
+			gatech: 5
+			natech: 5
+	BaseBuilderBotModule@normal:
+		InitialBuildOrder: gapowr, napowr, garefn, narefn, gapile, nahand, gaweap, naweap, gaairc, naradr
+		BuildingFractions:
+			garefn: 20
+			narefn: 20
+			gapowr: 20
+			napowr: 20
+			gapile: 12
+			nahand: 12
+			gaweap: 16
+			naweap: 16
+			gaairc: 8
+			amradr: 8
+			naradr: 8
+			gatech: 5
+			natech: 5
+	SquadManagerBotModule@normal:
+		AirUnitsTypes: jumpjet, shad, zep, orca, beag, r2cloud, r2mohajer, r2kuzgun
+	SquadManagerBotModule@medium:
+		AirUnitsTypes: jumpjet, shad, zep, orca, beag, r2cloud, r2mohajer, r2kuzgun
+	SquadManagerBotModule@rush:
+		AirUnitsTypes: jumpjet, shad, zep, orca, beag, r2cloud, r2mohajer, r2kuzgun
+	SquadManagerBotModule@turtle:
+		AirUnitsTypes: jumpjet, shad, zep, orca, beag, r2cloud, r2mohajer, r2kuzgun
+	SquadManagerBotModule@naval:
+		AirUnitsTypes: jumpjet, shad, zep, orca, beag, r2cloud, r2mohajer, r2kuzgun

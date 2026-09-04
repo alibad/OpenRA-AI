@@ -36,6 +36,9 @@ def check_map(resources: Path, binaries: Path, content: Path, output: Path, name
         text = map_yaml.read_text()
         text = re.sub(r"(\tPlayerReference@Multi\d+:\n(?:(?!\tPlayerReference)[^\n]*\n)*?\t\tFaction:) Random",
                       rf"\g<1> {faction}\n\t\tLockFaction: True", text)
+        if require_unit:
+            # A unit present in a starting army is not proof of AI production.
+            text = text.replace("\t\tLockFaction: True", "\t\tLockFaction: True\n\t\tStartingUnitsClass: none")
         map_yaml.write_text(text)
     with socket.socket() as listener:
         listener.bind(("127.0.0.1", 0))
@@ -150,7 +153,7 @@ if __name__ == "__main__":
     parser.add_argument("--ticks", type=int, default=150)
     parser.add_argument("--verify-movement", action="store_true", help="Check a manual MCV movement order instead of AUTO deployment")
     parser.add_argument("--timeout", type=float, default=35, help="Maximum wall-clock seconds per map")
-    parser.add_argument("--faction", choices=("france", "iraq"), help="Lock both players in a private copy of each map")
+    parser.add_argument("--faction", choices=("france", "iraq", "china", "iran", "turkey"), help="Lock both players in a private copy of each map")
     parser.add_argument("--require-unit", help="Wait for AUTO to produce this actor type")
     parser.add_argument("--verify-deployment", action="store_true", help="After AUTO play, deploy a GI and verify its weapon range changes")
     args = parser.parse_args()

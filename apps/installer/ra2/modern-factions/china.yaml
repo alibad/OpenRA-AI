@@ -1,0 +1,202 @@
+World:
+	Faction@china:
+		Name: ra2-modern-china-name
+		InternalName: china
+		Side: Allies
+		RandomFactionMemberOf: random-allies
+		Description: ra2-modern-china-description
+	StartingUnits@china-none:
+		Class: none
+		ClassName: options-starting-units.mcv-only
+		Factions: china
+		BaseActor: amcv
+		BaseActorFacing: 896
+	StartingUnits@china-light:
+		Class: light
+		ClassName: options-starting-units.light
+		Factions: china
+		BaseActor: amcv
+		BaseActorFacing: 896
+		SupportActors: dog, e1, e1
+		SupportActorsFacing: 896
+		InnerSupportRadius: 3
+		OuterSupportRadius: 5
+	StartingUnits@china-medium:
+		Class: medium
+		ClassName: options-starting-units.medium
+		Factions: china
+		BaseActor: amcv
+		BaseActorFacing: 896
+		SupportActors: dog, e1, e1, e1, r2qilin, engineer
+		SupportActorsFacing: 896
+		InnerSupportRadius: 3
+		OuterSupportRadius: 5
+	StartingUnits@china-heavy:
+		Class: heavy
+		ClassName: options-starting-units.heavy
+		Factions: china
+		BaseActor: amcv
+		BaseActorFacing: 896
+		SupportActors: dog, e1, e1, e1, e1, r2qilin, r2qilin, r2mantis, engineer
+		SupportActorsFacing: 896
+		InnerSupportRadius: 3
+		OuterSupportRadius: 5
+
+Player:
+	ProvidesPrerequisite@china:
+		Prerequisite: faction.china
+		Factions: china
+	UnitBuilderBotModule@normal:
+		UnitsToBuild:
+			r2qilin: 65
+			r2lynx: 20
+			r2mantis: 25
+			r2cloud: 8
+		UnitLimits:
+			r2cloud: 4
+	UnitBuilderBotModule@medium:
+		UnitsToBuild:
+			r2qilin: 65
+			r2lynx: 20
+			r2mantis: 25
+			r2cloud: 8
+		UnitLimits:
+			r2cloud: 4
+	UnitBuilderBotModule@rush:
+		UnitsToBuild:
+			r2qilin: 65
+			r2lynx: 20
+			r2mantis: 25
+			r2cloud: 8
+		UnitLimits:
+			r2cloud: 4
+	UnitBuilderBotModule@turtle:
+		UnitsToBuild:
+			r2qilin: 65
+			r2lynx: 20
+			r2mantis: 25
+			r2cloud: 8
+		UnitLimits:
+			r2cloud: 4
+	UnitBuilderBotModule@naval:
+		UnitsToBuild:
+			r2qilin: 65
+			r2lynx: 20
+			r2mantis: 25
+			r2cloud: 8
+		UnitLimits:
+			r2cloud: 4
+
+gaairc:
+	ProvidesPrerequisite@harrier-china:
+		Prerequisite: aircraft.harrier
+		Factions: china
+
+gaweap:
+	GrantConditionOnProduction@china-drone:
+		Actors: r2cloud
+		Condition: roof-open
+		Duration: 50
+		ShowSelectionBar: false
+
+r2qilin:
+	Inherits: ^R2ModernVehicle
+	Inherits@doctrine: ^R2Networked
+	Tooltip:
+		Name: ra2-r2qilin-name
+	Buildable:
+		BuildPaletteOrder: 21
+		Prerequisites: ~faction.china, gaweap
+		Description: ra2-r2qilin-description
+	Valued:
+		Cost: 850
+	Health:
+		HP: 350
+	Armor:
+		Type: Heavy
+	Mobile:
+		Speed: 100
+	Armament:
+		Weapon: R2QilinGun
+		MuzzleSequence: muzzle
+
+r2lynx:
+	Inherits: ^R2ModernVehicle
+	Inherits@doctrine: ^R2Networked
+	Tooltip:
+		Name: ra2-r2lynx-name
+	Buildable:
+		BuildPaletteOrder: 41
+		Prerequisites: ~faction.china, gaweap
+		Description: ra2-r2lynx-description
+	Valued:
+		Cost: 600
+	Health:
+		HP: 180
+	Armor:
+		Type: Light
+	Mobile:
+		Speed: 135
+	Armament:
+		Weapon: R2ReconGun
+		MuzzleSequence: muzzle
+	ProximityExternalCondition@network:
+		Condition: r2-network
+		Range: 5c0
+		ValidRelationships: Ally
+		AffectsParent: True
+	WithRangeCircle@network:
+		Range: 5c0
+		Color: FFCC6680
+	RevealsShroud:
+		Range: 11c0
+
+r2mantis:
+	Inherits: ^R2ModernVehicle
+	Inherits@AUTOTARGET: ^AutoTargetAir
+	Inherits@doctrine: ^R2Networked
+	Tooltip:
+		Name: ra2-r2mantis-name
+	Buildable:
+		BuildPaletteOrder: 61
+		Prerequisites: ~faction.china, gaweap
+		Description: ra2-r2mantis-description
+	Valued:
+		Cost: 950
+	Health:
+		HP: 230
+	Armor:
+		Type: Light
+	Mobile:
+		Speed: 100
+	Armament:
+		Weapon: R2AirDefense
+	AutoTarget:
+		ScanRadius: 10
+
+r2cloud:
+	Inherits: ^R2ModernDrone
+	Inherits@doctrine: ^R2Networked
+	Tooltip:
+		Name: ra2-r2cloud-name
+	Buildable:
+		BuildPaletteOrder: 81
+		Prerequisites: ~faction.china, gaweap, radar
+		Description: ra2-r2cloud-description
+	Valued:
+		Cost: 1000
+	Health:
+		HP: 120
+	Armor:
+		Type: Light
+	Aircraft:
+		Speed: 180
+	Armament:
+		Weapon: R2DroneMissile
+	SpawnActorOnDeath:
+		Actor: r2cloudhusk
+
+r2cloudhusk:
+	Inherits: ^R2DroneHusk
+	RenderVoxels:
+		Image: r2cloud

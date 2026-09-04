@@ -1,0 +1,44 @@
+r2qilin:
+	idle: ra2|modern-factions/voxels/r2qilin
+	turret: ra2|modern-factions/voxels/r2qilintur
+
+r2lynx:
+	idle: ra2|modern-factions/voxels/r2lynx
+	turret: ra2|modern-factions/voxels/r2lynxtur
+
+r2mantis:
+	idle: ra2|modern-factions/voxels/r2mantis
+	turret: ra2|modern-factions/voxels/r2mantistur
+
+r2cloud:
+	idle: ra2|modern-factions/voxels/r2cloud
+
+r2karrar:
+	idle: ra2|modern-factions/voxels/r2karrar
+	turret: ra2|modern-factions/voxels/r2karrartur
+
+r2raad:
+	idle: ra2|modern-factions/voxels/r2raad
+	turret: ra2|modern-factions/voxels/r2raadtur
+
+r2fajr:
+	idle: ra2|modern-factions/voxels/r2fajr
+	turret: ra2|modern-factions/voxels/r2fajrtur
+
+r2mohajer:
+	idle: ra2|modern-factions/voxels/r2mohajer
+
+r2bozkir:
+	idle: ra2|modern-factions/voxels/r2bozkir
+	turret: ra2|modern-factions/voxels/r2bozkirtur
+
+r2yildirim:
+	idle: ra2|modern-factions/voxels/r2yildirim
+	turret: ra2|modern-factions/voxels/r2yildirimtur
+
+r2sancak:
+	idle: ra2|modern-factions/voxels/r2sancak
+	turret: ra2|modern-factions/voxels/r2sancaktur
+
+r2kuzgun:
+	idle: ra2|modern-factions/voxels/r2kuzgun

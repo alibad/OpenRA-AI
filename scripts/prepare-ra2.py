@@ -11,6 +11,8 @@ import shutil
 import subprocess
 import tempfile
 
+from PIL import Image
+
 ROOT = Path(__file__).resolve().parents[1]
 SPEC = importlib.util.spec_from_file_location("ra2_source", ROOT / "scripts/build-ra2-preview.py")
 SOURCE = importlib.util.module_from_spec(SPEC)
@@ -79,11 +81,29 @@ def integrate(source: Path, engine: Path, version: str) -> None:
             rules = rules.replace("dest: 20", "dest: 60").replace("sub: 20", "sub: 60")
         profiles.append(rules)
     (mod / "rules/ai.yaml").write_text("Player:\n" + "".join(profiles))
-    (mod / "experiences.yaml").write_text(
-        "ExperienceCatalog:\n\tMod: ra2\n\tDefaultProfile: ra2-classic\n\tComponents:\n"
-        "\tProfiles:\n\t\tra2-classic:\n\t\t\tTitle: Red Alert 2\n"
-        "\t\t\tDescription: Original RA2 countries and gameplay with the shared OpenRA AI assistant.\n\t\t\tComponents:\n"
-    )
+    modern = ROOT / "apps/installer/ra2/modern-factions"
+    shutil.copytree(modern, mod / "modern-factions")
+    shutil.copy2(modern / "experiences.yaml", mod / "experiences.yaml")
+    # Model sequences are manifest-level data. Unused models are harmless when
+    # a pack is off; gameplay rules/weapons/sprite sequences remain conditional.
+    replace_once(manifest, "ModelSequences:\n", "ModelSequences:\n\tra2|modern-factions/voxels.yaml\n")
+    replace_once(manifest, "FluentMessages:\n", "FluentMessages:\n\tra2|modern-factions/messages.ftl\n")
+    metrics = mod / "metrics.yaml"
+    metrics.write_text(metrics.read_text().replace("Metrics:\n", "Metrics:\n\tFactionSuffix-china: allies\n\tFactionSuffix-turkey: allies\n\tFactionSuffix-iran: soviets\n", 1))
+    # Extend the upstream UI atlas at build time, reusing our existing country
+    # flags. Do not ship a replacement that could lose any stock UI regions.
+    buttons = mod / "uibits/buttons.png"
+    with Image.open(buttons) as original, Image.open(engine / "mods/ra/uibits/glyphs-redsea.png") as flags:
+        atlas = Image.new("RGBA", (max(256, original.width), 1 << (original.height + 20).bit_length()))
+        atlas.paste(original, (0, 0))
+        regions = []
+        for i, (country, x, y) in enumerate((("china", 192, 128), ("iran", 226, 33), ("turkey", 226, 113))):
+            flag = flags.crop((x, y, x + 30, y + 15)).resize((45, 21), Image.Resampling.NEAREST)
+            atlas.paste(flag, (45 * i, original.height))
+            regions.append(f"\t\t{country}: {45 * i}, {original.height}, 45, 21\n")
+        atlas.save(buttons)
+    replace_once(mod / "chrome.yaml", "flags:\n\tImage: buttons.png\n\tRegions:\n",
+                 "flags:\n\tImage: buttons.png\n\tRegions:\n" + "".join(regions))
     (mod / "languages/native-preview.ftl").write_text(
         "ra2-preview-window-title = OpenRA AI — Red Alert 2\n"
         "ra2-preview-note = Red Alert 2 with the shared AI assistant. Original campaigns and Yuri’s Revenge are not included.\n"

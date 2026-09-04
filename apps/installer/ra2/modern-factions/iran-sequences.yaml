@@ -1,0 +1,21 @@
+r2karrar:
+	Inherits@MC: ^MindControllable
+	Inherits@Muzzle: ^WithCannonMuzzle
+	icon:
+		Filename: ra2|modern-factions/icons/r2karrar.png
+
+r2raad:
+	Inherits@MC: ^MindControllable
+	Inherits@Muzzle: ^WithCannonMuzzle
+	icon:
+		Filename: ra2|modern-factions/icons/r2raad.png
+
+r2fajr:
+	Inherits@MC: ^MindControllable
+	Inherits@Muzzle: ^WithCannonMuzzle
+	icon:
+		Filename: ra2|modern-factions/icons/r2fajr.png
+
+r2mohajer:
+	icon:
+		Filename: ra2|modern-factions/icons/r2mohajer.png

@@ -1,0 +1,65 @@
+R2QilinGun:
+	Inherits: 105mm
+	ReloadDelay: 65
+	Warhead@1Dam: SpreadDamage
+		Damage: 68
+
+R2KarrarGun:
+	Inherits: 120mm
+	ReloadDelay: 75
+	Warhead@1Dam: SpreadDamage
+		Damage: 90
+
+R2BozkirGun:
+	Inherits: 105mm
+	ReloadDelay: 70
+	Warhead@1Dam: SpreadDamage
+		Damage: 80
+
+R2ReconGun:
+	Inherits: 20mm
+	ValidTargets: Ground, Water
+	ReloadDelay: 25
+	Warhead@1Dam: SpreadDamage
+		Damage: 12
+		ValidTargets: Ground, Water
+
+R2AirDefense:
+	Inherits: MammothTusk
+	Range: 10c0
+	ReloadDelay: 90
+	Warhead@1Dam: SpreadDamage
+		Damage: 45
+
+R2Howitzer:
+	Inherits: 155mm
+	Range: 12c0
+	MinRange: 4c0
+	ReloadDelay: 140
+	Projectile: Bullet
+		LaunchAngle: 62
+		Speed: 240
+	Warhead@1Dam: SpreadDamage
+		Damage: 95
+		Spread: 341
+
+R2RocketSalvo:
+	Inherits: Maverick
+	Range: 11c0
+	MinRange: 4c0
+	ReloadDelay: 180
+	Burst: 4
+	BurstDelays: 8
+	Projectile: Missile
+		Speed: 240
+		RangeLimit: 14c0
+	Warhead@1Dam: SpreadDamage
+		Damage: 30
+		Spread: 256
+
+R2DroneMissile:
+	Inherits: Maverick
+	Range: 6c0
+	ReloadDelay: 140
+	Warhead@1Dam: SpreadDamage
+		Damage: 35

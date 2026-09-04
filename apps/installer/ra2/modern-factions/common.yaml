@@ -1,0 +1,117 @@
+# Native RA2 rendering; no classic-perspective sprites or proprietary art.
+World:
+	SpawnStartingUnits:
+		StartingUnitsClass: medium
+
+^Palettes:
+	PaletteFromFile@modern:
+		Name: modern
+		Filename: ra2|modern-factions/voxels/modern.pal
+	PlayerColorPalette@modern:
+		BasePalette: modern
+		BaseName: modernplayer
+		RemapIndex: 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31
+
+^R2ModernVehicle:
+	Inherits: ^Vehicle
+	Tooltip:
+		GenericName: ra2-modern-vehicle
+	Inherits@AUTOTARGET: ^AutoTargetGroundAssaultMove
+	Inherits@MC: ^MindControllable
+	UpdatesPlayerStatistics:
+		AddToArmyValue: true
+	Buildable:
+		Queue: Vehicle
+	RenderSprites:
+	RenderVoxels:
+		PlayerPalette: modernplayer
+		Scale: 15.2
+	WithVoxelBody:
+	WithVoxelTurret:
+	Turreted:
+		TurnSpeed: 28
+	AttackTurreted:
+		Voice: Attack
+	Armament:
+		LocalOffset: 700,0,450
+	WithMuzzleOverlay:
+	RevealsShroud:
+		Range: 8c0
+	Mobile:
+		Locomotor: heavytracked
+		TurnSpeed: 24
+	AutoTarget:
+	Selectable:
+		Bounds: 1544, 2300, 0, -289
+	HitShape:
+	ProducibleWithLevel:
+		Prerequisites: warfactory.infiltrated
+
+^R2ModernDrone:
+	Inherits: ^Aircraft
+	Tooltip:
+		GenericName: ra2-modern-aircraft
+	Inherits@AUTOTARGET: ^AutoTargetGroundAssaultMove
+	Buildable:
+		Queue: Vehicle
+		BuildPaletteOrder: 95
+	UpdatesPlayerStatistics:
+		AddToArmyValue: true
+	RenderSprites:
+	RenderVoxels:
+		PlayerPalette: modernplayer
+		Scale: 15.2
+	WithVoxelBody:
+	RevealsShroud:
+		Range: 11c0
+		Type: CenterPosition
+	AttackAircraft:
+		Voice: Attack
+		AttackType: Hover
+	Aircraft:
+		CruiseAltitude: 3072
+		LandableTerrainTypes: Clear, Rough, Road, DirtRoad, Ore, Gems
+		TurnSpeed: 32
+		Speed: 180
+		AltitudeVelocity: 120
+		CruisingCondition: cruising
+		IdleBehavior: Land
+	Hovers@CRUISING:
+		RequiresCondition: cruising
+		BobDistance: -30
+	Repairable:
+		Voice: Move
+		RepairActors: gadept, nadept, caoutp
+	Voiced:
+		VoiceSet: NighthawkVoice
+	Armor:
+		Type: Light
+	Selectable:
+		Bounds: 1544, 2509, 0, -289
+	HitShape:
+
+^R2Networked:
+	ExternalCondition@network:
+		Condition: r2-network
+	ReloadDelayMultiplier@network:
+		Modifier: 85
+		RequiresCondition: r2-network
+
+^R2Protected:
+	ExternalCondition@screen:
+		Condition: r2-screen
+	DamageMultiplier@screen:
+		Modifier: 85
+		RequiresCondition: r2-screen
+
+^R2DroneHusk:
+	Inherits: ^HelicopterHusk
+	Tooltip:
+		Name: ra2-modern-husk
+		GenericName: ra2-modern-husk
+	RenderVoxels:
+		PlayerPalette: modernplayer
+		Scale: 15.2
+	FallsToEarth:
+		Explosion: PlaneExplode
+		MaximumSpinSpeed: 10

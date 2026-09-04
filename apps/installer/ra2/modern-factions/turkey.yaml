@@ -1,0 +1,204 @@
+World:
+	Faction@turkey:
+		Name: ra2-modern-turkey-name
+		InternalName: turkey
+		Side: Allies
+		RandomFactionMemberOf: random-allies
+		Description: ra2-modern-turkey-description
+	StartingUnits@turkey-none:
+		Class: none
+		ClassName: options-starting-units.mcv-only
+		Factions: turkey
+		BaseActor: amcv
+		BaseActorFacing: 896
+	StartingUnits@turkey-light:
+		Class: light
+		ClassName: options-starting-units.light
+		Factions: turkey
+		BaseActor: amcv
+		BaseActorFacing: 896
+		SupportActors: dog, e1, e1
+		SupportActorsFacing: 896
+		InnerSupportRadius: 3
+		OuterSupportRadius: 5
+	StartingUnits@turkey-medium:
+		Class: medium
+		ClassName: options-starting-units.medium
+		Factions: turkey
+		BaseActor: amcv
+		BaseActorFacing: 896
+		SupportActors: dog, e1, e1, e1, r2bozkir, engineer
+		SupportActorsFacing: 896
+		InnerSupportRadius: 3
+		OuterSupportRadius: 5
+	StartingUnits@turkey-heavy:
+		Class: heavy
+		ClassName: options-starting-units.heavy
+		Factions: turkey
+		BaseActor: amcv
+		BaseActorFacing: 896
+		SupportActors: dog, e1, e1, e1, e1, r2bozkir, r2bozkir, r2sancak, engineer
+		SupportActorsFacing: 896
+		InnerSupportRadius: 3
+		OuterSupportRadius: 5
+
+Player:
+	ProvidesPrerequisite@turkey:
+		Prerequisite: faction.turkey
+		Factions: turkey
+	UnitBuilderBotModule@normal:
+		UnitsToBuild:
+			r2bozkir: 65
+			r2yildirim: 20
+			r2sancak: 25
+			r2kuzgun: 8
+		UnitLimits:
+			r2kuzgun: 4
+	UnitBuilderBotModule@medium:
+		UnitsToBuild:
+			r2bozkir: 65
+			r2yildirim: 20
+			r2sancak: 25
+			r2kuzgun: 8
+		UnitLimits:
+			r2kuzgun: 4
+	UnitBuilderBotModule@rush:
+		UnitsToBuild:
+			r2bozkir: 65
+			r2yildirim: 20
+			r2sancak: 25
+			r2kuzgun: 8
+		UnitLimits:
+			r2kuzgun: 4
+	UnitBuilderBotModule@turtle:
+		UnitsToBuild:
+			r2bozkir: 65
+			r2yildirim: 20
+			r2sancak: 25
+			r2kuzgun: 8
+		UnitLimits:
+			r2kuzgun: 4
+	UnitBuilderBotModule@naval:
+		UnitsToBuild:
+			r2bozkir: 65
+			r2yildirim: 20
+			r2sancak: 25
+			r2kuzgun: 8
+		UnitLimits:
+			r2kuzgun: 4
+
+gaairc:
+	ProvidesPrerequisite@harrier-turkey:
+		Prerequisite: aircraft.harrier
+		Factions: turkey
+
+gaweap:
+	GrantConditionOnProduction@turkey-drone:
+		Actors: r2kuzgun
+		Condition: roof-open
+		Duration: 50
+		ShowSelectionBar: false
+
+r2bozkir:
+	Inherits: ^R2ModernVehicle
+	Inherits@doctrine: ^R2Protected
+	Tooltip:
+		Name: ra2-r2bozkir-name
+	Buildable:
+		BuildPaletteOrder: 21
+		Prerequisites: ~faction.turkey, gaweap
+		Description: ra2-r2bozkir-description
+	Valued:
+		Cost: 950
+	Health:
+		HP: 400
+	Armor:
+		Type: Heavy
+	Mobile:
+		Speed: 100
+	Armament:
+		Weapon: R2BozkirGun
+		MuzzleSequence: muzzle
+
+r2yildirim:
+	Inherits: ^R2ModernVehicle
+	Inherits@doctrine: ^R2Protected
+	Tooltip:
+		Name: ra2-r2yildirim-name
+	Buildable:
+		BuildPaletteOrder: 41
+		Prerequisites: ~faction.turkey, gaweap
+		Description: ra2-r2yildirim-description
+	Valued:
+		Cost: 1200
+	Health:
+		HP: 220
+	Armor:
+		Type: Light
+	Mobile:
+		Speed: 110
+	Armament:
+		Weapon: R2Howitzer
+		MuzzleSequence: muzzle
+
+r2sancak:
+	Inherits: ^R2ModernVehicle
+	Inherits@doctrine: ^R2Protected
+	Tooltip:
+		Name: ra2-r2sancak-name
+	Buildable:
+		BuildPaletteOrder: 61
+		Prerequisites: ~faction.turkey, gaweap
+		Description: ra2-r2sancak-description
+	Valued:
+		Cost: 850
+	Health:
+		HP: 180
+	Armor:
+		Type: Light
+	Mobile:
+		Speed: 120
+	Armament:
+		Weapon: R2ReconGun
+		MuzzleSequence: muzzle
+	ProximityExternalCondition@screen:
+		Condition: r2-screen
+		Range: 5c0
+		ValidRelationships: Ally
+		AffectsParent: True
+	WithRangeCircle@screen:
+		Range: 5c0
+		Color: 66CCFF80
+	DetectCloaked:
+		DetectionTypes: Cloak
+		Range: 6c0
+	RenderDetectionCircle:
+	RevealsShroud:
+		Range: 10c0
+
+r2kuzgun:
+	Inherits: ^R2ModernDrone
+	Inherits@doctrine: ^R2Protected
+	Tooltip:
+		Name: ra2-r2kuzgun-name
+	Buildable:
+		BuildPaletteOrder: 81
+		Prerequisites: ~faction.turkey, gaweap, radar
+		Description: ra2-r2kuzgun-description
+	Valued:
+		Cost: 1000
+	Health:
+		HP: 130
+	Armor:
+		Type: Light
+	Aircraft:
+		Speed: 180
+	Armament:
+		Weapon: R2DroneMissile
+	SpawnActorOnDeath:
+		Actor: r2kuzgunhusk
+
+r2kuzgunhusk:
+	Inherits: ^R2DroneHusk
+	RenderVoxels:
+		Image: r2kuzgun

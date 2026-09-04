@@ -1,0 +1,108 @@
+ExperienceCatalog:
+	Mod: ra2
+	DefaultProfile: ra2-modern
+	Components:
+		ra2-modern-foundation:
+			Title: RA2 modern faction foundation
+			Description: Native voxel rendering, original material palette and shared modern unit weapons.
+			Effects: Supports the three modern country packs without changing original RA2 actors.
+			Tradeoffs: Internal dependency; no selectable faction by itself.
+			Scope: Modern country units only.
+			Category: Faction packs
+			Version: 1
+			Source: Original OpenRA AI faction geometry adapted for RA2
+			License: GPL-3.0-or-later code and original project art
+			Kind: Internal
+			Hidden: true
+			Rules: ra2|modern-factions/common.yaml, ra2|modern-factions/aircraft-ai.yaml
+			Weapons: ra2|modern-factions/weapons.yaml
+		ra2-china:
+			Title: China
+			Description: Networked combined arms with four signature units on a complete RA2 Allies economy.
+			Effects: Adds China to faction selection and the Allies random pool.
+			Tradeoffs: Support vehicles are fragile; isolated tanks lose the network bonus.
+			Scope: Prototype faction pack; original nine countries retain their rules and units.
+			Category: Faction packs
+			Version: 1
+			Source: Original OpenRA AI faction geometry and GPT Image portraits
+			License: GPL-3.0-or-later code and original project art
+			Kind: Faction
+			Dependencies: ra2-modern-foundation
+			Rules: ra2|modern-factions/china.yaml
+			Sequences: ra2|modern-factions/china-sequences.yaml
+			Faction:
+				InternalName: china
+				Side: Allies
+				RandomPool: random-allies
+				Doctrine: networked-combined-arms
+				Preview: ra2|modern-factions/previews/china.png
+				Roster:
+					Infantry: e1, engineer, jumpjet
+					Vehicles: r2qilin, r2lynx, r2mantis
+					Aircraft: r2cloud
+					Navy: dest, aegis, dlph, carrier
+					Buildings: gacnst, gapowr, garefn, gaweap, gapile, gaairc, gayard
+					Defenses: gapill, nasam, atesla
+		ra2-iran:
+			Title: Iran
+			Description: Layered denial with four signature units on a complete RA2 Soviets economy.
+			Effects: Adds Iran to faction selection and the Soviets random pool.
+			Tradeoffs: Long-range launchers have a minimum range and need armor and air-defense escorts.
+			Scope: Prototype faction pack; original nine countries retain their rules and units.
+			Category: Faction packs
+			Version: 1
+			Source: Original OpenRA AI faction geometry and GPT Image portraits
+			License: GPL-3.0-or-later code and original project art
+			Kind: Faction
+			Dependencies: ra2-modern-foundation
+			Rules: ra2|modern-factions/iran.yaml
+			Sequences: ra2|modern-factions/iran-sequences.yaml
+			Faction:
+				InternalName: iran
+				Side: Soviets
+				RandomPool: random-soviets
+				Doctrine: layered-denial
+				Preview: ra2|modern-factions/previews/iran.png
+				Roster:
+					Infantry: e2, engineer, flakt, shk
+					Vehicles: r2karrar, r2raad, r2fajr
+					Aircraft: r2mohajer
+					Navy: sub, hyd, sqd, dred
+					Buildings: nacnst, napowr, narefn, naweap, nahand, naradr, nayard
+					Defenses: nalasr, naflak, tesla
+		ra2-turkey:
+			Title: Turkey
+			Description: Mobile defense with four signature units on a complete RA2 Allies economy.
+			Effects: Adds Turkey to faction selection and the Allies random pool.
+			Tradeoffs: Screening depends on keeping a lightly armored support truck near the formation.
+			Scope: Prototype faction pack; original nine countries retain their rules and units.
+			Category: Faction packs
+			Version: 1
+			Source: Original OpenRA AI faction geometry and GPT Image portraits
+			License: GPL-3.0-or-later code and original project art
+			Kind: Faction
+			Dependencies: ra2-modern-foundation
+			Rules: ra2|modern-factions/turkey.yaml
+			Sequences: ra2|modern-factions/turkey-sequences.yaml
+			Faction:
+				InternalName: turkey
+				Side: Allies
+				RandomPool: random-allies
+				Doctrine: mobile-defense
+				Preview: ra2|modern-factions/previews/turkey.png
+				Roster:
+					Infantry: e1, engineer, jumpjet
+					Vehicles: r2bozkir, r2yildirim, r2sancak
+					Aircraft: r2kuzgun
+					Navy: dest, aegis, dlph, carrier
+					Buildings: gacnst, gapowr, garefn, gaweap, gapile, gaairc, gayard
+					Defenses: gapill, nasam, atesla
+	Profiles:
+		ra2-modern:
+			Title: Red Alert 2 — Modern Factions
+			Description: China, Iran and Turkey join the original nine RA2 countries. Shared AI included. Prototype balance.
+			Components: ra2-china, ra2-iran, ra2-turkey
+		ra2-classic:
+			Title: Red Alert 2 — Original Countries
+			Description: Original nine RA2 countries with the shared AI assistant. Modern faction packs disabled.
+			Components:
