@@ -10,6 +10,8 @@ experience choices are preserved; choose **Change Experience → Modern Factions
 to enable the new packs. The **Original Countries** preset disables all three.
 The modern preset starts with the native medium-force class so a signature tank
 is visible immediately. MCV-only, light and heavy starts remain selectable.
+Saved skirmish options also persist: if a previous game used MCV-only, change
+**Starting units → Medium** in the lobby to get the signature tank immediately.
 
 | Country | Four signature units | Prototype mechanic |
 | --- | --- | --- |
@@ -55,3 +57,8 @@ retains upstream bot tuning.
 Evidence and release/install results are recorded in the dated todo changelog
 and local `artifacts/ra2-modern/` directory. All tests use disposable profiles.
 Owned RA2 game data remains outside the application and release payload.
+
+Validated local Mac build: **0.1.0-alpha.18-ra2-preview.7**, installed as
+**OpenRA AI RA2 Preview**. Developer-ID signed, notarized and stapled; this is
+not a new public website or Windows release. See `todo/2026-09-03.md` for exact
+source commits, checksum, notarization ID, test results and remaining limits.
