@@ -38,7 +38,8 @@
       ],
       "occupied_voxels": 8560,
       "remap_voxels": 687,
-      "sha256": "4fb6c3322c1fa8101c5e80acc36fa5a734739fe63ed7bfba296523b5c335849a"
+      "animation_frames": 1,
+      "sha256": "e67e686c69f7bc05e7383c1f2c378b64a2627819750e4088027762d86187f84b"
     },
     "r2qilintur": {
       "size": [
@@ -53,7 +54,8 @@
       ],
       "occupied_voxels": 1486,
       "remap_voxels": 218,
-      "sha256": "578dc461441bb853884596d9cb9dbd6155f743149c5bc359ec3fd0cbd110fcc7"
+      "animation_frames": 1,
+      "sha256": "a7af53c21986b4a3514f66b87f78cd14e84174020b039bb254b9d0cafbcbeba2"
     },
     "r2lynx": {
       "size": [
@@ -68,7 +70,8 @@
       ],
       "occupied_voxels": 2798,
       "remap_voxels": 227,
-      "sha256": "38bf42d4e36fbe4548ec635bd4b8524f0df549618ef3a45ca9f9c0425e4d56df"
+      "animation_frames": 1,
+      "sha256": "aea744abe1d7f5e23e9a03e988f2eac42a1181a3428b9b273eb4c92c33024da9"
     },
     "r2lynxtur": {
       "size": [
@@ -83,7 +86,8 @@
       ],
       "occupied_voxels": 275,
       "remap_voxels": 57,
-      "sha256": "42fbc62e33449b976d6f48e0aabb8f5868c1060c96bcb9f3be15c8dd1b445746"
+      "animation_frames": 1,
+      "sha256": "31c003f0d971813a154882da779738633380d96554aed119357248b27a1910ad"
     },
     "r2mantis": {
       "size": [
@@ -98,7 +102,8 @@
       ],
       "occupied_voxels": 5085,
       "remap_voxels": 336,
-      "sha256": "8b221256602f8aa803d919d5193d7ae3e0cb877a41d757d1dc25ae52cd518cc8"
+      "animation_frames": 1,
+      "sha256": "c9496b0bf61143d65a4dd7d409816ba54d8d4861de101747e424ae68b3ad95eb"
     },
     "r2mantistur": {
       "size": [
@@ -113,7 +118,8 @@
       ],
       "occupied_voxels": 757,
       "remap_voxels": 114,
-      "sha256": "40203a1e34a4abda70e93dafcec2f3149347941980f6b400701f411c789798a2"
+      "animation_frames": 1,
+      "sha256": "c89f26aee7b27db5e772896142c1b08da60870fbeef24d88f70546b47a328f18"
     },
     "r2cloud": {
       "size": [
@@ -128,7 +134,8 @@
       ],
       "occupied_voxels": 1151,
       "remap_voxels": 116,
-      "sha256": "7509d1054bd08a026390ebc65c9cc1b6e9ba015268aed0a223a65f1fd37b3896"
+      "animation_frames": 1,
+      "sha256": "6d9c8079803a02249e08bd98f6213f2bf02e0d929aabdb5b9b28e1114f61a57d"
     },
     "r2karrar": {
       "size": [
@@ -143,7 +150,8 @@
       ],
       "occupied_voxels": 6434,
       "remap_voxels": 597,
-      "sha256": "53533b8d40cf55658e3f49241f7d5549c408d5f1fdb91e80847a42436544581e"
+      "animation_frames": 1,
+      "sha256": "05baa7a0e041b5e82606336f96ff75074be4a851fb01190d31402d092887e559"
     },
     "r2karrartur": {
       "size": [
@@ -158,7 +166,8 @@
       ],
       "occupied_voxels": 1227,
       "remap_voxels": 265,
-      "sha256": "0fbf4e65ebfc0188917b889372d62b2ff044a91f03916bc2e67486c8811bc87f"
+      "animation_frames": 1,
+      "sha256": "3514c799f6fe08405ca3c1d2c6b109d66a5119888af5927b23a61e268a2e564e"
     },
     "r2raad": {
       "size": [
@@ -173,7 +182,8 @@
       ],
       "occupied_voxels": 5185,
       "remap_voxels": 638,
-      "sha256": "2825818028b63a901bb70149083b7733161cbc23b844518a80d20b76b898cd06"
+      "animation_frames": 1,
+      "sha256": "07c491ffe2b0a680dcc47d3c93876781a78a53d62e50b5e97aa9b7e51ab0ddde"
     },
     "r2raadtur": {
       "size": [
@@ -188,7 +198,8 @@
       ],
       "occupied_voxels": 1168,
       "remap_voxels": 282,
-      "sha256": "902e4653fa2a9591611fe4f57dc0e31c7bca0e3563076125dba3a02b79d5c378"
+      "animation_frames": 1,
+      "sha256": "329a318e4b706358a38734716f13720f3149e564d7c47a38cf90710e1ee6ad73"
     },
     "r2fajr": {
       "size": [
@@ -203,7 +214,8 @@
       ],
       "occupied_voxels": 5185,
       "remap_voxels": 638,
-      "sha256": "2825818028b63a901bb70149083b7733161cbc23b844518a80d20b76b898cd06"
+      "animation_frames": 1,
+      "sha256": "07c491ffe2b0a680dcc47d3c93876781a78a53d62e50b5e97aa9b7e51ab0ddde"
     },
     "r2fajrtur": {
       "size": [
@@ -218,7 +230,8 @@
       ],
       "occupied_voxels": 1201,
       "remap_voxels": 387,
-      "sha256": "9940d584f56885fcf12e0329dc106cca6939f784bcbb67a0b4685d48197cb92e"
+      "animation_frames": 1,
+      "sha256": "e3ee4a58adfe8a60610a3cb7ce91ffc6fafd90fbb471802147d45e1217c1681b"
     },
     "r2mohajer": {
       "size": [
@@ -233,7 +246,8 @@
       ],
       "occupied_voxels": 1420,
       "remap_voxels": 392,
-      "sha256": "c083ebdbfef3ad1829c0b9492f6d601cec5bc684c5b7af717f7e247e52c9012a"
+      "animation_frames": 1,
+      "sha256": "e018d935d7fb0336229700b4e3e7cdfcf2193000f1fc06d5c0909b3f9cd8f36f"
     },
     "r2bozkir": {
       "size": [
@@ -248,7 +262,8 @@
       ],
       "occupied_voxels": 6545,
       "remap_voxels": 491,
-      "sha256": "24d93b3fdee219f138018b4c53f6d86f2641d01e112946d515d49472a636f37b"
+      "animation_frames": 1,
+      "sha256": "4a058a42074630e876d5be3344c29c5d390a6782e43a5f6dbeea071f6ad1b733"
     },
     "r2bozkirtur": {
       "size": [
@@ -263,7 +278,8 @@
       ],
       "occupied_voxels": 1374,
       "remap_voxels": 180,
-      "sha256": "3590f8fd8c53172afe2ac54cff7c8c4136b1f65518ce24579e292f24b998e560"
+      "animation_frames": 1,
+      "sha256": "8c8d2451ae8b972aa1a31da73228dad8fbc31e1469cb4d50e0a856b356e8a657"
     },
     "r2yildirim": {
       "size": [
@@ -278,7 +294,8 @@
       ],
       "occupied_voxels": 6069,
       "remap_voxels": 578,
-      "sha256": "152f1359fd2e9c76eff32917a7bec894d461c74e1646e49ac4a4439a5af59601"
+      "animation_frames": 1,
+      "sha256": "1ff0ec0caca8f7c5bd653732f6afef9f1bfacd6141f95c8597b46cfa63f116c2"
     },
     "r2yildirimtur": {
       "size": [
@@ -293,7 +310,8 @@
       ],
       "occupied_voxels": 1305,
       "remap_voxels": 0,
-      "sha256": "298c6edcaa66ae1e96ded378fbf7014b20877b07c540f0db1c0150f25aa38494"
+      "animation_frames": 1,
+      "sha256": "6bf05f25ab21bedd62bf064bdb6a77d6efdb385a48a069f0ffc7956a2caa7fae"
     },
     "r2sancak": {
       "size": [
@@ -308,7 +326,8 @@
       ],
       "occupied_voxels": 5691,
       "remap_voxels": 475,
-      "sha256": "0b602d60590b4b405127ea15aa09424a0846adf485a490f5c58512305621caed"
+      "animation_frames": 1,
+      "sha256": "4a41cb632232d27354aa8a89be6b4536c1d39bac4d609cb83325aa947a3d2b5f"
     },
     "r2sancaktur": {
       "size": [
@@ -323,7 +342,8 @@
       ],
       "occupied_voxels": 520,
       "remap_voxels": 59,
-      "sha256": "07cf925a5b37209b8b3858e58605eea7b2bc088aa109ac7246ce52ea85a90538"
+      "animation_frames": 1,
+      "sha256": "c94105ea9ae45d7faebad798faed2e6e5f0e7577290ccb049eedf9adfa3244e5"
     },
     "r2kuzgun": {
       "size": [
@@ -338,7 +358,248 @@
       ],
       "occupied_voxels": 1177,
       "remap_voxels": 60,
-      "sha256": "5517c8e35ffd244ddae12a3f6459d7d0651bdc08dd90447fb1d2464251fdcdc1"
+      "animation_frames": 1,
+      "sha256": "3cd0b699c0dc435ac423d1c81de9fda58e1c50007293cd0b4798c5f315b35fb6"
+    },
+    "r2aras": {
+      "size": [
+        41,
+        27,
+        16
+      ],
+      "origin": [
+        -20,
+        -13,
+        -1
+      ],
+      "occupied_voxels": 6069,
+      "remap_voxels": 578,
+      "animation_frames": 1,
+      "sha256": "1ff0ec0caca8f7c5bd653732f6afef9f1bfacd6141f95c8597b46cfa63f116c2"
+    },
+    "r2arastur": {
+      "size": [
+        25,
+        15,
+        9
+      ],
+      "origin": [
+        -7,
+        -7,
+        10
+      ],
+      "occupied_voxels": 482,
+      "remap_voxels": 80,
+      "animation_frames": 1,
+      "sha256": "1fdcbd12cc887a6e941bc0c165e23b79650ff1dd286a22c0e9744d5cf58e3423"
+    },
+    "r2gokkalkan": {
+      "size": [
+        41,
+        27,
+        16
+      ],
+      "origin": [
+        -20,
+        -13,
+        -1
+      ],
+      "occupied_voxels": 6069,
+      "remap_voxels": 578,
+      "animation_frames": 1,
+      "sha256": "1ff0ec0caca8f7c5bd653732f6afef9f1bfacd6141f95c8597b46cfa63f116c2"
+    },
+    "r2gokkalkantur": {
+      "size": [
+        28,
+        17,
+        14
+      ],
+      "origin": [
+        -10,
+        -8,
+        10
+      ],
+      "occupied_voxels": 1322,
+      "remap_voxels": 113,
+      "animation_frames": 1,
+      "sha256": "ede6f5e64795576158ed0fb1e67d1dfb192a3d965e105d72a79f0d5078b3bbb4"
+    },
+    "r2deniz": {
+      "size": [
+        41,
+        27,
+        16
+      ],
+      "origin": [
+        -20,
+        -13,
+        -1
+      ],
+      "occupied_voxels": 6249,
+      "remap_voxels": 781,
+      "animation_frames": 1,
+      "sha256": "e26b807a05eed95c3200a576549f10d70552938142efc94c4e1d747e7b9b0ddd"
+    },
+    "r2deniztur": {
+      "size": [
+        25,
+        15,
+        9
+      ],
+      "origin": [
+        -7,
+        -7,
+        10
+      ],
+      "occupied_voxels": 482,
+      "remap_voxels": 80,
+      "animation_frames": 1,
+      "sha256": "1fdcbd12cc887a6e941bc0c165e23b79650ff1dd286a22c0e9744d5cf58e3423"
+    },
+    "r2turna": {
+      "size": [
+        64,
+        33,
+        23
+      ],
+      "origin": [
+        -36,
+        -16,
+        0
+      ],
+      "occupied_voxels": 2567,
+      "remap_voxels": 591,
+      "animation_frames": 1,
+      "sha256": "257b8b583e1ecc696f9908cd81c2d35860305715e7a26bf31ace33155f183b18"
+    },
+    "r2turnatur": {
+      "size": [
+        57,
+        57,
+        5
+      ],
+      "origin": [
+        -28,
+        -28,
+        14
+      ],
+      "occupied_voxels": 359,
+      "remap_voxels": 62,
+      "animation_frames": 8,
+      "sha256": "13687cadf146fbae3dc373be53f45fe031b05a5f1b5c9fc79c1cf96bb62dec89"
+    },
+    "r2sahin": {
+      "size": [
+        67,
+        55,
+        17
+      ],
+      "origin": [
+        -28,
+        -27,
+        1
+      ],
+      "occupied_voxels": 2541,
+      "remap_voxels": 30,
+      "animation_frames": 1,
+      "sha256": "e7bb19628714371178d74f6ee0181012c0eded2d393dc6bf21e21c5df44db476"
+    },
+    "r2marmara": {
+      "size": [
+        61,
+        33,
+        28
+      ],
+      "origin": [
+        -29,
+        -16,
+        -1
+      ],
+      "occupied_voxels": 5180,
+      "remap_voxels": 72,
+      "animation_frames": 1,
+      "sha256": "6dc8cb6dd4355994bbfc7fa7749b356c9729d683299b9ec45a3ee88e45682219"
+    },
+    "r2marmaratur": {
+      "size": [
+        16,
+        11,
+        8
+      ],
+      "origin": [
+        3,
+        -5,
+        5
+      ],
+      "occupied_voxels": 174,
+      "remap_voxels": 0,
+      "animation_frames": 1,
+      "sha256": "99d10c3fbec794d8cfd7087a9050e13af4a2bc17ceb7b9eff4e74e086c164d51"
+    },
+    "r2ege": {
+      "size": [
+        49,
+        29,
+        25
+      ],
+      "origin": [
+        -23,
+        -14,
+        -1
+      ],
+      "occupied_voxels": 3425,
+      "remap_voxels": 72,
+      "animation_frames": 1,
+      "sha256": "a35fa76200743d677ac8d151aca2098928454ab88568ea891c1937507b933036"
+    },
+    "r2egetur": {
+      "size": [
+        16,
+        11,
+        8
+      ],
+      "origin": [
+        3,
+        -5,
+        5
+      ],
+      "occupied_voxels": 174,
+      "remap_voxels": 0,
+      "animation_frames": 1,
+      "sha256": "99d10c3fbec794d8cfd7087a9050e13af4a2bc17ceb7b9eff4e74e086c164d51"
+    },
+    "r2poyraz": {
+      "size": [
+        37,
+        23,
+        20
+      ],
+      "origin": [
+        -17,
+        -11,
+        -1
+      ],
+      "occupied_voxels": 1964,
+      "remap_voxels": 72,
+      "animation_frames": 1,
+      "sha256": "37b63f144badda398adb521245448bbfbd755b94f0afca35cd0761cf887ccf64"
+    },
+    "r2poyraztur": {
+      "size": [
+        13,
+        11,
+        8
+      ],
+      "origin": [
+        4,
+        -5,
+        5
+      ],
+      "occupied_voxels": 153,
+      "remap_voxels": 0,
+      "animation_frames": 1,
+      "sha256": "56b80910526823fa14d8a82683204b561a365dd189109e85b6ddac95a0eaf776"
     }
   }
 }

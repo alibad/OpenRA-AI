@@ -1,0 +1,497 @@
+# Turkey's full combat roster. Shared Allied economy/support remain native.
+^Palettes:
+	PaletteFromFile@turkey:
+		Name: turkey-art
+		Filename: ra2|modern-factions/turkey-art/turkey.pal
+	PlayerColorPalette@turkey:
+		BasePalette: turkey-art
+		BaseName: turkeyplayer
+		RemapIndex: 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31
+
+^ExistsInWorld:
+	ExternalCondition@R2DESIGNATED:
+		Condition: r2-designated
+	DamageMultiplier@R2DESIGNATED:
+		Modifier: 120
+		RequiresCondition: r2-designated
+	WithColoredOverlay@R2DESIGNATED:
+		Color: 40FF9030
+		RequiresCondition: r2-designated
+
+^R2TurkishInfantry:
+	Inherits: ^Infantry
+	Inherits@AUTOTARGET: ^AutoTargetGroundAssaultMove
+	Inherits@MC: ^MindControllable
+	Inherits@screen: ^R2Protected
+	Buildable:
+		Queue: Infantry
+	UpdatesPlayerStatistics:
+		AddToArmyValue: true
+	Selectable:
+		Bounds: 600, 1500, 0, -530
+	RenderSprites:
+		PlayerPalette: turkeyplayer
+	-TakeCover:
+	-WithDeathAnimation@effect:
+	WithDeathAnimation@normal:
+		DeathSequencePalette: turkeyplayer
+		DeathPaletteIsPlayerPalette: true
+	AttackFrontal:
+		Voice: Attack
+		FacingTolerance: 32
+	Armament:
+		Weapon: R2ServiceRifle
+	ProducibleWithLevel:
+		Prerequisites: barracks.infiltrated
+	ExternalCondition@mechanized:
+		Condition: r2-mechanized
+	FirepowerMultiplier@mechanized:
+		Modifier: 115
+		RequiresCondition: r2-mechanized
+	SpeedMultiplier@mechanized:
+		Modifier: 110
+		RequiresCondition: r2-mechanized
+	ExternalCondition@command:
+		Condition: r2-command
+	ReloadDelayMultiplier@command:
+		Modifier: 90
+		RequiresCondition: r2-command
+
+r2trrifle:
+	Inherits: ^R2TurkishInfantry
+	Tooltip:
+		Name: ra2-r2trrifle-name
+	Buildable:
+		Prerequisites: ~faction.turkey, gapile
+		BuildPaletteOrder: 10
+		Description: ra2-r2trrifle-description
+	Valued:
+		Cost: 200
+	Health:
+		HP: 125
+	RevealsShroud:
+		Range: 5c0
+
+r2trat:
+	Inherits: ^R2TurkishInfantry
+	Tooltip:
+		Name: ra2-r2trat-name
+	Buildable:
+		Prerequisites: ~faction.turkey, gapile
+		BuildPaletteOrder: 20
+		Description: ra2-r2trat-description
+	Valued:
+		Cost: 400
+	Health:
+		HP: 100
+	Mobile:
+		Speed: 55
+	Armament:
+		Weapon: R2PortableAT
+	Cloak:
+		InitialDelay: 100
+		CloakDelay: 100
+		UncloakOn: Attack, Move, Damage
+		DetectionTypes: Cloak
+		IsPlayerPalette: true
+	RevealsShroud:
+		Range: 6c0
+
+r2trdroneop:
+	Inherits: ^R2TurkishInfantry
+	Tooltip:
+		Name: ra2-r2trdroneop-name
+	Buildable:
+		Prerequisites: ~faction.turkey, gapile, radar
+		BuildPaletteOrder: 60
+		Description: ra2-r2trdroneop-description
+	Valued:
+		Cost: 550
+	Health:
+		HP: 90
+	Armament:
+		Weapon: R2Designator
+	RevealsShroud:
+		Range: 10c0
+	DetectCloaked:
+		DetectionTypes: Cloak
+		Range: 5c0
+	RenderDetectionCircle:
+
+r2greywolf:
+	Inherits: ^R2TurkishInfantry
+	Tooltip:
+		Name: ra2-r2greywolf-name
+	Buildable:
+		Prerequisites: ~faction.turkey, gapile, gatech
+		BuildPaletteOrder: 140
+		BuildLimit: 1
+		Description: ra2-r2greywolf-description
+	Valued:
+		Cost: 1800
+	Health:
+		HP: 200
+	Mobile:
+		Speed: 75
+	Armament:
+		Weapon: R2CommandoRifle
+	Cloak:
+		InitialDelay: 100
+		CloakDelay: 100
+		UncloakOn: Attack, Move, Damage
+		DetectionTypes: Cloak
+		IsPlayerPalette: true
+	ProximityExternalCondition@command:
+		Range: 5c0
+		Condition: r2-command
+		ValidRelationships: Ally
+	WithRangeCircle:
+		Range: 5c0
+	RevealsShroud:
+		Range: 8c0
+
+^R2TroopCarrier:
+	Inherits: ^R2ModernVehicle
+	Inherits@screen: ^R2Protected
+	Cargo:
+		Types: Infantry
+		MaxWeight: 5
+		UnloadVoice: Move
+		LoadingCondition: loading
+	Mobile:
+		PauseOnCondition: loading || chronodisable
+	WithCargoPipsDecoration:
+		Position: BottomLeft
+		RequiresSelection: true
+		Palette: pips
+	ProximityExternalCondition@mechanized:
+		Range: 5c0
+		Condition: r2-mechanized
+		ValidRelationships: Ally
+	WithRangeCircle:
+		Range: 5c0
+	Armament:
+		Weapon: R2ReconGun
+	Health:
+		HP: 260
+	Armor:
+		Type: Light
+
+r2aras:
+	Inherits: ^R2TroopCarrier
+	Tooltip:
+		Name: ra2-r2aras-name
+	Buildable:
+		Prerequisites: ~faction.turkey, gaweap
+		BuildPaletteOrder: 15
+		Description: ra2-r2aras-description
+	Valued:
+		Cost: 650
+	Mobile:
+		Speed: 130
+
+r2deniz:
+	Inherits: ^R2TroopCarrier
+	Tooltip:
+		Name: ra2-r2deniz-name
+	Buildable:
+		Prerequisites: ~faction.turkey, gaweap, radar
+		BuildPaletteOrder: 55
+		Description: ra2-r2deniz-description
+	Valued:
+		Cost: 950
+	Mobile:
+		Locomotor: lcraft
+		Speed: 100
+	Cargo:
+		UnloadTerrainTypes: Clear, Rough, Rail, Road, DirtRoad, Beach, Ore, Gems
+	LeavesTrails:
+		Image: wake
+		Palette: effect50alpha
+		TerrainTypes: Water
+		StationaryInterval: 18
+		MovingInterval: 6
+
+r2gokkalkan:
+	Inherits: ^R2ModernVehicle
+	Inherits@AUTOTARGET: ^AutoTargetAir
+	Inherits@screen: ^R2Protected
+	Tooltip:
+		Name: ra2-r2gokkalkan-name
+	Buildable:
+		Prerequisites: ~faction.turkey, gaweap
+		BuildPaletteOrder: 35
+		Description: ra2-r2gokkalkan-description
+	Valued:
+		Cost: 950
+	Health:
+		HP: 240
+	Armor:
+		Type: Light
+	Mobile:
+		Speed: 110
+	Armament:
+		Weapon: R2AirDefense
+	AutoTarget:
+		ScanRadius: 10
+
+r2turna:
+	Inherits: ^R2ModernDrone
+	Inherits@screen: ^R2Protected
+	Tooltip:
+		Name: ra2-r2turna-name
+	Buildable:
+		Prerequisites: ~faction.turkey, gaweap, gatech
+		BuildPaletteOrder: 100
+		Description: ra2-r2turna-description
+	Valued:
+		Cost: 1600
+	Health:
+		HP: 250
+	Aircraft:
+		Speed: 165
+	Armament:
+		Weapon: R2GunshipMissile
+	WithVoxelHelicopterBody:
+		Sequence: rotor
+		TickRate: 1
+	SpawnActorOnDeath:
+		Actor: r2turnahusk
+
+r2turnahusk:
+	Inherits: ^R2DroneHusk
+	RenderVoxels:
+		Image: r2turna
+
+r2sahin:
+	Inherits: orca
+	Inherits@AUTOTARGET: ^AutoTargetAir
+	Inherits@screen: ^R2Protected
+	Tooltip:
+		Name: ra2-r2sahin-name
+	Buildable:
+		Prerequisites: ~faction.turkey, gaairc, gatech
+		Description: ra2-r2sahin-description
+	Valued:
+		Cost: 1800
+	Health:
+		HP: 220
+	Aircraft:
+		Speed: 260
+	Armament:
+		Weapon: R2InterceptorMissile
+	AmmoPool:
+		Ammo: 4
+	RenderSprites:
+		Image: r2sahin
+	RenderVoxels:
+		Image: r2sahin
+		PlayerPalette: modernplayer
+		Scale: 15.2
+		LightAmbientColor: -0.3,-0.3,-0.3
+		LightDiffuseColor: 0.75,0.75,0.75
+	SpawnActorOnDeath:
+		Actor: r2sahinhusk
+
+r2sahinhusk:
+	Inherits: orcahusk
+	Tooltip:
+		Name: ra2-r2sahin-name
+		GenericName: ra2-modern-husk
+	RenderVoxels:
+		Image: r2sahin
+		PlayerPalette: modernplayer
+		Scale: 15.2
+		LightAmbientColor: -0.3,-0.3,-0.3
+		LightDiffuseColor: 0.75,0.75,0.75
+
+^R2TurkishShip:
+	Inherits: ^Ship
+	Tooltip:
+		GenericName: ra2-turkey-ship
+	Inherits@AUTOTARGET: ^AutoTargetAllAssaultMove
+	Inherits@MC: ^MindControllable
+	Inherits@screen: ^R2Protected
+	Buildable:
+		Queue: Ship
+	UpdatesPlayerStatistics:
+		AddToArmyValue: true
+	RenderSprites:
+	RenderVoxels:
+		PlayerPalette: modernplayer
+		Scale: 22
+		LightAmbientColor: -0.3,-0.3,-0.3
+		LightDiffuseColor: 0.75,0.75,0.75
+	WithVoxelBody:
+	WithVoxelTurret:
+	Turreted:
+		TurnSpeed: 32
+	AttackTurreted:
+		Voice: Attack
+	Armament:
+		Weapon: R2NavalGun
+		LocalOffset: 800,0,550
+	Mobile:
+		Speed: 90
+	Selectable:
+		Bounds: 1600, 3400, 0, -289
+	RevealsShroud:
+		Range: 9c0
+	DetectCloaked:
+		DetectionTypes: Underwater
+		Range: 6c0
+	RenderDetectionCircle:
+	Voiced:
+		VoiceSet: AlliedNavalVoice
+	HitShape:
+
+r2marmara:
+	Inherits: ^R2TurkishShip
+	Tooltip:
+		Name: ra2-r2marmara-name
+	Buildable:
+		Prerequisites: ~faction.turkey, gayard, gatech
+		BuildPaletteOrder: 60
+		Description: ra2-r2marmara-description
+	Valued:
+		Cost: 2000
+	Health:
+		HP: 850
+	Armor:
+		Type: Heavy
+	Mobile:
+		Speed: 70
+	Armament@AA:
+		Weapon: R2AirDefense
+		LocalOffset: -400,0,600
+
+r2ege:
+	Inherits: ^R2TurkishShip
+	Tooltip:
+		Name: ra2-r2ege-name
+	Buildable:
+		Prerequisites: ~faction.turkey, gayard, radar
+		BuildPaletteOrder: 30
+		Description: ra2-r2ege-description
+	Valued:
+		Cost: 1200
+	Health:
+		HP: 500
+	Armor:
+		Type: Heavy
+	Armament:
+		Weapon: R2CoastalMissile
+	Armament@ASW:
+		Weapon: R2DepthCharge
+		LocalOffset: 0,0,0
+
+r2poyraz:
+	Inherits: ^R2TurkishShip
+	Tooltip:
+		Name: ra2-r2poyraz-name
+	Buildable:
+		Prerequisites: ~faction.turkey, gayard
+		BuildPaletteOrder: 10
+		Description: ra2-r2poyraz-description
+	Valued:
+		Cost: 650
+	Health:
+		HP: 250
+	Armor:
+		Type: Light
+	Mobile:
+		Speed: 130
+	Armament:
+		Weapon: R2PatrolGun
+
+^R2TurkishDefense:
+	Inherits: ^SupportBuilding
+	Inherits@AUTOTARGET: ^AutoTargetGround
+	Buildable:
+		Queue: Support
+	Building:
+		Footprint: x
+		Dimensions: 1, 1
+	Armor:
+		Type: Steel
+	RenderSprites:
+		PlayerPalette: turkeyplayer
+	WithSpriteTurret:
+		RequiresCondition: !build-incomplete
+	Turreted:
+		TurnSpeed: 32
+		InitialFacing: 640
+	BodyOrientation:
+		QuantizedFacings: 32
+	AttackTurreted:
+		Voice: Attack
+		RequiresCondition: !build-incomplete
+		PauseOnCondition: lowpower
+	IsometricSelectable:
+		Height: 40
+	Armament:
+		Weapon: R2SentryGun
+		LocalOffset: 550,0,700
+	GrantConditionOnPowerState@LOWPOWER:
+		Condition: lowpower
+		ValidPowerStates: Low, Critical
+	RevealsShroud:
+		Range: 8c0
+	RequiresBuildableArea:
+		Adjacent: 5
+
+r2hisar:
+	Inherits: ^R2TurkishDefense
+	Tooltip:
+		Name: ra2-r2hisar-name
+	Buildable:
+		Prerequisites: ~faction.turkey, barracks
+		BuildPaletteOrder: 20
+		Description: ra2-r2hisar-description
+	Valued:
+		Cost: 550
+	Health:
+		HP: 450
+	Power:
+		Amount: -15
+	WithRangeCircle:
+		Range: 6c0
+
+r2siper:
+	Inherits: ^R2TurkishDefense
+	Inherits@AUTOTARGET: ^AutoTargetAir
+	Tooltip:
+		Name: ra2-r2siper-name
+	Buildable:
+		Prerequisites: ~faction.turkey, barracks, radar
+		BuildPaletteOrder: 30
+		Description: ra2-r2siper-description
+	Valued:
+		Cost: 1100
+	Health:
+		HP: 650
+	Power:
+		Amount: -50
+	Armament:
+		Weapon: R2SiperMissile
+	WithRangeCircle:
+		Range: 12c0
+
+r2boran:
+	Inherits: ^R2TurkishDefense
+	Tooltip:
+		Name: ra2-r2boran-name
+	Buildable:
+		Prerequisites: ~faction.turkey, radar
+		BuildPaletteOrder: 40
+		Description: ra2-r2boran-description
+	Valued:
+		Cost: 1300
+	Health:
+		HP: 700
+	Power:
+		Amount: -60
+	Armament:
+		Weapon: R2BoranGun
+	WithRangeCircle:
+		Range: 9c0

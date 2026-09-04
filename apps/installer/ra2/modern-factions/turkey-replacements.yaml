@@ -1,0 +1,68 @@
+# Replace combat roles only for Turkey. Preserve every original country gate.
+e1:
+	Buildable:
+		Prerequisites: ~gapile, ~!faction.turkey
+
+jumpjet:
+	Buildable:
+		Prerequisites: ~gapile, radar, ~!faction.turkey
+
+tany:
+	Buildable:
+		Prerequisites: gatech, ~gapile, ~!faction.turkey
+
+cleg:
+	Buildable:
+		Prerequisites: ~gapile, gatech, ~!faction.turkey
+
+mtnk:
+	Buildable:
+		Prerequisites: ~gaweap, ~!faction.turkey
+
+fv:
+	Buildable:
+		Prerequisites: ~gaweap, ~!faction.turkey
+
+sref:
+	Buildable:
+		Prerequisites: gatech, ~gaweap, ~!faction.turkey
+
+mgtk:
+	Buildable:
+		Prerequisites: gatech, ~gaweap, ~!faction.turkey
+
+shad:
+	Buildable:
+		Prerequisites: ~gaweap, ~!faction.turkey
+
+orca:
+	Buildable:
+		Prerequisites: ~aircraft.harrier, ~!faction.turkey
+
+dest:
+	Buildable:
+		Prerequisites: ~gayard, ~!faction.turkey
+
+aegis:
+	Buildable:
+		Prerequisites: radar, ~gayard, ~!faction.turkey
+
+dlph:
+	Buildable:
+		Prerequisites: gatech, ~gayard, ~!faction.turkey
+
+carrier:
+	Buildable:
+		Prerequisites: gatech, ~gayard, ~!faction.turkey
+
+gapill:
+	Buildable:
+		Prerequisites: barracks, ~structures.allies, ~!faction.turkey
+
+nasam:
+	Buildable:
+		Prerequisites: barracks, ~structures.allies, ~!faction.turkey
+
+atesla:
+	Buildable:
+		Prerequisites: power, radar, ~structures.allies, ~!faction.turkey

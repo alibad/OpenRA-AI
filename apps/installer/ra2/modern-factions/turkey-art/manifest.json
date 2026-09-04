@@ -1,0 +1,58 @@
+{
+  "r2trrifle": {
+    "frames": 112,
+    "size": [
+      48,
+      48
+    ],
+    "sha256": "1f8feaa979d98337eb429260908db9f30302072ea9e4d22c6acd6277d9944fc4"
+  },
+  "r2trat": {
+    "frames": 112,
+    "size": [
+      48,
+      48
+    ],
+    "sha256": "c7d6f89fc974a882bd11ff672be8c8956f521aa990918ff1457c81b739b1fd16"
+  },
+  "r2trdroneop": {
+    "frames": 112,
+    "size": [
+      48,
+      48
+    ],
+    "sha256": "2fb34cb87f25a8eecb224038139d1b2fa400440a958deb3035f32baaa77fab6b"
+  },
+  "r2greywolf": {
+    "frames": 112,
+    "size": [
+      48,
+      48
+    ],
+    "sha256": "064f7d30c490216a82773ce7af98be8bedf0af169ce54523566a6730cda5be8a"
+  },
+  "r2hisar": {
+    "frames": 41,
+    "size": [
+      96,
+      96
+    ],
+    "sha256": "52a9507ae1be8c6451230c962cd702305cd365011c08c9f6be98cbd9bc15756c"
+  },
+  "r2siper": {
+    "frames": 41,
+    "size": [
+      96,
+      96
+    ],
+    "sha256": "b867089e48bf033669df3ecffd2dbda7ddb0e779ef4c4a778e63eae4259d786d"
+  },
+  "r2boran": {
+    "frames": 41,
+    "size": [
+      96,
+      96
+    ],
+    "sha256": "b5f83af506fa7befcb2d8822cb1cc2e2ed8846efc3ac1ba75e32307bd74fa148"
+  }
+}

@@ -1,0 +1,31 @@
+r2aras:
+	idle: ra2|modern-factions/voxels/r2aras
+	turret: ra2|modern-factions/voxels/r2arastur
+
+r2gokkalkan:
+	idle: ra2|modern-factions/voxels/r2gokkalkan
+	turret: ra2|modern-factions/voxels/r2gokkalkantur
+
+r2deniz:
+	idle: ra2|modern-factions/voxels/r2deniz
+	turret: ra2|modern-factions/voxels/r2deniztur
+
+r2turna:
+	idle: ra2|modern-factions/voxels/r2turna
+	rotor: ra2|modern-factions/voxels/r2turnatur
+	slow-rotor: ra2|modern-factions/voxels/r2turnatur
+
+r2sahin:
+	idle: ra2|modern-factions/voxels/r2sahin
+
+r2marmara:
+	idle: ra2|modern-factions/voxels/r2marmara
+	turret: ra2|modern-factions/voxels/r2marmaratur
+
+r2ege:
+	idle: ra2|modern-factions/voxels/r2ege
+	turret: ra2|modern-factions/voxels/r2egetur
+
+r2poyraz:
+	idle: ra2|modern-factions/voxels/r2poyraz
+	turret: ra2|modern-factions/voxels/r2poyraztur

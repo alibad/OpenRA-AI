@@ -1,0 +1,63 @@
+r2trrifle:
+	Voiced:
+		VoiceSet: R2TurkeyinfantryVoice
+
+r2trat:
+	Voiced:
+		VoiceSet: R2TurkeyinfantryVoice
+
+r2trdroneop:
+	Voiced:
+		VoiceSet: R2TurkeyinfantryVoice
+
+r2greywolf:
+	Voiced:
+		VoiceSet: R2TurkeygreywolfVoice
+
+r2bozkir:
+	Voiced:
+		VoiceSet: R2TurkeyvehicleVoice
+
+r2aras:
+	Voiced:
+		VoiceSet: R2TurkeyvehicleVoice
+
+r2yildirim:
+	Voiced:
+		VoiceSet: R2TurkeyvehicleVoice
+
+r2gokkalkan:
+	Voiced:
+		VoiceSet: R2TurkeyvehicleVoice
+
+r2sancak:
+	Voiced:
+		VoiceSet: R2TurkeyvehicleVoice
+
+r2deniz:
+	Voiced:
+		VoiceSet: R2TurkeyvehicleVoice
+
+r2kuzgun:
+	Voiced:
+		VoiceSet: R2TurkeyairVoice
+
+r2turna:
+	Voiced:
+		VoiceSet: R2TurkeyairVoice
+
+r2sahin:
+	Voiced:
+		VoiceSet: R2TurkeyairVoice
+
+r2marmara:
+	Voiced:
+		VoiceSet: R2TurkeynavalVoice
+
+r2ege:
+	Voiced:
+		VoiceSet: R2TurkeynavalVoice
+
+r2poyraz:
+	Voiced:
+		VoiceSet: R2TurkeynavalVoice

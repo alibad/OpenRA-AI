@@ -15,6 +15,7 @@ ROOT = Path(__file__).resolve().parents[3]
 ASSETS = ROOT / "apps/installer/ra2/modern-factions"
 sys.path.insert(0, str(ROOT / "scripts"))
 import ra2_faction_voxels as voxels
+import ra2_turkey_assets as turkey_art
 
 
 def decode(data):
@@ -51,7 +52,7 @@ def decode(data):
 class RA2ModernFactionTests(unittest.TestCase):
     def test_native_voxels_round_trip_and_match_manifest(self):
         manifest = json.loads((ASSETS / "voxel-manifest.json").read_text())
-        self.assertEqual(len(manifest["models"]), 21)  # 12 bodies + 9 independent turrets
+        self.assertEqual(len(manifest["models"]), 36)  # 20 bodies + 15 turrets + 1 animated rotor
         for name, expected in manifest["models"].items():
             with self.subTest(model=name):
                 data = (ASSETS / "voxels" / (name + ".vxl")).read_bytes()
@@ -65,8 +66,11 @@ class RA2ModernFactionTests(unittest.TestCase):
                 self.assertTrue(all(0 < v[0] < 256 and 0 <= v[1] < 244 for v in occupied.values()))
                 self.assertTrue(all(0 <= p[i] < footer[-4+i] for p in occupied for i in range(3)))
                 hva = (ASSETS / "voxels" / (name + ".hva")).read_bytes()
-                self.assertEqual(struct.unpack_from("<2I", hva, 16), (1, 1))
+                frames = expected["animation_frames"]
+                self.assertEqual(struct.unpack_from("<2I", hva, 16), (frames, 1))
                 self.assertEqual(struct.unpack_from("<12f", hva, 40), voxels.IDENTITY)
+                self.assertEqual(len(hva), 40 + 48 * frames)
+                self.assertEqual(frames, 8 if name == "r2turnatur" else 1)
 
     def test_every_complete_unit_has_remap_pixels(self):
         models = json.loads((ASSETS / "voxel-manifest.json").read_text())["models"]
@@ -95,7 +99,10 @@ class RA2ModernFactionTests(unittest.TestCase):
         for actor in voxels.models():
             with Image.open(ASSETS / "icons" / (actor + ".png")) as icon:
                 self.assertEqual(icon.size, (60, 48))
-                self.assertGreater(len(icon.convert("RGB").getcolors(2881)), 500)
+                # Source-rendered cameos have deliberately limited materials;
+                # preserve the stronger color-detail contract for illustrated art.
+                minimum = 200 if actor in turkey_art.EXTRA_MODELS else 500
+                self.assertGreater(len(icon.convert("RGB").getcolors(2881)), minimum)
         for country in ("china", "iran", "turkey"):
             with Image.open(ASSETS / "previews" / (country + ".png")) as preview:
                 self.assertEqual(preview.size, (512, 512))
@@ -117,7 +124,7 @@ class RA2ModernFactionTests(unittest.TestCase):
             self.assertIn("SpawnActorOnDeath:", rules)
 
     def test_new_ui_strings_have_translation_keys(self):
-        messages = (ASSETS / "messages.ftl").read_text()
+        messages = (ASSETS / "messages.ftl").read_text() + (ASSETS / "turkey-messages.ftl").read_text()
         for actor in voxels.models():
             self.assertIn("ra2-" + actor + "-name =", messages)
             self.assertIn("ra2-" + actor + "-description =", messages)

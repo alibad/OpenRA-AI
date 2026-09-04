@@ -1,0 +1,129 @@
+R2ServiceRifle:
+	Inherits: M60
+	Range: 5c0
+	ReloadDelay: 30
+	Burst: 3
+	BurstDelays: 4
+	Warhead@1Dam: SpreadDamage
+		Damage: 7
+
+R2PortableAT:
+	Inherits: Maverick
+	Range: 6c0
+	MinRange: 1c0
+	ReloadDelay: 100
+	Warhead@1Dam: SpreadDamage
+		Damage: 60
+		Versus:
+			None: 15
+			Flak: 25
+			Plate: 30
+			Light: 100
+			Medium: 100
+			Heavy: 110
+			Wood: 55
+			Steel: 55
+			Concrete: 40
+
+R2Designator:
+	Range: 9c0
+	ReloadDelay: 90
+	ValidTargets: Ground, Water
+	Projectile: Bullet
+		Speed: 2048
+		Blockable: false
+		ContrailLength: 5
+		ContrailStartWidth: 24
+		ContrailEndWidth: 8
+		ContrailStartColor: 70FFB0
+		ContrailEndColor: 20A060
+	Warhead@designate: GrantExternalCondition
+		Condition: r2-designated
+		Duration: 180
+		Range: 0c256
+		ValidRelationships: Enemy
+		ValidTargets: Ground, Water
+
+R2CommandoRifle:
+	Inherits: R2ServiceRifle
+	Range: 7c0
+	ReloadDelay: 40
+	Warhead@1Dam: SpreadDamage
+		Damage: 20
+
+R2GunshipMissile:
+	Inherits: R2DroneMissile
+	Burst: 2
+	BurstDelays: 8
+	ReloadDelay: 110
+	Warhead@1Dam: SpreadDamage
+		Damage: 40
+
+R2InterceptorMissile:
+	Inherits: R2AirDefense
+	Range: 10c0
+	ReloadDelay: 25
+	Projectile: Missile
+		Speed: 450
+		RangeLimit: 16c0
+		MinimumLaunchAngle: 0
+		MaximumLaunchAngle: 0
+	Warhead@1Dam: SpreadDamage
+		Damage: 65
+
+R2NavalGun:
+	Inherits: 155mm
+	Range: 12c0
+	MinRange: 2c0
+	ReloadDelay: 100
+	Warhead@1Dam: SpreadDamage
+		Damage: 90
+
+R2CoastalMissile:
+	Inherits: Maverick
+	Range: 9c0
+	ReloadDelay: 90
+	Burst: 2
+	BurstDelays: 8
+	Warhead@1Dam: SpreadDamage
+		Damage: 40
+
+R2DepthCharge:
+	Inherits: R2CoastalMissile
+	Range: 6c0
+	ValidTargets: Underwater
+	Projectile: Bullet
+		Speed: 350
+	Warhead@1Dam: SpreadDamage
+		ValidTargets: Underwater
+		Damage: 40
+
+R2PatrolGun:
+	Inherits: R2ReconGun
+	Range: 7c0
+	Warhead@1Dam: SpreadDamage
+		Damage: 18
+
+R2SentryGun:
+	Inherits: R2ServiceRifle
+	Range: 6c0
+	ReloadDelay: 24
+	Warhead@1Dam: SpreadDamage
+		Damage: 10
+
+R2SiperMissile:
+	Inherits: R2AirDefense
+	Range: 12c0
+	Projectile: Missile
+		RangeLimit: 15c0
+	Burst: 2
+	BurstDelays: 8
+	ReloadDelay: 110
+
+R2BoranGun:
+	Inherits: R2BozkirGun
+	Range: 9c0
+	MinRange: 2c0
+	ReloadDelay: 90
+	Warhead@1Dam: SpreadDamage
+		Damage: 100

@@ -15,6 +15,7 @@ import struct
 import china_directional_assets as cn
 import iran_directional_assets as ir
 import turkey_directional_assets as tr
+from ra2_turkey_assets import extra_models
 
 ROOT = Path(__file__).resolve().parents[1]
 OUTPUT = ROOT / "apps/installer/ra2/modern-factions"
@@ -36,6 +37,7 @@ def models():
         "r2yildirim": (tr._wheeled_hull(4), tr._turret("yildirim")),
         "r2sancak": (tr._wheeled_hull(3, ew=True), tr._turret("sancak")),
         "r2kuzgun": (tr._airframe("kuzgunm"),),
+        **extra_models(),
     }
 
 
@@ -169,10 +171,18 @@ def build(output=OUTPUT):
             size, lower, voxels = voxelize(mesh, colors, normals)
             data = encode_vxl(size, lower, voxels, pal)
             (destination / (name + ".vxl")).write_bytes(data)
-            hva = bytes(16) + struct.pack("<2I", 1, 1) + b"body".ljust(16, b"\0") + struct.pack("<12f", *IDENTITY)
+            matrices = [IDENTITY]
+            if name == "r2turnatur":
+                matrices = []
+                for i in range(8):
+                    a = i * math.pi / 16
+                    c, s = math.cos(a), math.sin(a)
+                    matrices.append((c, -s, 0., 0., s, c, 0., 0., 0., 0., 1., 0.))
+            hva = bytes(16) + struct.pack("<2I", len(matrices), 1) + b"body".ljust(16, b"\0")
+            hva += b"".join(struct.pack("<12f", *matrix) for matrix in matrices)
             (destination / (name + ".hva")).write_bytes(hva)
             report["models"][name] = {"size": size, "origin": lower, "occupied_voxels": len(voxels),
-                "remap_voxels": sum(16 <= value[0] <= 31 for value in voxels.values()),
+                "remap_voxels": sum(16 <= value[0] <= 31 for value in voxels.values()), "animation_frames": len(matrices),
                 "sha256": hashlib.sha256(data).hexdigest()}
             print(name, size, len(voxels), flush=True)
     (output / "voxel-manifest.json").write_text(json.dumps(report, indent=2) + "\n")

@@ -1,6 +1,6 @@
 # Original project faction names and descriptions.
 ra2-modern-turkey-name = Turkey
-ra2-modern-turkey-description = Mobile defense. Screening depends on keeping a lightly armored support truck near the formation.
+ra2-modern-turkey-description = Combined arms: 16 Turkish units and three defenses. Mechanized infantry, drones and naval escorts; keep support vehicles close.
 ra2-modern-iran-name = Iran
 ra2-modern-iran-description = Layered denial. Long-range launchers have a minimum range and need armor and air-defense escorts.
 ra2-modern-china-name = China

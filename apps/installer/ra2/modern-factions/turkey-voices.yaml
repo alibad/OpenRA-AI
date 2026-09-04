@@ -1,0 +1,49 @@
+R2TurkeyinfantryVoice:
+	Inherits: ^InfantryDeath
+	DefaultVariant: .wav
+	Voices:
+		Select: ra2|modern-factions/audio/tr-infantry-select-tr, ra2|modern-factions/audio/tr-infantry-select-en
+		Move: ra2|modern-factions/audio/tr-infantry-move-tr, ra2|modern-factions/audio/tr-infantry-move-en
+		Attack: ra2|modern-factions/audio/tr-infantry-attack-tr, ra2|modern-factions/audio/tr-infantry-attack-en
+		Action: ra2|modern-factions/audio/tr-infantry-attack-tr, ra2|modern-factions/audio/tr-infantry-attack-en
+		Die: igidia, igidib, igidic
+
+R2TurkeygreywolfVoice:
+	Inherits: ^InfantryDeath
+	DefaultVariant: .wav
+	Voices:
+		Select: ra2|modern-factions/audio/tr-greywolf-select-tr, ra2|modern-factions/audio/tr-greywolf-select-en
+		Move: ra2|modern-factions/audio/tr-greywolf-move-tr, ra2|modern-factions/audio/tr-greywolf-move-en
+		Attack: ra2|modern-factions/audio/tr-greywolf-attack-tr, ra2|modern-factions/audio/tr-greywolf-attack-en
+		Action: ra2|modern-factions/audio/tr-greywolf-attack-tr, ra2|modern-factions/audio/tr-greywolf-attack-en
+		Die: igidia, igidib, igidic
+
+R2TurkeyvehicleVoice:
+	Inherits: ^InfantryDeath
+	DefaultVariant: .wav
+	Voices:
+		Select: ra2|modern-factions/audio/tr-vehicle-select-tr, ra2|modern-factions/audio/tr-vehicle-select-en
+		Move: ra2|modern-factions/audio/tr-vehicle-action-tr, ra2|modern-factions/audio/tr-vehicle-action-en
+		Attack: ra2|modern-factions/audio/tr-vehicle-action-tr, ra2|modern-factions/audio/tr-vehicle-action-en
+		Action: ra2|modern-factions/audio/tr-vehicle-action-tr, ra2|modern-factions/audio/tr-vehicle-action-en
+		Die: igidia, igidib, igidic
+
+R2TurkeyairVoice:
+	Inherits: ^InfantryDeath
+	DefaultVariant: .wav
+	Voices:
+		Select: ra2|modern-factions/audio/tr-air-select-tr, ra2|modern-factions/audio/tr-air-select-en
+		Move: ra2|modern-factions/audio/tr-air-action-tr, ra2|modern-factions/audio/tr-air-action-en
+		Attack: ra2|modern-factions/audio/tr-air-action-tr, ra2|modern-factions/audio/tr-air-action-en
+		Action: ra2|modern-factions/audio/tr-air-action-tr, ra2|modern-factions/audio/tr-air-action-en
+		Die: igidia, igidib, igidic
+
+R2TurkeynavalVoice:
+	Inherits: ^InfantryDeath
+	DefaultVariant: .wav
+	Voices:
+		Select: ra2|modern-factions/audio/tr-naval-select-tr, ra2|modern-factions/audio/tr-naval-select-en
+		Move: ra2|modern-factions/audio/tr-naval-action-tr, ra2|modern-factions/audio/tr-naval-action-en
+		Attack: ra2|modern-factions/audio/tr-naval-action-tr, ra2|modern-factions/audio/tr-naval-action-en
+		Action: ra2|modern-factions/audio/tr-naval-action-tr, ra2|modern-factions/audio/tr-naval-action-en
+		Die: igidia, igidib, igidic

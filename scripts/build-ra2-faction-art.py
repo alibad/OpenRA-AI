@@ -3,6 +3,7 @@
 from PIL import Image, ImageOps
 
 from ra2_faction_voxels import ROOT, OUTPUT, build
+from ra2_turkey_assets import build as build_turkey
 
 ROSTERS = {
     "china": ("r2qilin", "r2lynx", "r2mantis", "r2cloud"),
@@ -31,3 +32,4 @@ def portraits(output=OUTPUT):
 if __name__ == "__main__":
     build()
     portraits()
+    build_turkey()

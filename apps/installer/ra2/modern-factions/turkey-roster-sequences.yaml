@@ -1,0 +1,239 @@
+r2trrifle:
+	Inherits@MC: ^MindControllable
+	Defaults:
+		Filename: ra2|modern-factions/turkey-art/r2trrifle.shp
+		Offset: 0, -11, 16
+	stand:
+		Facings: 8
+	run:
+		Start: 8
+		Length: 6
+		Facings: 8
+		Tick: 80
+	shoot:
+		Start: 56
+		Length: 4
+		Facings: 8
+		Tick: 80
+	idle1:
+		Start: 96
+		Length: 8
+	idle2:
+		Start: 104
+		Length: 8
+	die1:
+		Start: 88
+		Length: 8
+	die2:
+		Start: 88
+		Length: 8
+	icon:
+		Filename: ra2|modern-factions/icons/r2trrifle.png
+		Offset: 0, 0
+
+r2trat:
+	Inherits@MC: ^MindControllable
+	Defaults:
+		Filename: ra2|modern-factions/turkey-art/r2trat.shp
+		Offset: 0, -11, 16
+	stand:
+		Facings: 8
+	run:
+		Start: 8
+		Length: 6
+		Facings: 8
+		Tick: 80
+	shoot:
+		Start: 56
+		Length: 4
+		Facings: 8
+		Tick: 80
+	idle1:
+		Start: 96
+		Length: 8
+	idle2:
+		Start: 104
+		Length: 8
+	die1:
+		Start: 88
+		Length: 8
+	die2:
+		Start: 88
+		Length: 8
+	icon:
+		Filename: ra2|modern-factions/icons/r2trat.png
+		Offset: 0, 0
+
+r2trdroneop:
+	Inherits@MC: ^MindControllable
+	Defaults:
+		Filename: ra2|modern-factions/turkey-art/r2trdroneop.shp
+		Offset: 0, -11, 16
+	stand:
+		Facings: 8
+	run:
+		Start: 8
+		Length: 6
+		Facings: 8
+		Tick: 80
+	shoot:
+		Start: 56
+		Length: 4
+		Facings: 8
+		Tick: 80
+	idle1:
+		Start: 96
+		Length: 8
+	idle2:
+		Start: 104
+		Length: 8
+	die1:
+		Start: 88
+		Length: 8
+	die2:
+		Start: 88
+		Length: 8
+	icon:
+		Filename: ra2|modern-factions/icons/r2trdroneop.png
+		Offset: 0, 0
+
+r2greywolf:
+	Inherits@MC: ^MindControllable
+	Defaults:
+		Filename: ra2|modern-factions/turkey-art/r2greywolf.shp
+		Offset: 0, -11, 16
+	stand:
+		Facings: 8
+	run:
+		Start: 8
+		Length: 6
+		Facings: 8
+		Tick: 80
+	shoot:
+		Start: 56
+		Length: 4
+		Facings: 8
+		Tick: 80
+	idle1:
+		Start: 96
+		Length: 8
+	idle2:
+		Start: 104
+		Length: 8
+	die1:
+		Start: 88
+		Length: 8
+	die2:
+		Start: 88
+		Length: 8
+	icon:
+		Filename: ra2|modern-factions/icons/r2greywolf.png
+		Offset: 0, 0
+
+r2hisar:
+	Defaults:
+		Filename: ra2|modern-factions/turkey-art/r2hisar.shp
+		Offset: 0, -19, 19
+	idle:
+	damaged-idle:
+	turret:
+		Start: 1
+		Facings: 32
+	damaged-turret:
+		Start: 1
+		Facings: 32
+	make:
+		Start: 33
+		Length: 8
+		Tick: 80
+	icon:
+		Filename: ra2|modern-factions/icons/r2hisar.png
+		Offset: 0, 0
+
+r2siper:
+	Defaults:
+		Filename: ra2|modern-factions/turkey-art/r2siper.shp
+		Offset: 0, -19, 19
+	idle:
+	damaged-idle:
+	turret:
+		Start: 1
+		Facings: 32
+	damaged-turret:
+		Start: 1
+		Facings: 32
+	make:
+		Start: 33
+		Length: 8
+		Tick: 80
+	icon:
+		Filename: ra2|modern-factions/icons/r2siper.png
+		Offset: 0, 0
+
+r2boran:
+	Defaults:
+		Filename: ra2|modern-factions/turkey-art/r2boran.shp
+		Offset: 0, -19, 19
+	idle:
+	damaged-idle:
+	turret:
+		Start: 1
+		Facings: 32
+	damaged-turret:
+		Start: 1
+		Facings: 32
+	make:
+		Start: 33
+		Length: 8
+		Tick: 80
+	icon:
+		Filename: ra2|modern-factions/icons/r2boran.png
+		Offset: 0, 0
+
+r2aras:
+	Inherits@MC: ^MindControllable
+	Inherits@Muzzle: ^WithCannonMuzzle
+	icon:
+		Filename: ra2|modern-factions/icons/r2aras.png
+
+r2gokkalkan:
+	Inherits@MC: ^MindControllable
+	Inherits@Muzzle: ^WithCannonMuzzle
+	icon:
+		Filename: ra2|modern-factions/icons/r2gokkalkan.png
+
+r2deniz:
+	Inherits@MC: ^MindControllable
+	Inherits@Muzzle: ^WithCannonMuzzle
+	icon:
+		Filename: ra2|modern-factions/icons/r2deniz.png
+
+r2turna:
+	Inherits@MC: ^MindControllable
+	Inherits@Muzzle: ^WithCannonMuzzle
+	icon:
+		Filename: ra2|modern-factions/icons/r2turna.png
+
+r2sahin:
+	Inherits@MC: ^MindControllable
+	Inherits@Muzzle: ^WithCannonMuzzle
+	icon:
+		Filename: ra2|modern-factions/icons/r2sahin.png
+
+r2marmara:
+	Inherits@MC: ^MindControllable
+	Inherits@Muzzle: ^WithCannonMuzzle
+	icon:
+		Filename: ra2|modern-factions/icons/r2marmara.png
+
+r2ege:
+	Inherits@MC: ^MindControllable
+	Inherits@Muzzle: ^WithCannonMuzzle
+	icon:
+		Filename: ra2|modern-factions/icons/r2ege.png
+
+r2poyraz:
+	Inherits@MC: ^MindControllable
+	Inherits@Muzzle: ^WithCannonMuzzle
+	icon:
+		Filename: ra2|modern-factions/icons/r2poyraz.png

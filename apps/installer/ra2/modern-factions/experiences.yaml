@@ -72,18 +72,20 @@ ExperienceCatalog:
 					Defenses: nalasr, naflak, tesla
 		ra2-turkey:
 			Title: Turkey
-			Description: Mobile defense with four signature units on a complete RA2 Allies economy.
+			Description: Full combined-arms Turkey roster with infantry, armor, aircraft, navy and dedicated defenses.
 			Effects: Adds Turkey to faction selection and the Allies random pool.
 			Tradeoffs: Screening depends on keeping a lightly armored support truck near the formation.
-			Scope: Prototype faction pack; original nine countries retain their rules and units.
+			Scope: 16 original combat/support units and three defenses; shared Allied economy and utilities. Preview balance.
 			Category: Faction packs
-			Version: 1
-			Source: Original OpenRA AI faction geometry and GPT Image portraits
+			Version: 2
+			Source: Original OpenRA AI Turkey geometry, animated native sprites, voxels and bilingual voice performances
 			License: GPL-3.0-or-later code and original project art
 			Kind: Faction
 			Dependencies: ra2-modern-foundation
-			Rules: ra2|modern-factions/turkey.yaml
-			Sequences: ra2|modern-factions/turkey-sequences.yaml
+			Rules: ra2|modern-factions/turkey.yaml, ra2|modern-factions/turkey-roster.yaml, ra2|modern-factions/turkey-ai.yaml, ra2|modern-factions/turkey-replacements.yaml, ra2|modern-factions/turkey-audio.yaml
+			Voices: ra2|modern-factions/turkey-voices.yaml
+			Sequences: ra2|modern-factions/turkey-sequences.yaml, ra2|modern-factions/turkey-roster-sequences.yaml
+			Weapons: ra2|modern-factions/turkey-weapons.yaml
 			Faction:
 				InternalName: turkey
 				Side: Allies
@@ -91,12 +93,12 @@ ExperienceCatalog:
 				Doctrine: mobile-defense
 				Preview: ra2|modern-factions/previews/turkey.png
 				Roster:
-					Infantry: e1, engineer, jumpjet
-					Vehicles: r2bozkir, r2yildirim, r2sancak
-					Aircraft: r2kuzgun
-					Navy: dest, aegis, dlph, carrier
-					Buildings: gacnst, gapowr, garefn, gaweap, gapile, gaairc, gayard
-					Defenses: gapill, nasam, atesla
+					Infantry: r2trrifle, r2trat, r2trdroneop, r2greywolf, engineer, dog, spy
+					Vehicles: r2bozkir, r2aras, r2yildirim, r2gokkalkan, r2sancak, r2deniz, cmin, amcv
+					Aircraft: r2kuzgun, r2turna, r2sahin
+					Navy: r2poyraz, r2ege, r2marmara, lcrf
+					Buildings: gacnst, gapowr, garefn, gaweap, gapile, gaairc, gayard, gatech, gadept
+					Defenses: r2hisar, r2siper, r2boran
 	Profiles:
 		ra2-modern:
 			Title: Red Alert 2 — Modern Factions

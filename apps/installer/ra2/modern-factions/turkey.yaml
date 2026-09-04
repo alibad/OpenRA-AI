@@ -17,7 +17,7 @@ World:
 		Factions: turkey
 		BaseActor: amcv
 		BaseActorFacing: 896
-		SupportActors: dog, e1, e1
+		SupportActors: r2trrifle, r2trrifle, r2trat
 		SupportActorsFacing: 896
 		InnerSupportRadius: 3
 		OuterSupportRadius: 5
@@ -27,7 +27,7 @@ World:
 		Factions: turkey
 		BaseActor: amcv
 		BaseActorFacing: 896
-		SupportActors: dog, e1, e1, e1, r2bozkir, engineer
+		SupportActors: r2trrifle, r2trrifle, r2trat, r2bozkir, engineer
 		SupportActorsFacing: 896
 		InnerSupportRadius: 3
 		OuterSupportRadius: 5
@@ -37,7 +37,7 @@ World:
 		Factions: turkey
 		BaseActor: amcv
 		BaseActorFacing: 896
-		SupportActors: dog, e1, e1, e1, e1, r2bozkir, r2bozkir, r2sancak, engineer
+		SupportActors: r2trrifle, r2trrifle, r2trat, r2trdroneop, r2bozkir, r2aras, r2gokkalkan, engineer
 		SupportActorsFacing: 896
 		InnerSupportRadius: 3
 		OuterSupportRadius: 5
@@ -94,7 +94,7 @@ gaairc:
 
 gaweap:
 	GrantConditionOnProduction@turkey-drone:
-		Actors: r2kuzgun
+		Actors: r2kuzgun, r2turna
 		Condition: roof-open
 		Duration: 50
 		ShowSelectionBar: false

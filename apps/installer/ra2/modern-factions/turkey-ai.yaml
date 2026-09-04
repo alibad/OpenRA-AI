@@ -1,0 +1,171 @@
+Player:
+	UnitBuilderBotModule@normal:
+		UnitsToBuild:
+			r2trrifle: 65
+			r2trat: 25
+			r2trdroneop: 8
+			r2greywolf: 2
+			r2aras: 12
+			r2gokkalkan: 25
+			r2deniz: 4
+			r2turna: 8
+			r2sahin: 8
+			r2poyraz: 20
+			r2ege: 20
+			r2marmara: 8
+		UnitLimits:
+			r2trdroneop: 3
+			r2greywolf: 1
+			r2aras: 3
+			r2deniz: 2
+			r2turna: 4
+			r2sahin: 4
+	BaseBuilderBotModule@normal:
+		BuildingFractions:
+			r2hisar: 10
+			r2siper: 5
+			r2boran: 5
+		BuildingLimits:
+			r2hisar: 6
+			r2siper: 4
+			r2boran: 4
+		DefenseTypes: gapill, nasam, gtgcan, atesla, naflak, tesla, nalasr, r2hisar, r2siper, r2boran
+	SquadManagerBotModule@normal:
+		AirUnitsTypes: jumpjet, shad, zep, orca, beag, r2cloud, r2mohajer, r2kuzgun, r2turna, r2sahin
+		NavalUnitsTypes: dest, aegis, dlph, carrier, sub, hyd, sqd, r2poyraz, r2ege, r2marmara
+	UnitBuilderBotModule@medium:
+		UnitsToBuild:
+			r2trrifle: 65
+			r2trat: 25
+			r2trdroneop: 8
+			r2greywolf: 2
+			r2aras: 12
+			r2gokkalkan: 25
+			r2deniz: 4
+			r2turna: 8
+			r2sahin: 8
+			r2poyraz: 20
+			r2ege: 20
+			r2marmara: 8
+		UnitLimits:
+			r2trdroneop: 3
+			r2greywolf: 1
+			r2aras: 3
+			r2deniz: 2
+			r2turna: 4
+			r2sahin: 4
+	BaseBuilderBotModule@medium:
+		BuildingFractions:
+			r2hisar: 10
+			r2siper: 5
+			r2boran: 5
+		BuildingLimits:
+			r2hisar: 6
+			r2siper: 4
+			r2boran: 4
+		DefenseTypes: gapill, nasam, gtgcan, atesla, naflak, tesla, nalasr, r2hisar, r2siper, r2boran
+	SquadManagerBotModule@medium:
+		AirUnitsTypes: jumpjet, shad, zep, orca, beag, r2cloud, r2mohajer, r2kuzgun, r2turna, r2sahin
+		NavalUnitsTypes: dest, aegis, dlph, carrier, sub, hyd, sqd, r2poyraz, r2ege, r2marmara
+	UnitBuilderBotModule@rush:
+		UnitsToBuild:
+			r2trrifle: 65
+			r2trat: 25
+			r2trdroneop: 8
+			r2greywolf: 2
+			r2aras: 12
+			r2gokkalkan: 25
+			r2deniz: 4
+			r2turna: 8
+			r2sahin: 8
+			r2poyraz: 20
+			r2ege: 20
+			r2marmara: 8
+		UnitLimits:
+			r2trdroneop: 3
+			r2greywolf: 1
+			r2aras: 3
+			r2deniz: 2
+			r2turna: 4
+			r2sahin: 4
+	BaseBuilderBotModule@rush:
+		BuildingFractions:
+			r2hisar: 10
+			r2siper: 5
+			r2boran: 5
+		BuildingLimits:
+			r2hisar: 6
+			r2siper: 4
+			r2boran: 4
+		DefenseTypes: gapill, nasam, gtgcan, atesla, naflak, tesla, nalasr, r2hisar, r2siper, r2boran
+	SquadManagerBotModule@rush:
+		AirUnitsTypes: jumpjet, shad, zep, orca, beag, r2cloud, r2mohajer, r2kuzgun, r2turna, r2sahin
+		NavalUnitsTypes: dest, aegis, dlph, carrier, sub, hyd, sqd, r2poyraz, r2ege, r2marmara
+	UnitBuilderBotModule@turtle:
+		UnitsToBuild:
+			r2trrifle: 65
+			r2trat: 25
+			r2trdroneop: 8
+			r2greywolf: 2
+			r2aras: 12
+			r2gokkalkan: 25
+			r2deniz: 4
+			r2turna: 8
+			r2sahin: 8
+			r2poyraz: 20
+			r2ege: 20
+			r2marmara: 8
+		UnitLimits:
+			r2trdroneop: 3
+			r2greywolf: 1
+			r2aras: 3
+			r2deniz: 2
+			r2turna: 4
+			r2sahin: 4
+	BaseBuilderBotModule@turtle:
+		BuildingFractions:
+			r2hisar: 10
+			r2siper: 5
+			r2boran: 5
+		BuildingLimits:
+			r2hisar: 6
+			r2siper: 4
+			r2boran: 4
+		DefenseTypes: gapill, nasam, gtgcan, atesla, naflak, tesla, nalasr, r2hisar, r2siper, r2boran
+	SquadManagerBotModule@turtle:
+		AirUnitsTypes: jumpjet, shad, zep, orca, beag, r2cloud, r2mohajer, r2kuzgun, r2turna, r2sahin
+		NavalUnitsTypes: dest, aegis, dlph, carrier, sub, hyd, sqd, r2poyraz, r2ege, r2marmara
+	UnitBuilderBotModule@naval:
+		UnitsToBuild:
+			r2trrifle: 65
+			r2trat: 25
+			r2trdroneop: 8
+			r2greywolf: 2
+			r2aras: 12
+			r2gokkalkan: 25
+			r2deniz: 4
+			r2turna: 8
+			r2sahin: 8
+			r2poyraz: 20
+			r2ege: 20
+			r2marmara: 8
+		UnitLimits:
+			r2trdroneop: 3
+			r2greywolf: 1
+			r2aras: 3
+			r2deniz: 2
+			r2turna: 4
+			r2sahin: 4
+	BaseBuilderBotModule@naval:
+		BuildingFractions:
+			r2hisar: 10
+			r2siper: 5
+			r2boran: 5
+		BuildingLimits:
+			r2hisar: 6
+			r2siper: 4
+			r2boran: 4
+		DefenseTypes: gapill, nasam, gtgcan, atesla, naflak, tesla, nalasr, r2hisar, r2siper, r2boran
+	SquadManagerBotModule@naval:
+		AirUnitsTypes: jumpjet, shad, zep, orca, beag, r2cloud, r2mohajer, r2kuzgun, r2turna, r2sahin
+		NavalUnitsTypes: dest, aegis, dlph, carrier, sub, hyd, sqd, r2poyraz, r2ege, r2marmara
