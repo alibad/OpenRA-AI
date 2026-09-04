@@ -46,6 +46,9 @@ portrait's twin-boom silhouette while retaining the original fuselage/materials.
 - Comparison against locally owned Grizzly/Rhino units at the same camera zoom.
 - Bright neutral armor with localized team-color panels, readable wheels/tracks,
   optics, guns/radars and distinct drone silhouettes.
+- Bounded custom-model lighting: the stock RA2 overbright shader is calibrated
+  for its darker palette. Custom vehicles, drones and husks use a 1.2 maximum
+  light multiplier so authored material detail is not clipped into white panels.
 - Native shadows, muzzle effects and falling drone husks. Ground vehicles use
   RA2's normal explosion-on-death behavior, not invented persistent wreck art.
 - Power-of-two UI atlases, native 60×48 icons, 512×512 experience previews and

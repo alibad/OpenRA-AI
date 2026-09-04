@@ -26,6 +26,10 @@ World:
 	RenderVoxels:
 		PlayerPalette: modernplayer
 		Scale: 15.2
+		# The stock palette is pre-darkened for RA2's overbright voxel light.
+		# Our authored material palette needs a bounded highlight instead.
+		LightAmbientColor: -0.3,-0.3,-0.3
+		LightDiffuseColor: 0.75,0.75,0.75
 	WithVoxelBody:
 	WithVoxelTurret:
 	Turreted:
@@ -61,6 +65,8 @@ World:
 	RenderVoxels:
 		PlayerPalette: modernplayer
 		Scale: 15.2
+		LightAmbientColor: -0.3,-0.3,-0.3
+		LightDiffuseColor: 0.75,0.75,0.75
 	WithVoxelBody:
 	RevealsShroud:
 		Range: 11c0
@@ -112,6 +118,8 @@ World:
 	RenderVoxels:
 		PlayerPalette: modernplayer
 		Scale: 15.2
+		LightAmbientColor: -0.3,-0.3,-0.3
+		LightDiffuseColor: 0.75,0.75,0.75
 	FallsToEarth:
 		Explosion: PlaneExplode
 		MaximumSpinSpeed: 10

@@ -75,6 +75,14 @@ class RA2ModernFactionTests(unittest.TestCase):
             self.assertGreater(count, 20, actor)
         self.assertEqual(len((ASSETS / "voxels/modern.pal").read_bytes()), 768)
 
+    def test_authored_palette_uses_bounded_lighting_for_units_and_husks(self):
+        rules = (ASSETS / "common.yaml").read_text()
+        self.assertEqual(rules.count("LightAmbientColor: -0.3,-0.3,-0.3"), 3)
+        self.assertEqual(rules.count("LightDiffuseColor: 0.75,0.75,0.75"), 3)
+        # Native model.frag includes the homogeneous normal component in its
+        # dot product: maximum intensity is ambient + 2 * diffuse, not A + D.
+        self.assertLessEqual(-0.3 + 2 * 0.75, 1.2)
+
     def test_geometry_axes_and_reproducible_export(self):
         self.assertEqual(voxels.coordinates((1, -2, 3)), (2, 1, 3))
         meshes = voxels.models()
