@@ -18,6 +18,30 @@ SPEC = importlib.util.spec_from_file_location("ra2_source", ROOT / "scripts/buil
 SOURCE = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(SOURCE)
 
+FLAG_SIZE = (30, 15)
+MODERN_FLAGS = (("china", 192, 128), ("iran", 226, 33), ("turkey", 226, 113))
+
+
+def extend_flag_atlas(original: Image.Image, flags: Image.Image) -> tuple[Image.Image, str]:
+    """Keep flag pixels inside the native lobby's 30x15 slot.
+
+    ImageWidget draws at the sprite's intrinsic size, not its widget bounds.
+    Upstream's 45x21 atlas cells contain padding: stretching our flags to fill
+    that cell makes them overlap the country label and the following row.
+    """
+    width, height = FLAG_SIZE
+    required = (max(original.width, len(MODERN_FLAGS) * width), original.height + height)
+    atlas = Image.new("RGBA", tuple(1 << (size - 1).bit_length() for size in required))
+    atlas.paste(original.convert("RGBA"), (0, 0))
+    regions = []
+    for i, (country, x, y) in enumerate(MODERN_FLAGS):
+        if x + width > flags.width or y + height > flags.height:
+            raise ValueError(f"Source atlas is missing the {country} flag")
+        flag = flags.crop((x, y, x + width, y + height)).convert("RGBA")
+        atlas.paste(flag, (width * i, original.height))
+        regions.append(f"\t\t{country}: {width * i}, {original.height}, {width}, {height}\n")
+    return atlas, "".join(regions)
+
 
 def replace_once(path: Path, old: str, new: str) -> None:
     text = path.read_text()
@@ -94,16 +118,10 @@ def integrate(source: Path, engine: Path, version: str) -> None:
     # flags. Do not ship a replacement that could lose any stock UI regions.
     buttons = mod / "uibits/buttons.png"
     with Image.open(buttons) as original, Image.open(engine / "mods/ra/uibits/glyphs-redsea.png") as flags:
-        atlas = Image.new("RGBA", (max(256, original.width), 1 << (original.height + 20).bit_length()))
-        atlas.paste(original, (0, 0))
-        regions = []
-        for i, (country, x, y) in enumerate((("china", 192, 128), ("iran", 226, 33), ("turkey", 226, 113))):
-            flag = flags.crop((x, y, x + 30, y + 15)).resize((45, 21), Image.Resampling.NEAREST)
-            atlas.paste(flag, (45 * i, original.height))
-            regions.append(f"\t\t{country}: {45 * i}, {original.height}, 45, 21\n")
+        atlas, regions = extend_flag_atlas(original, flags)
         atlas.save(buttons)
     replace_once(mod / "chrome.yaml", "flags:\n\tImage: buttons.png\n\tRegions:\n",
-                 "flags:\n\tImage: buttons.png\n\tRegions:\n" + "".join(regions))
+                 "flags:\n\tImage: buttons.png\n\tRegions:\n" + regions)
     (mod / "languages/native-preview.ftl").write_text(
         "ra2-preview-window-title = OpenRA AI — Red Alert 2\n"
         "ra2-preview-note = Red Alert 2 with the shared AI assistant. Original campaigns and Yuri’s Revenge are not included.\n"

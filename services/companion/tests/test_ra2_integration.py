@@ -2,9 +2,12 @@ from __future__ import annotations
 
 import importlib.util
 from pathlib import Path
+import re
 import tempfile
 import unittest
 from unittest.mock import patch
+
+from PIL import Image
 
 from openra_ai_companion.game_content import import_content, ra2_content_root
 from openra_ai_companion.game_runtime import GameRuntime
@@ -23,6 +26,37 @@ SPEC.loader.exec_module(prepare)
 
 
 class RA2IntegrationTests(unittest.TestCase):
+    def test_modern_flags_keep_native_pixels_and_preserve_upstream_atlas(self):
+        original = Image.new("RGBA", (256, 256), (12, 34, 56, 128))
+        with Image.open(ROOT / "engine/openra/mods/ra/uibits/glyphs-redsea.png") as source:
+            atlas, regions = prepare.extend_flag_atlas(original, source)
+            self.assertEqual(atlas.size, (256, 512))
+            self.assertEqual(atlas.crop((0, 0, 256, 256)).tobytes(), original.tobytes())
+            for i, (country, x, y) in enumerate(prepare.MODERN_FLAGS):
+                self.assertIn(f"{country}: {i * 30}, 256, 30, 15\n", regions)
+                expected = source.crop((x, y, x + 30, y + 15)).convert("RGBA")
+                actual = atlas.crop((i * 30, 256, (i + 1) * 30, 271))
+                self.assertEqual(actual.tobytes(), expected.tobytes(), country)
+            self.assertIsNone(atlas.crop((90, 256, 256, 512)).getbbox())
+            self.assertIsNone(atlas.crop((0, 271, 90, 512)).getbbox())
+
+    def test_modern_flags_fit_lobby_rows_without_touching_country_names(self):
+        chrome = (ROOT / "engine/openra/mods/common/chrome/lobby-players.yaml").read_text()
+        template = chrome.split("ScrollPanel@FACTION_DROPDOWN_TEMPLATE:", 1)[1].split("ScrollItem@TEMPLATE:", 1)[1]
+        flag, label = template.split("Image@FLAG:", 1)[1].split("Label@LABEL:", 1)
+        def value(block, key):
+            return int(re.search(rf"^\s+{key}: (\d+)$", block, re.MULTILINE).group(1))
+        width, height = prepare.FLAG_SIZE
+        self.assertLessEqual(width, value(flag, "Width"))
+        self.assertLessEqual(height, value(flag, "Height"))
+        for scale in (1, 1.5, 2, 3):
+            self.assertGreaterEqual((value(label, "X") - value(flag, "X") - width) * scale, 5 * scale)
+            self.assertGreaterEqual((value(template, "Height") - value(flag, "Y") - height) * scale, 5 * scale)
+
+    def test_flag_atlas_rejects_missing_source_regions(self):
+        with self.assertRaisesRegex(ValueError, "missing the china flag"):
+            prepare.extend_flag_atlas(Image.new("RGBA", (256, 256)), Image.new("RGBA", (30, 15)))
+
     def test_game_identity_and_power_plant_questions_are_not_strategy_queries(self):
         for question in ("What country am I playing?", "Which faction am I playing?",
                          "What game am I playing?", "Which power plants do I own?"):
