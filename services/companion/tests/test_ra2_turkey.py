@@ -63,6 +63,28 @@ class TurkeyFactionTests(unittest.TestCase):
                 self.assertGreater(box[1],0)
                 self.assertLess(box[3],48)
 
+    def test_native_decks_and_jet_surfaces_have_outward_normals(self):
+        for name in ("marmara","ege","poyraz"):
+            source=art.tr._ship_hull(name).faces[5]
+            deck=art.naval_hull(name).faces[5]
+            self.assertEqual(set(deck.vertices),set(source.vertices))
+            self.assertEqual(deck.color,source.color)
+            self.assertGreater(deck.normal[2],.9)
+            # Every triangle in the VXL triangle fan must face upward: no
+            # self-crossed deck perimeter or invisible downward-facing strip.
+            a=deck.vertices[0]
+            for b,c in zip(deck.vertices[1:-1],deck.vertices[2:]):
+                self.assertGreater((b[0]-a[0])*(c[1]-a[1])-(b[1]-a[1])*(c[0]-a[0]),0)
+        source=art.tr._airframe("sahinx")
+        corrected=art.sahin_airframe()
+        self.assertEqual([(f.vertices,f.color) for f in corrected.faces],[(f.vertices,f.color) for f in source.faces])
+        wings=[f for f in corrected.faces if len(f.vertices) in (5,7)]
+        self.assertEqual(len(wings),2)
+        self.assertTrue(all(f.normal[2]>.9 for f in wings))
+        for face in corrected.faces[:14]:
+            center=tuple(sum(v[i] for v in face.vertices)/len(face.vertices)-(0,-.15,.55)[i] for i in range(3))
+            self.assertGreater(sum(a*b for a,b in zip(face.normal,center)),0)
+
     def test_native_effects_and_depth_survive_rendering(self):
         sequences=(ASSETS/"turkey-roster-sequences.yaml").read_text()
         for actor in art.INFANTRY:
@@ -90,6 +112,23 @@ class TurkeyFactionTests(unittest.TestCase):
         self.assertIn("r2trrifle, r2trrifle, r2trat",rules)
         self.assertIn("Class: none",rules)
 
+    def test_composition_roles_distinguish_gunships_from_cargo_transports(self):
+        roles=(ASSETS/"turkey-roles.yaml").read_text()
+        roster=(ASSETS/"turkey-roster.yaml").read_text()
+        role_sections=dict(re.findall(r"(?m)^(r2\w+):\n((?:\t[^\n]*\n)+)",roles))
+        self.assertIn("Roles: strike-aircraft",role_sections["r2turna"])
+        gunship=roster.split("\nr2turna:\n",1)[1].split("\n\n",1)[0]
+        self.assertIn("Inherits: ^R2ModernDrone",gunship)
+        self.assertIn("Weapon: R2GunshipMissile",gunship)
+        self.assertNotIn("Cargo:",gunship)
+        transports={actor for actor,section in role_sections.items() if "Roles: transport\n" in section}
+        self.assertEqual(transports,{"r2aras","r2deniz"})
+        carrier=roster.split("\n^R2TroopCarrier:\n",1)[1].split("\n\n",1)[0]
+        self.assertIn("\tCargo:\n\t\tTypes: Infantry\n\t\tMaxWeight: 5",carrier)
+        for actor in transports:
+            section=roster.split("\n"+actor+":\n",1)[1].split("\n\n",1)[0]
+            self.assertIn("Inherits: ^R2TroopCarrier",section)
+
     def test_replacements_restrict_only_turkey_and_keep_support(self):
         rules=(ASSETS/"turkey-replacements.yaml").read_text()
         for line in rules.splitlines():
@@ -114,6 +153,11 @@ class TurkeyFactionTests(unittest.TestCase):
         self.assertIn("Speed: 450",interceptor)
         self.assertIn("MinimumLaunchAngle: 0",interceptor)
         self.assertIn("MaximumLaunchAngle: 0",interceptor)
+        for name in ("R2PortableAT", "R2CoastalMissile"):
+            section=weapons.split(name+":\n",1)[1].split("\n\n",1)[0]
+            self.assertIn("CruiseAltitude:",section)
+            self.assertIn("RangeLimit:",section)
+            self.assertIn("MinimumLaunchAngle:",section)
 
     def test_bilingual_voice_sources_exist_for_every_unit(self):
         voices=(ASSETS/"turkey-voices.yaml").read_text()

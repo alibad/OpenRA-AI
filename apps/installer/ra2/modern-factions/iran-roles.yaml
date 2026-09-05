@@ -1,0 +1,84 @@
+r2basij:
+	StrategicRole:
+		Domain: infantry
+		Roles: line-infantry
+
+r2toophan:
+	StrategicRole:
+		Domain: infantry
+		Roles: anti-armor
+
+r2dronecontrol:
+	StrategicRole:
+		Domain: infantry
+		Roles: support
+
+r2shadowone:
+	StrategicRole:
+		Domain: infantry
+		Roles: line-infantry
+
+r2karrar:
+	StrategicRole:
+		Domain: ground
+		Roles: main-battle-tank
+
+r2raad:
+	StrategicRole:
+		Domain: ground
+		Roles: anti-air
+
+r2fajr:
+	StrategicRole:
+		Domain: ground
+		Roles: artillery
+
+r2coast:
+	StrategicRole:
+		Domain: ground
+		Roles: artillery
+
+r2mohajer:
+	StrategicRole:
+		Domain: air
+		Roles: strike-aircraft
+
+r2toufan:
+	StrategicRole:
+		Domain: air
+		Roles: strike-aircraft
+
+r2azar:
+	StrategicRole:
+		Domain: air
+		Roles: strike-aircraft
+
+r2loiter:
+	StrategicRole:
+		Domain: air
+		Roles: strike-aircraft
+
+r2peykaap:
+	StrategicRole:
+		Domain: naval
+		Roles: naval-screen
+
+r2ghadir:
+	StrategicRole:
+		Domain: naval
+		Roles: submarine
+
+r2irbunker:
+	StrategicRole:
+		Domain: defense
+		Roles: line-infantry
+
+r2iraasite:
+	StrategicRole:
+		Domain: defense
+		Roles: anti-air
+
+r2ircoast:
+	StrategicRole:
+		Domain: defense
+		Roles: anti-armor

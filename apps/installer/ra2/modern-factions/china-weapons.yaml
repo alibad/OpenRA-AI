@@ -1,0 +1,160 @@
+R2ChinaRifle:
+	Inherits: M60
+	Range: 5c0
+	ReloadDelay: 26
+	Burst: 2
+	BurstDelays: 4
+	Warhead@1Dam: SpreadDamage
+		Damage: 9
+
+R2ChinaCarbine:
+	Inherits: R2ChinaRifle
+	Range: 4c0
+	ReloadDelay: 38
+	Warhead@1Dam: SpreadDamage
+		Damage: 6
+
+R2ChinaPortableAT:
+	Inherits: Maverick
+	Range: 6c0
+	MinRange: 1c0
+	ReloadDelay: 110
+	Projectile: Missile
+		Speed: 260
+		MinimumLaunchAngle: 0
+		MaximumLaunchAngle: 32
+		CruiseAltitude: 768
+		RangeLimit: 10c0
+	Warhead@1Dam: SpreadDamage
+		Damage: 65
+		Versus:
+			None: 12
+			Flak: 20
+			Plate: 25
+			Light: 100
+			Medium: 100
+			Heavy: 110
+			Wood: 50
+			Steel: 50
+			Concrete: 40
+
+R2ChinaPortableAA:
+	Inherits: R2AirDefense
+	Range: 7c0
+	ReloadDelay: 90
+	Warhead@1Dam: SpreadDamage
+		Damage: 40
+
+R2ChinaRedSpearRifle:
+	Inherits: R2ChinaRifle
+	Range: 7c0
+	ReloadDelay: 36
+	Burst: 3
+	BurstDelays: 5
+	Warhead@1Dam: SpreadDamage
+		Damage: 22
+
+R2ChinaIFVCannon:
+	Inherits: R2ReconGun
+	Range: 6c0
+	ReloadDelay: 40
+	Burst: 2
+	BurstDelays: 5
+	Warhead@1Dam: SpreadDamage
+		Damage: 14
+
+R2ChinaLongbowRockets:
+	Inherits: Maverick
+	Range: 12c0
+	MinRange: 4c0
+	ReloadDelay: 220
+	Burst: 6
+	BurstDelays: 7
+	Projectile: Missile
+		RangeLimit: 16c0
+		Speed: 300
+		MinimumLaunchAngle: 90
+		MaximumLaunchAngle: 120
+		Inaccuracy: 1c0
+	Warhead@1Dam: SpreadDamage
+		Damage: 34
+		Spread: 256
+		Versus:
+			None: 70
+			Flak: 70
+			Plate: 70
+			Light: 100
+			Medium: 75
+			Heavy: 60
+			Wood: 100
+			Steel: 90
+			Concrete: 80
+
+R2ChinaInterceptor:
+	Inherits: R2AirDefense
+	Range: 10c0
+	ReloadDelay: 20
+	Projectile: Missile
+		Speed: 480
+		RangeLimit: 16c0
+		MinimumLaunchAngle: 0
+		MaximumLaunchAngle: 0
+	Warhead@1Dam: SpreadDamage
+		Damage: 55
+
+R2ChinaNavalGun:
+	Inherits: 155mm
+	Range: 10c0
+	MinRange: 2c0
+	ReloadDelay: 90
+	Warhead@1Dam: SpreadDamage
+		Damage: 75
+
+R2ChinaASW:
+	Inherits: SubTorpedo
+	Range: 7c0
+	ReloadDelay: 110
+	ValidTargets: Underwater
+	Warhead@1Dam: SpreadDamage
+		ValidTargets: Underwater
+		Damage: 75
+
+R2ChinaCoastalMissile:
+	Inherits: Maverick
+	Range: 9c0
+	ReloadDelay: 110
+	Burst: 2
+	BurstDelays: 10
+	Projectile: Missile
+		Speed: 300
+		MinimumLaunchAngle: 32
+		MaximumLaunchAngle: 64
+		CruiseAltitude: 1c512
+		RangeLimit: 16c0
+	Warhead@1Dam: SpreadDamage
+		Damage: 40
+
+R2ChinaNavalAA:
+	Inherits: R2AirDefense
+	Range: 9c0
+	ReloadDelay: 90
+	Warhead@1Dam: SpreadDamage
+		Damage: 40
+
+R2ChinaBastion:
+	Inherits: R2ChinaIFVCannon
+	Range: 6c0
+	ReloadDelay: 28
+	Warhead@1Dam: SpreadDamage
+		Damage: 16
+
+R2ChinaSkyshield:
+	Inherits: R2AirDefense
+	Range: 11c0
+	ReloadDelay: 100
+	Burst: 2
+	BurstDelays: 7
+	Projectile: Missile
+		RangeLimit: 14c0
+	Warhead@1Dam: SpreadDamage
+		Damage: 40

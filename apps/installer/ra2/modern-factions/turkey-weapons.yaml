@@ -12,6 +12,11 @@ R2PortableAT:
 	Range: 6c0
 	MinRange: 1c0
 	ReloadDelay: 100
+	Projectile: Missile
+		MinimumLaunchAngle: 0
+		MaximumLaunchAngle: 32
+		CruiseAltitude: 768
+		RangeLimit: 10c0
 	Warhead@1Dam: SpreadDamage
 		Damage: 60
 		Versus:
@@ -85,6 +90,11 @@ R2CoastalMissile:
 	ReloadDelay: 90
 	Burst: 2
 	BurstDelays: 8
+	Projectile: Missile
+		MinimumLaunchAngle: 32
+		MaximumLaunchAngle: 64
+		CruiseAltitude: 1c512
+		RangeLimit: 16c0
 	Warhead@1Dam: SpreadDamage
 		Damage: 40
 

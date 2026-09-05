@@ -13,17 +13,86 @@ is visible immediately. MCV-only, light and heavy starts remain selectable.
 Saved skirmish options also persist: if a previous game used MCV-only, change
 **Starting units → Medium** in the lobby to get the signature tank immediately.
 
-| Country | Signature roster | Preview mechanic |
+| Country | Combat/support roster | Gameplay identity |
 | --- | --- | --- |
-| China | Qilin, Lynx, Mantis, Cloud | Lynx gives nearby Chinese units 15% shorter reloads; overlapping networks do not stack. |
-| Iran | Karrar, Raad, Fajr, Mohajer | Layered AA/artillery; Fajr has a four-rocket salvo, minimum range and 20% shorter reload while stationary. |
-| Turkey | 16 units and three defenses; full list below | Mechanized infantry, target designation, mobile screening and combined land/air/naval forces. |
+| China | 17 units + 3 defenses | Networked formations, deployable missile teams, amphibious armor, airlift and carrier wings. |
+| Iran | 14 units + 3 defenses | Ambush infantry, stationary artillery, drone guidance and mobile coastal denial. |
+| Turkey | 16 units + 3 defenses | Mechanized infantry, target designation, mobile screening and naval escorts. |
 
-China uses the complete Allied economy, infantry, technology and naval tree.
-Iran uses the Soviet equivalents. Their four units are faction-gated
-and built through the native war factory; reconnaissance drones also require
-radar. Drones use light ground-attack missiles with a cooldown rather than a new
-ammunition/rearming system. Native repair depots service landed drones.
+These are asymmetric armies, not identical rosters with different flags.
+Construction, economy and utility buildings use the native Allied/Soviet trees.
+Combat units have country-specific prerequisites and replace the corresponding
+stock options only for that country. Original countries keep their unit stats.
+
+## China — networked combined arms
+
+- Barracks: Rifleman, Portable Missile Team, Network Technician and the
+  one-at-a-time Red Spear commando.
+- War Factory: Qilin tank, Lynx command scout, Mantis AA, Sea Dragon amphibious
+  carrier, Longbow rocket artillery, Cloud recon drone and Crane airlift.
+- Airfield: Skyspear interceptor, with limited ammunition and native rearming.
+- Naval Yard: Luyang ASW destroyer, Haiying missile corvette, Haiwang drone
+  carrier, Kunlun landing ship and Jiaolong submarine.
+- Defenses: Bastion anti-infantry turret, Skyshield AA and Spectrum radar/
+  network tower. Spectrum is unarmed and loses its powered functions when
+  the base is short of electricity.
+
+Keep Qilin armor near a Lynx or deployed technician: the network shortens reloads
+by 15%, without stacking duplicate networks. Deploy the portable missile team
+to switch between AT and AA; moving technicians retracts their relay.
+Fragile support units give opponents a concrete target. Longbow artillery has
+a minimum range; tanks and infantry must protect it from close attackers.
+Sea Dragon carries four infantry, Crane six, and Kunlun up to 16 cargo weight.
+Carrier aircraft are attached wing units, not extra build-menu entries.
+
+## Iran — layered denial
+
+- Barracks: Basij rifleman, Toophan AT ambusher, Drone Coordinator and the
+  one-at-a-time Shadow One infiltrator.
+- War Factory: Karrar tank, Raad AA, Fajr rocket artillery, Coastal Missile
+  Launcher, Mohajer reconnaissance drone, Toufan gunship, Azar strike aircraft
+  and expendable Loiter Munition.
+- Naval Yard: Peykaap missile craft and Ghadir concealed submarine; the native
+  Soviet amphibious transport remains available.
+- Defenses: Gun Bunker, Raad AA Site and Coastal Denial Battery.
+
+Stationary launchers and ambushers gain their emplacement bonuses, so flanking
+and forcing them to relocate are useful counters. The coordinator improves
+nearby compatible drones, not the entire army. A loiter munition is consumed
+after its attack; it cannot be reused as a cheap permanent aircraft.
+Peykaap carries a separate AA weapon; Ghadir supplies submerged attack.
+The native Flak Track is retained as an infantry transport.
+
+Iran has no invented Soviet airfield: its aircraft use the War Factory,
+cooldowns and native repair facilities. They do not claim an Allied-style
+ammunition/rearm cycle. Coastal weapons cannot replace a general-purpose
+ground army; their target restrictions and minimum ranges are deliberate.
+
+## Experiences and AI
+
+The default modern experience enables all three country packs and
+**Combined-arms AI**. **Original Armies, Smarter Bots** enables the same AI for
+the original nine countries; **Original Countries** retains upstream tuning.
+Custom selections stay saved and are not silently enrolled in new options.
+
+Combined-arms AI chooses production by missing battlefield role, respects
+tech/cost/unit limits, and gives rush, defensive and naval bots different
+priorities. Role weights are normalized within each production queue so a
+growing infantry/naval force cannot indefinitely crowd factory-built aircraft
+out of production. Its formation-size setting is 3–20 units (default 8). This changes
+bot production and squad assembly, not human controls or unit health/damage.
+It is not omniscient counter-picking. Tactical deployment and sophisticated
+multi-transport assaults are not promised as automated micro.
+Original-country specialists retain positive recruitment roles. Snipers,
+desolators, bomb specialists and mind-control infantry have small bot-only
+caps as conservative preview tuning; human unit statistics and limits stay
+unchanged. Roles describe actual weapons, not assumptions based on unit names.
+
+Faction packs compose their air/naval/defense registrations without overwriting
+one another. Experience dependencies load before their consumers; disabling a
+module removes its effects without deleting saved parameter choices. The UI
+separates gameplay modules from authoring contracts that provide tools or
+extension definitions rather than standalone match behavior.
 
 ## Turkey — full combat roster
 
@@ -35,7 +104,8 @@ stay MCV-only; choose Medium explicitly if you want troops immediately.
 | --- | --- | --- |
 | Barracks | Mechanized Rifleman; Portable AT Specialist | Barracks |
 | Barracks | Forward Drone Operator; Grey Wolf | Radar; Battle Lab respectively |
-| War Factory | Bozkir tank; Aras-8 carrier; Yildirim howitzer; Gokkalkan mobile AA; Sancak screening vehicle | War Factory |
+| War Factory | Bozkir tank; Aras-8 carrier; Gokkalkan mobile AA; Sancak screening vehicle | War Factory |
+| War Factory | Yildirim howitzer | Radar |
 | War Factory | Deniz Kaplan amphibious carrier; Kuzgun-M drone; Turna-AH gunship | Radar for carrier/drone; Battle Lab for gunship |
 | Airfield | Sahin-X interceptor | Airfield and Battle Lab; four missiles, native return-to-base rearming |
 | Naval Yard | Poyraz patrol boat; Ege missile corvette; Marmara frigate | Yard; radar for Ege; Battle Lab for Marmara |
@@ -72,7 +142,7 @@ shows all 19 entries rather than four tanks.
 This is a focused RA2 adaptation, **not a claim that every World War III unit,
 faction, special ability or mission has been ported**. Campaigns and Yuri's
 Revenge are not included. Competitive balance and long-session multiplayer
-testing remain future work. The shared AI/voice implementation is unchanged;
+testing remain future work. Voice setup is unchanged;
 this faction work does not resolve the previously documented macOS microphone
 shortcut interception or free-form local-model reliability limitations.
 
@@ -85,9 +155,9 @@ and unused models do not enable disabled countries. The modern preset also
 raises native bot production/technology priorities; the original-country preset
 retains upstream bot tuning.
 
-- `scripts/build-ra2-faction-art.py`: reproducible 36 native models (20 bodies,
-  15 turrets, one animated rotor), HVA transforms, custom palettes, 27 icons,
-  three previews and seven animated Turkey SHPs.
+- `scripts/build-ra2-faction-art.py`: 58 native models (35 bodies, 20 turrets,
+  three animated rotors), HVA transforms, custom palettes, 56 icons, three
+  full-roster previews and 21 animated infantry/defense SHPs.
 - `test_ra2_modern_factions.py`: independent VXL span decoding, SHA-256 evidence,
   native normal/remap indices, bounds, transforms, deterministic regeneration,
   every unit's team-color coverage, exact icon dimensions and country contracts.
@@ -105,6 +175,16 @@ retains upstream bot tuning.
   actual GPU captures, with infantry/armor/navy review scenes.
 - `scripts/validate-ra2-turkey-combat.py`: isolated attack range with an inert
   opponent, paired targets, native weapons and a marked/control damage test.
+- `scripts/validate-ra2-china.py`: complete production, three cargo round-trips,
+  six water movers, native combat, carrier wing, network and deployable roles.
+- `scripts/validate-ra2-iran.py`: complete production, water movement, native
+  combat, drone guidance, stationary bonuses and expendable loiter attacks.
+- `scripts/validate-ra2-experiences.py`: all 16 combinations of the three packs
+  and doctrine AI, original-country preservation and isolated native map lint.
+- `scripts/validate-ra2-ai-composition.py`: native AUTO recruitment of six
+  battlefield roles from an empty army, with no manual recruitment. This uses
+  prebuilt full technology, fast build, a fixed 50,000-credit budget and no base
+  expansion; it complements rather than replaces normal-economy start tests.
 
 Evidence and release/install results are recorded in the dated todo changelog
 and local `artifacts/ra2-modern/` directory. All tests use disposable profiles.

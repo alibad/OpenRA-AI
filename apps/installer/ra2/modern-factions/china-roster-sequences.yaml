@@ -1,0 +1,249 @@
+r2cnrifle:
+	Inherits@MC: ^MindControllable
+	Defaults:
+		Filename: ra2|modern-factions/china-art/r2cnrifle.shp
+		Offset: 0, -11, 16
+	stand:
+		Facings: 8
+	run:
+		Start: 8
+		Length: 6
+		Facings: 8
+		Tick: 80
+	shoot:
+		Start: 56
+		Length: 4
+		Facings: 8
+		Tick: 80
+	idle1:
+		Start: 96
+		Length: 8
+	idle2:
+		Start: 104
+		Length: 8
+	die1:
+		Start: 88
+		Length: 8
+	die2:
+		Start: 88
+		Length: 8
+	icon:
+		Filename: ra2|modern-factions/icons/r2cnrifle.png
+		Offset: 0, 0
+
+r2cnportable:
+	Inherits@MC: ^MindControllable
+	Defaults:
+		Filename: ra2|modern-factions/china-art/r2cnportable.shp
+		Offset: 0, -11, 16
+	stand:
+		Facings: 8
+	run:
+		Start: 8
+		Length: 6
+		Facings: 8
+		Tick: 80
+	shoot:
+		Start: 56
+		Length: 4
+		Facings: 8
+		Tick: 80
+	idle1:
+		Start: 96
+		Length: 8
+	idle2:
+		Start: 104
+		Length: 8
+	die1:
+		Start: 88
+		Length: 8
+	die2:
+		Start: 88
+		Length: 8
+	icon:
+		Filename: ra2|modern-factions/icons/r2cnportable.png
+		Offset: 0, 0
+
+r2cnnetwork:
+	Inherits@MC: ^MindControllable
+	Defaults:
+		Filename: ra2|modern-factions/china-art/r2cnnetwork.shp
+		Offset: 0, -11, 16
+	stand:
+		Facings: 8
+	run:
+		Start: 8
+		Length: 6
+		Facings: 8
+		Tick: 80
+	shoot:
+		Start: 56
+		Length: 4
+		Facings: 8
+		Tick: 80
+	idle1:
+		Start: 96
+		Length: 8
+	idle2:
+		Start: 104
+		Length: 8
+	die1:
+		Start: 88
+		Length: 8
+	die2:
+		Start: 88
+		Length: 8
+	icon:
+		Filename: ra2|modern-factions/icons/r2cnnetwork.png
+		Offset: 0, 0
+
+r2redspear:
+	Inherits@MC: ^MindControllable
+	Defaults:
+		Filename: ra2|modern-factions/china-art/r2redspear.shp
+		Offset: 0, -11, 16
+	stand:
+		Facings: 8
+	run:
+		Start: 8
+		Length: 6
+		Facings: 8
+		Tick: 80
+	shoot:
+		Start: 56
+		Length: 4
+		Facings: 8
+		Tick: 80
+	idle1:
+		Start: 96
+		Length: 8
+	idle2:
+		Start: 104
+		Length: 8
+	die1:
+		Start: 88
+		Length: 8
+	die2:
+		Start: 88
+		Length: 8
+	icon:
+		Filename: ra2|modern-factions/icons/r2redspear.png
+		Offset: 0, 0
+
+r2bastion:
+	Defaults:
+		Filename: ra2|modern-factions/china-art/r2bastion.shp
+		Offset: 0, -19, 19
+	idle:
+	damaged-idle:
+	turret:
+		Start: 1
+		Facings: 32
+	damaged-turret:
+		Start: 1
+		Facings: 32
+	make:
+		Start: 33
+		Length: 8
+		Tick: 80
+	icon:
+		Filename: ra2|modern-factions/icons/r2bastion.png
+		Offset: 0, 0
+
+r2skyshield:
+	Defaults:
+		Filename: ra2|modern-factions/china-art/r2skyshield.shp
+		Offset: 0, -19, 19
+	idle:
+	damaged-idle:
+	turret:
+		Start: 1
+		Facings: 32
+	damaged-turret:
+		Start: 1
+		Facings: 32
+	make:
+		Start: 33
+		Length: 8
+		Tick: 80
+	icon:
+		Filename: ra2|modern-factions/icons/r2skyshield.png
+		Offset: 0, 0
+
+r2spectrum:
+	Defaults:
+		Filename: ra2|modern-factions/china-art/r2spectrum.shp
+		Offset: 0, -19, 19
+	idle:
+	damaged-idle:
+	active:
+		Start: 1
+		Length: 32
+		Tick: 100
+	turret:
+		Start: 1
+		Facings: 32
+	damaged-turret:
+		Start: 1
+		Facings: 32
+	make:
+		Start: 33
+		Length: 8
+		Tick: 80
+	icon:
+		Filename: ra2|modern-factions/icons/r2spectrum.png
+		Offset: 0, 0
+
+r2zbd:
+	Inherits@MC: ^MindControllable
+	Inherits@Muzzle: ^WithCannonMuzzle
+	icon:
+		Filename: ra2|modern-factions/icons/r2zbd.png
+
+r2phl:
+	Inherits@MC: ^MindControllable
+	Inherits@Muzzle: ^WithCannonMuzzle
+	icon:
+		Filename: ra2|modern-factions/icons/r2phl.png
+
+r2skyspear:
+	Inherits@MC: ^MindControllable
+	Inherits@Muzzle: ^WithCannonMuzzle
+	icon:
+		Filename: ra2|modern-factions/icons/r2skyspear.png
+
+r2crane:
+	Inherits@MC: ^MindControllable
+	Inherits@Muzzle: ^WithCannonMuzzle
+	icon:
+		Filename: ra2|modern-factions/icons/r2crane.png
+
+r2luyang:
+	Inherits@MC: ^MindControllable
+	Inherits@Muzzle: ^WithCannonMuzzle
+	icon:
+		Filename: ra2|modern-factions/icons/r2luyang.png
+
+r2haiwang:
+	Inherits@MC: ^MindControllable
+	Inherits@Muzzle: ^WithCannonMuzzle
+	icon:
+		Filename: ra2|modern-factions/icons/r2haiwang.png
+
+r2haiying:
+	Inherits@MC: ^MindControllable
+	Inherits@Muzzle: ^WithCannonMuzzle
+	icon:
+		Filename: ra2|modern-factions/icons/r2haiying.png
+
+r2kunlun:
+	Inherits@MC: ^MindControllable
+	Inherits@Muzzle: ^WithCannonMuzzle
+	icon:
+		Filename: ra2|modern-factions/icons/r2kunlun.png
+
+r2jiaolong:
+	Inherits@MC: ^MindControllable
+	Inherits@Muzzle: ^WithCannonMuzzle
+	icon:
+		Filename: ra2|modern-factions/icons/r2jiaolong.png

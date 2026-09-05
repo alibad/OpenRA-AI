@@ -1,0 +1,72 @@
+# Replace combat roles only for China. Preserve every original country gate.
+e1:
+	Buildable:
+		Prerequisites: ~gapile, ~!faction.china
+
+jumpjet:
+	Buildable:
+		Prerequisites: ~gapile, radar, ~!faction.china
+
+tany:
+	Buildable:
+		Prerequisites: gatech, ~gapile, ~!faction.china
+
+cleg:
+	Buildable:
+		Prerequisites: ~gapile, gatech, ~!faction.china
+
+mtnk:
+	Buildable:
+		Prerequisites: ~gaweap, ~!faction.china
+
+fv:
+	Buildable:
+		Prerequisites: ~gaweap, ~!faction.china
+
+sref:
+	Buildable:
+		Prerequisites: gatech, ~gaweap, ~!faction.china
+
+mgtk:
+	Buildable:
+		Prerequisites: gatech, ~gaweap, ~!faction.china
+
+shad:
+	Buildable:
+		Prerequisites: ~gaweap, ~!faction.china
+
+orca:
+	Buildable:
+		Prerequisites: ~aircraft.harrier, ~!faction.china
+
+dest:
+	Buildable:
+		Prerequisites: ~gayard, ~!faction.china
+
+aegis:
+	Buildable:
+		Prerequisites: radar, ~gayard, ~!faction.china
+
+dlph:
+	Buildable:
+		Prerequisites: gatech, ~gayard, ~!faction.china
+
+carrier:
+	Buildable:
+		Prerequisites: gatech, ~gayard, ~!faction.china
+
+gapill:
+	Buildable:
+		Prerequisites: barracks, ~structures.allies, ~!faction.china
+
+nasam:
+	Buildable:
+		Prerequisites: barracks, ~structures.allies, ~!faction.china
+
+atesla:
+	Buildable:
+		Prerequisites: power, radar, ~structures.allies, ~!faction.china
+
+lcrf:
+	Buildable:
+		Prerequisites: ~gayard, ~!faction.china

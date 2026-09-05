@@ -29,10 +29,13 @@ Player:
 			r2hisar: 6
 			r2siper: 4
 			r2boran: 4
-		DefenseTypes: gapill, nasam, gtgcan, atesla, naflak, tesla, nalasr, r2hisar, r2siper, r2boran
+		AdditionalDefenseTypes:
+			turkey: r2hisar, r2siper, r2boran
 	SquadManagerBotModule@normal:
-		AirUnitsTypes: jumpjet, shad, zep, orca, beag, r2cloud, r2mohajer, r2kuzgun, r2turna, r2sahin
-		NavalUnitsTypes: dest, aegis, dlph, carrier, sub, hyd, sqd, r2poyraz, r2ege, r2marmara
+		AdditionalAirUnitsTypes:
+			turkey: r2kuzgun, r2turna, r2sahin
+		AdditionalNavalUnitsTypes:
+			turkey: r2poyraz, r2ege, r2marmara
 	UnitBuilderBotModule@medium:
 		UnitsToBuild:
 			r2trrifle: 65
@@ -63,10 +66,13 @@ Player:
 			r2hisar: 6
 			r2siper: 4
 			r2boran: 4
-		DefenseTypes: gapill, nasam, gtgcan, atesla, naflak, tesla, nalasr, r2hisar, r2siper, r2boran
+		AdditionalDefenseTypes:
+			turkey: r2hisar, r2siper, r2boran
 	SquadManagerBotModule@medium:
-		AirUnitsTypes: jumpjet, shad, zep, orca, beag, r2cloud, r2mohajer, r2kuzgun, r2turna, r2sahin
-		NavalUnitsTypes: dest, aegis, dlph, carrier, sub, hyd, sqd, r2poyraz, r2ege, r2marmara
+		AdditionalAirUnitsTypes:
+			turkey: r2kuzgun, r2turna, r2sahin
+		AdditionalNavalUnitsTypes:
+			turkey: r2poyraz, r2ege, r2marmara
 	UnitBuilderBotModule@rush:
 		UnitsToBuild:
 			r2trrifle: 65
@@ -97,10 +103,13 @@ Player:
 			r2hisar: 6
 			r2siper: 4
 			r2boran: 4
-		DefenseTypes: gapill, nasam, gtgcan, atesla, naflak, tesla, nalasr, r2hisar, r2siper, r2boran
+		AdditionalDefenseTypes:
+			turkey: r2hisar, r2siper, r2boran
 	SquadManagerBotModule@rush:
-		AirUnitsTypes: jumpjet, shad, zep, orca, beag, r2cloud, r2mohajer, r2kuzgun, r2turna, r2sahin
-		NavalUnitsTypes: dest, aegis, dlph, carrier, sub, hyd, sqd, r2poyraz, r2ege, r2marmara
+		AdditionalAirUnitsTypes:
+			turkey: r2kuzgun, r2turna, r2sahin
+		AdditionalNavalUnitsTypes:
+			turkey: r2poyraz, r2ege, r2marmara
 	UnitBuilderBotModule@turtle:
 		UnitsToBuild:
 			r2trrifle: 65
@@ -131,10 +140,13 @@ Player:
 			r2hisar: 6
 			r2siper: 4
 			r2boran: 4
-		DefenseTypes: gapill, nasam, gtgcan, atesla, naflak, tesla, nalasr, r2hisar, r2siper, r2boran
+		AdditionalDefenseTypes:
+			turkey: r2hisar, r2siper, r2boran
 	SquadManagerBotModule@turtle:
-		AirUnitsTypes: jumpjet, shad, zep, orca, beag, r2cloud, r2mohajer, r2kuzgun, r2turna, r2sahin
-		NavalUnitsTypes: dest, aegis, dlph, carrier, sub, hyd, sqd, r2poyraz, r2ege, r2marmara
+		AdditionalAirUnitsTypes:
+			turkey: r2kuzgun, r2turna, r2sahin
+		AdditionalNavalUnitsTypes:
+			turkey: r2poyraz, r2ege, r2marmara
 	UnitBuilderBotModule@naval:
 		UnitsToBuild:
 			r2trrifle: 65
@@ -165,7 +177,10 @@ Player:
 			r2hisar: 6
 			r2siper: 4
 			r2boran: 4
-		DefenseTypes: gapill, nasam, gtgcan, atesla, naflak, tesla, nalasr, r2hisar, r2siper, r2boran
+		AdditionalDefenseTypes:
+			turkey: r2hisar, r2siper, r2boran
 	SquadManagerBotModule@naval:
-		AirUnitsTypes: jumpjet, shad, zep, orca, beag, r2cloud, r2mohajer, r2kuzgun, r2turna, r2sahin
-		NavalUnitsTypes: dest, aegis, dlph, carrier, sub, hyd, sqd, r2poyraz, r2ege, r2marmara
+		AdditionalAirUnitsTypes:
+			turkey: r2kuzgun, r2turna, r2sahin
+		AdditionalNavalUnitsTypes:
+			turkey: r2poyraz, r2ege, r2marmara

@@ -1,0 +1,79 @@
+r2trrifle:
+	StrategicRole:
+		Roles: line-infantry
+		Domain: ground
+
+r2trat:
+	StrategicRole:
+		Roles: anti-armor
+		Domain: ground
+
+r2greywolf:
+	StrategicRole:
+		Roles: line-infantry
+		Domain: ground
+
+r2trdroneop:
+	StrategicRole:
+		Roles: support
+		Domain: ground
+
+r2sancak:
+	StrategicRole:
+		Roles: support
+		Domain: ground
+
+r2bozkir:
+	StrategicRole:
+		Roles: main-battle-tank
+		Domain: ground
+
+r2yildirim:
+	StrategicRole:
+		Roles: artillery
+		Domain: ground
+
+r2gokkalkan:
+	StrategicRole:
+		Roles: anti-air
+		Domain: ground
+
+r2aras:
+	StrategicRole:
+		Roles: transport
+		Domain: ground
+
+r2deniz:
+	StrategicRole:
+		Roles: transport
+		Domain: ground
+
+r2turna:
+	StrategicRole:
+		Roles: strike-aircraft
+		Domain: air
+
+r2sahin:
+	StrategicRole:
+		Roles: interceptor
+		Domain: air
+
+r2kuzgun:
+	StrategicRole:
+		Roles: strike-aircraft
+		Domain: air
+
+r2poyraz:
+	StrategicRole:
+		Roles: naval-screen
+		Domain: naval
+
+r2marmara:
+	StrategicRole:
+		Roles: naval-screen
+		Domain: naval
+
+r2ege:
+	StrategicRole:
+		Roles: anti-submarine
+		Domain: naval

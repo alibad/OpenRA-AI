@@ -1,0 +1,59 @@
+R2IraninfantryVoice:
+	Inherits: ^InfantryDeath
+	DefaultVariant: .wav
+	Voices:
+		Select: ra2|modern-factions/audio/iran-inf-select-fa, ra2|modern-factions/audio/iran-inf-select-en
+		Move: ra2|modern-factions/audio/iran-inf-move-fa, ra2|modern-factions/audio/iran-inf-move-en
+		Attack: ra2|modern-factions/audio/iran-inf-attack-fa, ra2|modern-factions/audio/iran-inf-attack-en
+		Action: ra2|modern-factions/audio/iran-inf-action-fa, ra2|modern-factions/audio/iran-inf-action-en
+		Die: igidia, igidib, igidic
+
+R2IrandroneVoice:
+	Inherits: ^InfantryDeath
+	DefaultVariant: .wav
+	Voices:
+		Select: ra2|modern-factions/audio/iran-drone-select-fa, ra2|modern-factions/audio/iran-drone-select-en
+		Move: ra2|modern-factions/audio/iran-drone-move-fa, ra2|modern-factions/audio/iran-drone-move-en
+		Attack: ra2|modern-factions/audio/iran-drone-attack-fa, ra2|modern-factions/audio/iran-drone-attack-en
+		Action: ra2|modern-factions/audio/iran-drone-action-fa, ra2|modern-factions/audio/iran-drone-action-en
+		Die: igidia, igidib, igidic
+
+R2IranshadowVoice:
+	Inherits: ^InfantryDeath
+	DefaultVariant: .wav
+	Voices:
+		Select: ra2|modern-factions/audio/shadow-select-fa, ra2|modern-factions/audio/shadow-select-en
+		Move: ra2|modern-factions/audio/shadow-move-fa, ra2|modern-factions/audio/shadow-move-en
+		Attack: ra2|modern-factions/audio/shadow-attack-fa, ra2|modern-factions/audio/shadow-attack-en
+		Action: ra2|modern-factions/audio/shadow-action-fa, ra2|modern-factions/audio/shadow-action-en
+		Die: igidia, igidib, igidic
+
+R2IranvehicleVoice:
+	Inherits: ^InfantryDeath
+	DefaultVariant: .wav
+	Voices:
+		Select: ra2|modern-factions/audio/iran-veh-select-fa, ra2|modern-factions/audio/iran-veh-select-en
+		Move: ra2|modern-factions/audio/iran-veh-move-fa, ra2|modern-factions/audio/iran-veh-move-en
+		Attack: ra2|modern-factions/audio/iran-veh-attack-fa, ra2|modern-factions/audio/iran-veh-attack-en
+		Action: ra2|modern-factions/audio/iran-veh-action-fa, ra2|modern-factions/audio/iran-veh-action-en
+		Die: igidia, igidib, igidic
+
+R2IranairVoice:
+	Inherits: ^InfantryDeath
+	DefaultVariant: .wav
+	Voices:
+		Select: ra2|modern-factions/audio/iran-air-select-fa, ra2|modern-factions/audio/iran-air-select-en
+		Move: ra2|modern-factions/audio/iran-air-move-fa, ra2|modern-factions/audio/iran-air-move-en
+		Attack: ra2|modern-factions/audio/iran-air-attack-fa, ra2|modern-factions/audio/iran-air-attack-en
+		Action: ra2|modern-factions/audio/iran-air-action-fa, ra2|modern-factions/audio/iran-air-action-en
+		Die: igidia, igidib, igidic
+
+R2IrannavalVoice:
+	Inherits: ^InfantryDeath
+	DefaultVariant: .wav
+	Voices:
+		Select: ra2|modern-factions/audio/iran-naval-select-fa, ra2|modern-factions/audio/iran-naval-select-en
+		Move: ra2|modern-factions/audio/iran-naval-move-fa, ra2|modern-factions/audio/iran-naval-move-en
+		Attack: ra2|modern-factions/audio/iran-naval-attack-fa, ra2|modern-factions/audio/iran-naval-attack-en
+		Action: ra2|modern-factions/audio/iran-naval-action-fa, ra2|modern-factions/audio/iran-naval-action-en
+		Die: igidia, igidib, igidic

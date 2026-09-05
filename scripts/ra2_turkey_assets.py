@@ -9,6 +9,7 @@ from __future__ import annotations
 import hashlib
 import json
 import math
+from dataclasses import replace
 from pathlib import Path
 import struct
 from functools import lru_cache
@@ -51,10 +52,45 @@ def rotor():
     return mesh
 
 
+def naval_hull(name):
+    """Order the original deck perimeter for native triangle/normal sampling.
+
+    The classic painter tolerated the bow/left/right vertex ordering, but VXL
+    triangulation crosses the deck and points its normal downward. Preserve all
+    five authored vertices and materials, changing only their perimeter order.
+    Leave the shared classic-art source untouched.
+    """
+    mesh=tr._ship_hull(name)
+    deck=mesh.faces[5]
+    corrected=Mesh()
+    corrected.polygon(tuple(deck.vertices[i] for i in (0,2,3,4,1)),deck.color,outline=deck.outline)
+    mesh.faces[5]=corrected.faces[0]
+    return mesh
+
+
+def sahin_airframe():
+    """Keep the authored jet shape with outward fuselage/upward wing normals."""
+    mesh=tr._airframe("sahinx")
+    faces=[]
+    for face in mesh.faces:
+        on_fuselage=all(abs(abs(y+.15)-2.6)<1e-6 and abs(math.hypot(x,z-.55)-.30)<1e-6
+                        for x,y,z in face.vertices)
+        center=tuple(sum(v[i] for v in face.vertices)/len(face.vertices)-(0,-.15,.55)[i]
+                     for i in range(3))
+        inward_fuselage=on_fuselage and sum(a*b for a,b in zip(face.normal,center))<0
+        downward_wing=(len(face.vertices) in (5,7) and face.normal[2]<-.5
+                       and max(v[2] for v in face.vertices)-min(v[2] for v in face.vertices)<.2)
+        if inward_fuselage or downward_wing:
+            face=replace(face,normal=tuple(-axis for axis in face.normal))
+        faces.append(face)
+    mesh.faces=faces
+    return mesh
+
+
 def extra_models():
     ships = {}
     for name in ("marmara", "ege", "poyraz"):
-        body = tr._ship_hull(name)
+        body = naval_hull(name)
         body.box(-.40, .40, .80, 1.12, 1.43 if name != "poyraz" else 1.09,
                  1.49 if name != "poyraz" else 1.15, tr.RED)
         ships["r2" + name] = (body, tr._ship_turret(name))
@@ -63,7 +99,7 @@ def extra_models():
         "r2gokkalkan": (tr._wheeled_hull(4), tr._turret("gokkalkan")),
         "r2deniz": (tr._wheeled_hull(4, amphibious=True), tr._turret("remote")),
         "r2turna": (tr._airframe("turnaah"), rotor()),
-        "r2sahin": (tr._airframe("sahinx"),),
+        "r2sahin": (sahin_airframe(),),
         **ships,
     }
 

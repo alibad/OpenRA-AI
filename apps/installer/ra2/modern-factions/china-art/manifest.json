@@ -1,0 +1,58 @@
+{
+  "r2cnrifle": {
+    "frames": 112,
+    "size": [
+      48,
+      48
+    ],
+    "sha256": "4a520c7366077cf39344e668836de9c2d93303cef99026f4c387ae0bee813783"
+  },
+  "r2cnportable": {
+    "frames": 112,
+    "size": [
+      48,
+      48
+    ],
+    "sha256": "c9b1537bc45f5093bf6edfe126e0b7d162e6a4dd22afd7736ced7fad6de02831"
+  },
+  "r2cnnetwork": {
+    "frames": 112,
+    "size": [
+      48,
+      48
+    ],
+    "sha256": "9955dc971aa6a579f74fc0eab8664c3cf2b38b9409bb875a251e78226b5f507a"
+  },
+  "r2redspear": {
+    "frames": 112,
+    "size": [
+      48,
+      48
+    ],
+    "sha256": "e22fbf290ce2dbbecd9dcc805e083b4ee1f78dbbfdd11d5ddb6d8e83ce269021"
+  },
+  "r2bastion": {
+    "frames": 41,
+    "size": [
+      96,
+      96
+    ],
+    "sha256": "140fc6659ae0a59868d79d3eb109d14b54c9ac27f344a2a0256b1e3fbc939702"
+  },
+  "r2skyshield": {
+    "frames": 41,
+    "size": [
+      96,
+      96
+    ],
+    "sha256": "5a159f75fc86b8ddfb084a5b542091451ca8699abf6b4de2d6a3da33709b4e1b"
+  },
+  "r2spectrum": {
+    "frames": 41,
+    "size": [
+      96,
+      96
+    ],
+    "sha256": "32154039ec01e2b044c760933f187952c889831ddd29b17f21b5df1ff1bb0379"
+  }
+}

@@ -22,6 +22,27 @@ FLAG_SIZE = (30, 15)
 MODERN_FLAGS = (("china", 192, 128), ("iran", 226, 33), ("turkey", 226, 113))
 
 
+def combined_replacements(modern: Path) -> str:
+    prerequisites = {}
+    for country in ("china", "iran", "turkey"):
+        actor = None
+        source = modern / (country + "-replacements.yaml")
+        for line in source.read_text().splitlines():
+            if line and not line[0].isspace() and not line.startswith("#"):
+                actor = line.removesuffix(":")
+            elif line.startswith("\t\tPrerequisites: "):
+                items = line.split(": ", 1)[1].split(", ")
+                base = [item for item in items if not item.startswith("~!faction.")]
+                previous = prerequisites.setdefault(actor, [base, []])
+                if previous[0] != base:
+                    raise ValueError(f"Inconsistent original prerequisites for {actor}: {previous[0]} vs {base}")
+                previous[1].append("~!faction." + country)
+    return "\n".join(
+        f"{actor}:\n\tBuildable:\n\t\tPrerequisites: {', '.join(base + exclusions)}\n"
+        for actor, (base, exclusions) in sorted(prerequisites.items())
+    )
+
+
 def extend_flag_atlas(original: Image.Image, flags: Image.Image) -> tuple[Image.Image, str]:
     """Keep flag pixels inside the native lobby's 30x15 slot.
 
@@ -107,11 +128,15 @@ def integrate(source: Path, engine: Path, version: str) -> None:
     (mod / "rules/ai.yaml").write_text("Player:\n" + "".join(profiles))
     modern = ROOT / "apps/installer/ra2/modern-factions"
     shutil.copytree(modern, mod / "modern-factions")
-    # Reuse original bilingual Turkey performances, not proprietary RA1 audio.
-    turkey_audio = mod / "modern-factions/audio"
-    turkey_audio.mkdir()
-    for voice in (engine / "mods/ra/bits").glob("tr-*.wav"):
-        shutil.copy2(voice, turkey_audio / voice.name)
+    (mod / "modern-factions/shared-replacements.yaml").write_text(combined_replacements(modern))
+    shutil.copy2(engine / "mods/ra/uibits/experience-previews/unit-composition-doctrine-ai.png",
+                 mod / "modern-factions/previews/combined-arms-ai.png")
+    # Reuse original bilingual faction performances, not proprietary RA1 audio.
+    faction_audio = mod / "modern-factions/audio"
+    faction_audio.mkdir()
+    for pattern in ("tr-*.wav", "rcn-*.wav", "china-role-*.wav", "china-network-*.wav", "iran-*.wav", "shadow-*.wav"):
+        for voice in (engine / "mods/ra/bits").glob(pattern):
+            shutil.copy2(voice, faction_audio / voice.name)
     shutil.copy2(modern / "experiences.yaml", mod / "experiences.yaml")
     # Upstream carrier declares RevealsShroud twice. It becomes an ambiguous
     # merge when the Turkey pack adds its faction exclusion to that actor.
@@ -120,8 +145,8 @@ def integrate(source: Path, engine: Path, version: str) -> None:
                  "\tMobile:\n\t\tTurnSpeed: 4\n\t\tSpeed: 60\n\tAttackFrontal:")
     # Model sequences are manifest-level data. Unused models are harmless when
     # a pack is off; gameplay rules/weapons/sprite sequences remain conditional.
-    replace_once(manifest, "ModelSequences:\n", "ModelSequences:\n\tra2|modern-factions/voxels.yaml\n\tra2|modern-factions/turkey-voxels.yaml\n")
-    replace_once(manifest, "FluentMessages:\n", "FluentMessages:\n\tra2|modern-factions/messages.ftl\n\tra2|modern-factions/turkey-messages.ftl\n")
+    replace_once(manifest, "ModelSequences:\n", "ModelSequences:\n\tra2|modern-factions/voxels.yaml\n\tra2|modern-factions/turkey-voxels.yaml\n\tra2|modern-factions/china-voxels.yaml\n\tra2|modern-factions/iran-voxels.yaml\n")
+    replace_once(manifest, "FluentMessages:\n", "FluentMessages:\n\tra2|modern-factions/messages.ftl\n\tra2|modern-factions/turkey-messages.ftl\n\tra2|modern-factions/china-messages.ftl\n\tra2|modern-factions/iran-messages.ftl\n")
     metrics = mod / "metrics.yaml"
     metrics.write_text(metrics.read_text().replace("Metrics:\n", "Metrics:\n\tFactionSuffix-china: allies\n\tFactionSuffix-turkey: allies\n\tFactionSuffix-iran: soviets\n", 1))
     # Extend the upstream UI atlas at build time, reusing our existing country

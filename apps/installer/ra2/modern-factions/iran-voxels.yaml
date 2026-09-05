@@ -1,0 +1,21 @@
+r2coast:
+	idle: ra2|modern-factions/voxels/r2coast
+	turret: ra2|modern-factions/voxels/r2coasttur
+
+r2toufan:
+	idle: ra2|modern-factions/voxels/r2toufan
+	rotor: ra2|modern-factions/voxels/r2toufantur
+	slow-rotor: ra2|modern-factions/voxels/r2toufantur
+
+r2azar:
+	idle: ra2|modern-factions/voxels/r2azar
+
+r2loiter:
+	idle: ra2|modern-factions/voxels/r2loiter
+
+r2peykaap:
+	idle: ra2|modern-factions/voxels/r2peykaap
+	turret: ra2|modern-factions/voxels/r2peykaaptur
+
+r2ghadir:
+	idle: ra2|modern-factions/voxels/r2ghadir

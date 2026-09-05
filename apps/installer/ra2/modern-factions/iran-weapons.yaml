@@ -1,0 +1,220 @@
+R2BasijRifle:
+	Inherits: M1Carbine
+	Range: 4c512
+	ReloadDelay: 25
+	Warhead@1Dam: SpreadDamage
+		Damage: 12
+
+R2ToophanMissile:
+	Inherits: Maverick
+	Range: 7c0
+	MinRange: 2c0
+	ReloadDelay: 125
+	Projectile: Missile
+		Speed: 230
+		RangeLimit: 10c0
+		CruiseAltitude: 512
+		MinimumLaunchAngle: 0
+		MaximumLaunchAngle: 32
+	Warhead@1Dam: SpreadDamage
+		Damage: 95
+		Versus:
+			None: 10
+			Flak: 20
+			Plate: 20
+			Light: 100
+			Medium: 100
+			Heavy: 110
+			Wood: 35
+			Steel: 40
+			Concrete: 30
+
+R2ControllerCarbine:
+	Inherits: R2BasijRifle
+	Range: 5c0
+	Warhead@1Dam: SpreadDamage
+		Damage: 10
+
+R2ShadowSMG:
+	Inherits: M60
+	Range: 6c0
+	ReloadDelay: 30
+	Burst: 3
+	BurstDelays: 3
+	Warhead@1Dam: SpreadDamage
+		Damage: 18
+
+R2ShadowCharge:
+	Inherits: 120mm
+	Range: 1c512
+	ReloadDelay: 180
+	ValidTargets: Structure
+	Projectile: Bullet
+		Speed: 1024
+	Warhead@1Dam: SpreadDamage
+		Damage: 300
+		ValidTargets: Structure
+		Versus:
+			Wood: 100
+			Steel: 100
+			Concrete: 100
+
+R2IranCoastalMissile:
+	Inherits: Maverick
+	Range: 13c0
+	MinRange: 4c0
+	ReloadDelay: 210
+	Burst: 2
+	BurstDelays: 12
+	ValidTargets: Water, Structure
+	Projectile: Missile
+		Speed: 300
+		RangeLimit: 17c0
+		CruiseAltitude: 256
+		MinimumLaunchAngle: 0
+		MaximumLaunchAngle: 32
+	Warhead@1Dam: SpreadDamage
+		Damage: 110
+		ValidTargets: Water, Structure
+		Versus:
+			Light: 100
+			Medium: 100
+			Heavy: 100
+			Wood: 75
+			Steel: 75
+			Concrete: 60
+
+R2ToufanRocket:
+	Inherits: Maverick
+	Range: 6c0
+	ReloadDelay: 170
+	Burst: 6
+	BurstDelays: 6
+	Warhead@1Dam: SpreadDamage
+		Damage: 16
+		Spread: 341
+		Versus:
+			None: 100
+			Flak: 100
+			Plate: 100
+			Light: 75
+			Medium: 50
+			Heavy: 25
+			Wood: 50
+			Steel: 25
+			Concrete: 20
+
+R2AzarStrike:
+	Inherits: Maverick
+	Range: 7c0
+	ReloadDelay: 190
+	Burst: 2
+	BurstDelays: 8
+	Projectile: Missile
+		Speed: 450
+		RangeLimit: 13c0
+	Warhead@1Dam: SpreadDamage
+		Damage: 80
+		Versus:
+			None: 30
+			Flak: 30
+			Plate: 30
+			Light: 80
+			Medium: 100
+			Heavy: 100
+			Wood: 110
+			Steel: 110
+			Concrete: 100
+
+R2LoiterCharge:
+	Inherits: Maverick
+	Range: 1c512
+	ReloadDelay: 100
+	Projectile: Bullet
+		Speed: 2048
+	Warhead@1Dam: SpreadDamage
+		Damage: 200
+		Spread: 256
+		Versus:
+			None: 20
+			Flak: 20
+			Plate: 20
+			Light: 100
+			Medium: 100
+			Heavy: 110
+			Wood: 80
+			Steel: 80
+			Concrete: 65
+
+R2PeykaapMissile:
+	Inherits: Maverick
+	Range: 8c0
+	ReloadDelay: 125
+	Burst: 2
+	BurstDelays: 10
+	Projectile: Missile
+		CruiseAltitude: 256
+		MinimumLaunchAngle: 0
+		MaximumLaunchAngle: 32
+		RangeLimit: 12c0
+	Warhead@1Dam: SpreadDamage
+		Damage: 40
+
+R2PeykaapAA:
+	Inherits: R2AirDefense
+	Range: 6c0
+	ReloadDelay: 110
+	Warhead@1Dam: SpreadDamage
+		Damage: 30
+
+R2GhadirTorpedo:
+	Inherits: SubTorpedo
+	Range: 8c0
+	ReloadDelay: 150
+	Burst: 2
+	BurstDelays: 12
+	Warhead@1Dam: SpreadDamage
+		Damage: 65
+
+R2BunkerGun:
+	Inherits: R2BasijRifle
+	Range: 5c512
+	ReloadDelay: 18
+	Warhead@1Dam: SpreadDamage
+		Damage: 20
+
+R2RaadSiteMissile:
+	Inherits: R2AirDefense
+	Range: 11c0
+	ReloadDelay: 150
+	Burst: 3
+	BurstDelays: 8
+	Projectile: Missile
+		RangeLimit: 15c0
+	Warhead@1Dam: SpreadDamage
+		Damage: 40
+
+R2IranFixedMissile:
+	Inherits: Maverick
+	Range: 11c0
+	MinRange: 3c0
+	ReloadDelay: 160
+	Burst: 2
+	BurstDelays: 10
+	Projectile: Missile
+		RangeLimit: 15c0
+		CruiseAltitude: 512
+		MinimumLaunchAngle: 0
+		MaximumLaunchAngle: 32
+	Warhead@1Dam: SpreadDamage
+		Damage: 70
+		Versus:
+			None: 10
+			Flak: 20
+			Plate: 20
+			Light: 100
+			Medium: 100
+			Heavy: 100
+			Wood: 60
+			Steel: 60
+			Concrete: 50

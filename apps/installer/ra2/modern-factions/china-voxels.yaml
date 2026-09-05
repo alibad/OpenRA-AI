@@ -1,0 +1,31 @@
+r2zbd:
+	idle: ra2|modern-factions/voxels/r2zbd
+	turret: ra2|modern-factions/voxels/r2zbdtur
+
+r2phl:
+	idle: ra2|modern-factions/voxels/r2phl
+
+r2skyspear:
+	idle: ra2|modern-factions/voxels/r2skyspear
+
+r2crane:
+	idle: ra2|modern-factions/voxels/r2crane
+	rotor: ra2|modern-factions/voxels/r2cranetur
+	slow-rotor: ra2|modern-factions/voxels/r2cranetur
+
+r2luyang:
+	idle: ra2|modern-factions/voxels/r2luyang
+	turret: ra2|modern-factions/voxels/r2luyangtur
+
+r2haiwang:
+	idle: ra2|modern-factions/voxels/r2haiwang
+
+r2haiying:
+	idle: ra2|modern-factions/voxels/r2haiying
+	turret: ra2|modern-factions/voxels/r2haiyingtur
+
+r2kunlun:
+	idle: ra2|modern-factions/voxels/r2kunlun
+
+r2jiaolong:
+	idle: ra2|modern-factions/voxels/r2jiaolong

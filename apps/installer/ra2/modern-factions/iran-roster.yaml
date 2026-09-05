@@ -1,0 +1,445 @@
+# Iran wins by screening fragile salvo platforms and contesting approaches.
+^Palettes:
+	PaletteFromFile@iran:
+		Name: iran-art
+		Filename: ra2|modern-factions/iran-art/iran.pal
+	PlayerColorPalette@iran:
+		BasePalette: iran-art
+		BaseName: iranplayer
+		RemapIndex: 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31
+
+^R2IranInfantry:
+	Inherits: ^Infantry
+	Inherits@AUTOTARGET: ^AutoTargetGroundAssaultMove
+	Inherits@MC: ^MindControllable
+	Buildable:
+		Queue: Infantry
+	UpdatesPlayerStatistics:
+		AddToArmyValue: true
+	Selectable:
+		Bounds: 600, 1500, 0, -530
+	RenderSprites:
+		PlayerPalette: iranplayer
+	-TakeCover:
+	-WithDeathAnimation@effect:
+	WithDeathAnimation@normal:
+		DeathSequencePalette: iranplayer
+		DeathPaletteIsPlayerPalette: true
+	AttackFrontal:
+		Voice: Attack
+		FacingTolerance: 32
+	Armament:
+		Weapon: R2BasijRifle
+	ProducibleWithLevel:
+		Prerequisites: barracks.infiltrated
+	RevealsShroud:
+		Range: 5c0
+
+r2basij:
+	Inherits: ^R2IranInfantry
+	Tooltip:
+		Name: ra2-r2basij-name
+	Buildable:
+		Prerequisites: ~faction.iran, nahand
+		BuildPaletteOrder: 10
+		Description: ra2-r2basij-description
+	Valued:
+		Cost: 100
+	Health:
+		HP: 105
+	Mobile:
+		Speed: 65
+
+r2toophan:
+	Inherits: ^R2IranInfantry
+	Tooltip:
+		Name: ra2-r2toophan-name
+	Buildable:
+		Prerequisites: ~faction.iran, nahand
+		BuildPaletteOrder: 30
+		Description: ra2-r2toophan-description
+	Valued:
+		Cost: 450
+	Health:
+		HP: 85
+	Mobile:
+		Speed: 48
+	Armament:
+		Weapon: R2ToophanMissile
+	GrantConditionOnMovement:
+		Condition: moving
+	ReloadDelayMultiplier@emplaced:
+		Modifier: 85
+		RequiresCondition: !moving
+	Cloak:
+		InitialDelay: 100
+		CloakDelay: 100
+		UncloakOn: Attack, Move, Damage
+		DetectionTypes: Cloak
+		IsPlayerPalette: true
+	RevealsShroud:
+		Range: 7c0
+
+r2dronecontrol:
+	Inherits: ^R2IranInfantry
+	Tooltip:
+		Name: ra2-r2dronecontrol-name
+	Buildable:
+		Prerequisites: ~faction.iran, nahand, radar
+		BuildPaletteOrder: 70
+		Description: ra2-r2dronecontrol-description
+	Valued:
+		Cost: 550
+	Health:
+		HP: 100
+	Armament:
+		Weapon: R2ControllerCarbine
+	RevealsShroud:
+		Range: 10c0
+	DetectCloaked:
+		DetectionTypes: Cloak, Underwater
+		Range: 6c0
+	RenderDetectionCircle:
+	ProximityExternalCondition@drone-control:
+		Range: 7c0
+		Condition: r2-iran-guidance
+		ValidRelationships: Ally
+	WithRangeCircle:
+		Range: 7c0
+
+r2shadowone:
+	Inherits: ^R2IranInfantry
+	Tooltip:
+		Name: ra2-r2shadowone-name
+	Buildable:
+		Prerequisites: ~faction.iran, nahand, natech
+		BuildPaletteOrder: 140
+		BuildLimit: 1
+		Description: ra2-r2shadowone-description
+	Valued:
+		Cost: 1900
+	Health:
+		HP: 180
+	Mobile:
+		Speed: 80
+	Armament:
+		Weapon: R2ShadowSMG
+	Armament@SABOTAGE:
+		Name: secondary
+		Weapon: R2ShadowCharge
+	WithInfantryBody:
+		DefaultAttackSequence: shoot
+	Cloak:
+		InitialDelay: 100
+		CloakDelay: 100
+		UncloakOn: Attack, Move, Damage
+		DetectionTypes: Cloak
+		IsPlayerPalette: true
+	RevealsShroud:
+		Range: 8c0
+
+r2coast:
+	Inherits: ^R2ModernVehicle
+	Tooltip:
+		Name: ra2-r2coast-name
+	Buildable:
+		Prerequisites: ~faction.iran, naweap, natech
+		BuildPaletteOrder: 65
+		Description: ra2-r2coast-description
+	Valued:
+		Cost: 1500
+	Health:
+		HP: 220
+	Armor:
+		Type: Light
+	Mobile:
+		Speed: 100
+	Armament:
+		Weapon: R2IranCoastalMissile
+	WithRangeCircle:
+		Range: 13c0
+
+^R2IranGuidedAircraft:
+	Inherits: ^R2ModernDrone
+	ExternalCondition@guidance:
+		Condition: r2-iran-guidance
+	ReloadDelayMultiplier@guidance:
+		Modifier: 80
+		RequiresCondition: r2-iran-guidance
+	WithColoredOverlay@guidance:
+		Color: 60D8C020
+		RequiresCondition: r2-iran-guidance
+
+r2mohajer:
+	ExternalCondition@guidance:
+		Condition: r2-iran-guidance
+	ReloadDelayMultiplier@guidance:
+		Modifier: 80
+		RequiresCondition: r2-iran-guidance
+
+r2toufan:
+	Inherits: ^R2IranGuidedAircraft
+	Tooltip:
+		Name: ra2-r2toufan-name
+	Buildable:
+		Prerequisites: ~faction.iran, naweap, radar
+		BuildPaletteOrder: 95
+		Description: ra2-r2toufan-description
+	Valued:
+		Cost: 1450
+	Health:
+		HP: 220
+	Aircraft:
+		Speed: 145
+	Armament:
+		Weapon: R2ToufanRocket
+	WithVoxelHelicopterBody:
+		Sequence: rotor
+		TickRate: 1
+	SpawnActorOnDeath:
+		Actor: r2toufanhusk
+
+r2toufanhusk:
+	Inherits: ^R2DroneHusk
+	RenderVoxels:
+		Image: r2toufan
+
+# Launches from the native Soviet war factory, like the existing Kirov.
+# No unavailable Soviet airfield or ammunition/rearming promise is introduced.
+r2azar:
+	Inherits: ^R2IranGuidedAircraft
+	Tooltip:
+		Name: ra2-r2azar-name
+	Buildable:
+		Prerequisites: ~faction.iran, naweap, natech
+		BuildPaletteOrder: 120
+		Description: ra2-r2azar-description
+	Valued:
+		Cost: 2050
+	Health:
+		HP: 190
+	Aircraft:
+		Speed: 240
+		TurnSpeed: 24
+		CanHover: false
+		CanSlide: false
+		IdleBehavior: None
+	AttackAircraft:
+		AttackType: Strafe
+	Armament:
+		Weapon: R2AzarStrike
+	SpawnActorOnDeath:
+		Actor: r2azarhusk
+
+r2azarhusk:
+	Inherits: ^R2DroneHusk
+	RenderVoxels:
+		Image: r2azar
+
+r2loiter:
+	Inherits: ^R2ModernDrone
+	Tooltip:
+		Name: ra2-r2loiter-name
+	Buildable:
+		Prerequisites: ~faction.iran, naweap, radar
+		BuildPaletteOrder: 85
+		Description: ra2-r2loiter-description
+	Valued:
+		Cost: 500
+	Health:
+		HP: 70
+	Aircraft:
+		Speed: 205
+		CruiseAltitude: 1536
+	Armament:
+		Weapon: R2LoiterCharge
+	GrantConditionOnAttack:
+		Condition: expended
+	KillsSelf:
+		RequiresCondition: expended
+		RemoveInstead: true
+	SpawnActorOnDeath:
+		Actor: r2loiterhusk
+
+r2loiterhusk:
+	Inherits: ^R2DroneHusk
+	RenderVoxels:
+		Image: r2loiter
+
+r2peykaap:
+	Inherits: ^Ship
+	Inherits@AUTOTARGET: ^AutoTargetAllAssaultMove
+	Inherits@MC: ^MindControllable
+	Buildable:
+		Queue: Ship
+		Prerequisites: ~faction.iran, nayard
+		BuildPaletteOrder: 20
+		Description: ra2-r2peykaap-description
+	Tooltip:
+		Name: ra2-r2peykaap-name
+		GenericName: ra2-modern-ship
+	Valued:
+		Cost: 750
+	Health:
+		HP: 260
+	Armor:
+		Type: Light
+	Mobile:
+		Speed: 140
+		TurnSpeed: 32
+	UpdatesPlayerStatistics:
+		AddToArmyValue: true
+	RenderSprites:
+	RenderVoxels:
+		PlayerPalette: modernplayer
+		Scale: 22
+		LightAmbientColor: -0.3,-0.3,-0.3
+		LightDiffuseColor: 0.75,0.75,0.75
+	WithVoxelBody:
+	WithVoxelTurret:
+	Turreted:
+		TurnSpeed: 32
+	AttackTurreted:
+		Voice: Attack
+	Armament:
+		Weapon: R2PeykaapMissile
+		LocalOffset: 500,0,500
+	Armament@AA:
+		Weapon: R2PeykaapAA
+		LocalOffset: 500,0,500
+	Selectable:
+		Bounds: 1500, 3000, 0, -289
+	RevealsShroud:
+		Range: 8c0
+	DetectCloaked:
+		DetectionTypes: Underwater
+		Range: 5c0
+	RenderDetectionCircle:
+	HitShape:
+
+r2ghadir:
+	Inherits: sub
+	Tooltip:
+		Name: ra2-r2ghadir-name
+		GenericName: ra2-modern-ship
+	Buildable:
+		Prerequisites: ~faction.iran, nayard, radar
+		BuildPaletteOrder: 40
+		Description: ra2-r2ghadir-description
+	Valued:
+		Cost: 1050
+	Health:
+		HP: 380
+	Mobile:
+		Speed: 95
+		TurnSpeed: 24
+	Armament:
+		Weapon: R2GhadirTorpedo
+		RequiresCondition: true
+	-Armament@Elite:
+	Cloak:
+		InitialDelay: 0
+		CloakDelay: 50
+		UncloakOn: Attack, Damage
+	DetectCloaked:
+		Range: 7c0
+	RenderSprites:
+		Image: r2ghadir
+	RenderVoxels:
+		Image: r2ghadir
+		PlayerPalette: modernplayer
+		Scale: 22
+		LightAmbientColor: -0.3,-0.3,-0.3
+		LightDiffuseColor: 0.75,0.75,0.75
+
+^R2IranDefense:
+	Inherits: ^SupportBuilding
+	Inherits@AUTOTARGET: ^AutoTargetGround
+	Buildable:
+		Queue: Support
+	Building:
+		Footprint: x
+		Dimensions: 1, 1
+	Armor:
+		Type: Steel
+	RenderSprites:
+		PlayerPalette: iranplayer
+	WithSpriteTurret:
+		RequiresCondition: !build-incomplete
+	Turreted:
+		TurnSpeed: 24
+		InitialFacing: 640
+	BodyOrientation:
+		QuantizedFacings: 32
+	AttackTurreted:
+		Voice: Attack
+		RequiresCondition: !build-incomplete
+		PauseOnCondition: lowpower
+	IsometricSelectable:
+		Height: 40
+	Armament:
+		Weapon: R2BunkerGun
+		LocalOffset: 550,0,700
+	GrantConditionOnPowerState@LOWPOWER:
+		Condition: lowpower
+		ValidPowerStates: Low, Critical
+	RevealsShroud:
+		Range: 8c0
+	RequiresBuildableArea:
+		Adjacent: 5
+
+r2irbunker:
+	Inherits: ^R2IranDefense
+	Tooltip:
+		Name: ra2-r2irbunker-name
+	Buildable:
+		Prerequisites: ~faction.iran, barracks
+		BuildPaletteOrder: 20
+		Description: ra2-r2irbunker-description
+	Valued:
+		Cost: 450
+	Health:
+		HP: 600
+	Power:
+		Amount: -10
+	WithRangeCircle:
+		Range: 5c512
+
+r2iraasite:
+	Inherits: ^R2IranDefense
+	Inherits@AUTOTARGET: ^AutoTargetAir
+	Tooltip:
+		Name: ra2-r2iraasite-name
+	Buildable:
+		Prerequisites: ~faction.iran, barracks, radar
+		BuildPaletteOrder: 30
+		Description: ra2-r2iraasite-description
+	Valued:
+		Cost: 950
+	Health:
+		HP: 550
+	Power:
+		Amount: -40
+	Armament:
+		Weapon: R2RaadSiteMissile
+	WithRangeCircle:
+		Range: 11c0
+
+r2ircoast:
+	Inherits: ^R2IranDefense
+	Tooltip:
+		Name: ra2-r2ircoast-name
+	Buildable:
+		Prerequisites: ~faction.iran, radar
+		BuildPaletteOrder: 40
+		Description: ra2-r2ircoast-description
+	Valued:
+		Cost: 1250
+	Health:
+		HP: 650
+	Power:
+		Amount: -55
+	Armament:
+		Weapon: R2IranFixedMissile
+	WithRangeCircle:
+		Range: 11c0

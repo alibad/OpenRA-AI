@@ -16,6 +16,8 @@ import china_directional_assets as cn
 import iran_directional_assets as ir
 import turkey_directional_assets as tr
 from ra2_turkey_assets import extra_models
+from ra2_china_assets import extra_models as china_models
+from ra2_iran_assets import extra_models as iran_models
 
 ROOT = Path(__file__).resolve().parents[1]
 OUTPUT = ROOT / "apps/installer/ra2/modern-factions"
@@ -38,6 +40,8 @@ def models():
         "r2sancak": (tr._wheeled_hull(3, ew=True), tr._turret("sancak")),
         "r2kuzgun": (tr._airframe("kuzgunm"),),
         **extra_models(),
+        **china_models(),
+        **iran_models(),
     }
 
 
@@ -172,7 +176,7 @@ def build(output=OUTPUT):
             data = encode_vxl(size, lower, voxels, pal)
             (destination / (name + ".vxl")).write_bytes(data)
             matrices = [IDENTITY]
-            if name == "r2turnatur":
+            if name in ("r2turnatur", "r2cranetur", "r2toufantur"):
                 matrices = []
                 for i in range(8):
                     a = i * math.pi / 16

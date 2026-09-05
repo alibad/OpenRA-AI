@@ -14,22 +14,24 @@ ExperienceCatalog:
 			License: GPL-3.0-or-later code and original project art
 			Kind: Internal
 			Hidden: true
-			Rules: ra2|modern-factions/common.yaml, ra2|modern-factions/aircraft-ai.yaml
+			Rules: ra2|modern-factions/common.yaml, ra2|modern-factions/aircraft-ai.yaml, ra2|modern-factions/shared-replacements.yaml
 			Weapons: ra2|modern-factions/weapons.yaml
 		ra2-china:
 			Title: China
-			Description: Networked combined arms with four signature units on a complete RA2 Allies economy.
+			Description: Full networked army with deployable missile teams, mobile relays, amphibious armor, airlift and a carrier fleet.
 			Effects: Adds China to faction selection and the Allies random pool.
 			Tradeoffs: Support vehicles are fragile; isolated tanks lose the network bonus.
-			Scope: Prototype faction pack; original nine countries retain their rules and units.
+			Scope: 17 combat/support units and three defenses; shared Allied economy and utilities. Preview balance.
 			Category: Faction packs
-			Version: 1
-			Source: Original OpenRA AI faction geometry and GPT Image portraits
+			Version: 2
+			Source: Original OpenRA AI China meshes, animated native sprites, voxels and bilingual voices
 			License: GPL-3.0-or-later code and original project art
 			Kind: Faction
 			Dependencies: ra2-modern-foundation
-			Rules: ra2|modern-factions/china.yaml
-			Sequences: ra2|modern-factions/china-sequences.yaml
+			Rules: ra2|modern-factions/china.yaml, ra2|modern-factions/china-roster.yaml, ra2|modern-factions/china-ai.yaml, ra2|modern-factions/china-audio.yaml
+			Sequences: ra2|modern-factions/china-sequences.yaml, ra2|modern-factions/china-roster-sequences.yaml
+			Voices: ra2|modern-factions/china-voices.yaml
+			Weapons: ra2|modern-factions/china-weapons.yaml
 			Faction:
 				InternalName: china
 				Side: Allies
@@ -37,26 +39,28 @@ ExperienceCatalog:
 				Doctrine: networked-combined-arms
 				Preview: ra2|modern-factions/previews/china.png
 				Roster:
-					Infantry: e1, engineer, jumpjet
-					Vehicles: r2qilin, r2lynx, r2mantis
-					Aircraft: r2cloud
-					Navy: dest, aegis, dlph, carrier
-					Buildings: gacnst, gapowr, garefn, gaweap, gapile, gaairc, gayard
-					Defenses: gapill, nasam, atesla
+					Infantry: r2cnrifle, r2cnportable, r2cnnetwork, r2redspear, engineer, dog, spy
+					Vehicles: r2qilin, r2lynx, r2mantis, r2zbd, r2phl, cmin, amcv
+					Aircraft: r2cloud, r2skyspear, r2crane
+					Navy: r2luyang, r2haiwang, r2haiying, r2kunlun, r2jiaolong
+					Buildings: gacnst, gapowr, garefn, gaweap, gapile, gaairc, gayard, gatech, gadept
+					Defenses: r2bastion, r2skyshield, r2spectrum
 		ra2-iran:
 			Title: Iran
-			Description: Layered denial with four signature units on a complete RA2 Soviets economy.
+			Description: Full layered-denial army with ambush missiles, drone coordination, strike aircraft, coastal batteries and stealth boats.
 			Effects: Adds Iran to faction selection and the Soviets random pool.
 			Tradeoffs: Long-range launchers have a minimum range and need armor and air-defense escorts.
-			Scope: Prototype faction pack; original nine countries retain their rules and units.
+			Scope: 14 combat/support units and three defenses; shared Soviet economy and utilities. Preview balance.
 			Category: Faction packs
-			Version: 1
-			Source: Original OpenRA AI faction geometry and GPT Image portraits
+			Version: 2
+			Source: Original OpenRA AI Iran meshes, animated native sprites, voxels and bilingual voices
 			License: GPL-3.0-or-later code and original project art
 			Kind: Faction
 			Dependencies: ra2-modern-foundation
-			Rules: ra2|modern-factions/iran.yaml
-			Sequences: ra2|modern-factions/iran-sequences.yaml
+			Rules: ra2|modern-factions/iran.yaml, ra2|modern-factions/iran-roster.yaml, ra2|modern-factions/iran-ai.yaml, ra2|modern-factions/iran-audio.yaml, ra2|modern-factions/iran-roles.yaml
+			Sequences: ra2|modern-factions/iran-sequences.yaml, ra2|modern-factions/iran-roster-sequences.yaml
+			Voices: ra2|modern-factions/iran-voices.yaml
+			Weapons: ra2|modern-factions/iran-weapons.yaml
 			Faction:
 				InternalName: iran
 				Side: Soviets
@@ -64,12 +68,12 @@ ExperienceCatalog:
 				Doctrine: layered-denial
 				Preview: ra2|modern-factions/previews/iran.png
 				Roster:
-					Infantry: e2, engineer, flakt, shk
-					Vehicles: r2karrar, r2raad, r2fajr
-					Aircraft: r2mohajer
-					Navy: sub, hyd, sqd, dred
-					Buildings: nacnst, napowr, narefn, naweap, nahand, naradr, nayard
-					Defenses: nalasr, naflak, tesla
+					Infantry: r2basij, r2toophan, r2dronecontrol, r2shadowone, engineer, dog
+					Vehicles: r2karrar, r2raad, r2fajr, r2coast, htk, harv, smcv
+					Aircraft: r2mohajer, r2toufan, r2azar, r2loiter
+					Navy: r2peykaap, r2ghadir, sapc
+					Buildings: nacnst, napowr, narefn, naweap, nahand, naradr, nayard, natech, nadept
+					Defenses: r2irbunker, r2iraasite, r2ircoast
 		ra2-turkey:
 			Title: Turkey
 			Description: Full combined-arms Turkey roster with infantry, armor, aircraft, navy and dedicated defenses.
@@ -82,7 +86,7 @@ ExperienceCatalog:
 			License: GPL-3.0-or-later code and original project art
 			Kind: Faction
 			Dependencies: ra2-modern-foundation
-			Rules: ra2|modern-factions/turkey.yaml, ra2|modern-factions/turkey-roster.yaml, ra2|modern-factions/turkey-ai.yaml, ra2|modern-factions/turkey-replacements.yaml, ra2|modern-factions/turkey-audio.yaml
+			Rules: ra2|modern-factions/turkey.yaml, ra2|modern-factions/turkey-roster.yaml, ra2|modern-factions/turkey-ai.yaml, ra2|modern-factions/turkey-roles.yaml, ra2|modern-factions/turkey-audio.yaml
 			Voices: ra2|modern-factions/turkey-voices.yaml
 			Sequences: ra2|modern-factions/turkey-sequences.yaml, ra2|modern-factions/turkey-roster-sequences.yaml
 			Weapons: ra2|modern-factions/turkey-weapons.yaml
@@ -99,11 +103,38 @@ ExperienceCatalog:
 					Navy: r2poyraz, r2ege, r2marmara, lcrf
 					Buildings: gacnst, gapowr, garefn, gaweap, gapile, gaairc, gayard, gatech, gadept
 					Defenses: r2hisar, r2siper, r2boran
+		ra2-combined-arms-ai:
+			Title: Combined-arms AI
+			Preview: ra2|modern-factions/previews/combined-arms-ai.png
+			Description: Bots replace losses by battlefield role instead of filling their armies with a single available unit.
+			Effects: Rush favors infantry and armor; defensive AI invests in artillery and air defense; naval AI emphasizes surface escorts and submarines.
+			Tradeoffs: Production preferences depend on money, factories, map access and tech. This is not omniscient enemy counter-picking.
+			Scope: All original and enabled modern countries. Human controls, unit costs, damage and health are unchanged.
+			Category: AI strategies
+			Version: 1
+			Source: Native OpenRA role-driven production and squad management
+			License: GPL-3.0-or-later
+			Rules: ra2|modern-factions/combined-arms-ai.yaml
+			Parameters:
+				formation-size:
+					Title: Preferred formation size
+					Description: How many units bots try to assemble before attacking.
+					Group: AI
+					Type: Integer
+					Default: 8
+					Minimum: 3
+					Maximum: 20
+					Step: 1
+					Unit: units
 	Profiles:
 		ra2-modern:
 			Title: Red Alert 2 — Modern Factions
-			Description: China, Iran and Turkey join the original nine RA2 countries. Shared AI included. Prototype balance.
-			Components: ra2-china, ra2-iran, ra2-turkey
+			Description: Three full modern rosters join the original nine countries, with role-based bot armies and the shared AI assistant. Preview balance.
+			Components: ra2-china, ra2-iran, ra2-turkey, ra2-combined-arms-ai
+		ra2-original-combined-arms:
+			Title: Red Alert 2 — Original Armies, Smarter Bots
+			Description: Original nine countries and original unit statistics, with role-based bot production and adjustable formations.
+			Components: ra2-combined-arms-ai
 		ra2-classic:
 			Title: Red Alert 2 — Original Countries
 			Description: Original nine RA2 countries with the shared AI assistant. Modern faction packs disabled.

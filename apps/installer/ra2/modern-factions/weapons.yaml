@@ -28,6 +28,12 @@ R2AirDefense:
 	Inherits: MammothTusk
 	Range: 10c0
 	ReloadDelay: 90
+	Projectile: Missile
+		Speed: 300
+		RangeLimit: 16c0
+		MinimumLaunchAngle: 64
+		MaximumLaunchAngle: 128
+		CruiseAltitude: 3c0
 	Warhead@1Dam: SpreadDamage
 		Damage: 45
 
@@ -52,7 +58,10 @@ R2RocketSalvo:
 	BurstDelays: 8
 	Projectile: Missile
 		Speed: 240
-		RangeLimit: 14c0
+		RangeLimit: 18c0
+		MinimumLaunchAngle: 32
+		MaximumLaunchAngle: 64
+		CruiseAltitude: 1c512
 	Warhead@1Dam: SpreadDamage
 		Damage: 30
 		Spread: 256

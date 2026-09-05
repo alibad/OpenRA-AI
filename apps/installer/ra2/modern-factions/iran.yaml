@@ -17,7 +17,7 @@ World:
 		Factions: iran
 		BaseActor: smcv
 		BaseActorFacing: 896
-		SupportActors: dog, e2, e2, e2
+		SupportActors: dog, r2basij, r2basij, r2basij, r2toophan
 		SupportActorsFacing: 896
 		InnerSupportRadius: 3
 		OuterSupportRadius: 5
@@ -27,7 +27,7 @@ World:
 		Factions: iran
 		BaseActor: smcv
 		BaseActorFacing: 896
-		SupportActors: dog, e2, e2, e2, e2, r2karrar, engineer
+		SupportActors: dog, r2basij, r2basij, r2basij, r2toophan, r2karrar, engineer
 		SupportActorsFacing: 896
 		InnerSupportRadius: 3
 		OuterSupportRadius: 5
@@ -37,7 +37,7 @@ World:
 		Factions: iran
 		BaseActor: smcv
 		BaseActorFacing: 896
-		SupportActors: dog, e2, e2, e2, e2, e2, r2karrar, r2karrar, r2fajr, engineer
+		SupportActors: dog, r2basij, r2basij, r2toophan, r2toophan, r2dronecontrol, r2karrar, r2raad, r2fajr, engineer
 		SupportActorsFacing: 896
 		InnerSupportRadius: 3
 		OuterSupportRadius: 5
@@ -89,7 +89,7 @@ Player:
 
 naweap:
 	GrantConditionOnProduction@iran-drone:
-		Actors: r2mohajer
+		Actors: r2mohajer, r2toufan, r2azar, r2loiter
 		Condition: roof-open
 		Duration: 50
 		ShowSelectionBar: false
@@ -146,7 +146,7 @@ r2fajr:
 		Name: ra2-r2fajr-name
 	Buildable:
 		BuildPaletteOrder: 61
-		Prerequisites: ~faction.iran, naweap
+		Prerequisites: ~faction.iran, naweap, radar
 		Description: ra2-r2fajr-description
 	Valued:
 		Cost: 1300

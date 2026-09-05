@@ -1,0 +1,201 @@
+Player:
+	UnitBuilderBotModule@normal:
+		UnitsToBuild:
+			r2basij: 70
+			r2toophan: 28
+			r2dronecontrol: 7
+			r2shadowone: 2
+			r2karrar: 55
+			r2raad: 24
+			r2fajr: 18
+			r2coast: 6
+			r2mohajer: 8
+			r2toufan: 8
+			r2azar: 5
+			r2loiter: 8
+			r2peykaap: 24
+			r2ghadir: 18
+		UnitLimits:
+			r2dronecontrol: 3
+			r2shadowone: 1
+			r2coast: 3
+			r2mohajer: 4
+			r2toufan: 4
+			r2azar: 3
+			r2loiter: 5
+	BaseBuilderBotModule@normal:
+		BuildingFractions:
+			r2irbunker: 10
+			r2iraasite: 7
+			r2ircoast: 5
+		BuildingLimits:
+			r2irbunker: 6
+			r2iraasite: 4
+			r2ircoast: 4
+		AdditionalDefenseTypes:
+			iran: r2irbunker, r2iraasite, r2ircoast
+	SquadManagerBotModule@normal:
+		AdditionalAirUnitsTypes:
+			iran: r2mohajer, r2toufan, r2azar, r2loiter
+		AdditionalNavalUnitsTypes:
+			iran: r2peykaap, r2ghadir
+	UnitBuilderBotModule@medium:
+		UnitsToBuild:
+			r2basij: 70
+			r2toophan: 28
+			r2dronecontrol: 7
+			r2shadowone: 2
+			r2karrar: 55
+			r2raad: 24
+			r2fajr: 18
+			r2coast: 6
+			r2mohajer: 8
+			r2toufan: 8
+			r2azar: 5
+			r2loiter: 8
+			r2peykaap: 24
+			r2ghadir: 18
+		UnitLimits:
+			r2dronecontrol: 3
+			r2shadowone: 1
+			r2coast: 3
+			r2mohajer: 4
+			r2toufan: 4
+			r2azar: 3
+			r2loiter: 5
+	BaseBuilderBotModule@medium:
+		BuildingFractions:
+			r2irbunker: 10
+			r2iraasite: 7
+			r2ircoast: 5
+		BuildingLimits:
+			r2irbunker: 6
+			r2iraasite: 4
+			r2ircoast: 4
+		AdditionalDefenseTypes:
+			iran: r2irbunker, r2iraasite, r2ircoast
+	SquadManagerBotModule@medium:
+		AdditionalAirUnitsTypes:
+			iran: r2mohajer, r2toufan, r2azar, r2loiter
+		AdditionalNavalUnitsTypes:
+			iran: r2peykaap, r2ghadir
+	UnitBuilderBotModule@rush:
+		UnitsToBuild:
+			r2basij: 85
+			r2toophan: 28
+			r2dronecontrol: 7
+			r2shadowone: 2
+			r2karrar: 70
+			r2raad: 24
+			r2fajr: 18
+			r2coast: 6
+			r2mohajer: 8
+			r2toufan: 8
+			r2azar: 5
+			r2loiter: 23
+			r2peykaap: 24
+			r2ghadir: 18
+		UnitLimits:
+			r2dronecontrol: 3
+			r2shadowone: 1
+			r2coast: 3
+			r2mohajer: 4
+			r2toufan: 4
+			r2azar: 3
+			r2loiter: 5
+	BaseBuilderBotModule@rush:
+		BuildingFractions:
+			r2irbunker: 10
+			r2iraasite: 7
+			r2ircoast: 5
+		BuildingLimits:
+			r2irbunker: 6
+			r2iraasite: 4
+			r2ircoast: 4
+		AdditionalDefenseTypes:
+			iran: r2irbunker, r2iraasite, r2ircoast
+	SquadManagerBotModule@rush:
+		AdditionalAirUnitsTypes:
+			iran: r2mohajer, r2toufan, r2azar, r2loiter
+		AdditionalNavalUnitsTypes:
+			iran: r2peykaap, r2ghadir
+	UnitBuilderBotModule@turtle:
+		UnitsToBuild:
+			r2basij: 70
+			r2toophan: 40
+			r2dronecontrol: 7
+			r2shadowone: 2
+			r2karrar: 55
+			r2raad: 36
+			r2fajr: 30
+			r2coast: 6
+			r2mohajer: 8
+			r2toufan: 8
+			r2azar: 5
+			r2loiter: 8
+			r2peykaap: 24
+			r2ghadir: 18
+		UnitLimits:
+			r2dronecontrol: 3
+			r2shadowone: 1
+			r2coast: 3
+			r2mohajer: 4
+			r2toufan: 4
+			r2azar: 3
+			r2loiter: 5
+	BaseBuilderBotModule@turtle:
+		BuildingFractions:
+			r2irbunker: 10
+			r2iraasite: 7
+			r2ircoast: 5
+		BuildingLimits:
+			r2irbunker: 6
+			r2iraasite: 4
+			r2ircoast: 4
+		AdditionalDefenseTypes:
+			iran: r2irbunker, r2iraasite, r2ircoast
+	SquadManagerBotModule@turtle:
+		AdditionalAirUnitsTypes:
+			iran: r2mohajer, r2toufan, r2azar, r2loiter
+		AdditionalNavalUnitsTypes:
+			iran: r2peykaap, r2ghadir
+	UnitBuilderBotModule@naval:
+		UnitsToBuild:
+			r2basij: 70
+			r2toophan: 28
+			r2dronecontrol: 7
+			r2shadowone: 2
+			r2karrar: 55
+			r2raad: 24
+			r2fajr: 18
+			r2coast: 6
+			r2mohajer: 8
+			r2toufan: 8
+			r2azar: 5
+			r2loiter: 8
+			r2peykaap: 54
+			r2ghadir: 48
+		UnitLimits:
+			r2dronecontrol: 3
+			r2shadowone: 1
+			r2coast: 3
+			r2mohajer: 4
+			r2toufan: 4
+			r2azar: 3
+			r2loiter: 5
+	BaseBuilderBotModule@naval:
+		BuildingFractions:
+			r2irbunker: 10
+			r2iraasite: 7
+			r2ircoast: 5
+		BuildingLimits:
+			r2irbunker: 6
+			r2iraasite: 4
+			r2ircoast: 4
+		AdditionalDefenseTypes:
+			iran: r2irbunker, r2iraasite, r2ircoast
+	SquadManagerBotModule@naval:
+		AdditionalAirUnitsTypes:
+			iran: r2mohajer, r2toufan, r2azar, r2loiter
+		AdditionalNavalUnitsTypes:
+			iran: r2peykaap, r2ghadir

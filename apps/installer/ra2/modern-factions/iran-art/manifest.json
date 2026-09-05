@@ -1,0 +1,58 @@
+{
+  "r2basij": {
+    "frames": 112,
+    "size": [
+      48,
+      48
+    ],
+    "sha256": "ec77a524d60a87b4ca65633af462490a1ee6c9e4a3b25eb193e0389a8b61245e"
+  },
+  "r2toophan": {
+    "frames": 112,
+    "size": [
+      48,
+      48
+    ],
+    "sha256": "87eefd0400f5813caf0375672dcc0cb33a69c230bbef18379cc856271b30686b"
+  },
+  "r2dronecontrol": {
+    "frames": 112,
+    "size": [
+      48,
+      48
+    ],
+    "sha256": "6ff3d8fc8f1ab40f2c320464a1842a8e2efd68effb925d7469456f19b25b9739"
+  },
+  "r2shadowone": {
+    "frames": 112,
+    "size": [
+      48,
+      48
+    ],
+    "sha256": "7cdf42d355dff4bfcf368fcba007be181e56210b53730df2c5b015c1e4c14862"
+  },
+  "r2irbunker": {
+    "frames": 41,
+    "size": [
+      96,
+      96
+    ],
+    "sha256": "69ec09a6de03e8acf97fafcce2d5f3ce9f7bfdaa832424f858d1defc3e511df4"
+  },
+  "r2iraasite": {
+    "frames": 41,
+    "size": [
+      96,
+      96
+    ],
+    "sha256": "4b175f2ea0cd9d5d5240666cb7aed43d478f9bbe69561597da6a7a2d0c6cf2c5"
+  },
+  "r2ircoast": {
+    "frames": 41,
+    "size": [
+      96,
+      96
+    ],
+    "sha256": "49c2ee939853e7960ddb6af111080d79cbe9a45b6717653da5e253ca6604dc59"
+  }
+}

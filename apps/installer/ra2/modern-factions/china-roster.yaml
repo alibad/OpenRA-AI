@@ -1,0 +1,676 @@
+# China: coordinated precision and support with explicit specialist counters.
+^Palettes:
+	PaletteFromFile@china:
+		Name: china-art
+		Filename: ra2|modern-factions/china-art/china.pal
+	PlayerColorPalette@china:
+		BasePalette: china-art
+		BaseName: chinaplayer
+		RemapIndex: 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31
+
+^R2ChineseInfantry:
+	Inherits: ^Infantry
+	Inherits@AUTOTARGET: ^AutoTargetGroundAssaultMove
+	Inherits@MC: ^MindControllable
+	Inherits@doctrine: ^R2Networked
+	Buildable:
+		Queue: Infantry
+	UpdatesPlayerStatistics:
+		AddToArmyValue: true
+	Selectable:
+		Bounds: 600, 1500, 0, -530
+	RenderSprites:
+		PlayerPalette: chinaplayer
+	-TakeCover:
+	-WithDeathAnimation@effect:
+	WithDeathAnimation@normal:
+		DeathSequencePalette: chinaplayer
+		DeathPaletteIsPlayerPalette: true
+	AttackFrontal:
+		Voice: Attack
+		FacingTolerance: 32
+	Armament:
+		Weapon: R2ChinaRifle
+	ProducibleWithLevel:
+		Prerequisites: barracks.infiltrated
+	Voiced:
+		VoiceSet: R2ChinainfantryVoice
+
+r2cnrifle:
+	Inherits: ^R2ChineseInfantry
+	StrategicRole:
+		Domain: infantry
+		Roles: line-infantry
+	Tooltip:
+		Name: ra2-r2cnrifle-name
+	Buildable:
+		Prerequisites: ~faction.china, gapile
+		BuildPaletteOrder: 10
+		Description: ra2-r2cnrifle-description
+	Valued:
+		Cost: 180
+	Health:
+		HP: 115
+	RevealsShroud:
+		Range: 5c0
+
+r2cnportable:
+	Inherits: ^R2ChineseInfantry
+	StrategicRole:
+		Domain: infantry
+		Roles: anti-armor
+	Inherits@AUTOTARGET: ^AutoTargetAllAssaultMove
+	Tooltip:
+		Name: ra2-r2cnportable-name
+	Buildable:
+		Prerequisites: ~faction.china, gapile
+		BuildPaletteOrder: 30
+		Description: ra2-r2cnportable-description
+	Valued:
+		Cost: 400
+	Health:
+		HP: 90
+	Mobile:
+		Speed: 55
+	Armament:
+		Weapon: R2ChinaPortableAT
+		RequiresCondition: !aa-mode
+	Armament@AA:
+		Weapon: R2ChinaPortableAA
+		RequiresCondition: aa-mode
+	GrantConditionOnDeploy:
+		DeployedCondition: aa-mode
+		SkipMakeAnimation: true
+		DeploySounds: ra2|modern-factions/audio/china-role-aa.wav
+		UndeploySounds: ra2|modern-factions/audio/china-role-at.wav
+	WithTextDecoration@AT:
+		Text: AT
+		Position: Top
+		Margin: 0, -14
+		Color: FFE190
+		RequiresSelection: true
+		RequiresCondition: !aa-mode
+	WithTextDecoration@AA:
+		Text: AA
+		Position: Top
+		Margin: 0, -14
+		Color: 80CBFF
+		RequiresSelection: true
+		RequiresCondition: aa-mode
+	RevealsShroud:
+		Range: 6c0
+
+r2cnnetwork:
+	Inherits: ^R2ChineseInfantry
+	StrategicRole:
+		Domain: infantry
+		Roles: support
+	Tooltip:
+		Name: ra2-r2cnnetwork-name
+	Buildable:
+		Prerequisites: ~faction.china, gapile, radar
+		BuildPaletteOrder: 65
+		Description: ra2-r2cnnetwork-description
+	Valued:
+		Cost: 550
+	Health:
+		HP: 85
+	Mobile:
+		Speed: 55
+		PauseOnCondition: network-deployed || chronodisable
+	Armament:
+		Weapon: R2ChinaCarbine
+	GrantConditionOnDeploy:
+		DeployedCondition: network-deployed
+		SkipMakeAnimation: true
+		UndeployOnMove: true
+		DeploySounds: ra2|modern-factions/audio/china-network-deploy.wav
+		UndeploySounds: ra2|modern-factions/audio/china-network-fold.wav
+	WithTextDecoration@RELAY:
+		Text: LINK
+		Position: Top
+		Margin: 0, -14
+		Color: 80CBFF
+		RequiresSelection: true
+		RequiresCondition: network-deployed
+	ProximityExternalCondition@network:
+		Condition: r2-network
+		Range: 6c0
+		ValidRelationships: Ally
+		RequiresCondition: network-deployed
+	RevealsShroud:
+		Range: 6c0
+	RevealsShroud@network:
+		Range: 10c0
+		RequiresCondition: network-deployed
+	DetectCloaked:
+		DetectionTypes: Cloak, Underwater
+		Range: 6c0
+		RequiresCondition: network-deployed
+	RenderDetectionCircle:
+	WithRangeCircle:
+		Range: 6c0
+		Color: 4ED8FF90
+		RequiresCondition: network-deployed
+
+r2redspear:
+	Inherits: ^R2ChineseInfantry
+	StrategicRole:
+		Domain: infantry
+		Roles: line-infantry
+	Tooltip:
+		Name: ra2-r2redspear-name
+	Buildable:
+		Prerequisites: ~faction.china, gapile, gatech
+		BuildPaletteOrder: 140
+		BuildLimit: 1
+		Description: ra2-r2redspear-description
+	Valued:
+		Cost: 1900
+	Health:
+		HP: 190
+	Mobile:
+		Speed: 75
+	Armament:
+		Weapon: R2ChinaRedSpearRifle
+	RevealsShroud:
+		Range: 8c0
+	DetectCloaked:
+		DetectionTypes: Cloak
+		Range: 6c0
+	RenderDetectionCircle:
+	ProximityExternalCondition@network:
+		Condition: r2-network
+		Range: 4c0
+		ValidRelationships: Ally
+	WithRangeCircle:
+		Range: 4c0
+		Color: 4ED8FF90
+	Voiced:
+		VoiceSet: R2ChinaredspearVoice
+
+r2zbd:
+	Inherits: ^R2ModernVehicle
+	StrategicRole:
+		Domain: ground
+		Roles: transport
+	Inherits@doctrine: ^R2Networked
+	Tooltip:
+		Name: ra2-r2zbd-name
+	Buildable:
+		Prerequisites: ~faction.china, gaweap
+		BuildPaletteOrder: 35
+		Description: ra2-r2zbd-description
+	Valued:
+		Cost: 850
+	Health:
+		HP: 300
+	Armor:
+		Type: Light
+	Mobile:
+		Locomotor: lcraft
+		Speed: 100
+		PauseOnCondition: loading || chronodisable
+	Cargo:
+		Types: Infantry
+		MaxWeight: 4
+		UnloadVoice: Move
+		LoadingCondition: loading
+		UnloadTerrainTypes: Clear, Rough, Rail, Road, DirtRoad, Beach, Ore, Gems
+	WithCargoPipsDecoration:
+		Position: BottomLeft
+		RequiresSelection: true
+		Palette: pips
+	Armament:
+		Weapon: R2ChinaIFVCannon
+		MuzzleSequence: muzzle
+	LeavesTrails:
+		Image: wake
+		Palette: effect50alpha
+		TerrainTypes: Water
+		StationaryInterval: 18
+		MovingInterval: 6
+
+r2phl:
+	Inherits: ^R2ModernVehicle
+	StrategicRole:
+		Domain: ground
+		Roles: artillery
+	Inherits@doctrine: ^R2Networked
+	Tooltip:
+		Name: ra2-r2phl-name
+	Buildable:
+		Prerequisites: ~faction.china, gaweap, radar
+		BuildPaletteOrder: 75
+		Description: ra2-r2phl-description
+	Valued:
+		Cost: 1500
+	Health:
+		HP: 160
+	Armor:
+		Type: Light
+	Mobile:
+		Speed: 90
+	-WithVoxelTurret:
+	-Turreted:
+	-AttackTurreted:
+	AttackFrontal:
+		Voice: Attack
+		FacingTolerance: 64
+	Armament:
+		Weapon: R2ChinaLongbowRockets
+		LocalOffset: 500,0,700
+	WithRangeCircle:
+		Range: 12c0
+
+r2skyspear:
+	Inherits: orca
+	StrategicRole:
+		Domain: air
+		Roles: interceptor
+	Inherits@AUTOTARGET: ^AutoTargetAir
+	Inherits@doctrine: ^R2Networked
+	Tooltip:
+		Name: ra2-r2skyspear-name
+	Buildable:
+		Prerequisites: ~faction.china, gaairc, gatech
+		Description: ra2-r2skyspear-description
+	Valued:
+		Cost: 1700
+	Health:
+		HP: 200
+	Aircraft:
+		Speed: 285
+	Armament:
+		Weapon: R2ChinaInterceptor
+	AmmoPool:
+		Ammo: 4
+	RenderSprites:
+		Image: r2skyspear
+	RenderVoxels:
+		Image: r2skyspear
+		PlayerPalette: modernplayer
+		Scale: 15.2
+		LightAmbientColor: -0.3,-0.3,-0.3
+		LightDiffuseColor: 0.75,0.75,0.75
+	SpawnActorOnDeath:
+		Actor: r2skyspearhusk
+
+r2skyspearhusk:
+	Inherits: orcahusk
+	Tooltip:
+		Name: ra2-r2skyspear-name
+		GenericName: ra2-modern-husk
+	RenderVoxels:
+		Image: r2skyspear
+		PlayerPalette: modernplayer
+		Scale: 15.2
+		LightAmbientColor: -0.3,-0.3,-0.3
+		LightDiffuseColor: 0.75,0.75,0.75
+
+r2crane:
+	Inherits: shad
+	StrategicRole:
+		Domain: air
+		Roles: transport
+	Inherits@doctrine: ^R2Networked
+	Tooltip:
+		Name: ra2-r2crane-name
+	Buildable:
+		Prerequisites: ~faction.china, gaweap, radar
+		BuildPaletteOrder: 95
+		Description: ra2-r2crane-description
+	Valued:
+		Cost: 1200
+	Health:
+		HP: 230
+	Cargo:
+		MaxWeight: 6
+	AppearsOnRadar:
+	Aircraft:
+		Speed: 155
+	RenderSprites:
+		Image: r2crane
+	RenderVoxels:
+		Image: r2crane
+		PlayerPalette: modernplayer
+		Scale: 15.2
+		LightAmbientColor: -0.3,-0.3,-0.3
+		LightDiffuseColor: 0.75,0.75,0.75
+	SpawnActorOnDeath:
+		Actor: r2cranehusk
+
+r2cranehusk:
+	Inherits: ^R2DroneHusk
+	RenderVoxels:
+		Image: r2crane
+
+^R2ChineseShip:
+	Inherits: ^Ship
+	Inherits@AUTOTARGET: ^AutoTargetAllAssaultMove
+	Inherits@MC: ^MindControllable
+	Inherits@doctrine: ^R2Networked
+	Buildable:
+		Queue: Ship
+	UpdatesPlayerStatistics:
+		AddToArmyValue: true
+	RenderSprites:
+	RenderVoxels:
+		PlayerPalette: modernplayer
+		Scale: 22
+		LightAmbientColor: -0.3,-0.3,-0.3
+		LightDiffuseColor: 0.75,0.75,0.75
+	WithVoxelBody:
+	WithVoxelTurret:
+	Turreted:
+		TurnSpeed: 28
+	AttackTurreted:
+		Voice: Attack
+	Armament:
+		Weapon: R2ChinaNavalGun
+		LocalOffset: 800,0,550
+	Mobile:
+		Speed: 85
+	Selectable:
+		Bounds: 1600, 3400, 0, -289
+	RevealsShroud:
+		Range: 9c0
+	DetectCloaked:
+		DetectionTypes: Underwater
+		Range: 6c0
+	RenderDetectionCircle:
+	Voiced:
+		VoiceSet: R2ChinanavalVoice
+	HitShape:
+
+r2luyang:
+	Inherits: ^R2ChineseShip
+	StrategicRole:
+		Domain: naval
+		Roles: anti-submarine
+	Tooltip:
+		Name: ra2-r2luyang-name
+		GenericName: ra2-modern-ship
+	Buildable:
+		Prerequisites: ~faction.china, gayard
+		BuildPaletteOrder: 20
+		Description: ra2-r2luyang-description
+	Valued:
+		Cost: 1250
+	Health:
+		HP: 650
+	Armor:
+		Type: Heavy
+	Armament@ASW:
+		Weapon: R2ChinaASW
+		LocalOffset: 0,0,0
+
+r2haiying:
+	Inherits: ^R2ChineseShip
+	StrategicRole:
+		Domain: naval
+		Roles: naval-screen
+	Tooltip:
+		Name: ra2-r2haiying-name
+		GenericName: ra2-modern-ship
+	Buildable:
+		Prerequisites: ~faction.china, gayard, radar
+		BuildPaletteOrder: 40
+		Description: ra2-r2haiying-description
+	Valued:
+		Cost: 950
+	Health:
+		HP: 350
+	Armor:
+		Type: Light
+	Mobile:
+		Speed: 130
+	Armament:
+		Weapon: R2ChinaCoastalMissile
+	Armament@AA:
+		Weapon: R2ChinaNavalAA
+		LocalOffset: 0,0,600
+
+r2haiwang:
+	Inherits: carrier
+	StrategicRole:
+		Domain: naval
+		Roles: artillery
+	Inherits@doctrine: ^R2Networked
+	Tooltip:
+		Name: ra2-r2haiwang-name
+		GenericName: ra2-modern-ship
+	Buildable:
+		Prerequisites: ~faction.china, gayard, gatech
+		BuildPaletteOrder: 65
+		Description: ra2-r2haiwang-description
+	Valued:
+		Cost: 2400
+	Health:
+		HP: 850
+	CarrierParent:
+		Actors: r2haiwangdrone, r2haiwangdrone, r2haiwangdrone
+		RespawnTicks: 450
+	RenderSprites:
+		Image: r2haiwang
+	RenderVoxels:
+		Image: r2haiwang
+		PlayerPalette: modernplayer
+		Scale: 22
+		LightAmbientColor: -0.3,-0.3,-0.3
+		LightDiffuseColor: 0.75,0.75,0.75
+
+r2haiwangdrone:
+	Inherits: hornet
+	Rearmable:
+		RearmActors: r2haiwang
+	Tooltip:
+		Name: ra2-r2cloud-name
+	RenderSprites:
+		Image: r2cloud
+	RenderVoxels:
+		Image: r2cloud
+		PlayerPalette: modernplayer
+		Scale: 9
+		LightAmbientColor: -0.3,-0.3,-0.3
+		LightDiffuseColor: 0.75,0.75,0.75
+	SpawnActorOnDeath:
+		Actor: r2haiwangdronehusk
+
+r2haiwangdronehusk:
+	Inherits: ^R2DroneHusk
+	RenderVoxels:
+		Image: r2cloud
+		Scale: 9
+
+r2kunlun:
+	Inherits: lcrf
+	StrategicRole:
+		Domain: naval
+		Roles: transport
+	Tooltip:
+		Name: ra2-r2kunlun-name
+		GenericName: ra2-modern-ship
+	Buildable:
+		Prerequisites: ~faction.china, gayard
+		BuildPaletteOrder: 10
+		Description: ra2-r2kunlun-description
+	Valued:
+		Cost: 1100
+	Health:
+		HP: 550
+	Armor:
+		Type: Heavy
+	Mobile:
+		Speed: 70
+	Cargo:
+		MaxWeight: 16
+	RenderSprites:
+		Image: r2kunlun
+	RenderVoxels:
+		Image: r2kunlun
+		PlayerPalette: modernplayer
+		Scale: 22
+		LightAmbientColor: -0.3,-0.3,-0.3
+		LightDiffuseColor: 0.75,0.75,0.75
+
+r2jiaolong:
+	Inherits: sub
+	StrategicRole:
+		Domain: naval
+		Roles: submarine
+	Inherits@doctrine: ^R2Networked
+	Tooltip:
+		Name: ra2-r2jiaolong-name
+		GenericName: ra2-modern-ship
+	Buildable:
+		Prerequisites: ~faction.china, gayard, radar
+		BuildPaletteOrder: 50
+		Description: ra2-r2jiaolong-description
+	Valued:
+		Cost: 1300
+	Health:
+		HP: 500
+	Mobile:
+		Speed: 80
+	RenderSprites:
+		Image: r2jiaolong
+	RenderVoxels:
+		Image: r2jiaolong
+		PlayerPalette: modernplayer
+		Scale: 22
+		LightAmbientColor: -0.3,-0.3,-0.3
+		LightDiffuseColor: 0.75,0.75,0.75
+
+^R2ChineseDefense:
+	Inherits: ^SupportBuilding
+	Inherits@AUTOTARGET: ^AutoTargetGround
+	Inherits@doctrine: ^R2Networked
+	Buildable:
+		Queue: Support
+	Building:
+		Footprint: x
+		Dimensions: 1, 1
+	Armor:
+		Type: Steel
+	RenderSprites:
+		PlayerPalette: chinaplayer
+	WithSpriteTurret:
+		RequiresCondition: !build-incomplete
+	Turreted:
+		TurnSpeed: 32
+		InitialFacing: 640
+	BodyOrientation:
+		QuantizedFacings: 32
+	AttackTurreted:
+		Voice: Attack
+		RequiresCondition: !build-incomplete
+		PauseOnCondition: lowpower
+	IsometricSelectable:
+		Height: 40
+	Armament:
+		Weapon: R2ChinaBastion
+		LocalOffset: 550,0,700
+	GrantConditionOnPowerState@LOWPOWER:
+		Condition: lowpower
+		ValidPowerStates: Low, Critical
+	RevealsShroud:
+		Range: 8c0
+	RequiresBuildableArea:
+		Adjacent: 5
+
+r2bastion:
+	Inherits: ^R2ChineseDefense
+	StrategicRole:
+		Domain: defense
+		Roles: line-infantry
+	Tooltip:
+		Name: ra2-r2bastion-name
+	Buildable:
+		Prerequisites: ~faction.china, barracks
+		BuildPaletteOrder: 20
+		Description: ra2-r2bastion-description
+	Valued:
+		Cost: 650
+	Health:
+		HP: 500
+	Power:
+		Amount: -25
+	WithRangeCircle:
+		Range: 6c0
+
+r2skyshield:
+	Inherits: ^R2ChineseDefense
+	StrategicRole:
+		Domain: defense
+		Roles: anti-air
+	Inherits@AUTOTARGET: ^AutoTargetAir
+	Tooltip:
+		Name: ra2-r2skyshield-name
+	Buildable:
+		Prerequisites: ~faction.china, barracks, radar
+		BuildPaletteOrder: 30
+		Description: ra2-r2skyshield-description
+	Valued:
+		Cost: 1000
+	Health:
+		HP: 550
+	Power:
+		Amount: -55
+	Armament:
+		Weapon: R2ChinaSkyshield
+	WithRangeCircle:
+		Range: 11c0
+
+r2spectrum:
+	Inherits: ^R2ChineseDefense
+	StrategicRole:
+		Domain: defense
+		Roles: support
+	Tooltip:
+		Name: ra2-r2spectrum-name
+	Buildable:
+		Prerequisites: ~faction.china, gatech
+		BuildPaletteOrder: 60
+		Description: ra2-r2spectrum-description
+	Valued:
+		Cost: 1200
+	Health:
+		HP: 400
+	Armor:
+		Type: Wood
+	Power:
+		Amount: -90
+	-Armament:
+	-AttackTurreted:
+	-AutoTarget:
+	-AutoTargetPriority@DEFAULT:
+	-AutoTargetPriority@ATTACKANYTHING:
+	-WithSpriteTurret:
+	-Turreted:
+	WithIdleOverlay@dish:
+		Sequence: active
+		RequiresCondition: !build-incomplete
+		PauseOnCondition: lowpower
+	ProximityExternalCondition@network:
+		Condition: r2-network
+		Range: 7c0
+		ValidRelationships: Ally
+		RequiresCondition: !lowpower && !build-incomplete
+	RevealsShroud:
+		Range: 11c0
+		RequiresCondition: !lowpower && !build-incomplete
+	DetectCloaked:
+		DetectionTypes: Cloak, Underwater
+		Range: 7c0
+		RequiresCondition: !lowpower && !build-incomplete
+	JamsMissiles:
+		Range: 5c0
+		Chance: 30
+		DeflectionRelationships: Enemy
+		RequiresCondition: !lowpower && !build-incomplete
+	WithRangeCircle:
+		Range: 7c0
+		Color: 4ED8FF90
+		RequiresCondition: !lowpower && !build-incomplete
+	RenderDetectionCircle:

@@ -1,0 +1,201 @@
+Player:
+	UnitBuilderBotModule@normal:
+		UnitsToBuild:
+			r2cnrifle: 60
+			r2cnportable: 25
+			r2cnnetwork: 6
+			r2redspear: 2
+			r2zbd: 10
+			r2phl: 18
+			r2skyspear: 8
+			r2crane: 3
+			r2luyang: 16
+			r2haiwang: 5
+			r2haiying: 12
+			r2kunlun: 3
+			r2jiaolong: 10
+		UnitLimits:
+			r2cnnetwork: 3
+			r2redspear: 1
+			r2zbd: 4
+			r2phl: 6
+			r2skyspear: 4
+			r2crane: 2
+			r2haiwang: 2
+			r2kunlun: 2
+	BaseBuilderBotModule@normal:
+		BuildingFractions:
+			r2bastion: 9
+			r2skyshield: 7
+			r2spectrum: 3
+		BuildingLimits:
+			r2bastion: 6
+			r2skyshield: 5
+			r2spectrum: 2
+		AdditionalDefenseTypes:
+			china: r2bastion, r2skyshield, r2spectrum
+	SquadManagerBotModule@normal:
+		AdditionalAirUnitsTypes:
+			china: r2cloud, r2skyspear, r2crane
+		AdditionalNavalUnitsTypes:
+			china: r2luyang, r2haiwang, r2haiying, r2kunlun, r2jiaolong
+	UnitBuilderBotModule@medium:
+		UnitsToBuild:
+			r2cnrifle: 60
+			r2cnportable: 25
+			r2cnnetwork: 6
+			r2redspear: 2
+			r2zbd: 10
+			r2phl: 18
+			r2skyspear: 8
+			r2crane: 3
+			r2luyang: 16
+			r2haiwang: 5
+			r2haiying: 12
+			r2kunlun: 3
+			r2jiaolong: 10
+		UnitLimits:
+			r2cnnetwork: 3
+			r2redspear: 1
+			r2zbd: 4
+			r2phl: 6
+			r2skyspear: 4
+			r2crane: 2
+			r2haiwang: 2
+			r2kunlun: 2
+	BaseBuilderBotModule@medium:
+		BuildingFractions:
+			r2bastion: 9
+			r2skyshield: 7
+			r2spectrum: 3
+		BuildingLimits:
+			r2bastion: 6
+			r2skyshield: 5
+			r2spectrum: 2
+		AdditionalDefenseTypes:
+			china: r2bastion, r2skyshield, r2spectrum
+	SquadManagerBotModule@medium:
+		AdditionalAirUnitsTypes:
+			china: r2cloud, r2skyspear, r2crane
+		AdditionalNavalUnitsTypes:
+			china: r2luyang, r2haiwang, r2haiying, r2kunlun, r2jiaolong
+	UnitBuilderBotModule@rush:
+		UnitsToBuild:
+			r2cnrifle: 75
+			r2cnportable: 25
+			r2cnnetwork: 6
+			r2redspear: 2
+			r2zbd: 10
+			r2phl: 18
+			r2skyspear: 8
+			r2crane: 3
+			r2luyang: 16
+			r2haiwang: 5
+			r2haiying: 12
+			r2kunlun: 3
+			r2jiaolong: 10
+		UnitLimits:
+			r2cnnetwork: 3
+			r2redspear: 1
+			r2zbd: 4
+			r2phl: 6
+			r2skyspear: 4
+			r2crane: 2
+			r2haiwang: 2
+			r2kunlun: 2
+	BaseBuilderBotModule@rush:
+		BuildingFractions:
+			r2bastion: 9
+			r2skyshield: 7
+			r2spectrum: 3
+		BuildingLimits:
+			r2bastion: 6
+			r2skyshield: 5
+			r2spectrum: 2
+		AdditionalDefenseTypes:
+			china: r2bastion, r2skyshield, r2spectrum
+	SquadManagerBotModule@rush:
+		AdditionalAirUnitsTypes:
+			china: r2cloud, r2skyspear, r2crane
+		AdditionalNavalUnitsTypes:
+			china: r2luyang, r2haiwang, r2haiying, r2kunlun, r2jiaolong
+	UnitBuilderBotModule@turtle:
+		UnitsToBuild:
+			r2cnrifle: 60
+			r2cnportable: 25
+			r2cnnetwork: 6
+			r2redspear: 2
+			r2zbd: 10
+			r2phl: 18
+			r2skyspear: 8
+			r2crane: 3
+			r2luyang: 16
+			r2haiwang: 5
+			r2haiying: 12
+			r2kunlun: 3
+			r2jiaolong: 10
+		UnitLimits:
+			r2cnnetwork: 3
+			r2redspear: 1
+			r2zbd: 4
+			r2phl: 6
+			r2skyspear: 4
+			r2crane: 2
+			r2haiwang: 2
+			r2kunlun: 2
+	BaseBuilderBotModule@turtle:
+		BuildingFractions:
+			r2bastion: 15
+			r2skyshield: 7
+			r2spectrum: 3
+		BuildingLimits:
+			r2bastion: 6
+			r2skyshield: 5
+			r2spectrum: 2
+		AdditionalDefenseTypes:
+			china: r2bastion, r2skyshield, r2spectrum
+	SquadManagerBotModule@turtle:
+		AdditionalAirUnitsTypes:
+			china: r2cloud, r2skyspear, r2crane
+		AdditionalNavalUnitsTypes:
+			china: r2luyang, r2haiwang, r2haiying, r2kunlun, r2jiaolong
+	UnitBuilderBotModule@naval:
+		UnitsToBuild:
+			r2cnrifle: 60
+			r2cnportable: 25
+			r2cnnetwork: 6
+			r2redspear: 2
+			r2zbd: 10
+			r2phl: 8
+			r2skyspear: 8
+			r2crane: 3
+			r2luyang: 35
+			r2haiwang: 12
+			r2haiying: 28
+			r2kunlun: 3
+			r2jiaolong: 25
+		UnitLimits:
+			r2cnnetwork: 3
+			r2redspear: 1
+			r2zbd: 4
+			r2phl: 6
+			r2skyspear: 4
+			r2crane: 2
+			r2haiwang: 2
+			r2kunlun: 2
+	BaseBuilderBotModule@naval:
+		BuildingFractions:
+			r2bastion: 9
+			r2skyshield: 7
+			r2spectrum: 3
+		BuildingLimits:
+			r2bastion: 6
+			r2skyshield: 5
+			r2spectrum: 2
+		AdditionalDefenseTypes:
+			china: r2bastion, r2skyshield, r2spectrum
+	SquadManagerBotModule@naval:
+		AdditionalAirUnitsTypes:
+			china: r2cloud, r2skyspear, r2crane
+		AdditionalNavalUnitsTypes:
+			china: r2luyang, r2haiwang, r2haiying, r2kunlun, r2jiaolong

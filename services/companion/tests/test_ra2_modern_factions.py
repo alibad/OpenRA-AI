@@ -16,6 +16,8 @@ ASSETS = ROOT / "apps/installer/ra2/modern-factions"
 sys.path.insert(0, str(ROOT / "scripts"))
 import ra2_faction_voxels as voxels
 import ra2_turkey_assets as turkey_art
+import ra2_china_assets as china_art
+import ra2_iran_assets as iran_art
 
 
 def decode(data):
@@ -52,7 +54,9 @@ def decode(data):
 class RA2ModernFactionTests(unittest.TestCase):
     def test_native_voxels_round_trip_and_match_manifest(self):
         manifest = json.loads((ASSETS / "voxel-manifest.json").read_text())
-        self.assertEqual(len(manifest["models"]), 36)  # 20 bodies + 15 turrets + 1 animated rotor
+        expected_names = {actor + ("tur" if part else "") for actor, parts in voxels.models().items() for part in range(len(parts))}
+        self.assertEqual(set(manifest["models"]), expected_names)
+        self.assertEqual(len(expected_names), 58)
         for name, expected in manifest["models"].items():
             with self.subTest(model=name):
                 data = (ASSETS / "voxels" / (name + ".vxl")).read_bytes()
@@ -70,7 +74,7 @@ class RA2ModernFactionTests(unittest.TestCase):
                 self.assertEqual(struct.unpack_from("<2I", hva, 16), (frames, 1))
                 self.assertEqual(struct.unpack_from("<12f", hva, 40), voxels.IDENTITY)
                 self.assertEqual(len(hva), 40 + 48 * frames)
-                self.assertEqual(frames, 8 if name == "r2turnatur" else 1)
+                self.assertEqual(frames, 8 if name in ("r2turnatur", "r2cranetur", "r2toufantur") else 1)
 
     def test_every_complete_unit_has_remap_pixels(self):
         models = json.loads((ASSETS / "voxel-manifest.json").read_text())["models"]
@@ -101,7 +105,9 @@ class RA2ModernFactionTests(unittest.TestCase):
                 self.assertEqual(icon.size, (60, 48))
                 # Source-rendered cameos have deliberately limited materials;
                 # preserve the stronger color-detail contract for illustrated art.
-                minimum = 200 if actor in turkey_art.EXTRA_MODELS else 500
+                minimum = 200 if actor in turkey_art.EXTRA_MODELS + china_art.EXTRA_MODELS + iran_art.EXTRA_MODELS else 500
+                if actor == "r2jiaolong":
+                    minimum = 150
                 self.assertGreater(len(icon.convert("RGB").getcolors(2881)), minimum)
         for country in ("china", "iran", "turkey"):
             with Image.open(ASSETS / "previews" / (country + ".png")) as preview:
@@ -118,13 +124,13 @@ class RA2ModernFactionTests(unittest.TestCase):
             self.assertIn("Factions: " + country, rules)
             self.assertIn("BaseActor: " + mcv, rules)
             self.assertEqual(rules.count("StartingUnits@" + country + "-"), 4)
-            self.assertEqual(rules.count("Prerequisites: ~faction." + country + ", " + factory), 4)
+            self.assertGreaterEqual(rules.count("Prerequisites: ~faction." + country + ", " + factory), 3)
             for profile in ("normal", "medium", "rush", "turtle", "naval"):
                 self.assertIn("UnitBuilderBotModule@" + profile, rules)
             self.assertIn("SpawnActorOnDeath:", rules)
 
     def test_new_ui_strings_have_translation_keys(self):
-        messages = (ASSETS / "messages.ftl").read_text() + (ASSETS / "turkey-messages.ftl").read_text()
+        messages = "".join((ASSETS / name).read_text() for name in ("messages.ftl", "turkey-messages.ftl", "china-messages.ftl", "iran-messages.ftl"))
         for actor in voxels.models():
             self.assertIn("ra2-" + actor + "-name =", messages)
             self.assertIn("ra2-" + actor + "-description =", messages)

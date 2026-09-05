@@ -1,0 +1,297 @@
+Player:
+	UnitBuilderBotModule@normal:
+		RoleShares:
+			line-infantry: 24
+			anti-armor: 14
+			main-battle-tank: 26
+			artillery: 12
+			anti-air: 12
+			transport: 3
+			support: 3
+			interceptor: 4
+			strike-aircraft: 6
+			naval-screen: 8
+			anti-submarine: 6
+			submarine: 6
+		# Conservative preview tuning, not proven competitive balance: two specialists each.
+		# Bot-only caps; native human build limits remain unchanged.
+		UnitLimits:
+			snipe: 2
+			deso: 2
+			ivan: 2
+			civan: 2
+			yuri: 2
+	SquadManagerBotModule@normal:
+		ExperienceComponent: ra2-combined-arms-ai
+		ExperienceSquadSizeParameter: formation-size
+	UnitBuilderBotModule@medium:
+		RoleShares:
+			line-infantry: 24
+			anti-armor: 14
+			main-battle-tank: 26
+			artillery: 12
+			anti-air: 12
+			transport: 3
+			support: 3
+			interceptor: 4
+			strike-aircraft: 6
+			naval-screen: 8
+			anti-submarine: 6
+			submarine: 6
+		UnitLimits:
+			snipe: 2
+			deso: 2
+			ivan: 2
+			civan: 2
+			yuri: 2
+	SquadManagerBotModule@medium:
+		ExperienceComponent: ra2-combined-arms-ai
+		ExperienceSquadSizeParameter: formation-size
+	UnitBuilderBotModule@rush:
+		RoleShares:
+			line-infantry: 30
+			anti-armor: 16
+			main-battle-tank: 32
+			artillery: 8
+			anti-air: 10
+			transport: 2
+			support: 2
+			interceptor: 2
+			strike-aircraft: 4
+			naval-screen: 6
+			anti-submarine: 4
+			submarine: 4
+		UnitLimits:
+			snipe: 2
+			deso: 2
+			ivan: 2
+			civan: 2
+			yuri: 2
+	SquadManagerBotModule@rush:
+		ExperienceComponent: ra2-combined-arms-ai
+		ExperienceSquadSizeParameter: formation-size
+	UnitBuilderBotModule@turtle:
+		RoleShares:
+			line-infantry: 22
+			anti-armor: 18
+			main-battle-tank: 24
+			artillery: 18
+			anti-air: 18
+			transport: 2
+			support: 4
+			interceptor: 6
+			strike-aircraft: 4
+			naval-screen: 8
+			anti-submarine: 6
+			submarine: 6
+		UnitLimits:
+			snipe: 2
+			deso: 2
+			ivan: 2
+			civan: 2
+			yuri: 2
+	SquadManagerBotModule@turtle:
+		ExperienceComponent: ra2-combined-arms-ai
+		ExperienceSquadSizeParameter: formation-size
+	UnitBuilderBotModule@naval:
+		RoleShares:
+			line-infantry: 16
+			anti-armor: 10
+			main-battle-tank: 16
+			artillery: 8
+			anti-air: 10
+			transport: 2
+			support: 2
+			interceptor: 6
+			strike-aircraft: 8
+			naval-screen: 30
+			anti-submarine: 20
+			submarine: 18
+		UnitLimits:
+			snipe: 2
+			deso: 2
+			ivan: 2
+			civan: 2
+			yuri: 2
+	SquadManagerBotModule@naval:
+		ExperienceComponent: ra2-combined-arms-ai
+		ExperienceSquadSizeParameter: formation-size
+
+e1:
+	StrategicRole:
+		Roles: line-infantry
+		Domain: ground
+
+e2:
+	StrategicRole:
+		Roles: line-infantry
+		Domain: ground
+
+dog:
+	StrategicRole:
+		# Guard/scout utility: detects spies and cloaked units. Native bot cap4 remains.
+		Roles: support
+		Domain: ground
+
+snipe:
+	StrategicRole:
+		# AWP targets Infantry only; not a vehicle counter.
+		Roles: line-infantry
+		Domain: ground
+
+deso:
+	StrategicRole:
+		# RadBeam/RadEruption combat infantry and light armor, not tanks or aircraft.
+		Roles: line-infantry
+		Domain: ground
+
+ivan:
+	StrategicRole:
+		# IvanBomber plants explosives; Chrono Ivan inherits this same specialist role.
+		Roles: support
+		Domain: ground
+
+yuri:
+	StrategicRole:
+		# MindControl/PsiWave support; Yuri Prime keeps its native build-limit-one gate.
+		Roles: support
+		Domain: ground
+
+shk:
+	StrategicRole:
+		Roles: anti-armor
+		Domain: ground
+
+tany:
+	StrategicRole:
+		# DoublePistols/MP5 do zero vehicle-armor damage; C4 is building sabotage.
+		Roles: line-infantry
+		Domain: ground
+
+cleg:
+	StrategicRole:
+		Roles: anti-armor
+		Domain: ground
+
+tnkd:
+	StrategicRole:
+		Roles: anti-armor
+		Domain: ground
+
+mtnk:
+	StrategicRole:
+		Roles: main-battle-tank
+		Domain: ground
+
+htnk:
+	StrategicRole:
+		Roles: main-battle-tank
+		Domain: ground
+
+apoc:
+	StrategicRole:
+		Roles: main-battle-tank
+		Domain: ground
+
+mgtk:
+	StrategicRole:
+		Roles: main-battle-tank
+		Domain: ground
+
+sref:
+	StrategicRole:
+		Roles: artillery
+		Domain: ground
+
+ttnk:
+	StrategicRole:
+		# TankBolt is direct fire at 4c (6c elite), not long-range artillery.
+		Roles: anti-armor
+		Domain: ground
+
+fv:
+	StrategicRole:
+		Roles: anti-air
+		Domain: ground
+
+flakt:
+	StrategicRole:
+		Roles: anti-air
+		Domain: ground
+
+htk:
+	StrategicRole:
+		Roles: anti-air
+		Domain: ground
+
+shad:
+	StrategicRole:
+		Roles: transport
+		Domain: air
+
+lcrf:
+	StrategicRole:
+		Roles: transport
+		Domain: naval
+
+sapc:
+	StrategicRole:
+		Roles: transport
+		Domain: naval
+
+beag:
+	StrategicRole:
+		Roles: strike-aircraft
+		Domain: air
+
+jumpjet:
+	StrategicRole:
+		Roles: strike-aircraft
+		Domain: air
+
+orca:
+	StrategicRole:
+		Roles: strike-aircraft
+		Domain: air
+
+zep:
+	StrategicRole:
+		Roles: strike-aircraft
+		Domain: air
+
+dest:
+	StrategicRole:
+		Roles: naval-screen
+		Domain: naval
+
+hyd:
+	StrategicRole:
+		# Sea Scorpion's FlakWeapon secondary supplies its principal AA role.
+		Roles: anti-air
+		Domain: naval
+
+carrier:
+	StrategicRole:
+		# HornetLauncher is a 25c Ground/Water strike launcher, not a screen gun.
+		Roles: artillery
+		Domain: naval
+
+aegis:
+	StrategicRole:
+		Roles: anti-air
+		Domain: naval
+
+dlph:
+	StrategicRole:
+		Roles: anti-submarine
+		Domain: naval
+
+sub:
+	StrategicRole:
+		Roles: submarine
+		Domain: naval
+
+sqd:
+	StrategicRole:
+		Roles: submarine
+		Domain: naval

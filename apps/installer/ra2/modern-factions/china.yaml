@@ -17,7 +17,7 @@ World:
 		Factions: china
 		BaseActor: amcv
 		BaseActorFacing: 896
-		SupportActors: dog, e1, e1
+		SupportActors: dog, r2cnrifle, r2cnrifle
 		SupportActorsFacing: 896
 		InnerSupportRadius: 3
 		OuterSupportRadius: 5
@@ -27,7 +27,7 @@ World:
 		Factions: china
 		BaseActor: amcv
 		BaseActorFacing: 896
-		SupportActors: dog, e1, e1, e1, r2qilin, engineer
+		SupportActors: dog, r2cnrifle, r2cnrifle, r2cnportable, r2qilin, engineer
 		SupportActorsFacing: 896
 		InnerSupportRadius: 3
 		OuterSupportRadius: 5
@@ -37,7 +37,7 @@ World:
 		Factions: china
 		BaseActor: amcv
 		BaseActorFacing: 896
-		SupportActors: dog, e1, e1, e1, e1, r2qilin, r2qilin, r2mantis, engineer
+		SupportActors: dog, r2cnrifle, r2cnrifle, r2cnportable, r2cnnetwork, r2qilin, r2zbd, r2mantis, engineer
 		SupportActorsFacing: 896
 		InnerSupportRadius: 3
 		OuterSupportRadius: 5
@@ -94,13 +94,16 @@ gaairc:
 
 gaweap:
 	GrantConditionOnProduction@china-drone:
-		Actors: r2cloud
+		Actors: r2cloud, r2crane
 		Condition: roof-open
 		Duration: 50
 		ShowSelectionBar: false
 
 r2qilin:
 	Inherits: ^R2ModernVehicle
+	StrategicRole:
+		Domain: ground
+		Roles: main-battle-tank
 	Inherits@doctrine: ^R2Networked
 	Tooltip:
 		Name: ra2-r2qilin-name
@@ -122,6 +125,9 @@ r2qilin:
 
 r2lynx:
 	Inherits: ^R2ModernVehicle
+	StrategicRole:
+		Domain: ground
+		Roles: support
 	Inherits@doctrine: ^R2Networked
 	Tooltip:
 		Name: ra2-r2lynx-name
@@ -153,6 +159,9 @@ r2lynx:
 
 r2mantis:
 	Inherits: ^R2ModernVehicle
+	StrategicRole:
+		Domain: ground
+		Roles: anti-air
 	Inherits@AUTOTARGET: ^AutoTargetAir
 	Inherits@doctrine: ^R2Networked
 	Tooltip:
@@ -176,6 +185,9 @@ r2mantis:
 
 r2cloud:
 	Inherits: ^R2ModernDrone
+	StrategicRole:
+		Domain: air
+		Roles: strike-aircraft
 	Inherits@doctrine: ^R2Networked
 	Tooltip:
 		Name: ra2-r2cloud-name

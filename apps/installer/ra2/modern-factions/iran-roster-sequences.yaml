@@ -1,0 +1,227 @@
+r2basij:
+	Inherits@MC: ^MindControllable
+	Defaults:
+		Filename: ra2|modern-factions/iran-art/r2basij.shp
+		Offset: 0, -11, 16
+	stand:
+		Facings: 8
+	run:
+		Start: 8
+		Length: 6
+		Facings: 8
+		Tick: 80
+	shoot:
+		Start: 56
+		Length: 4
+		Facings: 8
+		Tick: 80
+	idle1:
+		Start: 96
+		Length: 8
+	idle2:
+		Start: 104
+		Length: 8
+	die1:
+		Start: 88
+		Length: 8
+	die2:
+		Start: 88
+		Length: 8
+	icon:
+		Filename: ra2|modern-factions/icons/r2basij.png
+		Offset: 0, 0
+
+r2toophan:
+	Inherits@MC: ^MindControllable
+	Defaults:
+		Filename: ra2|modern-factions/iran-art/r2toophan.shp
+		Offset: 0, -11, 16
+	stand:
+		Facings: 8
+	run:
+		Start: 8
+		Length: 6
+		Facings: 8
+		Tick: 80
+	shoot:
+		Start: 56
+		Length: 4
+		Facings: 8
+		Tick: 80
+	idle1:
+		Start: 96
+		Length: 8
+	idle2:
+		Start: 104
+		Length: 8
+	die1:
+		Start: 88
+		Length: 8
+	die2:
+		Start: 88
+		Length: 8
+	icon:
+		Filename: ra2|modern-factions/icons/r2toophan.png
+		Offset: 0, 0
+
+r2dronecontrol:
+	Inherits@MC: ^MindControllable
+	Defaults:
+		Filename: ra2|modern-factions/iran-art/r2dronecontrol.shp
+		Offset: 0, -11, 16
+	stand:
+		Facings: 8
+	run:
+		Start: 8
+		Length: 6
+		Facings: 8
+		Tick: 80
+	shoot:
+		Start: 56
+		Length: 4
+		Facings: 8
+		Tick: 80
+	idle1:
+		Start: 96
+		Length: 8
+	idle2:
+		Start: 104
+		Length: 8
+	die1:
+		Start: 88
+		Length: 8
+	die2:
+		Start: 88
+		Length: 8
+	icon:
+		Filename: ra2|modern-factions/icons/r2dronecontrol.png
+		Offset: 0, 0
+
+r2shadowone:
+	Inherits@MC: ^MindControllable
+	Defaults:
+		Filename: ra2|modern-factions/iran-art/r2shadowone.shp
+		Offset: 0, -11, 16
+	stand:
+		Facings: 8
+	run:
+		Start: 8
+		Length: 6
+		Facings: 8
+		Tick: 80
+	shoot:
+		Start: 56
+		Length: 4
+		Facings: 8
+		Tick: 80
+	idle1:
+		Start: 96
+		Length: 8
+	idle2:
+		Start: 104
+		Length: 8
+	die1:
+		Start: 88
+		Length: 8
+	die2:
+		Start: 88
+		Length: 8
+	icon:
+		Filename: ra2|modern-factions/icons/r2shadowone.png
+		Offset: 0, 0
+
+r2irbunker:
+	Defaults:
+		Filename: ra2|modern-factions/iran-art/r2irbunker.shp
+		Offset: 0, -19, 19
+	idle:
+	damaged-idle:
+	turret:
+		Start: 1
+		Facings: 32
+	damaged-turret:
+		Start: 1
+		Facings: 32
+	make:
+		Start: 33
+		Length: 8
+		Tick: 80
+	icon:
+		Filename: ra2|modern-factions/icons/r2irbunker.png
+		Offset: 0, 0
+
+r2iraasite:
+	Defaults:
+		Filename: ra2|modern-factions/iran-art/r2iraasite.shp
+		Offset: 0, -19, 19
+	idle:
+	damaged-idle:
+	turret:
+		Start: 1
+		Facings: 32
+	damaged-turret:
+		Start: 1
+		Facings: 32
+	make:
+		Start: 33
+		Length: 8
+		Tick: 80
+	icon:
+		Filename: ra2|modern-factions/icons/r2iraasite.png
+		Offset: 0, 0
+
+r2ircoast:
+	Defaults:
+		Filename: ra2|modern-factions/iran-art/r2ircoast.shp
+		Offset: 0, -19, 19
+	idle:
+	damaged-idle:
+	turret:
+		Start: 1
+		Facings: 32
+	damaged-turret:
+		Start: 1
+		Facings: 32
+	make:
+		Start: 33
+		Length: 8
+		Tick: 80
+	icon:
+		Filename: ra2|modern-factions/icons/r2ircoast.png
+		Offset: 0, 0
+
+r2coast:
+	Inherits@MC: ^MindControllable
+	Inherits@Muzzle: ^WithCannonMuzzle
+	icon:
+		Filename: ra2|modern-factions/icons/r2coast.png
+
+r2toufan:
+	Inherits@MC: ^MindControllable
+	Inherits@Muzzle: ^WithCannonMuzzle
+	icon:
+		Filename: ra2|modern-factions/icons/r2toufan.png
+
+r2azar:
+	Inherits@MC: ^MindControllable
+	Inherits@Muzzle: ^WithCannonMuzzle
+	icon:
+		Filename: ra2|modern-factions/icons/r2azar.png
+
+r2loiter:
+	Inherits@MC: ^MindControllable
+	Inherits@Muzzle: ^WithCannonMuzzle
+	icon:
+		Filename: ra2|modern-factions/icons/r2loiter.png
+
+r2peykaap:
+	Inherits@MC: ^MindControllable
+	Inherits@Muzzle: ^WithCannonMuzzle
+	icon:
+		Filename: ra2|modern-factions/icons/r2peykaap.png
+
+r2ghadir:
+	Inherits@MC: ^MindControllable
+	Inherits@Muzzle: ^WithCannonMuzzle
+	icon:
+		Filename: ra2|modern-factions/icons/r2ghadir.png

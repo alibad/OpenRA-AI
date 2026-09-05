@@ -1,0 +1,67 @@
+r2cnrifle:
+	Voiced:
+		VoiceSet: R2ChinainfantryVoice
+
+r2cnportable:
+	Voiced:
+		VoiceSet: R2ChinainfantryVoice
+
+r2cnnetwork:
+	Voiced:
+		VoiceSet: R2ChinainfantryVoice
+
+r2redspear:
+	Voiced:
+		VoiceSet: R2ChinaredspearVoice
+
+r2qilin:
+	Voiced:
+		VoiceSet: R2ChinavehicleVoice
+
+r2lynx:
+	Voiced:
+		VoiceSet: R2ChinavehicleVoice
+
+r2mantis:
+	Voiced:
+		VoiceSet: R2ChinavehicleVoice
+
+r2zbd:
+	Voiced:
+		VoiceSet: R2ChinavehicleVoice
+
+r2phl:
+	Voiced:
+		VoiceSet: R2ChinavehicleVoice
+
+r2cloud:
+	Voiced:
+		VoiceSet: R2ChinaairVoice
+
+r2skyspear:
+	Voiced:
+		VoiceSet: R2ChinaairVoice
+
+r2crane:
+	Voiced:
+		VoiceSet: R2ChinaairVoice
+
+r2luyang:
+	Voiced:
+		VoiceSet: R2ChinanavalVoice
+
+r2haiwang:
+	Voiced:
+		VoiceSet: R2ChinanavalVoice
+
+r2haiying:
+	Voiced:
+		VoiceSet: R2ChinanavalVoice
+
+r2kunlun:
+	Voiced:
+		VoiceSet: R2ChinanavalVoice
+
+r2jiaolong:
+	Voiced:
+		VoiceSet: R2ChinanavalVoice

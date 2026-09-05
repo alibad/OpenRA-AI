@@ -3,6 +3,17 @@ World:
 	SpawnStartingUnits:
 		StartingUnitsClass: medium
 
+Player:
+	ProvidesPrerequisite@china:
+		Prerequisite: faction.china
+		Factions: china
+	ProvidesPrerequisite@iran:
+		Prerequisite: faction.iran
+		Factions: iran
+	ProvidesPrerequisite@turkey:
+		Prerequisite: faction.turkey
+		Factions: turkey
+
 ^Palettes:
 	PaletteFromFile@modern:
 		Name: modern

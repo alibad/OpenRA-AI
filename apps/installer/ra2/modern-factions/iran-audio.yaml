@@ -1,0 +1,55 @@
+r2basij:
+	Voiced:
+		VoiceSet: R2IraninfantryVoice
+
+r2toophan:
+	Voiced:
+		VoiceSet: R2IraninfantryVoice
+
+r2dronecontrol:
+	Voiced:
+		VoiceSet: R2IrandroneVoice
+
+r2mohajer:
+	Voiced:
+		VoiceSet: R2IrandroneVoice
+
+r2loiter:
+	Voiced:
+		VoiceSet: R2IrandroneVoice
+
+r2shadowone:
+	Voiced:
+		VoiceSet: R2IranshadowVoice
+
+r2karrar:
+	Voiced:
+		VoiceSet: R2IranvehicleVoice
+
+r2raad:
+	Voiced:
+		VoiceSet: R2IranvehicleVoice
+
+r2fajr:
+	Voiced:
+		VoiceSet: R2IranvehicleVoice
+
+r2coast:
+	Voiced:
+		VoiceSet: R2IranvehicleVoice
+
+r2toufan:
+	Voiced:
+		VoiceSet: R2IranairVoice
+
+r2azar:
+	Voiced:
+		VoiceSet: R2IranairVoice
+
+r2peykaap:
+	Voiced:
+		VoiceSet: R2IrannavalVoice
+
+r2ghadir:
+	Voiced:
+		VoiceSet: R2IrannavalVoice

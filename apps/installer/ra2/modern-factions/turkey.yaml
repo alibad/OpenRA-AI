@@ -127,7 +127,7 @@ r2yildirim:
 		Name: ra2-r2yildirim-name
 	Buildable:
 		BuildPaletteOrder: 41
-		Prerequisites: ~faction.turkey, gaweap
+		Prerequisites: ~faction.turkey, gaweap, radar
 		Description: ra2-r2yildirim-description
 	Valued:
 		Cost: 1200

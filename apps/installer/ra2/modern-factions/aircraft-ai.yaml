@@ -79,13 +79,3 @@ Player:
 			naradr: 8
 			gatech: 5
 			natech: 5
-	SquadManagerBotModule@normal:
-		AirUnitsTypes: jumpjet, shad, zep, orca, beag, r2cloud, r2mohajer, r2kuzgun
-	SquadManagerBotModule@medium:
-		AirUnitsTypes: jumpjet, shad, zep, orca, beag, r2cloud, r2mohajer, r2kuzgun
-	SquadManagerBotModule@rush:
-		AirUnitsTypes: jumpjet, shad, zep, orca, beag, r2cloud, r2mohajer, r2kuzgun
-	SquadManagerBotModule@turtle:
-		AirUnitsTypes: jumpjet, shad, zep, orca, beag, r2cloud, r2mohajer, r2kuzgun
-	SquadManagerBotModule@naval:
-		AirUnitsTypes: jumpjet, shad, zep, orca, beag, r2cloud, r2mohajer, r2kuzgun

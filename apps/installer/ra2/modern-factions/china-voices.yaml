@@ -1,0 +1,49 @@
+R2ChinainfantryVoice:
+	Inherits: ^InfantryDeath
+	DefaultVariant: .wav
+	Voices:
+		Select: ra2|modern-factions/audio/rcn-infantry-select-zh, ra2|modern-factions/audio/rcn-infantry-select-en
+		Move: ra2|modern-factions/audio/rcn-infantry-action-zh, ra2|modern-factions/audio/rcn-infantry-action-en
+		Attack: ra2|modern-factions/audio/rcn-infantry-action-zh, ra2|modern-factions/audio/rcn-infantry-action-en
+		Action: ra2|modern-factions/audio/rcn-infantry-action-zh, ra2|modern-factions/audio/rcn-infantry-action-en
+		Die: igidia, igidib, igidic
+
+R2ChinaredspearVoice:
+	Inherits: ^InfantryDeath
+	DefaultVariant: .wav
+	Voices:
+		Select: ra2|modern-factions/audio/rcn-redspear-select-zh, ra2|modern-factions/audio/rcn-redspear-select-en
+		Move: ra2|modern-factions/audio/rcn-redspear-action-zh, ra2|modern-factions/audio/rcn-redspear-action-en
+		Attack: ra2|modern-factions/audio/rcn-redspear-action-zh, ra2|modern-factions/audio/rcn-redspear-action-en
+		Action: ra2|modern-factions/audio/rcn-redspear-action-zh, ra2|modern-factions/audio/rcn-redspear-action-en
+		Die: igidia, igidib, igidic
+
+R2ChinavehicleVoice:
+	Inherits: ^InfantryDeath
+	DefaultVariant: .wav
+	Voices:
+		Select: ra2|modern-factions/audio/rcn-vehicle-select-zh, ra2|modern-factions/audio/rcn-vehicle-select-en
+		Move: ra2|modern-factions/audio/rcn-vehicle-action-zh, ra2|modern-factions/audio/rcn-vehicle-action-en
+		Attack: ra2|modern-factions/audio/rcn-vehicle-action-zh, ra2|modern-factions/audio/rcn-vehicle-action-en
+		Action: ra2|modern-factions/audio/rcn-vehicle-action-zh, ra2|modern-factions/audio/rcn-vehicle-action-en
+		Die: igidia, igidib, igidic
+
+R2ChinaairVoice:
+	Inherits: ^InfantryDeath
+	DefaultVariant: .wav
+	Voices:
+		Select: ra2|modern-factions/audio/rcn-air-select-zh, ra2|modern-factions/audio/rcn-air-select-en
+		Move: ra2|modern-factions/audio/rcn-air-action-zh, ra2|modern-factions/audio/rcn-air-action-en
+		Attack: ra2|modern-factions/audio/rcn-air-action-zh, ra2|modern-factions/audio/rcn-air-action-en
+		Action: ra2|modern-factions/audio/rcn-air-action-zh, ra2|modern-factions/audio/rcn-air-action-en
+		Die: igidia, igidib, igidic
+
+R2ChinanavalVoice:
+	Inherits: ^InfantryDeath
+	DefaultVariant: .wav
+	Voices:
+		Select: ra2|modern-factions/audio/rcn-naval-select-zh, ra2|modern-factions/audio/rcn-naval-select-en
+		Move: ra2|modern-factions/audio/rcn-naval-action-zh, ra2|modern-factions/audio/rcn-naval-action-en
+		Attack: ra2|modern-factions/audio/rcn-naval-action-zh, ra2|modern-factions/audio/rcn-naval-action-en
+		Action: ra2|modern-factions/audio/rcn-naval-action-zh, ra2|modern-factions/audio/rcn-naval-action-en
+		Die: igidia, igidib, igidic

@@ -1,0 +1,60 @@
+# Shared engineers, dog, miner, MCV, Flak Track and landing craft remain.
+e2:
+	Buildable:
+		Prerequisites: ~nahand, ~!faction.iran
+
+flakt:
+	Buildable:
+		Prerequisites: naradr, ~nahand, ~!faction.iran
+
+shk:
+	Buildable:
+		Prerequisites: ~nahand, ~!faction.iran
+
+ivan:
+	Buildable:
+		Prerequisites: naradr, ~nahand, ~!faction.iran
+
+yuri:
+	Buildable:
+		Prerequisites: natech, ~nahand, ~!faction.iran
+
+dron:
+	Buildable:
+		Prerequisites: ~naweap, ~!faction.iran
+
+htnk:
+	Buildable:
+		Prerequisites: ~naweap, ~!faction.iran
+
+apoc:
+	Buildable:
+		Prerequisites: ~naweap, natech, ~!faction.iran
+
+zep:
+	Buildable:
+		Prerequisites: ~naweap, natech, ~!faction.iran
+
+sub:
+	Buildable:
+		Prerequisites: ~nayard, ~!faction.iran
+
+hyd:
+	Buildable:
+		Prerequisites: naradr, ~nayard, ~!faction.iran
+
+sqd:
+	Buildable:
+		Prerequisites: natech, ~nayard, ~!faction.iran
+
+nalasr:
+	Buildable:
+		Prerequisites: barracks, ~structures.soviets, ~!faction.iran
+
+naflak:
+	Buildable:
+		Prerequisites: barracks, ~structures.soviets, ~!faction.iran
+
+tesla:
+	Buildable:
+		Prerequisites: naradr, ~structures.soviets, ~!faction.iran
