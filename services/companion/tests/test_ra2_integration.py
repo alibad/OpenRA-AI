@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 import importlib.util
+import json
 from pathlib import Path
 import re
+import subprocess
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -26,6 +28,13 @@ SPEC.loader.exec_module(prepare)
 
 
 class RA2IntegrationTests(unittest.TestCase):
+    def test_release_compatibility_lock_matches_checked_out_engine(self):
+        manifest = json.loads((ROOT / "apps/installer/ra2/upstream.json").read_text())
+        engine_commit = subprocess.check_output(
+            ["git", "-C", str(ROOT / "engine/openra"), "rev-parse", "HEAD"], text=True).strip()
+        self.assertEqual(manifest["engine_commit"], engine_commit,
+                         "Update the RA2 compatibility lock after validating an engine upgrade")
+
     def test_modern_flags_keep_native_pixels_and_preserve_upstream_atlas(self):
         original = Image.new("RGBA", (256, 256), (12, 34, 56, 128))
         with Image.open(ROOT / "engine/openra/mods/ra/uibits/glyphs-redsea.png") as source:
