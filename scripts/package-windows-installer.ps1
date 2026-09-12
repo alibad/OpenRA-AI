@@ -73,12 +73,21 @@ Copy-Item -LiteralPath $brandIcon -Destination (Join-Path $payloadBrand "rtsai.i
 $aiPack = Join-Path $releaseRoot "OpenRA-AI-AI-Pack-$Version-windows-x64.zip"
 $aiPackChecksum = "$aiPack.sha256"
 $bundledAI = Test-Path -LiteralPath (Join-Path $StageRoot "ai\pack.json")
-foreach ($required in $(if ($bundledAI) { @() } else { @($aiPack, $aiPackChecksum) })) {
+if ($bundledAI -and -not (Test-Path -LiteralPath $aiPack)) {
+    Add-Type -AssemblyName System.IO.Compression.FileSystem
+    [IO.Compression.ZipFile]::CreateFromDirectory((Join-Path $StageRoot "ai"), $aiPack, [IO.Compression.CompressionLevel]::Fastest, $false)
+    (Get-FileHash -LiteralPath $aiPack -Algorithm SHA256).Hash.ToLowerInvariant() | Set-Content -LiteralPath $aiPackChecksum -Encoding ASCII
+}
+foreach ($required in @($aiPack, $aiPackChecksum)) {
     if (-not (Test-Path -LiteralPath $required)) {
         throw "Build the Windows AI pack before the installer: $required"
     }
 }
-$aiPackHash = if ($bundledAI) { '0' * 64 } else { (Get-Content -LiteralPath $aiPackChecksum -Raw).Split(" ")[0].Trim().ToLowerInvariant() }
+$aiPackHash = (Get-Content -LiteralPath $aiPackChecksum -Raw).Split(" ")[0].Trim().ToLowerInvariant()
+if ((Get-FileHash -LiteralPath $aiPack -Algorithm SHA256).Hash.ToLowerInvariant() -ne $aiPackHash) {
+    throw "The local AI pack does not match its checksum file. Existing artifacts were preserved."
+}
+Copy-Item -LiteralPath (Join-Path $repositoryRoot "apps\launcher\Install-AIPack.ps1") -Destination (Join-Path $StageRoot "apps\launcher\Install-AIPack.ps1")
 $aiPackUrl = "https://github.com/alibad/OpenRA-AI/releases/download/v$Version/$([IO.Path]::GetFileName($aiPack))"
 
 $makensisCommand = Get-Command "makensis.exe" -ErrorAction SilentlyContinue

@@ -160,14 +160,20 @@ Section "OpenRA AI" SEC_MAIN
   SectionIn RO
   SetShellVarContext current
   SetOutPath "$INSTDIR"
-  File /r "${PAYLOAD}\*.*"
+  ; Keep the model payload outside NSIS's 2 GB data-block address space.
+  File /r /x ai /x logs /x *.log "${PAYLOAD}\*.*"
 
   ${If} $SilentInstall == "1"
     DetailPrint "Silent install: AI provider configuration skipped."
   ${ElseIf} $InstallLocalAI == "1"
     ${IfNot} ${FileExists} "$INSTDIR\ai\pack.json"
+    ${If} ${FileExists} "$EXEDIR\OpenRA-AI-AI-Pack-${VERSION}-windows-x64.zip"
+    DetailPrint "Verifying and installing the included local AI pack..."
+    nsExec::ExecToLog '"$SYSDIR\WindowsPowerShell\v1.0\powershell.exe" -NoProfile -ExecutionPolicy Bypass -File "$INSTDIR\apps\launcher\Install-AIPack.ps1" -SourceArchive "$EXEDIR\OpenRA-AI-AI-Pack-${VERSION}-windows-x64.zip" -SHA256 "${AIPACKSHA256}" -Destination "$INSTDIR\ai"'
+    ${Else}
     DetailPrint "Downloading and verifying the local AI pack (about 1.8 GB)..."
     nsExec::ExecToLog '"$SYSDIR\WindowsPowerShell\v1.0\powershell.exe" -NoProfile -ExecutionPolicy Bypass -File "$INSTDIR\apps\launcher\Install-AIPack.ps1" -Url "${AIPACKURL}" -SHA256 "${AIPACKSHA256}" -Destination "$INSTDIR\ai"'
+    ${EndIf}
     Pop $0
     ${If} $0 != 0
       MessageBox MB_ICONSTOP "The local AI pack could not be downloaded or verified. Setup will stop without leaving an unverified model payload."

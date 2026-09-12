@@ -1,10 +1,12 @@
 from pathlib import Path
 import json
+import hashlib
 import os
 import shutil
 import subprocess
 import tempfile
 import unittest
+import zipfile
 from unittest.mock import patch
 
 from openra_ai_companion.game_content import import_owned_ra2, owned_ra2_candidates, steam_roots
@@ -64,6 +66,30 @@ class WindowsGameSetupTests(unittest.TestCase):
         self.assertIn('--runtime win-x64 --data-only', script)
         self.assertIn('"launch-game.ps1"', script)
         self.assertIn('games = @("ra", "ra2")', script)
+
+    @unittest.skipUnless(os.name == "nt", "Windows PowerShell installer")
+    def test_installer_accepts_verified_adjacent_pack_and_rejects_wrong_digest(self):
+        with tempfile.TemporaryDirectory(prefix="openra pack ") as directory:
+            root = Path(directory)
+            archive = root / "AI pack.zip"
+            with zipfile.ZipFile(archive, "w") as bundle:
+                bundle.writestr("pack.json", '{"pack_version":"fixture"}')
+                bundle.writestr("models/test.bin", b"test model")
+            digest = hashlib.sha256(archive.read_bytes()).hexdigest()
+            destination = root / "install/ai"
+            command = ["powershell.exe", "-NoProfile", "-ExecutionPolicy", "Bypass", "-File",
+                       str(ROOT / "apps/launcher/Install-AIPack.ps1"), "-SourceArchive", str(archive),
+                       "-Destination", str(destination), "-SHA256"]
+            # Python can inherit PowerShell 7's module path. Windows PowerShell 5
+            # must discover its own modules, as it does when started by NSIS.
+            environment = {key: value for key, value in os.environ.items() if key.lower() != "psmodulepath"}
+            installed = subprocess.run([*command, digest], capture_output=True, text=True, env=environment)
+            self.assertEqual(installed.returncode, 0, installed.stdout + installed.stderr)
+            self.assertEqual((destination / "models/test.bin").read_bytes(), b"test model")
+            failed = subprocess.run([*command, "0" * 64], capture_output=True, text=True, env=environment)
+            self.assertNotEqual(failed.returncode, 0)
+            self.assertIn("checksum mismatch", failed.stderr)
+            self.assertEqual((destination / "models/test.bin").read_bytes(), b"test model")
 
 
 if __name__ == "__main__":
