@@ -2,6 +2,7 @@
 param(
     [string]$Version = "0.1.0-alpha.1",
     [switch]$SkipInstaller,
+    [switch]$ExcludeLocalAI,
     [switch]$RequireSignatures
 )
 
@@ -15,7 +16,11 @@ $stageRoot = Join-Path $packageRoot $releaseName
 $releaseArchive = Join-Path $releaseRoot "$releaseName.zip"
 $python = Join-Path $repositoryRoot ".venv\Scripts\python.exe"
 $engineRoot = Join-Path $repositoryRoot "engine\openra"
-$dotnetRoot = Join-Path $env:USERPROFILE ".dotnet"
+$dotnetRoot = Split-Path -Parent (Get-Command dotnet.exe -ErrorAction Stop).Source
+$sdkVersion = (& (Join-Path $dotnetRoot "dotnet.exe") --version).Trim()
+if ($LASTEXITCODE -ne 0 -or $sdkVersion -notmatch '^(\d+)\.' -or [int]$Matches[1] -lt 10) {
+    throw "Windows packaging requires the .NET 10 SDK or newer on PATH."
+}
 $brandIcon = Join-Path $repositoryRoot "assets\brand\rtsai.ico"
 $aiPackLock = Join-Path $repositoryRoot "packaging\ai-pack.lock.json"
 $aiRuntimeLock = Join-Path $repositoryRoot "packaging\ai-runtime.lock.json"
@@ -57,13 +62,8 @@ if ($runningEngine.Count -gt 0) {
 }
 
 New-Item -ItemType Directory -Path $artifactRoot -Force | Out-Null
-if (Test-Path -LiteralPath $packageRoot) {
-    $packageResolved = (Resolve-Path -LiteralPath $packageRoot).Path
-    $artifactResolved = (Resolve-Path -LiteralPath $artifactRoot).Path
-    if (-not $packageResolved.StartsWith($artifactResolved + [IO.Path]::DirectorySeparatorChar)) {
-        throw "Refusing to replace a package directory outside artifacts."
-    }
-    Remove-Item -LiteralPath $packageResolved -Recurse
+if (Test-Path -LiteralPath $stageRoot) {
+    throw "Package stage already exists: $stageRoot. Use a new version; existing artifacts are preserved."
 }
 New-Item -ItemType Directory -Path $stageRoot -Force | Out-Null
 New-Item -ItemType Directory -Path $releaseRoot -Force | Out-Null
@@ -77,14 +77,24 @@ export PATH='$dotnetPosix':`$PATH
 source '$enginePosix/packaging/functions.sh'
 install_assemblies '$enginePosix' '$stagePosix/engine/openra/bin' 'win-x64' 'True' 'True' 'False'
 install_data '$enginePosix' '$stagePosix/engine/openra' 'ra'
+set_engine_version '$Version' '$stagePosix/engine/openra'
+set_mod_version '$Version' '$stagePosix/engine/openra/mods/ra/mod.yaml'
 "@
 & "C:\Program Files\Git\bin\bash.exe" -lc $packageCommand
 if ($LASTEXITCODE -ne 0) {
     throw "OpenRA portable engine packaging failed."
 }
 
+# Ship both game definitions, using the same canonical RA2 assembly as World War III.
+$env:PYTHONUTF8 = "1"
+& $python (Join-Path $PSScriptRoot "prepare-ra2.py") --resources (Join-Path $stageRoot "engine\openra") --binaries (Join-Path $stageRoot "engine\openra\bin") --engine $engineRoot --version $Version --runtime win-x64 --data-only
+if ($LASTEXITCODE -ne 0) { throw "Integrated Windows RA2 preparation failed." }
+Copy-Item -LiteralPath (Join-Path $engineRoot "launch-game.ps1") -Destination (Join-Path $stageRoot "engine\openra")
+Copy-Item -LiteralPath (Join-Path $engineRoot "launch-game.cmd") -Destination (Join-Path $stageRoot "engine\openra")
+
 & (Join-Path $PSScriptRoot "build-windows-launcher.ps1") `
     -OutputDirectory (Join-Path $stageRoot "engine\openra\bin") `
+    -EngineRoot $engineRoot `
     -SelfContained
 
 $pyinstallerWork = Join-Path $artifactRoot "package\pyinstaller-work"
@@ -141,6 +151,12 @@ New-Item -ItemType Directory -Path $packagingMetadata -Force | Out-Null
 Copy-Item -LiteralPath $aiPackLock -Destination $packagingMetadata
 Copy-Item -LiteralPath $aiRuntimeLock -Destination $packagingMetadata
 Copy-Item -LiteralPath $modelNotices -Destination $packagingMetadata
+if (-not $ExcludeLocalAI) {
+    # The default portable/install payload is usable without a separate AI-pack step.
+    & $python (Join-Path $PSScriptRoot "setup-local-ai.py")
+    if ($LASTEXITCODE -ne 0) { throw "Verified local AI payload preparation failed." }
+    Copy-Item -LiteralPath (Join-Path $repositoryRoot "ai") -Destination $stageRoot -Recurse
+}
 $brandTarget = Join-Path $stageRoot "assets\brand"
 New-Item -ItemType Directory -Path $brandTarget -Force | Out-Null
 Copy-Item -LiteralPath $brandIcon -Destination (Join-Path $brandTarget "rtsai.ico")
@@ -162,13 +178,16 @@ $manifest = [ordered]@{
     engine_commit = (git -C $engineRoot rev-parse HEAD).Trim()
     product_commit = (git -C $repositoryRoot rev-parse HEAD).Trim()
     entrypoint = "Play-OpenRAAI.cmd"
+    games = @("ra", "ra2")
+    ra2_content = "Automatically imported from an owned Steam installation on first run; commercial content is never bundled."
     bundled_map = "generated/missions/riyadh-crossing-42.oramap"
     content = "Downloaded on first run from OpenRA's supported Red Alert quick-install mirrors"
     ai_pack = [ordered]@{
         manifest = "packaging/ai-pack.lock.json"
         runtime_manifest = "packaging/ai-runtime.lock.json"
         installer_default = $true
-        portable_install = "Extract the matching AI pack into the ai folder, or configure an external provider."
+        bundled = (-not $ExcludeLocalAI)
+        portable_install = $(if ($ExcludeLocalAI) { "Extract the matching AI pack into the ai folder, or configure an external provider." } else { "Included and verified during packaging; no separate model installation is required." })
         runtime_cost = "No hosted-provider charge"
     }
 }

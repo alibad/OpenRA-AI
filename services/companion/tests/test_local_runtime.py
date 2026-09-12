@@ -52,6 +52,8 @@ class LocalRuntimeTests(unittest.TestCase):
             root = Path(directory)
             for name in ("ai/runtime/llama/llama-server", "ai/runtime/whisper/whisper-server",
                          "ai/models/text.gguf", "ai/models/stt/ggml-base.en.bin"):
+                if name.endswith("-server") and os.name == "nt":
+                    name += ".exe"
                 path = root / name
                 path.parent.mkdir(parents=True, exist_ok=True)
                 path.touch()

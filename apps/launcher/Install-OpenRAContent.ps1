@@ -1,12 +1,12 @@
 [CmdletBinding()]
 param(
     [string]$MirrorList = "https://www.openra.net/packages/ra-quickinstall-mirrors.txt",
+    [string]$SupportRoot = (Join-Path $env:APPDATA "OpenRA"),
     [switch]$KeepDownload
 )
 
 $ErrorActionPreference = "Stop"
 $expectedSha1 = "44241f68e69db9511db82cf83c174737ccda300b"
-$supportRoot = Join-Path $env:APPDATA "OpenRA"
 $contentRoot = Join-Path $supportRoot "Content\ra\v2"
 $requiredFiles = @(
     "allies.mix",

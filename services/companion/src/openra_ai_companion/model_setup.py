@@ -21,7 +21,7 @@ if TYPE_CHECKING:
     from .core import Companion
 
 
-LOCAL_ROUTER_URL = "http://127.0.0.1:4000"
+LOCAL_ROUTER_URL = os.environ.get("OPENRA_AI_LOCAL_ROUTER_URL", "http://127.0.0.1:4000")
 
 
 class LocalAISetupError(RuntimeError):
@@ -360,7 +360,7 @@ class LocalAIManager:
             if _reachable(f"{LOCAL_ROUTER_URL}/health/liveliness"):
                 self._configure_local_route()
                 self._state = "running"
-                self._detail = "Local AI is installed and ready. Voice stays on this Mac."
+                self._detail = "Local AI is installed and ready. Voice stays on this device."
                 return
             if self._process and self._process.poll() is None:
                 return
@@ -375,7 +375,9 @@ class LocalAIManager:
             self._process = subprocess.Popen(
                 [
                     str(self.runtime_executable),
+                    *(["-m", "openra_ai_companion.local_runtime"] if os.environ.get("OPENRA_AI_RUNTIME_PYTHON") == "1" else []),
                     "serve",
+                    "--port", LOCAL_ROUTER_URL.rsplit(":", 1)[-1],
                     "--root",
                     str(self.install_root),
                     "--runtime-root",
@@ -389,6 +391,7 @@ class LocalAIManager:
                 cwd=self.runtime_executable.parent,
                 stdout=output,
                 stderr=error,
+                creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0),
             )
 
         deadline = time.monotonic() + 180
@@ -401,7 +404,7 @@ class LocalAIManager:
                 self._configure_local_route()
                 with self._lock:
                     self._state = "running"
-                    self._detail = "Local AI is installed and ready. Voice stays on this Mac."
+                    self._detail = "Local AI is installed and ready. Voice stays on this device."
                 return
             time.sleep(0.5)
         raise LocalAISetupError("Local models did not finish loading within three minutes. Select Retry.")

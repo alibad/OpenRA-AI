@@ -48,7 +48,12 @@ class RA2PreviewTests(unittest.TestCase):
 
     def test_import_rejects_symlink_target(self):
         self.destination.mkdir()
-        (self.destination / "ra2.mix").symlink_to(self.base / "RA2.MIX")
+        try:
+            (self.destination / "ra2.mix").symlink_to(self.base / "RA2.MIX")
+        except OSError as exc:
+            if getattr(exc, "winerror", None) == 1314:
+                self.skipTest("Windows symlink privilege is unavailable")
+            raise
         with self.assertRaisesRegex(ValueError, "Refusing to replace"):
             preview.import_content(self.base, self.language, self.destination)
 

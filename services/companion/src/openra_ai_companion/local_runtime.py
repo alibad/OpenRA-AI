@@ -23,8 +23,8 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
 
-LOCAL_CHAT_PORT = 4001
-LOCAL_TRANSCRIBE_PORT = 4002
+LOCAL_CHAT_PORT = int(os.environ.get("OPENRA_AI_LOCAL_CHAT_PORT", "4001"))
+LOCAL_TRANSCRIBE_PORT = int(os.environ.get("OPENRA_AI_LOCAL_TRANSCRIBE_PORT", "4002"))
 DEFAULT_PORT = 4000
 
 

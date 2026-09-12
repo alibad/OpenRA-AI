@@ -3,6 +3,7 @@ from __future__ import annotations
 import base64
 import io
 import json
+import os
 import threading
 import time
 import urllib.error
@@ -52,7 +53,7 @@ class AIRouter:
         started = time.perf_counter()
         local_audio = ((path == "/v1/audio/transcriptions" and self.settings.transcribe_model == "local-whisper") or
                        (path == "/v1/audio/speech" and self.settings.speech_model == "local-kokoro"))
-        base_url = "http://127.0.0.1:4000" if local_audio and self.settings.model_provider == "custom" else self.settings.router_url
+        base_url = os.environ.get("OPENRA_AI_LOCAL_ROUTER_URL", "http://127.0.0.1:4000") if local_audio and self.settings.model_provider == "custom" else self.settings.router_url
         request = urllib.request.Request(
             f"{base_url}{path}",
             data=body,

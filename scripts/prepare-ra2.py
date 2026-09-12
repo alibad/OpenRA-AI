@@ -65,10 +65,10 @@ def extend_flag_atlas(original: Image.Image, flags: Image.Image) -> tuple[Image.
 
 
 def replace_once(path: Path, old: str, new: str) -> None:
-    text = path.read_text()
+    text = path.read_text(encoding="utf-8")
     if text.count(old) != 1:
         raise ValueError(f"Expected one integration anchor in {path}: {old!r}")
-    path.write_text(text.replace(old, new, 1))
+    path.write_text(text.replace(old, new, 1), encoding="utf-8", newline="\n")
 
 
 def trim_off_map_fences(text: str) -> str:
@@ -165,11 +165,11 @@ def integrate(source: Path, engine: Path, version: str) -> None:
     for path in (mod / "maps").glob("*/map.yaml"):
         path.write_text(trim_off_map_fences(path.read_text()))
     for path in mod.rglob("*.yaml"):
-        path.write_text(path.read_text().replace("{DEV_VERSION}", version))
+        path.write_text(path.read_text(encoding="utf-8").replace("{DEV_VERSION}", version), encoding="utf-8", newline="\n")
 
 
-def prepare(resources: Path, binaries: Path, version: str, allow_engine_changes: bool = False, runtime: str = "osx-arm64") -> Path:
-    engine = ROOT / "engine/openra"
+def prepare(resources: Path, binaries: Path, version: str, allow_engine_changes: bool = False, runtime: str = "osx-arm64", engine: Path | None = None, data_only: bool = False) -> Path:
+    engine = (engine or ROOT / "engine/openra").resolve()
     manifest = json.loads((SOURCE.CONFIG / "upstream.json").read_text())
     actual = subprocess.check_output(["git", "-C", str(engine), "rev-parse", "HEAD"], text=True).strip()
     dirty = subprocess.check_output(["git", "-C", str(engine), "status", "--porcelain"], text=True).strip()
@@ -181,15 +181,21 @@ def prepare(resources: Path, binaries: Path, version: str, allow_engine_changes:
     cache.mkdir(parents=True, exist_ok=True)
     workspace = Path(tempfile.mkdtemp(prefix="integrated-", dir=cache))
     source = SOURCE.extract_source(SOURCE.download_source(manifest, cache), workspace, manifest["commit"])
-    SOURCE.run("git", "apply", "--check", SOURCE.CONFIG / "compatibility.patch", cwd=source)
-    SOURCE.run("git", "apply", SOURCE.CONFIG / "compatibility.patch", cwd=source)
+    patch = workspace / "compatibility.patch"
+    patch.write_text((SOURCE.CONFIG / "compatibility.patch").read_text(encoding="utf-8"), encoding="utf-8", newline="\n")
+    SOURCE.run("git", "-c", "core.autocrlf=false", "apply", "--check", patch, cwd=source)
+    SOURCE.run("git", "-c", "core.autocrlf=false", "apply", patch, cwd=source)
     integrate(source, engine, version)
-    SOURCE.run("dotnet", "build", source / "OpenRA.Mods.RA2/OpenRA.Mods.RA2.csproj", "-c", "Release",
-               f"-p:EngineRootPath={engine}", f"-p:OutputPath={workspace / 'bin'}", f"-p:TargetPlatform={runtime}", "--nologo")
+    if not data_only:
+        SOURCE.run("dotnet", "build", source / "OpenRA.Mods.RA2/OpenRA.Mods.RA2.csproj", "-c", "Release",
+                   f"-p:EngineRootPath={engine}", f"-p:OutputPath={workspace / 'bin'}", f"-p:TargetPlatform={runtime}", "--nologo")
+    # Keep the generated mod self-contained, including when used via ModSearchPaths.
+    replace_once(source / "mods/ra2/chrome.yaml", "common|native-ra2-glyphs.png", "ra2|uibits/native-ra2-glyphs.png")
+    shutil.copy2(engine / "mods/ts/uibits/glyphs.png", source / "mods/ra2/uibits/native-ra2-glyphs.png")
     shutil.copytree(source / "mods/ra2", resources / "mods/ra2")
-    shutil.copy2(engine / "mods/ts/uibits/glyphs.png", resources / "mods/common/native-ra2-glyphs.png")
-    for suffix in (".dll", ".deps.json"):
-        shutil.copy2(workspace / "bin" / ("OpenRA.Mods.RA2" + suffix), binaries)
+    if not data_only:
+        for suffix in (".dll", ".deps.json"):
+            shutil.copy2(workspace / "bin" / ("OpenRA.Mods.RA2" + suffix), binaries)
     evidence = {**manifest, "engine_commit": actual, "engine_dirty": bool(dirty), "version": version, "runtime": runtime,
                 "ai_assistant": True, "game_selection": ["ra", "ra2"], "proprietary_content_bundled": False}
     (resources / "RA2-BUILD.json").write_text(json.dumps(evidence, indent=2) + "\n")
@@ -204,6 +210,8 @@ if __name__ == "__main__":
     parser.add_argument("--binaries", type=Path, required=True)
     parser.add_argument("--version", required=True)
     parser.add_argument("--allow-engine-changes", action="store_true")
-    parser.add_argument("--runtime", choices=("osx-arm64", "osx-x64"), default="osx-arm64")
+    parser.add_argument("--runtime", choices=("osx-arm64", "osx-x64", "win-x64"), default="osx-arm64")
+    parser.add_argument("--engine", type=Path)
+    parser.add_argument("--data-only", action="store_true", help="Use the canonical engine's RA2 library; do not overwrite its mechanics")
     args = parser.parse_args()
-    print(prepare(args.resources, args.binaries, args.version, args.allow_engine_changes, args.runtime))
+    print(prepare(args.resources, args.binaries, args.version, args.allow_engine_changes, args.runtime, args.engine, args.data_only))

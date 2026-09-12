@@ -36,3 +36,5 @@ downloads/
 # Local development logs
 *.dev-server.out.log
 *.dev-server.err.log
+/ai/
+/logs/

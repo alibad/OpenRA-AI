@@ -1,6 +1,7 @@
 [CmdletBinding()]
 param(
     [string]$OutputDirectory,
+    [string]$EngineRoot,
     [ValidateSet("Debug", "Release")]
     [string]$Configuration = "Release",
     [switch]$SelfContained
@@ -8,7 +9,7 @@ param(
 
 $ErrorActionPreference = "Stop"
 $repositoryRoot = Split-Path -Parent $PSScriptRoot
-$engineRoot = Join-Path $repositoryRoot "engine\openra"
+if (-not $EngineRoot) { $engineRoot = Join-Path $repositoryRoot "engine\openra" }
 $project = Join-Path $engineRoot "OpenRA.WindowsLauncher\OpenRA.WindowsLauncher.csproj"
 $brandIcon = Join-Path $repositoryRoot "assets\brand\rtsai.ico"
 
@@ -23,16 +24,22 @@ foreach ($required in @($project, $brandIcon)) {
 }
 
 $dotnetCandidates = @(
+    (Get-Command dotnet.exe -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Source),
     (Join-Path $repositoryRoot ".dotnet\dotnet.exe"),
     (Join-Path $env:USERPROFILE ".dotnet\dotnet.exe")
 )
-$dotnet = $dotnetCandidates | Where-Object { Test-Path -LiteralPath $_ } | Select-Object -First 1
-if (-not $dotnet) {
-    $dotnetCommand = Get-Command dotnet.exe -ErrorAction SilentlyContinue
-    $dotnet = if ($dotnetCommand) { $dotnetCommand.Source } else { $null }
+$dotnet = $null
+foreach ($candidate in $dotnetCandidates) {
+    if ($candidate -and (Test-Path -LiteralPath $candidate)) {
+        $version = (& $candidate --version).Trim()
+        if ($LASTEXITCODE -eq 0 -and $version -match '^(\d+)\.' -and [int]$Matches[1] -ge 10) {
+            $dotnet = $candidate
+            break
+        }
+    }
 }
 if (-not $dotnet) {
-    throw "A compatible .NET SDK is required to build the OpenRA AI launcher."
+    throw "The .NET 10 SDK or newer is required to build the OpenRA AI launcher."
 }
 
 New-Item -ItemType Directory -Path $OutputDirectory -Force | Out-Null

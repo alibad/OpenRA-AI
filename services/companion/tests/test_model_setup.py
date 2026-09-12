@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import tempfile
 import threading
 import time
@@ -84,8 +85,9 @@ class LocalAIManagerTests(unittest.TestCase):
             runtime_root = root / "runtime"
             (runtime_root / "llama").mkdir(parents=True)
             (runtime_root / "whisper").mkdir()
-            (runtime_root / "llama" / "llama-server").write_text("llama", encoding="utf-8")
-            (runtime_root / "whisper" / "whisper-server").write_text("whisper", encoding="utf-8")
+            suffix = ".exe" if os.name == "nt" else ""
+            (runtime_root / "llama" / ("llama-server" + suffix)).write_text("llama", encoding="utf-8")
+            (runtime_root / "whisper" / ("whisper-server" + suffix)).write_text("whisper", encoding="utf-8")
             companion = Companion()
             manager = _TestManager(
                 companion,

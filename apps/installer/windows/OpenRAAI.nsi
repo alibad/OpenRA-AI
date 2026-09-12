@@ -165,12 +165,14 @@ Section "OpenRA AI" SEC_MAIN
   ${If} $SilentInstall == "1"
     DetailPrint "Silent install: AI provider configuration skipped."
   ${ElseIf} $InstallLocalAI == "1"
+    ${IfNot} ${FileExists} "$INSTDIR\ai\pack.json"
     DetailPrint "Downloading and verifying the local AI pack (about 1.8 GB)..."
     nsExec::ExecToLog '"$SYSDIR\WindowsPowerShell\v1.0\powershell.exe" -NoProfile -ExecutionPolicy Bypass -File "$INSTDIR\apps\launcher\Install-AIPack.ps1" -Url "${AIPACKURL}" -SHA256 "${AIPACKSHA256}" -Destination "$INSTDIR\ai"'
     Pop $0
     ${If} $0 != 0
       MessageBox MB_ICONSTOP "The local AI pack could not be downloaded or verified. Setup will stop without leaving an unverified model payload."
       Abort
+    ${EndIf}
     ${EndIf}
     nsExec::ExecToLog '"$INSTDIR\bin\openra-ai-runtime.exe" configure --mode local'
     Pop $0

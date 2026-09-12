@@ -72,12 +72,13 @@ Copy-Item -LiteralPath $brandIcon -Destination (Join-Path $payloadBrand "rtsai.i
 
 $aiPack = Join-Path $releaseRoot "OpenRA-AI-AI-Pack-$Version-windows-x64.zip"
 $aiPackChecksum = "$aiPack.sha256"
-foreach ($required in @($aiPack, $aiPackChecksum)) {
+$bundledAI = Test-Path -LiteralPath (Join-Path $StageRoot "ai\pack.json")
+foreach ($required in $(if ($bundledAI) { @() } else { @($aiPack, $aiPackChecksum) })) {
     if (-not (Test-Path -LiteralPath $required)) {
         throw "Build the Windows AI pack before the installer: $required"
     }
 }
-$aiPackHash = (Get-Content -LiteralPath $aiPackChecksum -Raw).Split(" ")[0].Trim().ToLowerInvariant()
+$aiPackHash = if ($bundledAI) { '0' * 64 } else { (Get-Content -LiteralPath $aiPackChecksum -Raw).Split(" ")[0].Trim().ToLowerInvariant() }
 $aiPackUrl = "https://github.com/alibad/OpenRA-AI/releases/download/v$Version/$([IO.Path]::GetFileName($aiPack))"
 
 $makensisCommand = Get-Command "makensis.exe" -ErrorAction SilentlyContinue

@@ -492,6 +492,20 @@ class CompanionTests(unittest.TestCase):
         self.assertIn("Active native profile: Fortified defense", explanation.text)
         self.assertEqual(explanation.metadata["strategy"]["active_native_profile"], "turtle")
 
+    def test_general_explanation_uses_one_answer_without_action_planner_or_disabled_vision(self) -> None:
+        router = FakeRouter()
+        router.settings = router.settings.with_updates({"vision_model": "local-no-vision"})
+        companion = Companion(router=router)
+        companion.update_snapshot(snapshot())
+        planner = mock.Mock(side_effect=AssertionError("Read-only explanation must not plan orders"))
+        companion.set_action_planner(planner)
+        with mock.patch.object(companion, "_vision_inputs", side_effect=AssertionError("Vision is disabled")):
+            response = companion.handle_player_input("Explain why scouting matters in this match.")
+        self.assertEqual(response.source, "ai-layer")
+        self.assertEqual(router.calls, 1)
+        planner.assert_not_called()
+        self.assertIsNone(companion.pending_action())
+
     def test_spoken_situation_prompts_return_live_facts_without_model_filler(self) -> None:
         router = FakeRouter()
         companion = Companion(router=router)

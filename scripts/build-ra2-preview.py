@@ -104,18 +104,18 @@ def download_source(manifest: dict, cache: Path) -> Path:
         return archive
     with tempfile.NamedTemporaryFile(dir=cache, prefix=".download-", delete=False) as stream:
         staging = Path(stream.name)
-        try:
-            request = urllib.request.Request(
-                manifest["archive_url"], headers={"User-Agent": "RTSAI-native-preview"}
-            )
+    try:
+        request = urllib.request.Request(
+            manifest["archive_url"], headers={"User-Agent": "RTSAI-native-preview"}
+        )
+        with staging.open("wb") as stream:
             with urllib.request.urlopen(request, timeout=60) as response:
                 shutil.copyfileobj(response, stream)
-            stream.flush()
-            if digest(staging) != manifest["archive_sha256"]:
-                raise ValueError("RA2 source download checksum mismatch")
-            os.link(staging, archive)
-        finally:
-            staging.unlink(missing_ok=True)
+        if digest(staging) != manifest["archive_sha256"]:
+            raise ValueError("RA2 source download checksum mismatch")
+        os.link(staging, archive)
+    finally:
+        staging.unlink(missing_ok=True)
     return archive
 
 

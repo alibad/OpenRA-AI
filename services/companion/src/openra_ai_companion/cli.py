@@ -27,6 +27,7 @@ from .agent_models import default_agent_model, default_agent_provider, default_a
 def _parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="openra-ai-companion")
     commands = parser.add_subparsers(dest="command", required=True)
+    commands.add_parser("content-check", help="discover and import owned RA2 content; missing content does not block Red Alert")
     server = commands.add_parser("serve", help="start the local companion API")
     server.add_argument("--host", default="127.0.0.1")
     server.add_argument("--port", type=int, default=8787)
@@ -166,6 +167,14 @@ def _match_started(
 
 def main(argv: list[str] | None = None) -> int:
     args = _parser().parse_args(argv)
+    if args.command == "content-check":
+        from .game_content import import_owned_ra2
+        try:
+            result = import_owned_ra2()
+        except (ValueError, OSError) as error:
+            result = {"installed": False, "detail": str(error)}
+        print(json.dumps(result))
+        return 0
     if args.command == "serve":
         serve(args.host, args.port)
         return 0

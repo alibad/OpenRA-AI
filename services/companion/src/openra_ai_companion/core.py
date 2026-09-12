@@ -600,7 +600,7 @@ class Companion:
             return CompanionResponse("I don't have a live game snapshot yet.", "deterministic-fallback", utterance_id=generation, metadata={"degraded": True})
         started = time.perf_counter()
         try:
-            images, views = self._vision_inputs(snapshot)
+            images, views = ([], []) if self.router.settings.vision_model == "local-no-vision" else self._vision_inputs(snapshot)
             if images:
                 result = self.router.vision_many(
                     SYSTEM_PROMPT + "\n" + FULL_VISION_PROMPT + "\nCONTEXT:\n" +
@@ -1852,6 +1852,12 @@ class Companion:
         progress_request = strategy_intent == "progress"
         failure_followup = _is_action_failure_followup(instruction)
         scout_request = _is_scout_request(instruction)
+
+        # General explanations need one grounded answer, not a multi-tool action plan.
+        # Preserve the planner's existing compound-order and live-briefing behavior.
+        if (not (progress_request or failure_followup or scout_request)
+                and instruction.lower().startswith(("explain ", "why ", "what is ", "what are ", "how does ", "how do "))):
+            return self.ask(instruction)
 
         started = time.perf_counter()
         with self._action_lock:
