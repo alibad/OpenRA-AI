@@ -16,6 +16,7 @@ PYTHON="$REPOSITORY_ROOT/.venv/bin/python"
 AI_PACK_LOCK="$REPOSITORY_ROOT/packaging/ai-pack.lock.json"
 AI_RUNTIME_LOCK="$REPOSITORY_ROOT/packaging/ai-runtime.lock.json"
 MODEL_NOTICES="$REPOSITORY_ROOT/packaging/THIRD_PARTY_MODELS.md"
+CATALOG_TOOL="$REPOSITORY_ROOT/scripts/content_catalog.py"
 BROTLI_LICENSE="$REPOSITORY_ROOT/packaging/BROTLI-LICENSE.txt"
 SAMPLE_MISSION="$REPOSITORY_ROOT/generated/missions/riyadh-crossing-42.oramap"
 
@@ -46,6 +47,7 @@ done
   echo >&2 "macOS packaging requires the companion voice extra. Run scripts/setup.ps1 again."
   exit 1
 }
+"$PYTHON" "$CATALOG_TOOL" --engine "$ENGINE_ROOT"
 
 case "$(uname -m)" in
   arm64)
@@ -201,6 +203,7 @@ cp "$REPOSITORY_ROOT/.env.example" "$RESOURCES/"
 cp "$REPOSITORY_ROOT/README.md" "$REPOSITORY_ROOT/LICENSE" "$RESOURCES/"
 mkdir -p "$RESOURCES/packaging"
 cp "$AI_PACK_LOCK" "$AI_RUNTIME_LOCK" "$MODEL_NOTICES" "$BROTLI_LICENSE" "$RESOURCES/packaging/"
+"$PYTHON" "$CATALOG_TOOL" --engine "$ENGINE_ROOT" --stage "$RESOURCES"
 
 sign_runtime_payload() {
   local identity="$1"

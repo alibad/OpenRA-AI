@@ -1,0 +1,494 @@
+{
+  "schemaVersion": 1,
+  "id": "modern-factions",
+  "revision": "2026-09-12.1",
+  "scope": "Curated faction guide and signature units; not the complete build roster or a balance database.",
+  "sources": {
+    "engineCommit": "a63f15f7f62138c078ecc77c63a7582d8fbde03a",
+    "productCommit": "8fc59f71ab71a5e4834f8476506a65c01d734a05"
+  },
+  "modes": [
+    {
+      "id": "ra",
+      "name": "Classic",
+      "subtitle": "World War III · classic engine",
+      "description": "Modern faction packs on OpenRA’s classic Red Alert battlefield. This is not the unmodified original roster."
+    },
+    {
+      "id": "ra2",
+      "name": "Red Alert 2",
+      "subtitle": "RA2 engine · modern factions",
+      "description": "The same faction identities, rebuilt for RA2’s isometric battlefield and rules. Requires owned Red Alert 2 game data."
+    }
+  ],
+  "profiles": [
+    {
+      "id": "world-war-iii",
+      "mode": "ra",
+      "factionIds": [
+        "china",
+        "iran",
+        "turkey",
+        "saudi-arabia",
+        "yemen"
+      ]
+    },
+    {
+      "id": "ra2-modern",
+      "mode": "ra2",
+      "factionIds": [
+        "china",
+        "iran",
+        "turkey"
+      ]
+    }
+  ],
+  "theatres": [
+    {
+      "id": "red-sea-2026",
+      "name": "Red Sea 2026",
+      "factionIds": [
+        "saudi-arabia",
+        "yemen"
+      ],
+      "mode": "ra",
+      "missions": [
+        "Jizan Corridor",
+        "Hodeidah Lifeline",
+        "Bab al-Mandab Passage"
+      ]
+    }
+  ],
+  "factions": [
+    {
+      "id": "china",
+      "name": "China",
+      "title": "Haitian Network",
+      "tagline": "Coordination is your strongest weapon.",
+      "story": "A scattered force can hold ground. A connected force can choose where the battle happens. China’s fictional Haitian Network brings reconnaissance, precision armor and maritime reach into one coordinated offensive.",
+      "playstyle": "Keep specialists and escorts close to your main force. Use reconnaissance to commit your armor where it matters.",
+      "strengths": "Coordinated armor, specialist support and sea-to-land pressure.",
+      "counterplay": "Disrupt the supporting units and attack separated formations.",
+      "heroAssetId": "china-cameo-atlas",
+      "accent": "#cb4c3b",
+      "unitIds": [
+        "cnrifle",
+        "cnqilin",
+        "cncloud",
+        "cnhaiwang"
+      ],
+      "variants": {
+        "ra": {
+          "status": "implemented",
+          "profileId": "world-war-iii",
+          "description": "Classic sprite-based battlefield with this modern faction’s native rules and roster."
+        },
+        "ra2": {
+          "status": "implemented",
+          "profileId": "ra2-modern",
+          "description": "RA2-specific actors and balance on an isometric battlefield. Shares the faction identity, not identical statistics or every mechanic."
+        }
+      }
+    },
+    {
+      "id": "iran",
+      "name": "Iran",
+      "title": "Distributed Denial",
+      "tagline": "Make every approach a difficult choice.",
+      "story": "In this fictional theatre, a dispersed defense turns coastlines and narrow approaches into contested ground. Iran’s force combines reconnaissance, mobile armor and overlapping air defense to make the opponent fight on unfavorable terms.",
+      "playstyle": "Build overlapping coverage and keep scouting. Move your armor under protection instead of committing it alone.",
+      "strengths": "Layered denial and mobile combined arms.",
+      "counterplay": "Scout coverage gaps, split the defense and pressure isolated specialists.",
+      "heroAssetId": "iran-cameo-roster",
+      "accent": "#67d6c5",
+      "unitIds": [
+        "irkarr",
+        "irraad"
+      ],
+      "variants": {
+        "ra": {
+          "status": "implemented",
+          "profileId": "world-war-iii",
+          "description": "Classic sprite-based battlefield with this modern faction’s native rules and roster."
+        },
+        "ra2": {
+          "status": "implemented",
+          "profileId": "ra2-modern",
+          "description": "RA2-specific actors and balance on an isometric battlefield. Shares the faction identity, not identical statistics or every mechanic."
+        }
+      }
+    },
+    {
+      "id": "turkey",
+      "name": "Türkiye",
+      "title": "Anatolian Guard",
+      "tagline": "Keep the initiative. Keep moving.",
+      "story": "The Anatolian Guard is a fictional combined-arms force built to cross difficult ground without losing cohesion. Mechanized armor, drones and electronic warfare support a flexible approach to contested straits and inland routes.",
+      "playstyle": "Pair your armored spearhead with reconnaissance and air cover. Change the direction of pressure before the opponent settles.",
+      "strengths": "Mechanized flexibility and drone-supported attacks.",
+      "counterplay": "Force unsupported units into fights and contest drone routes with air defense.",
+      "heroAssetId": "turkey-roster-concept",
+      "accent": "#d27768",
+      "unitIds": [
+        "bozkir",
+        "kuzgunm"
+      ],
+      "variants": {
+        "ra": {
+          "status": "implemented",
+          "profileId": "world-war-iii",
+          "description": "Classic sprite-based battlefield with this modern faction’s native rules and roster."
+        },
+        "ra2": {
+          "status": "implemented",
+          "profileId": "ra2-modern",
+          "description": "RA2-specific actors and balance on an isometric battlefield. Shares the faction identity, not identical statistics or every mechanic."
+        }
+      }
+    },
+    {
+      "id": "saudi-arabia",
+      "name": "Saudi Arabia",
+      "title": "Red Sea Command",
+      "tagline": "Hold the corridor. Protect the lifeline.",
+      "story": "In the fictional Red Sea 2026 campaign, Saudi forces must keep vital routes open under pressure. Heavy armor and professional infantry anchor a force that can hold ground while air power supports the next advance.",
+      "playstyle": "Use armor to anchor the push and infantry to secure the ground it takes.",
+      "strengths": "Durable armored formations supported by infantry and air power.",
+      "counterplay": "Avoid frontal armor trades; scout and pressure exposed support routes.",
+      "heroAssetId": "red-sea-saudi-infantry",
+      "accent": "#d7af79",
+      "unitIds": [
+        "m1a2s",
+        "sang"
+      ],
+      "variants": {
+        "ra": {
+          "status": "implemented",
+          "profileId": "world-war-iii",
+          "description": "Classic sprite-based battlefield with this modern faction’s native rules and roster."
+        },
+        "ra2": {
+          "status": "unavailable",
+          "profileId": null,
+          "description": "No RA2 implementation in the current modern-faction overlay. Explore this faction in Classic."
+        }
+      }
+    },
+    {
+      "id": "yemen",
+      "name": "Yemen",
+      "title": "Red Sea Resistance",
+      "tagline": "Choose the moment, not the front line.",
+      "story": "Across the fictional Red Sea 2026 theatre, a lighter force contests supply routes through mobility and selective pressure. Technicals and strike drones reward choosing engagements carefully instead of matching heavy armor head-on.",
+      "playstyle": "Scout first, attack exposed targets and relocate. Preserve mobile units for the next opportunity.",
+      "strengths": "Mobile harassment and asymmetric strike pressure.",
+      "counterplay": "Cover vulnerable routes and intercept light vehicles before they can disengage.",
+      "heroAssetId": "red-sea-yemen-infantry",
+      "accent": "#c8c78b",
+      "unitIds": [
+        "tech",
+        "samad"
+      ],
+      "variants": {
+        "ra": {
+          "status": "implemented",
+          "profileId": "world-war-iii",
+          "description": "Classic sprite-based battlefield with this modern faction’s native rules and roster."
+        },
+        "ra2": {
+          "status": "unavailable",
+          "profileId": null,
+          "description": "No RA2 implementation in the current modern-faction overlay. Explore this faction in Classic."
+        }
+      }
+    }
+  ],
+  "units": [
+    {
+      "id": "cnrifle",
+      "factionId": "china",
+      "name": "Combined-Arms Rifleman",
+      "role": "Line infantry",
+      "story": "The infantry element that secures ground for a networked advance.",
+      "strengths": "Use in numbers with supporting vehicles.",
+      "counterplay": "Keep away from concentrated anti-infantry fire.",
+      "assetIds": [
+        "china-cnrifleicon-review",
+        "china-cnrifle-contact-sheet"
+      ],
+      "variants": {
+        "ra": {
+          "actorId": "CNRIFLE",
+          "repository": "engine",
+          "rulesPath": "mods/ra/rules/china.yaml"
+        },
+        "ra2": {
+          "actorId": "r2cnrifle",
+          "repository": "product",
+          "rulesPath": "apps/installer/ra2/modern-factions/china-roster.yaml"
+        }
+      }
+    },
+    {
+      "id": "cnqilin",
+      "factionId": "china",
+      "name": "Qilin Main Battle Tank",
+      "role": "Precision armor",
+      "story": "A durable armored anchor with a precision cannon.",
+      "strengths": "Lead supported attacks against vehicles.",
+      "counterplay": "Screen against infantry ambushes and air strikes.",
+      "assetIds": [
+        "china-cnqilinicon-review",
+        "china-cnqilin-contact-sheet"
+      ],
+      "variants": {
+        "ra": {
+          "actorId": "CNQILIN",
+          "repository": "engine",
+          "rulesPath": "mods/ra/rules/china.yaml"
+        },
+        "ra2": {
+          "actorId": "r2qilin",
+          "repository": "product",
+          "rulesPath": "apps/installer/ra2/modern-factions/china.yaml"
+        }
+      }
+    },
+    {
+      "id": "cncloud",
+      "factionId": "china",
+      "name": "Cloud Shadow UAV",
+      "role": "Reconnaissance and strike",
+      "story": "A separate reconnaissance and precision-strike aircraft—not the carrier-launched drone.",
+      "strengths": "Scout routes and strike exposed targets.",
+      "counterplay": "Respect air defense and rearming windows.",
+      "assetIds": [
+        "china-cncloudicon-review",
+        "china-cncloud-contact-sheet"
+      ],
+      "variants": {
+        "ra": {
+          "actorId": "CNCLOUD",
+          "repository": "engine",
+          "rulesPath": "mods/ra/rules/china.yaml"
+        },
+        "ra2": {
+          "actorId": "r2cloud",
+          "repository": "product",
+          "rulesPath": "apps/installer/ra2/modern-factions/china.yaml"
+        }
+      }
+    },
+    {
+      "id": "cnhaiwang",
+      "factionId": "china",
+      "name": "Haiwang Drone Assault Ship",
+      "role": "Carrier and maritime command",
+      "story": "A high-value command ship that projects force through its drone wing.",
+      "strengths": "Operate behind an escort screen.",
+      "counterplay": "Protect the carrier from concentrated naval attacks.",
+      "assetIds": [
+        "china-cnhaiwangicon-review",
+        "china-cnhaiwang-contact-sheet"
+      ],
+      "variants": {
+        "ra": {
+          "actorId": "CNHAIWANG",
+          "repository": "engine",
+          "rulesPath": "mods/ra/rules/china.yaml"
+        },
+        "ra2": {
+          "actorId": "r2haiwang",
+          "repository": "product",
+          "rulesPath": "apps/installer/ra2/modern-factions/china-roster.yaml"
+        }
+      }
+    },
+    {
+      "id": "irkarr",
+      "factionId": "iran",
+      "name": "Karrar Tank",
+      "role": "Main battle tank",
+      "story": "The armored element of a dispersed combined-arms defense.",
+      "strengths": "Operate within supporting reconnaissance and air-defense coverage.",
+      "counterplay": "Avoid isolated advances into prepared anti-armor positions.",
+      "assetIds": [
+        "iran-irkarricon-review",
+        "iran-irkarr-contact-sheet"
+      ],
+      "variants": {
+        "ra": {
+          "actorId": "IRKARR",
+          "repository": "engine",
+          "rulesPath": "mods/ra/rules/iran.yaml"
+        },
+        "ra2": {
+          "actorId": "r2karrar",
+          "repository": "product",
+          "rulesPath": "apps/installer/ra2/modern-factions/iran.yaml"
+        }
+      }
+    },
+    {
+      "id": "irraad",
+      "factionId": "iran",
+      "name": "Raad Air Defense",
+      "role": "Mobile air defense",
+      "story": "A specialist escort that helps keep hostile aircraft away from the ground force.",
+      "strengths": "Position with valuable ground units.",
+      "counterplay": "Cover against ground attackers; it is not a substitute for tanks.",
+      "assetIds": [
+        "iran-irraadicon-review",
+        "iran-irraad-contact-sheet"
+      ],
+      "variants": {
+        "ra": {
+          "actorId": "IRRAAD",
+          "repository": "engine",
+          "rulesPath": "mods/ra/rules/iran.yaml"
+        },
+        "ra2": {
+          "actorId": "r2raad",
+          "repository": "product",
+          "rulesPath": "apps/installer/ra2/modern-factions/iran.yaml"
+        }
+      }
+    },
+    {
+      "id": "bozkir",
+      "factionId": "turkey",
+      "name": "Bozkir Tank",
+      "role": "Armored spearhead",
+      "story": "A main battle tank at the center of the Anatolian Guard’s mechanized force.",
+      "strengths": "Advance with infantry and drone reconnaissance.",
+      "counterplay": "Avoid unsupported pushes into specialist counters.",
+      "assetIds": [
+        "turkey-bozkiricon-review",
+        "turkey-bozkir-contact-sheet"
+      ],
+      "variants": {
+        "ra": {
+          "actorId": "BOZKIR",
+          "repository": "engine",
+          "rulesPath": "mods/ra/rules/turkey.yaml"
+        },
+        "ra2": {
+          "actorId": "r2bozkir",
+          "repository": "product",
+          "rulesPath": "apps/installer/ra2/modern-factions/turkey.yaml"
+        }
+      }
+    },
+    {
+      "id": "kuzgunm",
+      "factionId": "turkey",
+      "name": "Kuzgun-M UCAV",
+      "role": "Uncrewed strike aircraft",
+      "story": "An aerial strike platform supporting maneuver on the ground.",
+      "strengths": "Find exposed targets before committing the flight.",
+      "counterplay": "Plan around air defense and time away from the front to rearm.",
+      "assetIds": [
+        "turkey-kuzgunmicon-review",
+        "turkey-kuzgunm-contact-sheet"
+      ],
+      "variants": {
+        "ra": {
+          "actorId": "KUZGUNM",
+          "repository": "engine",
+          "rulesPath": "mods/ra/rules/turkey.yaml"
+        },
+        "ra2": {
+          "actorId": "r2kuzgun",
+          "repository": "product",
+          "rulesPath": "apps/installer/ra2/modern-factions/turkey.yaml"
+        }
+      }
+    },
+    {
+      "id": "m1a2s",
+      "factionId": "saudi-arabia",
+      "name": "M1A2S Tank",
+      "role": "Heavy armor",
+      "story": "Heavy armor anchors Saudi formations in the Red Sea theatre.",
+      "strengths": "Hold contested ground with infantry support.",
+      "counterplay": "Protect against anti-tank ambushes and attacks on supporting units.",
+      "assetIds": [
+        "red-sea-m1a2sicon-review",
+        "red-sea-m1a2s-contact-sheet"
+      ],
+      "variants": {
+        "ra": {
+          "actorId": "M1A2S",
+          "repository": "engine",
+          "rulesPath": "mods/ra/rules/red-sea.yaml"
+        }
+      }
+    },
+    {
+      "id": "sang",
+      "factionId": "saudi-arabia",
+      "name": "Saudi National Guard",
+      "role": "Line infantry",
+      "story": "The ground-holding infantry element of the Red Sea force.",
+      "strengths": "Secure routes alongside armor.",
+      "counterplay": "Avoid unsupported attacks into anti-infantry weapons.",
+      "assetIds": [
+        "red-sea-sangicon-review",
+        "red-sea-sang-contact-sheet"
+      ],
+      "variants": {
+        "ra": {
+          "actorId": "SANG",
+          "repository": "engine",
+          "rulesPath": "mods/ra/rules/red-sea.yaml"
+        }
+      }
+    },
+    {
+      "id": "tech",
+      "factionId": "yemen",
+      "name": "Armed Technical",
+      "role": "Mobile harassment",
+      "story": "A light vehicle for opportunistic pressure, not heavy frontal combat.",
+      "strengths": "Scout, strike exposed targets and relocate.",
+      "counterplay": "Heavy armor and prepared defenses punish prolonged engagements.",
+      "assetIds": [
+        "red-sea-techicon-review",
+        "red-sea-tech-contact-sheet"
+      ],
+      "variants": {
+        "ra": {
+          "actorId": "TECH",
+          "repository": "engine",
+          "rulesPath": "mods/ra/rules/red-sea.yaml"
+        }
+      }
+    },
+    {
+      "id": "samad",
+      "factionId": "yemen",
+      "name": "Samad Drone",
+      "role": "Terminal strike drone",
+      "story": "A strike drone whose attack culminates in a terminal dive.",
+      "strengths": "Choose a valuable target and a viable approach.",
+      "counterplay": "Air defenses can intercept it before impact.",
+      "assetIds": [
+        "red-sea-samadicon-review",
+        "red-sea-samad-contact-sheet"
+      ],
+      "variants": {
+        "ra": {
+          "actorId": "SAMAD",
+          "repository": "engine",
+          "rulesPath": "mods/ra/rules/red-sea.yaml"
+        }
+      }
+    }
+  ],
+  "assetPolicy": {
+    "origin": "OpenRA-AI game-media export",
+    "displayMode": "ra",
+    "licenseStatus": "review-required",
+    "note": "Existing project art and captured Classic assets. Labels are provenance, not independent redistribution clearance. RA2 screenshots are not substituted with Classic images."
+  }
+}

@@ -29,6 +29,9 @@ $sampleMission = Join-Path $repositoryRoot "generated\missions\riyadh-crossing-4
 $signingScript = Join-Path $PSScriptRoot "sign-windows-artifacts.ps1"
 $signaturesRequired = $RequireSignatures -or $env:OPENRA_AI_OFFICIAL_RELEASE -eq "1"
 
+& $python (Join-Path $PSScriptRoot "content_catalog.py") --engine $engineRoot
+if ($LASTEXITCODE -ne 0) { throw "Shared faction catalog validation failed." }
+
 foreach ($required in @($python, $brandIcon, $aiPackLock, $aiRuntimeLock, $modelNotices)) {
     if (-not (Test-Path -LiteralPath $required)) {
         throw "Packaging input is missing: $required"
@@ -151,6 +154,8 @@ New-Item -ItemType Directory -Path $packagingMetadata -Force | Out-Null
 Copy-Item -LiteralPath $aiPackLock -Destination $packagingMetadata
 Copy-Item -LiteralPath $aiRuntimeLock -Destination $packagingMetadata
 Copy-Item -LiteralPath $modelNotices -Destination $packagingMetadata
+& $python (Join-Path $PSScriptRoot "content_catalog.py") --engine $engineRoot --stage $stageRoot
+if ($LASTEXITCODE -ne 0) { throw "Shared faction catalog staging failed." }
 if (-not $ExcludeLocalAI) {
     # The default portable/install payload is usable without a separate AI-pack step.
     & $python (Join-Path $PSScriptRoot "setup-local-ai.py")
@@ -179,6 +184,8 @@ $manifest = [ordered]@{
     product_commit = (git -C $repositoryRoot rev-parse HEAD).Trim()
     entrypoint = "Play-OpenRAAI.cmd"
     games = @("ra", "ra2")
+    catalog = "catalog/factions.json"
+    catalog_sha256 = (Get-FileHash -LiteralPath (Join-Path $stageRoot "catalog\factions.json") -Algorithm SHA256).Hash.ToLowerInvariant()
     ra2_content = "Automatically imported from an owned Steam installation on first run; commercial content is never bundled."
     bundled_map = "generated/missions/riyadh-crossing-42.oramap"
     content = "Downloaded on first run from OpenRA's supported Red Alert quick-install mirrors"
