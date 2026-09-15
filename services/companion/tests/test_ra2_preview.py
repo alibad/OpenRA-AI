@@ -118,7 +118,7 @@ class RA2PreviewTests(unittest.TestCase):
         launcher = (config / "Program.cs").read_text()
         self.assertIn('"Game.Mod=ra2"', launcher)
         self.assertNotIn("Launch.Map=", launcher)
-        patch = (config / "compatibility.patch").read_text()
+        patch = (config / "compatibility.patch").read_text(encoding="utf-8")
         self.assertIn("original campaigns and Yuri’s Revenge are not included", patch)
         self.assertIn("+\tWindowTitle: ra2-preview-window-title", patch)
         self.assertNotIn("diff --git a/.github", patch)
