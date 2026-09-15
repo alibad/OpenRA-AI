@@ -4,7 +4,7 @@
   "revision": "2026-09-12.1",
   "scope": "Curated faction guide and signature units; not the complete build roster or a balance database.",
   "sources": {
-    "engineCommit": "28e5a6bb9bbb0c40faf77f91bf42b17879f7c37f",
+    "engineCommit": "dde7f13cb1d432a98aa121a5fd8826ff3842bcf0",
     "productCommit": "8fc59f71ab71a5e4834f8476506a65c01d734a05"
   },
   "modes": [
