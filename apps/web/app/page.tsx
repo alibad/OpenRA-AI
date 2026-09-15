@@ -29,6 +29,7 @@ export default function Home() {
         </a>
         <div className="nav-links">
           <a href="#companion">Companion</a>
+          <a href="#modes">Modes</a>
           <a href="#mission-studio">Mission studio</a>
           <a href="#download">Download</a>
           <a href="#architecture">How it works</a>
@@ -80,6 +81,31 @@ export default function Home() {
         <span>03 <b>Turns Earth into terrain</b></span>
         <span>04 <b>Ships ordinary .oramap files</b></span>
       </div>
+
+      <section className="modes-section" id="modes" aria-labelledby="modes-title">
+        <div className="section-intro modes-intro">
+          <span className="section-number">02 / EXPERIENCES</span>
+          <h2 id="modes-title">Two rulesets.<br />One companion.</h2>
+          <p>The launcher keeps the two game experiences explicit. Pick the ruleset from the main menu, then use the same observation-only AI, voice controls, and feedback tools inside the match.</p>
+        </div>
+        <div className="mode-grid">
+          <article className="mode-card mode-card-classic">
+            <div className="mode-card-top"><span>WORLD WAR III / CLASSIC</span><b>READY</b></div>
+            <h3>OpenRA classic</h3>
+            <p>Generated missions, the current OpenRA ruleset, and the dependable starting point for testing the companion and native AI.</p>
+            <div className="mode-facts"><span>GENERATED MAPS</span><span>NO OWNED ASSETS</span></div>
+            <a className="text-action" href="#download">Launch the classic path <ArrowRight size={16} /></a>
+          </article>
+          <article className="mode-card mode-card-ra2">
+            <div className="mode-card-top"><span>RED ALERT 2 / PREVIEW</span><b>INTEGRATED</b></div>
+            <h3>Red Alert 2 experience</h3>
+            <p>RA2 factions, content, and the same AI layer in a dedicated ruleset. The launcher detects or imports the player&apos;s owned game files locally.</p>
+            <div className="mode-facts"><span>FACTION CONTENT</span><span>OWNED FILES REQUIRED</span></div>
+            <a className="text-action" href="#download">See install options <ArrowRight size={16} /></a>
+          </article>
+        </div>
+        <p className="modes-note">Modes are selected before a match starts. An in-match screenshot shows the active ruleset, not both mode cards at once.</p>
+      </section>
 
       <section className="download-section" id="download" aria-labelledby="download-title">
         <div className="download-intro">

@@ -11,6 +11,12 @@ human-versus-bot skirmish:
 ./apps/launcher/Start-OpenRAAI.ps1 -Map ./generated/missions/riyadh-crossing-42.oramap
 ```
 
+The main menu exposes both supported experiences. To open one directly for
+testing, use `-Game classic` for World War III or `-Game ra2` for the Red Alert
+2 preview. The Red Alert 2 experience requires the player's owned `ra2.mix` and
+`language.mix` files; the launcher imports them into the local support cache and
+does not redistribute them. `-Map` is currently for generated classic maps.
+
 Use `-NoSpeech` for text-only companion logs or `-NoVoiceHotkeys` to keep spoken
 alerts without push-to-talk. During a normal match, hold `Ctrl+Space` on Windows
 or `Option+Space` on macOS to ask a question,

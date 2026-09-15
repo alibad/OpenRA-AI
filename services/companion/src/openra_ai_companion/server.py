@@ -7,6 +7,7 @@ from pathlib import Path
 from urllib.parse import parse_qs, urlparse
 
 from .core import Companion
+from .feedback import FeedbackStore, feedback_page
 from .game_content import import_owned_ra2
 from .learning import LearningStore, learning_dashboard
 from .model_setup import LocalAISetupError
@@ -214,6 +215,28 @@ class CompanionHandler(BaseHTTPRequestHandler):
             self._json(HTTPStatus.OK, LearningStore().latest())
         elif path == "/v1/war-room":
             self._json(HTTPStatus.OK, self._war_room_payload())
+        elif path.startswith("/feedback/"):
+            parts = path.strip("/").split("/")
+            if len(parts) != 2:
+                self._json(HTTPStatus.NOT_FOUND, {"error": "not_found"})
+                return
+            try:
+                record = FeedbackStore().get(parts[1])
+            except (FileNotFoundError, ValueError):
+                self._json(HTTPStatus.NOT_FOUND, {"error": "feedback_not_found"})
+                return
+            self._html(feedback_page(parts[1], record))
+        elif path.startswith("/v1/feedback/"):
+            parts = path.strip("/").split("/")
+            try:
+                if len(parts) == 3:
+                    self._json(HTTPStatus.OK, FeedbackStore().get(parts[2]))
+                elif len(parts) == 4 and parts[3] == "screenshot":
+                    self._binary(FeedbackStore().screenshot_path(parts[2]).read_bytes(), "image/png")
+                else:
+                    self._json(HTTPStatus.NOT_FOUND, {"error": "not_found"})
+            except (FileNotFoundError, ValueError):
+                self._json(HTTPStatus.NOT_FOUND, {"error": "feedback_not_found"})
         elif path.startswith("/v1/learning/matches/"):
             parts = path.strip("/").split("/")
             attempt = parts[3] if len(parts) >= 4 else ""
@@ -379,6 +402,16 @@ class CompanionHandler(BaseHTTPRequestHandler):
                 if not image.startswith(b"\x89PNG\r\n\x1a\n"):
                     raise ValueError("terrain image must be a PNG")
                 self._json(HTTPStatus.OK, self.companion.analyze_terrain(dict(payload.get("context") or {}), image))
+            elif path == "/v1/feedback/capture":
+                self._payload()
+                self._json(HTTPStatus.CREATED, self.companion.capture_feedback())
+            elif path.startswith("/v1/feedback/"):
+                parts = path.strip("/").split("/")
+                if len(parts) != 3:
+                    self._json(HTTPStatus.NOT_FOUND, {"error": "not_found"})
+                    return
+                payload = json.loads(self._payload() or b"{}")
+                self._json(HTTPStatus.OK, FeedbackStore().update(parts[2], payload))
             elif path == "/v1/interrupt":
                 self._payload()
                 self._json(HTTPStatus.OK, {"interrupted": True, "generation": self.companion.interrupt()})
@@ -437,6 +470,8 @@ class CompanionHandler(BaseHTTPRequestHandler):
             self._json(HTTPStatus.BAD_GATEWAY, {"error": "ai_router_error", "detail": str(exc)})
         except LocalAISetupError as exc:
             self._json(HTTPStatus.SERVICE_UNAVAILABLE, {"error": "local_ai_setup", "detail": str(exc)})
+        except FileNotFoundError:
+            self._json(HTTPStatus.NOT_FOUND, {"error": "feedback_not_found"})
         except Exception as exc:
             self._json(HTTPStatus.INTERNAL_SERVER_ERROR, {"error": "diagnostic_failed", "detail": str(exc)})
 

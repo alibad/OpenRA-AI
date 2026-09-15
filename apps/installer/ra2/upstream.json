@@ -3,6 +3,6 @@
   "commit": "61e24e3c1d7b586aa55a86096d29e1559aa9b994",
   "archive_url": "https://codeload.github.com/OpenRA/ra2/tar.gz/61e24e3c1d7b586aa55a86096d29e1559aa9b994",
   "archive_sha256": "267e38ba03769c404fb179d28224b61236798e75e2e4dabce36d83c0c9e8c6ce",
-  "engine_commit": "a63f15f7f62138c078ecc77c63a7582d8fbde03a",
+  "engine_commit": "28e5a6bb9bbb0c40faf77f91bf42b17879f7c37f",
   "version": "0.1.0-ra2-preview.1"
 }

@@ -10,6 +10,7 @@ from collections.abc import Callable
 
 from .brain import BrainArbiter, BrainOwner, GoalBlackboard, default_blackboard_path
 from .controller import TacticalController, controller_state
+from .feedback import FeedbackStore
 from .insights import InsightEngine
 from .models import (
     ACTOR_ACTIONS,
@@ -429,6 +430,28 @@ class Companion:
     def set_frame_provider(self, provider: Callable[[], VisionFrame] | None) -> None:
         with self._vision_lock:
             self._frame_provider = provider
+
+    def capture_feedback(self) -> dict:
+        """Capture a player-controlled local evidence bundle from the live match."""
+        snapshot = self.latest_snapshot
+        if snapshot is None:
+            raise RuntimeError("No live match snapshot is available yet.")
+
+        with self._vision_lock:
+            provider = self._frame_provider
+            if provider is None:
+                raise RuntimeError("The live OpenRA viewport is not available yet.")
+            frame = provider()
+
+        record = FeedbackStore().capture(
+            frame=frame.metadata(),
+            frame_png=frame.png,
+            snapshot=snapshot.compact(),
+            companion=self.status(),
+        )
+        record["feedback_url"] = f"/feedback/{record['feedback_id']}"
+        record["screenshot_url"] = f"/v1/feedback/{record['feedback_id']}/screenshot"
+        return record
 
     def _vision_inputs(self, snapshot: GameSnapshot) -> tuple[list[tuple[bytes, str]], list[dict]]:
         images: list[tuple[bytes, str]] = []

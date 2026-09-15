@@ -5,6 +5,8 @@ param(
     [switch]$NoVoiceHotkeys,
     [switch]$SkipContentInstall,
     [switch]$Headless,
+    [ValidateSet("classic", "ra2")]
+    [string]$Game,
     [ValidateSet("beginner", "easy", "medium", "rush", "normal", "turtle", "naval")]
     [string]$OpponentBot = "normal",
     [int]$BridgePort = 9998,
@@ -35,6 +37,7 @@ if (-not $SkipContentInstall) {
     & (Join-Path $PSScriptRoot "Install-OpenRAContent.ps1") -SupportRoot $supportRoot
 }
 if ($Map) {
+    if ($Game -eq "ra2") { throw "The generated map launcher currently targets the classic OpenRA ruleset. Start without -Map to choose Red Alert 2 from the main menu." }
     $source = (Resolve-Path -LiteralPath $Map).Path
     if ([IO.Path]::GetExtension($source) -ne ".oramap") { throw "Select an .oramap map." }
     $version = (Get-Content (Join-Path $engineRoot "VERSION") -Raw).Trim()
@@ -45,6 +48,9 @@ if ($Map) {
         if ((Get-FileHash $source).Hash -ne (Get-FileHash $destination).Hash) { throw "A different map already exists: $destination" }
     } else { Copy-Item -LiteralPath $source -Destination $destination }
     $gameArguments += @("Game.Mod=ra", "Launch.Map=$([IO.Path]::GetFileName($destination))", "Launch.Bots=Multi1:$OpponentBot")
+}
+if ($Game -and -not $Map) {
+    $gameArguments += "Game.Mod=$(if ($Game -eq 'ra2') { 'ra2' } else { 'ra' })"
 }
 if ($Headless) { $gameArguments += "Game.Platform=Null" }
 & $launcher -CompanionRoot $repositoryRoot -NoSpeech:$NoSpeech -NoVoiceHotkeys:$NoVoiceHotkeys -BridgePort $BridgePort -AIConsolePort $AIConsolePort -WorldStudioPort $WorldStudioPort -GameArguments $gameArguments

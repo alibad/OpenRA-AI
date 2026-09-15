@@ -22,6 +22,10 @@ test("renders the complete marketing and mission-creation surface", async () => 
   assert.match(html, /Your battlefield/);
   assert.match(html, /Mission studio/);
   assert.match(html, /Point anywhere/);
+  assert.match(html, /Two rulesets/);
+  assert.match(html, /OpenRA classic/);
+  assert.match(html, /Red Alert 2 experience/);
+  assert.match(html, /OWNED FILES REQUIRED/);
   assert.match(html, /Download macOS alpha/);
   assert.match(html, /Download for macOS/);
   assert.match(html, /Developer ID signed, Apple notarized, and stapled/);
