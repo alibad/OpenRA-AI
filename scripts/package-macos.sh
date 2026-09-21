@@ -231,7 +231,7 @@ if [ "$SIGNING_IDENTITY" = "-" ]; then
   codesign --force --timestamp=none --entitlements "$COMPANION_ENTITLEMENTS" --sign - "$MACOS/OpenRAAI"
   codesign --force --timestamp=none --entitlements "$COMPANION_ENTITLEMENTS" --sign - "$RESOURCES/bin/openra-ai-companion"
   codesign --force --timestamp=none --entitlements "$ENTITLEMENTS" --sign - "$MACOS/apphost-$ARCH_DIR"
-  codesign --force --timestamp=none --sign - "$APP_ROOT"
+  codesign --force --timestamp=none --entitlements "$COMPANION_ENTITLEMENTS" --sign - "$APP_ROOT"
 else
   sign_runtime_payload "$SIGNING_IDENTITY"
   codesign --force --options runtime --timestamp --entitlements "$COMPANION_ENTITLEMENTS" --sign "$SIGNING_IDENTITY" "$RESOURCES/bin/openra-ai-companion"
@@ -240,7 +240,7 @@ else
   codesign --force --options runtime --timestamp --entitlements "$COMPANION_ENTITLEMENTS" --sign "$SIGNING_IDENTITY" "$MACOS/OpenRAAI"
   codesign --force --options runtime --timestamp --entitlements "$COMPANION_ENTITLEMENTS" --sign "$SIGNING_IDENTITY" "$RESOURCES/bin/openra-ai-companion"
   codesign --force --options runtime --timestamp --entitlements "$ENTITLEMENTS" --sign "$SIGNING_IDENTITY" "$MACOS/apphost-$ARCH_DIR"
-  codesign --force --options runtime --timestamp --sign "$SIGNING_IDENTITY" "$APP_ROOT"
+  codesign --force --options runtime --timestamp --entitlements "$COMPANION_ENTITLEMENTS" --sign "$SIGNING_IDENTITY" "$APP_ROOT"
 fi
 
 codesign -d --entitlements - "$MACOS/apphost-$ARCH_DIR" 2>/dev/null | grep -F 'com.apple.security.cs.allow-jit' >/dev/null || {

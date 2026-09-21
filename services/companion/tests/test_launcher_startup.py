@@ -98,7 +98,7 @@ class LauncherStartupTests(unittest.TestCase):
         script = (root / "scripts" / "package-macos.sh").read_text()
         deep = script.rindex('codesign --force --deep')
         apphost = script.rindex('--entitlements "$ENTITLEMENTS"')
-        final = script.rindex('codesign --force --options runtime --timestamp --sign "$SIGNING_IDENTITY" "$APP_ROOT"')
+        final = script.rindex('--entitlements "$COMPANION_ENTITLEMENTS" --sign "$SIGNING_IDENTITY" "$APP_ROOT"')
         self.assertLess(deep, apphost)
         self.assertLess(apphost, final)
 
