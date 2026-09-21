@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import ctypes
 import platform
+import re
 import threading
 import time
 from collections.abc import Callable
@@ -110,18 +111,14 @@ class VoiceHotkeys:
         while self._pressed(key) and not self._stop.is_set():
             time.sleep(0.03)
 
-    @staticmethod
-    def _is_blank_transcript(transcript: str) -> bool:
-        normalized = " ".join(transcript.strip().lower().replace("_", " ").split())
-        return normalized in {
-            "",
-            "[blank audio]",
-            "(blank audio)",
-            "<blank audio>",
-            "[silence]",
-            "(silence)",
-            "<silence>",
-        }
+    _NON_SPEECH_ANNOTATION = re.compile(
+        r"(?i)(?:\[|\(|<)\s*(?:blank[ _-]?audio|silence|inaudible|no speech|music|noise|background noise)\s*(?:\]|\)|>)"
+    )
+
+    @classmethod
+    def _clean_transcript(cls, transcript: str) -> str:
+        """Remove Whisper's non-speech annotations without presenting them as user words."""
+        return " ".join(cls._NON_SPEECH_ANNOTATION.sub(" ", transcript).split()).strip()
 
     def _wait_for_question(self, cancel: threading.Event, seconds: float) -> bool:
         """Wait for UI/speech hold time, waking immediately for interruption or shutdown."""
@@ -157,11 +154,13 @@ class VoiceHotkeys:
             if not audio or self._stop.is_set() or cancel.is_set():
                 return
             self._set_status("transcribing", "AI TRANSCRIBING  •  PRESS ASK AGAIN TO INTERRUPT")
-            transcript = self.companion.transcribe(audio).text.strip()
+            raw_transcript = self.companion.transcribe(audio).text.strip()
+            transcript = self._clean_transcript(raw_transcript)
             if self._stop.is_set() or cancel.is_set():
                 return
-            if self._is_blank_transcript(transcript):
-                self._set_status("ready", "NO SPEECH HEARD  •  HOLD ASK KEY TO TRY AGAIN")
+            if not transcript:
+                console_print(f"Voice transcription contained no speech: {raw_transcript or '<empty>'}")
+                self._set_status("voice-no-speech", "NO VOICE DETECTED  •  CHECK MICROPHONE ACCESS AND TRY AGAIN")
                 self._wait_for_question(cancel, 1.5)
                 return
             transcript_started = time.monotonic()
@@ -191,10 +190,13 @@ class VoiceHotkeys:
                 self._set_status("error", "AI UNAVAILABLE  •  GAMEPLAY UNAFFECTED")
                 self._wait_for_question(cancel, 3)
         finally:
+            # Every generation owns one begin_user_turn call. Replaced generations
+            # must release theirs too, otherwise retries permanently suppress game
+            # events and later replies behind a leaked user-turn depth.
+            self.companion.end_user_turn()
             with self._question_lock:
                 is_current = generation is None or generation == self._question_generation
                 if is_current:
-                    self.companion.end_user_turn()
                     self.active.clear()
                     if self.companion.enabled:
                         self._set_status(*self.companion.idle_status())

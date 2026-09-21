@@ -1900,8 +1900,16 @@ class CompanionTests(unittest.TestCase):
             hotkeys._voice_question()
 
         companion.handle_player_input.assert_not_called()
-        self.assertIn(("ready", "NO SPEECH HEARD  •  HOLD ASK KEY TO TRY AGAIN"), statuses)
+        self.assertIn(("voice-no-speech", "NO VOICE DETECTED  •  CHECK MICROPHONE ACCESS AND TRY AGAIN"), statuses)
         self.assertFalse(hotkeys.active.is_set())
+
+    def test_whisper_notes_are_removed_before_display_and_submission(self) -> None:
+        self.assertEqual(VoiceHotkeys._clean_transcript("[BLANK_AUDIO]"), "")
+        self.assertEqual(VoiceHotkeys._clean_transcript("(music) [noise]"), "")
+        self.assertEqual(
+            VoiceHotkeys._clean_transcript("[background noise] Build two tanks"),
+            "Build two tanks",
+        )
 
     def test_new_hold_interrupts_and_replaces_active_voice_turn(self) -> None:
         companion = Companion(router=FakeRouter())
@@ -1946,6 +1954,34 @@ class CompanionTests(unittest.TestCase):
         hotkeys.stop_question()
         if hotkeys._question_thread:
             hotkeys._question_thread.join(timeout=1)
+
+    def test_replaced_voice_turn_releases_every_generation(self) -> None:
+        companion = Companion(router=FakeRouter())
+        companion.latest_snapshot = snapshot()
+        first_recording = threading.Event()
+        release_first = threading.Event()
+
+        def record(held):
+            if not first_recording.is_set():
+                first_recording.set()
+                release_first.wait(1)
+                return b""
+            return b""
+
+        hotkeys = VoiceHotkeys(companion, FakePlayer(), lambda _text: None, lambda _state, _message: None)
+        with (
+            mock.patch("openra_ai_companion.hotkeys.record_while", side_effect=record),
+            mock.patch.object(hotkeys, "_wait_for_question", return_value=False),
+        ):
+            self.assertTrue(hotkeys.start_question())
+            self.assertTrue(first_recording.wait(1))
+            self.assertTrue(hotkeys.start_question())
+            release_first.set()
+            if hotkeys._question_thread:
+                hotkeys._question_thread.join(timeout=1)
+            time.sleep(0.05)
+
+        self.assertEqual(companion._user_turn_depth, 0)
 
     def test_hud_message_hold_never_ends_before_speech(self) -> None:
         self.assertEqual(playback_hold_seconds(12.0, 8.0), 12.35)
