@@ -25,7 +25,9 @@ class WindowsGameSetupTests(unittest.TestCase):
             (game / "RA2.MIX").write_bytes(b"ra2" * 1024)
             (game / "LANGUAGE.MIX").write_bytes(b"language" * 1024)
             support = root / "support"
-            with patch("openra_ai_companion.game_content.steam_roots", return_value=[root]), patch.dict(os.environ, {"OPENRA_AI_SUPPORT_DIR": str(support)}):
+            with patch("openra_ai_companion.game_content.Path.home", return_value=root), \
+                    patch("openra_ai_companion.game_content.steam_roots", return_value=[root]), \
+                    patch.dict(os.environ, {"OPENRA_AI_SUPPORT_DIR": str(support)}):
                 self.assertTrue(import_owned_ra2()["installed"])
                 self.assertEqual((support / "Content/ra2/ra2.mix").read_bytes(), (game / "RA2.MIX").read_bytes())
                 self.assertTrue(import_owned_ra2()["already_installed"])

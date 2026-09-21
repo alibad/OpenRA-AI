@@ -1810,7 +1810,7 @@ class CompanionTests(unittest.TestCase):
         )
         with (
             mock.patch("openra_ai_companion.hotkeys.record_while", return_value=b"audio"),
-            mock.patch.object(hotkeys._stop, "wait", return_value=False),
+            mock.patch.object(hotkeys, "_wait_for_question", return_value=False),
         ):
             hotkeys._voice_question()
         transcript_index = next(i for i, status in enumerate(statuses) if status[0] == "transcript")
@@ -1870,12 +1870,82 @@ class CompanionTests(unittest.TestCase):
         )
         with (
             mock.patch("openra_ai_companion.hotkeys.record_while", return_value=b"audio"),
-            mock.patch.object(hotkeys._stop, "wait", side_effect=lambda seconds: waits.append(seconds) or False),
+            mock.patch.object(
+                hotkeys,
+                "_wait_for_question",
+                side_effect=lambda _cancel, seconds: waits.append(seconds) or False,
+            ),
         ):
             hotkeys._voice_question()
 
         self.assertEqual(priority_during_speech, [True])
         self.assertIn(9.85, waits)
+
+    def test_blank_audio_transcript_is_not_submitted_as_a_question(self) -> None:
+        statuses = []
+        companion = Companion(router=FakeRouter())
+        companion.latest_snapshot = snapshot()
+        companion.transcribe = mock.Mock(return_value=mock.Mock(text="[BLANK_AUDIO]"))
+        companion.handle_player_input = mock.Mock()
+        hotkeys = VoiceHotkeys(
+            companion,
+            FakePlayer(),
+            lambda _text: None,
+            lambda state, message: statuses.append((state, message)),
+        )
+        with (
+            mock.patch("openra_ai_companion.hotkeys.record_while", return_value=b"audio"),
+            mock.patch.object(hotkeys, "_wait_for_question", return_value=False),
+        ):
+            hotkeys._voice_question()
+
+        companion.handle_player_input.assert_not_called()
+        self.assertIn(("ready", "NO SPEECH HEARD  •  HOLD ASK KEY TO TRY AGAIN"), statuses)
+        self.assertFalse(hotkeys.active.is_set())
+
+    def test_new_hold_interrupts_and_replaces_active_voice_turn(self) -> None:
+        companion = Companion(router=FakeRouter())
+        hotkeys = VoiceHotkeys(companion, FakePlayer(), lambda _text: None, lambda _state, _message: None)
+        previous_cancel = hotkeys._question_cancel
+        hotkeys.active.set()
+
+        def finish_previous() -> None:
+            previous_cancel.wait(1)
+
+        previous = threading.Thread(target=finish_previous)
+        hotkeys._question_thread = previous
+        previous.start()
+        launched = threading.Event()
+        try:
+            with mock.patch.object(hotkeys, "_voice_question", side_effect=lambda *_args: launched.set()):
+                self.assertTrue(hotkeys.start_question())
+                self.assertTrue(launched.wait(1))
+        finally:
+            hotkeys.stop_question()
+            previous.join(timeout=1)
+            if hotkeys._question_thread:
+                hotkeys._question_thread.join(timeout=1)
+
+        self.assertTrue(previous_cancel.is_set())
+
+    def test_replacement_starts_without_waiting_for_blocked_previous_turn(self) -> None:
+        companion = Companion(router=FakeRouter())
+        hotkeys = VoiceHotkeys(companion, FakePlayer(), lambda _text: None, lambda _state, _message: None)
+        hotkeys.active.set()
+        previous = threading.Thread(target=lambda: time.sleep(2), daemon=True)
+        hotkeys._question_thread = previous
+        previous.start()
+        launched = threading.Event()
+
+        with mock.patch.object(hotkeys, "_voice_question", side_effect=lambda *_args: launched.set()):
+            started_at = time.monotonic()
+            self.assertTrue(hotkeys.start_question())
+            self.assertTrue(launched.wait(1))
+            self.assertLess(time.monotonic() - started_at, 0.5)
+
+        hotkeys.stop_question()
+        if hotkeys._question_thread:
+            hotkeys._question_thread.join(timeout=1)
 
     def test_hud_message_hold_never_ends_before_speech(self) -> None:
         self.assertEqual(playback_hold_seconds(12.0, 8.0), 12.35)

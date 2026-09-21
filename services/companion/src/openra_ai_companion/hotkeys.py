@@ -59,6 +59,9 @@ class VoiceHotkeys:
         self._stop = threading.Event()
         self._thread: threading.Thread | None = None
         self._question_thread: threading.Thread | None = None
+        self._question_lock = threading.RLock()
+        self._question_cancel = threading.Event()
+        self._question_generation = 0
 
     @staticmethod
     def supported() -> bool:
@@ -95,6 +98,7 @@ class VoiceHotkeys:
     def stop(self) -> None:
         self._stop.set()
         self._external_hold.clear()
+        self._question_cancel.set()
         self.companion.interrupt()
         self.player.stop()
         if self._thread and self._thread.is_alive():
@@ -106,7 +110,37 @@ class VoiceHotkeys:
         while self._pressed(key) and not self._stop.is_set():
             time.sleep(0.03)
 
-    def _voice_question(self, is_pressed: Callable[[], bool] | None = None) -> None:
+    @staticmethod
+    def _is_blank_transcript(transcript: str) -> bool:
+        normalized = " ".join(transcript.strip().lower().replace("_", " ").split())
+        return normalized in {
+            "",
+            "[blank audio]",
+            "(blank audio)",
+            "<blank audio>",
+            "[silence]",
+            "(silence)",
+            "<silence>",
+        }
+
+    def _wait_for_question(self, cancel: threading.Event, seconds: float) -> bool:
+        """Wait for UI/speech hold time, waking immediately for interruption or shutdown."""
+        deadline = time.monotonic() + max(0.0, seconds)
+        while not self._stop.is_set():
+            remaining = deadline - time.monotonic()
+            if remaining <= 0:
+                return False
+            if cancel.wait(min(0.05, remaining)):
+                return True
+        return True
+
+    def _voice_question(
+        self,
+        is_pressed: Callable[[], bool] | None = None,
+        cancel: threading.Event | None = None,
+        generation: int | None = None,
+    ) -> None:
+        cancel = cancel or threading.Event()
         self.active.set()
         self.companion.begin_user_turn()
         self.player.stop()
@@ -119,19 +153,23 @@ class VoiceHotkeys:
             self._set_status("listening", "● LISTENING  •  RELEASE TO ASK")
             print("Listening... release the Ask AI key when you finish speaking.")
             held = is_pressed or (lambda: self._combo_pressed(self.PUSH_TO_TALK))
-            audio = record_while(lambda: held() and not self._stop.is_set())
-            if not audio or self._stop.is_set():
+            audio = record_while(lambda: held() and not self._stop.is_set() and not cancel.is_set())
+            if not audio or self._stop.is_set() or cancel.is_set():
                 return
             self._set_status("transcribing", "AI TRANSCRIBING  •  PRESS ASK AGAIN TO INTERRUPT")
-            transcript = self.companion.transcribe(audio).text
-            if not transcript.strip():
+            transcript = self.companion.transcribe(audio).text.strip()
+            if self._stop.is_set() or cancel.is_set():
+                return
+            if self._is_blank_transcript(transcript):
+                self._set_status("ready", "NO SPEECH HEARD  •  HOLD ASK KEY TO TRY AGAIN")
+                self._wait_for_question(cancel, 1.5)
                 return
             transcript_started = time.monotonic()
-            self._set_status("transcript", f"YOU  •  {transcript.strip()}")
+            self._set_status("transcript", f"YOU  •  {transcript}")
             console_print(f"You: {transcript}")
             answer = self.companion.handle_player_input(transcript)
-            self._stop.wait(max(0.0, 1.25 - (time.monotonic() - transcript_started)))
-            if answer.text and not answer.interrupted:
+            self._wait_for_question(cancel, max(0.0, 1.25 - (time.monotonic() - transcript_started)))
+            if answer.text and not answer.interrupted and not cancel.is_set():
                 console_print(f"Companion: {answer.text}")
                 default_state = "insight" if self.companion.muted else "speaking"
                 self._set_status(
@@ -146,34 +184,47 @@ class VoiceHotkeys:
                     )
                 else:
                     answer_hold = min(8.0, max(2.0, len(answer.text) / 18))
-                self._stop.wait(answer_hold)
+                self._wait_for_question(cancel, answer_hold)
         except Exception as exc:  # Keep the match running if microphone or routing fails.
-            console_print(f"Voice question failed: {exc}")
-            self._set_status("error", "AI UNAVAILABLE  •  GAMEPLAY UNAFFECTED")
-            self._stop.wait(3)
+            if not cancel.is_set():
+                console_print(f"Voice question failed: {exc}")
+                self._set_status("error", "AI UNAVAILABLE  •  GAMEPLAY UNAFFECTED")
+                self._wait_for_question(cancel, 3)
         finally:
-            self.companion.end_user_turn()
-            self.active.clear()
-            if self.companion.enabled:
-                self._set_status(*self.companion.idle_status())
+            with self._question_lock:
+                is_current = generation is None or generation == self._question_generation
+                if is_current:
+                    self.companion.end_user_turn()
+                    self.active.clear()
+                    if self.companion.enabled:
+                        self._set_status(*self.companion.idle_status())
 
     def _launch_question(self, is_pressed: Callable[[], bool]) -> bool:
-        if self.active.is_set():
-            self.companion.interrupt()
-            self.player.stop()
-            self._external_hold.clear()
-            self._set_status("ready", "AI INTERRUPTED  •  HOLD ASK KEY TO SPEAK")
-            return False
-        self._question_thread = threading.Thread(
-            target=lambda: self._voice_question(is_pressed),
-            name="OpenRA-AI-Voice-Question",
-            daemon=True,
-        )
-        self._question_thread.start()
-        return True
+        with self._question_lock:
+            if self.active.is_set():
+                self._question_cancel.set()
+                self.companion.interrupt()
+                self.player.stop()
+                self._set_status("ready", "AI INTERRUPTED  •  KEEP HOLDING TO ASK")
+
+            if self._stop.is_set() or not is_pressed():
+                return False
+
+            self._question_generation += 1
+            generation = self._question_generation
+            cancel = threading.Event()
+            self._question_cancel = cancel
+            self.active.set()
+            self._question_thread = threading.Thread(
+                target=lambda: self._voice_question(is_pressed, cancel, generation),
+                name="OpenRA-AI-Voice-Question",
+                daemon=True,
+            )
+            self._question_thread.start()
+            return True
 
     def start_question(self) -> bool:
-        """Start push-to-talk from the native, remappable OpenRA hotkey."""
+        """Start or replace push-to-talk from the native, remappable OpenRA hotkey."""
         self._external_hold.set()
         started = self._launch_question(self._external_hold.is_set)
         if not started:
@@ -196,14 +247,9 @@ class VoiceHotkeys:
             enabled = self._combo_pressed(self.TOGGLE_ENABLED, shift=True)
 
             if push_to_talk and not previous_push_to_talk:
-                if self.active.is_set():
-                    self.companion.interrupt()
-                    self.player.stop()
-                    self._set_status("ready", "AI INTERRUPTED  •  HOLD ASK KEY TO SPEAK")
-                else:
-                    self._launch_question(
-                        lambda: self._combo_pressed(self.PUSH_TO_TALK),
-                    )
+                self._launch_question(
+                    lambda: self._combo_pressed(self.PUSH_TO_TALK),
+                )
             if mute and not previous_mute:
                 state = self.companion.configure(muted=not self.companion.muted)
                 if state["muted"]:
