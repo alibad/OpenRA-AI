@@ -36,7 +36,12 @@ from openra_ai_companion.settings import Settings
 from openra_ai_companion.strategy import hybrid_force_plan, mission_plan, opening_scout_count, scout_targets, strategic_profile
 from openra_ai_companion.tactical_vision import tactical_overview_png
 from openra_ai_companion.threats import assess_threat
-from openra_ai_companion.voice import _normalize_wav, _wav_bytes, playback_hold_seconds
+from openra_ai_companion.voice import (
+    _normalize_wav,
+    _wav_bytes,
+    playback_hold_seconds,
+    prepare_voice_audio,
+)
 
 
 class FakeRouter:
@@ -1818,6 +1823,56 @@ class CompanionTests(unittest.TestCase):
         self.assertLess(transcript_index, speaking_index)
         self.assertIn("Where is the threat?", statuses[transcript_index][1])
 
+    def test_quiet_voice_capture_is_amplified_for_whisper(self) -> None:
+        quiet = _wav_bytes([struct.pack("<1000h", *([100] * 1000))], 16_000)
+
+        prepared, signal = prepare_voice_audio(quiet)
+
+        self.assertTrue(signal["audible"])
+        self.assertEqual(signal["peak"], 100)
+        self.assertEqual(signal["gain"], 8.0)
+        with wave.open(BytesIO(prepared), "rb") as wav:
+            samples = struct.unpack("<1000h", wav.readframes(1000))
+        self.assertEqual(max(samples), 800)
+
+    def test_digitally_silent_voice_capture_is_identified_before_whisper(self) -> None:
+        silent = _wav_bytes([struct.pack("<1000h", *([0] * 1000))], 16_000)
+
+        prepared, signal = prepare_voice_audio(silent)
+
+        self.assertEqual(prepared, silent)
+        self.assertFalse(signal["audible"])
+        self.assertEqual(signal["peak"], 0)
+        self.assertEqual(signal["gain"], 1.0)
+
+    def test_silent_microphone_capture_names_selected_input_without_transcribing(self) -> None:
+        statuses = []
+        companion = Companion(router=FakeRouter())
+        companion.transcribe = mock.Mock()
+        hotkeys = VoiceHotkeys(
+            companion,
+            FakePlayer(),
+            lambda _text: None,
+            lambda state, message: statuses.append((state, message)),
+        )
+        silent = _wav_bytes([struct.pack("<1000h", *([0] * 1000))], 16_000)
+        with (
+            mock.patch("openra_ai_companion.hotkeys.record_while", return_value=silent),
+            mock.patch(
+                "openra_ai_companion.hotkeys.microphone_status",
+                return_value={"device_name": "MacBook Pro Microphone"},
+            ),
+            mock.patch.object(hotkeys, "_wait_for_question", return_value=False),
+        ):
+            hotkeys._voice_question()
+
+        companion.transcribe.assert_not_called()
+        self.assertIn(
+            ("voice-no-speech", "MIC HEARD SILENCE  •  INPUT: MACBOOK PRO MICROPHONE"),
+            statuses,
+        )
+        self.assertEqual(hotkeys.capture_status()["peak"], 0)
+
     def test_player_turn_defers_events_without_losing_their_context(self) -> None:
         companion = Companion(router=FakeRouter())
         companion.begin_user_turn()
@@ -1900,7 +1955,7 @@ class CompanionTests(unittest.TestCase):
             hotkeys._voice_question()
 
         companion.handle_player_input.assert_not_called()
-        self.assertIn(("voice-no-speech", "NO VOICE DETECTED  •  CHECK MICROPHONE ACCESS AND TRY AGAIN"), statuses)
+        self.assertIn(("voice-no-speech", "HEARD AUDIO, BUT COULDN'T UNDERSTAND  •  TRY AGAIN"), statuses)
         self.assertFalse(hotkeys.active.is_set())
 
     def test_whisper_notes_are_removed_before_display_and_submission(self) -> None:

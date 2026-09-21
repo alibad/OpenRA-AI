@@ -14,7 +14,7 @@ from .model_setup import LocalAISetupError
 from .lm_studio import discover as discover_lm_studio
 from .models import GameSnapshot
 from .router import RouterError
-from .voice import AudioPlayer, record_question
+from .voice import AudioPlayer, microphone_status, record_question
 from .webui import AI_CONSOLE_HTML
 
 
@@ -93,12 +93,19 @@ class CompanionHandler(BaseHTTPRequestHandler):
 
     def _voice_readiness(self) -> dict:
         model = self.companion.router.settings.transcribe_model.strip().lower()
+        microphone = microphone_status()
+        controller = getattr(self.server, "voice_controller", None)
+        capture_status = getattr(controller, "capture_status", None)
+        capture_result = capture_status() if callable(capture_status) else {}
+        last_capture = capture_result if isinstance(capture_result, dict) else {}
         if model != "local-whisper":
             return {
                 "ready": True,
                 "model": model,
                 "action": "none",
                 "reason": "ready",
+                "microphone": microphone,
+                "last_capture": last_capture,
             }
 
         manager = getattr(self.server, "local_ai_manager", None)
@@ -108,6 +115,8 @@ class CompanionHandler(BaseHTTPRequestHandler):
                 "model": model,
                 "action": "choose_cloud",
                 "reason": "local_ai_unsupported",
+                "microphone": microphone,
+                "last_capture": last_capture,
                 "local_ai": {
                     "supported": False,
                     "installed": False,
@@ -131,6 +140,8 @@ class CompanionHandler(BaseHTTPRequestHandler):
             "model": model,
             "action": "none" if state == "running" else actions.get(state, "wait"),
             "reason": "ready" if state == "running" else f"local_ai_{state}",
+            "microphone": microphone,
+            "last_capture": last_capture,
             "local_ai": local_ai,
         }
 

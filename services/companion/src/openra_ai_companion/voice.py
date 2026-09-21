@@ -1,10 +1,13 @@
 from __future__ import annotations
 
+import array
 import atexit
 import io
+import math
 import platform
 import struct
 import subprocess
+import sys
 import tempfile
 import threading
 import time
@@ -84,6 +87,73 @@ def _wav_bytes(frames: list[bytes], sample_rate: int) -> bytes:
         wav.setframerate(sample_rate)
         wav.writeframes(b"".join(frames))
     return output.getvalue()
+
+
+def prepare_voice_audio(
+    audio: bytes,
+    *,
+    target_peak: int = 12_000,
+    maximum_gain: float = 8.0,
+) -> tuple[bytes, dict[str, object]]:
+    """Measure a microphone WAV and safely lift quiet speech for Whisper.
+
+    Device discovery alone cannot prove that macOS is delivering useful audio.
+    These measurements let the UI distinguish an installed Whisper model from
+    an actually audible recording.  Quiet captures are amplified before local
+    transcription, while true digital silence is left untouched.
+    """
+    try:
+        with wave.open(io.BytesIO(audio), "rb") as wav:
+            channels = wav.getnchannels()
+            sample_width = wav.getsampwidth()
+            sample_rate = wav.getframerate()
+            frame_count = wav.getnframes()
+            frames = wav.readframes(frame_count)
+
+        if channels != 1 or sample_width != 2:
+            raise ValueError("voice capture must be mono 16-bit PCM")
+
+        samples = array.array("h")
+        samples.frombytes(frames)
+        if sys.byteorder != "little":
+            samples.byteswap()
+        peak = max((abs(value) for value in samples), default=0)
+        rms = math.sqrt(sum(value * value for value in samples) / max(1, len(samples)))
+        duration = frame_count / max(1, sample_rate)
+        audible = peak >= 64 and rms >= 8
+        gain = 1.0
+
+        if audible and peak < target_peak:
+            gain = min(maximum_gain, target_peak / peak)
+            if gain > 1.05:
+                samples = array.array(
+                    "h",
+                    (max(-32_768, min(32_767, round(value * gain))) for value in samples),
+                )
+                output_frames = array.array("h", samples)
+                if sys.byteorder != "little":
+                    output_frames.byteswap()
+                audio = _wav_bytes([output_frames.tobytes()], sample_rate)
+
+        return audio, {
+            "valid_wav": True,
+            "audible": audible,
+            "duration_seconds": round(duration, 2),
+            "rms": round(rms, 1),
+            "peak": peak,
+            "gain": round(gain, 2),
+        }
+    except (EOFError, ValueError, wave.Error):
+        # Tests and third-party callers may supply encoded/non-WAV audio. Keep
+        # the existing transcription behavior instead of rejecting it here.
+        return audio, {
+            "valid_wav": False,
+            "audible": True,
+            "duration_seconds": 0.0,
+            "rms": 0.0,
+            "peak": 0,
+            "gain": 1.0,
+        }
 
 
 def _normalize_wav(audio: bytes) -> bytes:

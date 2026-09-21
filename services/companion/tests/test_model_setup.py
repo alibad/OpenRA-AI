@@ -203,11 +203,20 @@ class LocalAIManagerTests(unittest.TestCase):
         server.local_ai_manager = Manager()
         controller = mock.Mock()
         controller.start_question.return_value = True
+        controller.capture_status.return_value = {
+            "audible": True,
+            "device_name": "MacBook Pro Microphone",
+            "peak": 2400,
+        }
         server.voice_controller = controller
         worker = threading.Thread(target=server.serve_forever)
         worker.start()
         try:
             base = f"http://127.0.0.1:{server.server_port}"
+            with urllib.request.urlopen(base + "/v1/voice/readiness", timeout=3) as response:
+                readiness = json.loads(response.read())
+            self.assertEqual(readiness["model"], "local-whisper")
+            self.assertEqual(readiness["last_capture"]["peak"], 2400)
             request = urllib.request.Request(base + "/v1/voice/start", data=b"{}")
             with urllib.request.urlopen(request, timeout=3) as response:
                 self.assertTrue(json.loads(response.read())["ok"])

@@ -8,7 +8,13 @@ import time
 from collections.abc import Callable
 
 from .core import Companion
-from .voice import AudioPlayer, playback_hold_seconds, record_while
+from .voice import (
+    AudioPlayer,
+    microphone_status,
+    playback_hold_seconds,
+    prepare_voice_audio,
+    record_while,
+)
 
 
 def console_print(message: str) -> None:
@@ -63,6 +69,7 @@ class VoiceHotkeys:
         self._question_lock = threading.RLock()
         self._question_cancel = threading.Event()
         self._question_generation = 0
+        self._last_capture: dict[str, object] = {}
 
     @staticmethod
     def supported() -> bool:
@@ -153,6 +160,23 @@ class VoiceHotkeys:
             audio = record_while(lambda: held() and not self._stop.is_set() and not cancel.is_set())
             if not audio or self._stop.is_set() or cancel.is_set():
                 return
+            audio, signal = prepare_voice_audio(audio)
+            microphone = microphone_status()
+            self._last_capture = {
+                **signal,
+                "device_name": microphone.get("device_name", ""),
+            }
+            console_print(
+                "Microphone capture: "
+                f"device={self._last_capture['device_name'] or 'unknown'}, "
+                f"duration={signal['duration_seconds']}s, rms={signal['rms']}, "
+                f"peak={signal['peak']}, gain={signal['gain']}x"
+            )
+            if signal["valid_wav"] and not signal["audible"]:
+                device = str(self._last_capture["device_name"] or "SELECTED INPUT").upper()
+                self._set_status("voice-no-speech", f"MIC HEARD SILENCE  •  INPUT: {device}")
+                self._wait_for_question(cancel, 2.5)
+                return
             self._set_status("transcribing", "AI TRANSCRIBING  •  PRESS ASK AGAIN TO INTERRUPT")
             raw_transcript = self.companion.transcribe(audio).text.strip()
             transcript = self._clean_transcript(raw_transcript)
@@ -160,8 +184,8 @@ class VoiceHotkeys:
                 return
             if not transcript:
                 console_print(f"Voice transcription contained no speech: {raw_transcript or '<empty>'}")
-                self._set_status("voice-no-speech", "NO VOICE DETECTED  •  CHECK MICROPHONE ACCESS AND TRY AGAIN")
-                self._wait_for_question(cancel, 1.5)
+                self._set_status("voice-no-speech", "HEARD AUDIO, BUT COULDN'T UNDERSTAND  •  TRY AGAIN")
+                self._wait_for_question(cancel, 2.5)
                 return
             transcript_started = time.monotonic()
             self._set_status("transcript", f"YOU  •  {transcript}")
@@ -238,6 +262,10 @@ class VoiceHotkeys:
         was_held = self._external_hold.is_set()
         self._external_hold.clear()
         return was_held
+
+    def capture_status(self) -> dict[str, object]:
+        """Return non-sensitive signal measurements from the latest capture."""
+        return dict(self._last_capture)
 
     def _run(self) -> None:
         previous_push_to_talk = False
