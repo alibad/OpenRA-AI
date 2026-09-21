@@ -125,6 +125,15 @@ if codesign -dv --verbose=4 "$app" 2>&1 | grep -q '^Authority=Developer ID Appli
       echo >&2 "Developer-ID apphost is missing the .NET JIT entitlement."
       exit 1
     }
+  for microphone_target in \
+    "$app" \
+    "$app/Contents/Resources/bin/openra-ai-companion"; do
+    codesign -d --entitlements - "$microphone_target" 2>&1 | \
+      grep -F 'com.apple.security.device.audio-input' >/dev/null || {
+        echo >&2 "Developer-ID package is missing microphone access: $microphone_target"
+        exit 1
+      }
+  done
 fi
 "$app/Contents/Resources/bin/openra-ai-companion" voice-check --dependencies-only
 "$app/Contents/Resources/bin/openra-ai-runtime" --help >/dev/null

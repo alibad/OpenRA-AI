@@ -12,6 +12,7 @@ BRAND_SOURCE="$REPOSITORY_ROOT/assets/brand/rtsai-app-icon.png"
 PLIST_TEMPLATE="$REPOSITORY_ROOT/apps/installer/macos/Info.plist.in"
 WRAPPER_SOURCE="$REPOSITORY_ROOT/apps/installer/macos/OpenRAAI"
 ENTITLEMENTS="$REPOSITORY_ROOT/apps/installer/macos/OpenRAAI.entitlements"
+COMPANION_ENTITLEMENTS="$REPOSITORY_ROOT/apps/installer/macos/OpenRAAICompanion.entitlements"
 PYTHON="$REPOSITORY_ROOT/.venv/bin/python"
 AI_PACK_LOCK="$REPOSITORY_ROOT/packaging/ai-pack.lock.json"
 AI_RUNTIME_LOCK="$REPOSITORY_ROOT/packaging/ai-runtime.lock.json"
@@ -39,7 +40,7 @@ if [ -z "${DOTNET_ROOT:-}" ]; then
     export DOTNET_ROOT="${DOTNET_RUNTIME_PATH%%/shared/*}"
   fi
 fi
-for required in "$BRAND_SOURCE" "$PLIST_TEMPLATE" "$WRAPPER_SOURCE" "$ENTITLEMENTS" "$PYTHON" "$AI_PACK_LOCK" "$AI_RUNTIME_LOCK" "$MODEL_NOTICES" "$BROTLI_LICENSE"; do
+for required in "$BRAND_SOURCE" "$PLIST_TEMPLATE" "$WRAPPER_SOURCE" "$ENTITLEMENTS" "$COMPANION_ENTITLEMENTS" "$PYTHON" "$AI_PACK_LOCK" "$AI_RUNTIME_LOCK" "$MODEL_NOTICES" "$BROTLI_LICENSE"; do
   [ -f "$required" ] || { echo >&2 "macOS packaging input is missing: $required"; exit 1; }
 done
 
@@ -222,21 +223,32 @@ sign_runtime_payload() {
 
 if [ "$SIGNING_IDENTITY" = "-" ]; then
   sign_runtime_payload -
-  codesign --force --timestamp=none --sign - "$RESOURCES/bin/openra-ai-companion"
+  codesign --force --timestamp=none --entitlements "$COMPANION_ENTITLEMENTS" --sign - "$RESOURCES/bin/openra-ai-companion"
   codesign --force --timestamp=none --sign - "$RESOURCES/bin/openra-ai-runtime"
   codesign --force --deep --timestamp=none --sign - "$APP_ROOT"
+  codesign --force --timestamp=none --entitlements "$COMPANION_ENTITLEMENTS" --sign - "$RESOURCES/bin/openra-ai-companion"
+  codesign --force --timestamp=none --entitlements "$ENTITLEMENTS" --sign - "$MACOS/apphost-$ARCH_DIR"
+  codesign --force --timestamp=none --entitlements "$COMPANION_ENTITLEMENTS" --sign - "$APP_ROOT"
 else
   sign_runtime_payload "$SIGNING_IDENTITY"
-  codesign --force --options runtime --timestamp --sign "$SIGNING_IDENTITY" "$RESOURCES/bin/openra-ai-companion"
+  codesign --force --options runtime --timestamp --entitlements "$COMPANION_ENTITLEMENTS" --sign "$SIGNING_IDENTITY" "$RESOURCES/bin/openra-ai-companion"
   codesign --force --options runtime --timestamp --sign "$SIGNING_IDENTITY" "$RESOURCES/bin/openra-ai-runtime"
   codesign --force --deep --options runtime --timestamp --sign "$SIGNING_IDENTITY" "$APP_ROOT"
+  codesign --force --options runtime --timestamp --entitlements "$COMPANION_ENTITLEMENTS" --sign "$SIGNING_IDENTITY" "$RESOURCES/bin/openra-ai-companion"
   codesign --force --options runtime --timestamp --entitlements "$ENTITLEMENTS" --sign "$SIGNING_IDENTITY" "$MACOS/apphost-$ARCH_DIR"
-  codesign --force --options runtime --timestamp --sign "$SIGNING_IDENTITY" "$APP_ROOT"
-  codesign -d --entitlements - "$MACOS/apphost-$ARCH_DIR" 2>/dev/null | grep -F 'com.apple.security.cs.allow-jit' >/dev/null || {
-    echo >&2 "The final apphost signature lost the .NET JIT entitlement."
+  codesign --force --options runtime --timestamp --entitlements "$COMPANION_ENTITLEMENTS" --sign "$SIGNING_IDENTITY" "$APP_ROOT"
+fi
+
+codesign -d --entitlements - "$MACOS/apphost-$ARCH_DIR" 2>/dev/null | grep -F 'com.apple.security.cs.allow-jit' >/dev/null || {
+  echo >&2 "The final apphost signature lost the .NET JIT entitlement."
+  exit 1
+}
+for microphone_target in "$APP_ROOT" "$RESOURCES/bin/openra-ai-companion"; do
+  codesign -d --entitlements - "$microphone_target" 2>/dev/null | grep -F 'com.apple.security.device.audio-input' >/dev/null || {
+    echo >&2 "The final signature is missing microphone access: $microphone_target"
     exit 1
   }
-fi
+done
 
 "$RESOURCES/bin/openra-ai-companion" voice-check --dependencies-only || {
   echo >&2 "Signed companion is missing local microphone capture support."
