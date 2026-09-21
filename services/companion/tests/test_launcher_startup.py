@@ -145,9 +145,21 @@ class LauncherStartupTests(unittest.TestCase):
         self.assertIn("com.apple.security.device.audio-input", entitlements)
         self.assertIn('--entitlements "$COMPANION_ENTITLEMENTS"', package_script)
         self.assertIn('"$RESOURCES/bin/openra-ai-companion"', package_script)
-        self.assertIn('final companion signature is missing microphone access', package_script)
+        self.assertIn('clang "$LAUNCHER_SOURCE" -o "$MACOS/OpenRAAI"', package_script)
+        self.assertIn('cp "$WRAPPER_SOURCE" "$MACOS/OpenRAAI.sh"', package_script)
+        self.assertIn('for microphone_target in "$APP_ROOT"', package_script)
         self.assertIn('com.apple.security.device.audio-input', smoke_script)
         self.assertIn('"$app/Contents/Resources/bin/openra-ai-companion"', smoke_script)
+
+    def test_macos_bundle_uses_native_responsible_process(self) -> None:
+        root = Path(__file__).resolve().parents[3]
+        launcher = (root / "apps/installer/macos/OpenRAAILauncher.m").read_text(encoding="utf-8")
+
+        self.assertIn("<Cocoa/Cocoa.h>", launcher)
+        self.assertIn('stringByAppendingPathComponent:@"Contents/MacOS/OpenRAAI.sh"', launcher)
+        self.assertIn('[self.wrapperTask setLaunchPath:@"/bin/bash"]', launcher)
+        self.assertIn("NSTaskDidTerminateNotification", launcher)
+        self.assertIn("applicationWillTerminate", launcher)
 
     def test_macos_package_relocates_homebrew_brotli(self) -> None:
         package_script = (REPOSITORY_ROOT / "scripts/package-macos.sh").read_text(encoding="utf-8")

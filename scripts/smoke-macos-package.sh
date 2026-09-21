@@ -36,6 +36,7 @@ app="$mount_root/OpenRA AI.app"
 for required in \
   "$app/Contents/Info.plist" \
   "$app/Contents/MacOS/OpenRAAI" \
+  "$app/Contents/MacOS/OpenRAAI.sh" \
   "$app/Contents/MacOS/GameLauncher" \
   "$app/Contents/Resources/bin/openra-ai-companion" \
   "$app/Contents/Resources/bin/openra-ai-runtime" \
@@ -46,7 +47,7 @@ for required in \
   [ -e "$required" ] || { echo >&2 "Mounted app is missing: $required"; exit 1; }
 done
 
-wrapper="$app/Contents/MacOS/OpenRAAI"
+wrapper="$app/Contents/MacOS/OpenRAAI.sh"
 /bin/bash -n "$wrapper"
 grep -F 'selected_map=""' "$wrapper" >/dev/null || {
   echo >&2 "macOS launcher must open the main menu unless a map is selected."
@@ -123,6 +124,11 @@ if codesign -dv --verbose=4 "$app" 2>&1 | grep -q '^Authority=Developer ID Appli
   codesign -d --entitlements - "$app/Contents/MacOS/apphost-arm64" 2>&1 | \
     grep -F 'com.apple.security.cs.allow-jit' >/dev/null || {
       echo >&2 "Developer-ID apphost is missing the .NET JIT entitlement."
+      exit 1
+    }
+  codesign -d --entitlements - "$app" 2>&1 | \
+    grep -F 'com.apple.security.device.audio-input' >/dev/null || {
+      echo >&2 "Developer-ID app launcher is missing microphone access."
       exit 1
     }
   codesign -d --entitlements - "$app/Contents/Resources/bin/openra-ai-companion" 2>&1 | \
