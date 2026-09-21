@@ -228,7 +228,7 @@ if [ "$SIGNING_IDENTITY" = "-" ]; then
   codesign --force --deep --timestamp=none --sign - "$APP_ROOT"
   codesign --force --timestamp=none --entitlements "$COMPANION_ENTITLEMENTS" --sign - "$RESOURCES/bin/openra-ai-companion"
   codesign --force --timestamp=none --entitlements "$ENTITLEMENTS" --sign - "$MACOS/apphost-$ARCH_DIR"
-  codesign --force --timestamp=none --entitlements "$COMPANION_ENTITLEMENTS" --sign - "$APP_ROOT"
+  codesign --force --timestamp=none --sign - "$APP_ROOT"
 else
   sign_runtime_payload "$SIGNING_IDENTITY"
   codesign --force --options runtime --timestamp --entitlements "$COMPANION_ENTITLEMENTS" --sign "$SIGNING_IDENTITY" "$RESOURCES/bin/openra-ai-companion"
@@ -236,19 +236,17 @@ else
   codesign --force --deep --options runtime --timestamp --sign "$SIGNING_IDENTITY" "$APP_ROOT"
   codesign --force --options runtime --timestamp --entitlements "$COMPANION_ENTITLEMENTS" --sign "$SIGNING_IDENTITY" "$RESOURCES/bin/openra-ai-companion"
   codesign --force --options runtime --timestamp --entitlements "$ENTITLEMENTS" --sign "$SIGNING_IDENTITY" "$MACOS/apphost-$ARCH_DIR"
-  codesign --force --options runtime --timestamp --entitlements "$COMPANION_ENTITLEMENTS" --sign "$SIGNING_IDENTITY" "$APP_ROOT"
+  codesign --force --options runtime --timestamp --sign "$SIGNING_IDENTITY" "$APP_ROOT"
 fi
 
 codesign -d --entitlements - "$MACOS/apphost-$ARCH_DIR" 2>/dev/null | grep -F 'com.apple.security.cs.allow-jit' >/dev/null || {
   echo >&2 "The final apphost signature lost the .NET JIT entitlement."
   exit 1
 }
-for microphone_target in "$APP_ROOT" "$RESOURCES/bin/openra-ai-companion"; do
-  codesign -d --entitlements - "$microphone_target" 2>/dev/null | grep -F 'com.apple.security.device.audio-input' >/dev/null || {
-    echo >&2 "The final signature is missing microphone access: $microphone_target"
-    exit 1
-  }
-done
+codesign -d --entitlements - "$RESOURCES/bin/openra-ai-companion" 2>/dev/null | grep -F 'com.apple.security.device.audio-input' >/dev/null || {
+  echo >&2 "The final companion signature is missing microphone access."
+  exit 1
+}
 
 "$RESOURCES/bin/openra-ai-companion" voice-check --dependencies-only || {
   echo >&2 "Signed companion is missing local microphone capture support."
