@@ -13,6 +13,13 @@ live here. These scripts are the replacement for hosted workflows.
   its checksum-pinned source release because upstream does not publish a Mac
   server executable.
 - `setup.ps1` installs local dependencies and builds the pinned engine.
+- `content_catalog.py` validates the shared faction catalog (structure, rules
+  paths, public deep links) and stages it byte-identically into packages.
+- `validate-faction-catalog.py` checks the catalog against each mode's merged
+  engine rules (Classic and a data-only integrated RA2) with the engine's
+  `--check-faction-catalog` utility. `verify-catalog-package-layout.py` proves
+  staged Windows and macOS layouts resolve the catalog for the game and the
+  companion. See `docs/in-game-catalog.md`.
 - `check.ps1 -FullEngine` runs product tests, web checks, engine tests, and map
   validation.
 - `package-windows.ps1` creates both the portable Windows x64 ZIP and the
