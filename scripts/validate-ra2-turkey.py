@@ -20,7 +20,7 @@ import time
 
 from openra_ai_companion.bridge import OpenRABridge
 from openra_ai_companion.models import ActionCommand
-from native_fixture import ExactMoveCheck, TickBudget, link_directory, run_with_startup_retry, startup_failure
+from native_fixture import ExactMoveCheck, TickBudget, absolute_path, link_directory, startup_failure
 from ra2_turkey_assets import TURKEY_UNITS, DEFENSES
 
 # The amphibious IFV and three ships, each with a distinct clear water cell (MPos).
@@ -190,4 +190,4 @@ if __name__=="__main__":
     parser.add_argument("--visual",action="store_true")
     parser.add_argument("--visual-scene",choices=("infantry","armor","navy"),default="infantry")
     args=parser.parse_args()
-    raise SystemExit(0 if run_with_startup_retry(run,*(getattr(args,k).resolve() for k in ("resources","binaries","content","output")),args.visual,args.visual_scene) else 1)
+    raise SystemExit(0 if run(*(absolute_path(getattr(args,k)) for k in ("resources","binaries","content","output")),args.visual,args.visual_scene) else 1)

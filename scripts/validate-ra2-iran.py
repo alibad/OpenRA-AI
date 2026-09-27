@@ -13,7 +13,7 @@ import time
 
 from openra_ai_companion.bridge import OpenRABridge
 from openra_ai_companion.models import ActionCommand
-from native_fixture import ExactMoveCheck, TickBudget, link_directory, run_with_startup_retry, startup_failure
+from native_fixture import ExactMoveCheck, TickBudget, absolute_path, link_directory, startup_failure
 from ra2_iran_assets import UNITS, DEFENSES
 
 SPEC=importlib.util.spec_from_file_location("turkey_fixture",Path(__file__).with_name("validate-ra2-turkey.py"))
@@ -255,4 +255,4 @@ if __name__=="__main__":
     parser.add_argument("--mode",choices=("production","combat","edges","visual"),default="production")
     parser.add_argument("--scene",choices=("infantry","armor","navy"),default="infantry")
     args=parser.parse_args()
-    raise SystemExit(0 if run_with_startup_retry(run,*(getattr(args,k).resolve() for k in ("resources","binaries","content","output")),args.mode,args.scene) else 1)
+    raise SystemExit(0 if run(*(absolute_path(getattr(args,k)) for k in ("resources","binaries","content","output")),args.mode,args.scene) else 1)

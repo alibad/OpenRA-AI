@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-import json
 from pathlib import Path
 import sys
 import tempfile
@@ -113,47 +112,23 @@ class TickBudgetTests(unittest.TestCase):
         self.assertIn("exited", budget.failure("water", False))
 
 
-class StartupRetryTests(unittest.TestCase):
-    def fake_run(self, outcomes):
-        calls = []
-
-        def run(resources, binaries, content, output, *extra):
-            report = {"passed": outcomes[len(calls)], "extra": list(extra)}
-            if not report["passed"] and len(calls) < len(outcomes) - 1:
-                nf.startup_failure(report, Path(output) / "missing-profile")
-            calls.append(extra)
-            (Path(output) / "result.json").write_text(json.dumps(report))
-            return report["passed"]
-
-        return run, calls
-
-    def test_only_startup_failures_are_relaunched_and_evidence_is_kept(self):
+class AbsolutePathTests(unittest.TestCase):
+    def test_absolute_path_never_carries_the_extended_length_prefix(self):
         with tempfile.TemporaryDirectory() as root:
-            run, calls = self.fake_run([False, True])
-            self.assertTrue(nf.run_with_startup_retry(run, "r", "b", "c", root, "visual", pause_seconds=0))
-            self.assertEqual(len(calls), 2)
-            self.assertTrue(json.loads((Path(root) / "result-startup-failure-1.json").read_text())["startup_failure"])
-            self.assertEqual(json.loads((Path(root) / "result.json").read_text())["startup_attempts"], 2)
+            missing = Path(root) / "parent-created-later" / "run03"
+            self.assertEqual(nf.absolute_path(missing), Path(root) / "parent-created-later" / "run03")
+            self.assertTrue(nf.absolute_path("relative").is_absolute())
+            if sys.platform == "win32":
+                self.assertEqual(str(nf.absolute_path("\\\\?\\" + str(missing))), str(missing))
 
-    def test_gameplay_failures_are_not_retried(self):
+    def test_startup_failure_keeps_the_game_log_tail(self):
         with tempfile.TemporaryDirectory() as root:
-            run, calls = self.fake_run([False])
-            self.assertFalse(nf.run_with_startup_retry(run, "r", "b", "c", root, pause_seconds=0))
-            self.assertEqual(len(calls), 1)
-
-    def test_repeated_startup_failure_fails(self):
-        with tempfile.TemporaryDirectory() as root:
-            calls = []
-
-            def run(resources, binaries, content, output):
-                calls.append(1)
-                report = {"passed": False}
-                nf.startup_failure(report, Path(output))
-                (Path(output) / "result.json").write_text(json.dumps(report))
-                return False
-
-            self.assertFalse(nf.run_with_startup_retry(run, "r", "b", "c", root, attempts=2, pause_seconds=0))
-            self.assertEqual(len(calls), 2)
+            (Path(root) / "game.log").write_text("x" * 2000 + "Could not find map")
+            report = {}
+            nf.startup_failure(report, Path(root))
+            self.assertTrue(report["startup_failure"])
+            self.assertTrue(report["startup_log_tail"].endswith("Could not find map"))
+            self.assertEqual(len(report["startup_log_tail"]), 1500)
 
 
 class LinkDirectoryTests(unittest.TestCase):

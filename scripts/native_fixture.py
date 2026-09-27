@@ -1,6 +1,6 @@
-"""Shared helpers for private, headless native OpenRA fixtures.
+r"""Shared helpers for private, headless native OpenRA fixtures.
 
-Two sources of nondeterminism used to leak into the RA2 production tests:
+Three sources of nondeterminism leaked into the RA2 production tests:
 
 * Their deadline was wall-clock time measured from process launch. Native
   fixtures run at normal game speed (40 ms per tick), so JIT/content start-up
@@ -19,20 +19,34 @@ Two sources of nondeterminism used to leak into the RA2 production tests:
   actor that is idle away from a destination it has not yet been seen to reach.
   The actor must still path natively to the exact cell; nothing is teleported.
 
-A launch that exits before its first observation (engine start-up failure)
-carries no information about the gameplay under test; :func:`run_with_startup_retry`
-relaunches it once in a fresh profile and keeps the failed attempt's evidence.
+The third, Windows-only, looked like engine flakiness when several fixtures
+started together: ``Path.resolve()`` of an output directory whose parent
+another process was creating at that moment returned an extended-length
+``\\?\C:\...`` path (CPython keeps the prefix when the two lookups in
+``ntpath.realpath`` fail with different errors). The engine appends
+``maps/ra2/...`` with forward slashes to that support directory; extended
+paths are not normalized, so the private map folder was silently skipped and
+the game exited with "Could not find map" before its first tick. All six such
+start-up failures in 113 launches carried the prefix; none of the others did.
+Fixtures therefore use :func:`absolute_path`, which never adds the prefix.
 """
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-import json
 import os
 from pathlib import Path
 import time
 from typing import Mapping
 
 TICKS_PER_SECOND = 25  # The "default" game speed: Timestep 40 ms.
+
+
+def absolute_path(path: Path | str) -> Path:
+    r"""Absolute path without the ``\\?\`` prefix ``Path.resolve()`` can return."""
+    text = os.path.abspath(os.fspath(path))
+    if os.name == "nt" and text.startswith("\\\\?\\") and not text.startswith("\\\\?\\UNC\\"):
+        text = text[4:]
+    return Path(text)
 
 
 def link_directory(link: Path, target: Path) -> None:
@@ -180,32 +194,3 @@ def startup_failure(report: dict, profile: Path) -> None:
     log = Path(profile) / "game.log"
     if log.is_file():
         report["startup_log_tail"] = log.read_text(errors="replace")[-1500:]
-
-
-def run_with_startup_retry(run, *args, attempts: int = 3, pause_seconds: float = 5.0, **kwargs) -> bool:
-    """Call a fixture ``run(resources, binaries, content, output, ...)``.
-
-    Only a launch marked :func:`startup_failure` is repeated, after a short
-    pause. Observed on Windows when several fixtures start together: the
-    engine occasionally skips the private user-map folder during
-    ``MapCache.LoadMaps`` (an optional folder whose open failure is silently
-    ignored) and exits with "Could not find map" before the first tick; it
-    was not reproduced in 40 instrumented launches. Each failed attempt's
-    result is preserved beside the final one, which records how many
-    launches it took.
-    """
-    output = Path(args[3])
-    for attempt in range(1, attempts + 1):
-        if attempt > 1:
-            time.sleep(pause_seconds)
-        passed = run(*args, **kwargs)
-        result_path = output / "result.json"
-        result = json.loads(result_path.read_text())
-        if passed or not result.get("startup_failure") or attempt == attempts:
-            if attempt > 1:
-                result["startup_attempts"] = attempt
-                result_path.write_text(json.dumps(result, indent=2) + "\n")
-            return passed
-        result_path.rename(output / f"result-startup-failure-{attempt}.json")
-    return False
-
