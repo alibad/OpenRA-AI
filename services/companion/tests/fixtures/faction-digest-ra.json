@@ -1,0 +1,1175 @@
+{
+ "schema": "openra-ai.faction-catalog.live/1",
+ "source": "fixture: OpenRA.Utility --check-faction-catalog --digest, trimmed",
+ "mode": "ra",
+ "modeName": "Classic",
+ "engineVersion": "{DEV_VERSION}",
+ "catalogRevision": "2026-09-12.1",
+ "catalogAvailable": true,
+ "experience": {
+  "title": "World War III",
+  "fingerprint": "50e79c1f6ed2c6d849fc0f436dfe10edb39d2b9652e954efabd7ef81b0272c35"
+ },
+ "otherModeFactions": [],
+ "factions": [
+  {
+   "key": "china",
+   "catalogId": "china",
+   "internalName": "china",
+   "name": "China",
+   "title": "Haitian Network",
+   "side": "Allies",
+   "kind": "modern",
+   "availability": "active",
+   "doctrine": "Networked combined arms",
+   "description": "China: Coordinated Systems Warfare\nSpecial Ability: Battlefield Network\nSpecial Units: Drones, Precision Missiles, Amphibious Forces",
+   "url": "https://rtsai.net/factions/china?mode=ra",
+   "signature": "cnrifle",
+   "roster": [
+    {
+     "actor": "cnrifle",
+     "catalogUnitId": "cnrifle",
+     "name": "PLA Combined-Arms Rifleman",
+     "domain": "Infantry",
+     "role": "Line infantry",
+     "exclusive": true,
+     "signature": true,
+     "url": "https://rtsai.net/units/cnrifle?mode=ra",
+     "rulesLoaded": true,
+     "cost": 130,
+     "buildTimeSeconds": 3.1,
+     "hitPoints": 5600,
+     "armor": "None",
+     "speed": 54,
+     "sightCells": 4,
+     "passengers": 0,
+     "power": 0,
+     "roles": [
+      "line-infantry",
+      "rifle"
+     ],
+     "counters": [
+      "infantry"
+     ],
+     "targets": "Ground only",
+     "antiAir": false,
+     "antiGround": true,
+     "prerequisites": [],
+     "description": "Fires controlled two-round armor-piercing tracer bursts against infantry and light vehicles.",
+     "weapons": [
+      {
+       "name": "ChinaServiceRifle",
+       "rangeCells": 4.25,
+       "minRangeCells": 0,
+       "damage": 800,
+       "burst": 2,
+       "reloadTicks": 28,
+       "targets": [
+        "Ground",
+        "GroundActor",
+        "Water",
+        "WaterActor"
+       ],
+       "hits": [
+        "Ground",
+        "Water"
+       ],
+       "antiAir": false,
+       "antiGround": true
+      }
+     ]
+    },
+    {
+     "actor": "cnqilin",
+     "catalogUnitId": "cnqilin",
+     "name": "Qilin Main Battle Tank",
+     "domain": "Vehicles",
+     "role": "Precision armor",
+     "exclusive": true,
+     "signature": true,
+     "url": "https://rtsai.net/units/cnqilin?mode=ra",
+     "rulesLoaded": true,
+     "cost": 1200,
+     "buildTimeSeconds": 28.8,
+     "hitPoints": 54000,
+     "armor": "Heavy",
+     "speed": 74,
+     "sightCells": 6,
+     "passengers": 0,
+     "power": 0,
+     "roles": [
+      "armor",
+      "frontline",
+      "main-battle-tank"
+     ],
+     "counters": [
+      "armor",
+      "building"
+     ],
+     "targets": "Ground only",
+     "antiAir": false,
+     "antiGround": true,
+     "prerequisites": [
+      "Service Depot"
+     ],
+     "description": "Durable main battle tank with a precision 125 mm cannon.",
+     "weapons": [
+      {
+       "name": "ChinaQilin125mm",
+       "rangeCells": 6,
+       "minRangeCells": 0,
+       "damage": 8200,
+       "burst": 1,
+       "reloadTicks": 74,
+       "targets": [
+        "Ground",
+        "GroundActor",
+        "Water",
+        "WaterActor"
+       ],
+       "hits": [
+        "Ground",
+        "Water"
+       ],
+       "antiAir": false,
+       "antiGround": true
+      }
+     ]
+    },
+    {
+     "actor": "cnmantis",
+     "catalogUnitId": null,
+     "name": "Mantis Mobile Air Defense",
+     "domain": "Vehicles",
+     "role": "Anti air, Escort",
+     "exclusive": true,
+     "signature": false,
+     "url": null,
+     "rulesLoaded": true,
+     "cost": 1000,
+     "buildTimeSeconds": 24,
+     "hitPoints": 32000,
+     "armor": "Heavy",
+     "speed": 86,
+     "sightCells": 9,
+     "passengers": 0,
+     "power": 0,
+     "roles": [
+      "anti-air",
+      "escort",
+      "light-vehicle"
+     ],
+     "counters": [
+      "aircraft",
+      "drone"
+     ],
+     "targets": "Air only",
+     "antiAir": true,
+     "antiGround": false,
+     "prerequisites": [
+      "Radar Dome"
+     ],
+     "description": "Networked tracked air-defense vehicle with twin guided-missile salvos.",
+     "weapons": [
+      {
+       "name": "ChinaMantisAA",
+       "rangeCells": 8,
+       "minRangeCells": 1,
+       "damage": 2800,
+       "burst": 2,
+       "reloadTicks": 42,
+       "targets": [
+        "AirborneActor"
+       ],
+       "hits": [
+        "Air"
+       ],
+       "antiAir": true,
+       "antiGround": false
+      }
+     ]
+    },
+    {
+     "actor": "cncloud",
+     "catalogUnitId": "cncloud",
+     "name": "Cloud Shadow UAV",
+     "domain": "Aircraft",
+     "role": "Reconnaissance and strike",
+     "exclusive": true,
+     "signature": true,
+     "url": "https://rtsai.net/units/cncloud?mode=ra",
+     "rulesLoaded": true,
+     "cost": 900,
+     "buildTimeSeconds": 21.6,
+     "hitPoints": 4200,
+     "armor": "Light",
+     "speed": 158,
+     "sightCells": 13,
+     "passengers": 0,
+     "power": 0,
+     "roles": [
+      "close-air-support",
+      "strike-aircraft"
+     ],
+     "counters": [
+      "armor",
+      "building"
+     ],
+     "targets": "Ground only",
+     "antiAir": false,
+     "antiGround": true,
+     "prerequisites": [
+      "Radar Dome"
+     ],
+     "description": "Unmanned reconnaissance and precision-strike aircraft with limited ammunition.",
+     "weapons": [
+      {
+       "name": "ChinaCloudStrike",
+       "rangeCells": 7,
+       "minRangeCells": 1.5,
+       "damage": 6800,
+       "burst": 1,
+       "reloadTicks": 70,
+       "targets": [
+        "Ground",
+        "GroundActor",
+        "Water",
+        "WaterActor"
+       ],
+       "hits": [
+        "Ground",
+        "Water"
+       ],
+       "antiAir": false,
+       "antiGround": true
+      }
+     ]
+    },
+    {
+     "actor": "cnhaiwang",
+     "catalogUnitId": "cnhaiwang",
+     "name": "Haiwang Drone Assault Ship",
+     "domain": "Navy",
+     "role": "Carrier and maritime command",
+     "exclusive": true,
+     "signature": true,
+     "url": "https://rtsai.net/units/cnhaiwang?mode=ra",
+     "rulesLoaded": true,
+     "cost": 2800,
+     "buildTimeSeconds": 67.2,
+     "hitPoints": 88000,
+     "armor": "Heavy",
+     "speed": 48,
+     "sightCells": 12,
+     "passengers": 0,
+     "power": 0,
+     "roles": [
+      "carrier",
+      "drone-mothership",
+      "wing-controller"
+     ],
+     "counters": [
+      "armor",
+      "building",
+      "ship"
+     ],
+     "targets": "Air and ground",
+     "antiAir": true,
+     "antiGround": true,
+     "prerequisites": [
+      "Allied Tech Center"
+     ],
+     "description": "Expensive amphibious command ship that launches long-range drone strikes.",
+     "weapons": [
+      {
+       "name": "ChinaHaiwangDroneLaunch",
+       "rangeCells": 14,
+       "minRangeCells": 5,
+       "damage": 0,
+       "burst": 1,
+       "reloadTicks": 145,
+       "targets": [
+        "GroundActor",
+        "Structure",
+        "WaterActor"
+       ],
+       "hits": [
+        "Ground",
+        "Structure",
+        "Water"
+       ],
+       "antiAir": false,
+       "antiGround": true
+      },
+      {
+       "name": "ChinaHaiwangDefense",
+       "rangeCells": 7,
+       "minRangeCells": 0.5,
+       "damage": 3000,
+       "burst": 2,
+       "reloadTicks": 48,
+       "targets": [
+        "AirborneActor"
+       ],
+       "hits": [
+        "Air"
+       ],
+       "antiAir": true,
+       "antiGround": false
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "key": "iran",
+   "catalogId": "iran",
+   "internalName": "iran",
+   "name": "Iran",
+   "title": "Distributed Denial",
+   "side": "Soviet",
+   "kind": "modern",
+   "availability": "active",
+   "doctrine": "Layered denial",
+   "description": "Iran: Distributed Reconnaissance and Layered Denial\nSpecial Infantry: Basij Rifle Section, ATGM Team, Drone Controller\nHero Commando: Shadow One\nSpecial Units: Karrar Tank, Simorgh Loitering Munition, Ghadir Submarine",
+   "url": "https://rtsai.net/factions/iran?mode=ra",
+   "signature": "irkarr",
+   "roster": [
+    {
+     "actor": "irkarr",
+     "catalogUnitId": "irkarr",
+     "name": "Karrar Main Battle Tank",
+     "domain": "Vehicles",
+     "role": "Main battle tank",
+     "exclusive": true,
+     "signature": true,
+     "url": "https://rtsai.net/units/irkarr?mode=ra",
+     "rulesLoaded": true,
+     "cost": 1350,
+     "buildTimeSeconds": 32.4,
+     "hitPoints": 61000,
+     "armor": "Heavy",
+     "speed": 65,
+     "sightCells": 6,
+     "passengers": 0,
+     "power": 0,
+     "roles": [
+      "armor",
+      "frontline",
+      "main-battle-tank"
+     ],
+     "counters": [
+      "armor",
+      "building"
+     ],
+     "targets": "Ground only",
+     "antiAir": false,
+     "antiGround": true,
+     "prerequisites": [
+      "Service Depot",
+      "Soviet Tech Center"
+     ],
+     "description": "Durable high-technology battle tank.",
+     "weapons": [
+      {
+       "name": "IranKarrar125mm",
+       "rangeCells": 6.25,
+       "minRangeCells": 0,
+       "damage": 8600,
+       "burst": 1,
+       "reloadTicks": 76,
+       "targets": [
+        "Ground",
+        "GroundActor",
+        "Water",
+        "WaterActor"
+       ],
+       "hits": [
+        "Ground",
+        "Water"
+       ],
+       "antiAir": false,
+       "antiGround": true
+      }
+     ]
+    },
+    {
+     "actor": "irraad",
+     "catalogUnitId": "irraad",
+     "name": "Raad Mobile Air Defense",
+     "domain": "Vehicles",
+     "role": "Mobile air defense",
+     "exclusive": true,
+     "signature": true,
+     "url": "https://rtsai.net/units/irraad?mode=ra",
+     "rulesLoaded": true,
+     "cost": 950,
+     "buildTimeSeconds": 22.8,
+     "hitPoints": 23000,
+     "armor": "Light",
+     "speed": 90,
+     "sightCells": 6,
+     "passengers": 0,
+     "power": 0,
+     "roles": [
+      "anti-air",
+      "escort",
+      "light-vehicle"
+     ],
+     "counters": [
+      "aircraft",
+      "drone"
+     ],
+     "targets": "Air only",
+     "antiAir": true,
+     "antiGround": false,
+     "prerequisites": [],
+     "description": "Fast long-range anti-air missile carrier.",
+     "weapons": [
+      {
+       "name": "IranRaadMissile",
+       "rangeCells": 9,
+       "minRangeCells": 0.5,
+       "damage": 3900,
+       "burst": 1,
+       "reloadTicks": 44,
+       "targets": [
+        "AirborneActor"
+       ],
+       "hits": [
+        "Air"
+       ],
+       "antiAir": true,
+       "antiGround": false
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "key": "turkey",
+   "catalogId": "turkey",
+   "internalName": "turkey",
+   "name": "Türkiye",
+   "title": "Anatolian Guard",
+   "side": "Allies",
+   "kind": "modern",
+   "availability": "active",
+   "doctrine": "Mobile defense",
+   "description": "Turkey: Mobile Combined Arms\nFlexible wheeled formations, tactical drones, electronic warfare,\nlayered air defense, amphibious mobility, and sea-control warships.\nMechanized Riflemen fight better near Turkish transports, while drone\noperators designate targets for the entire force.",
+   "url": "https://rtsai.net/factions/turkey?mode=ra",
+   "signature": "bozkir",
+   "roster": [
+    {
+     "actor": "bozkir",
+     "catalogUnitId": "bozkir",
+     "name": "Bozkir Main Battle Tank",
+     "domain": "Vehicles",
+     "role": "Armored spearhead",
+     "exclusive": true,
+     "signature": true,
+     "url": "https://rtsai.net/units/bozkir?mode=ra",
+     "rulesLoaded": true,
+     "cost": 1400,
+     "buildTimeSeconds": 33.6,
+     "hitPoints": 57000,
+     "armor": "Heavy",
+     "speed": 78,
+     "sightCells": 6,
+     "passengers": 0,
+     "power": 0,
+     "roles": [
+      "evacuation",
+      "logistics",
+      "transport"
+     ],
+     "counters": [
+      "armor",
+      "building"
+     ],
+     "targets": "Ground only",
+     "antiAir": false,
+     "antiGround": true,
+     "prerequisites": [
+      "Service Depot"
+     ],
+     "description": "Mobile heavy tank with a stabilized 120 mm cannon.\nStrong against armor; vulnerable to aircraft and concentrated AT teams.",
+     "weapons": [
+      {
+       "name": "TurkeyBozkir120",
+       "rangeCells": 6.25,
+       "minRangeCells": 0,
+       "damage": 9000,
+       "burst": 1,
+       "reloadTicks": 76,
+       "targets": [
+        "Ground",
+        "GroundActor",
+        "Water",
+        "WaterActor"
+       ],
+       "hits": [
+        "Ground",
+        "Water"
+       ],
+       "antiAir": false,
+       "antiGround": true
+      }
+     ]
+    },
+    {
+     "actor": "kuzgunm",
+     "catalogUnitId": "kuzgunm",
+     "name": "Kuzgun-M Tactical Drone",
+     "domain": "Aircraft",
+     "role": "Uncrewed strike aircraft",
+     "exclusive": true,
+     "signature": true,
+     "url": "https://rtsai.net/units/kuzgunm?mode=ra",
+     "rulesLoaded": true,
+     "cost": 950,
+     "buildTimeSeconds": 22.8,
+     "hitPoints": 5500,
+     "armor": "Light",
+     "speed": 164,
+     "sightCells": 13,
+     "passengers": 0,
+     "power": 0,
+     "roles": [
+      "close-air-support",
+      "strike-aircraft"
+     ],
+     "counters": [
+      "armor",
+      "building"
+     ],
+     "targets": "Ground only",
+     "antiAir": false,
+     "antiGround": true,
+     "prerequisites": [
+      "Radar Dome"
+     ],
+     "description": "Long-endurance reconnaissance and designation drone.\nCarries two precision missiles and must rearm at a helipad.",
+     "weapons": [
+      {
+       "name": "TurkeyDroneDesignator",
+       "rangeCells": 10,
+       "minRangeCells": 0,
+       "damage": 0,
+       "burst": 1,
+       "reloadTicks": 45,
+       "targets": [
+        "GroundActor",
+        "WaterActor"
+       ],
+       "hits": [
+        "Ground",
+        "Water"
+       ],
+       "antiAir": false,
+       "antiGround": true
+      },
+      {
+       "name": "TurkeyDroneMissile",
+       "rangeCells": 7,
+       "minRangeCells": 2,
+       "damage": 6500,
+       "burst": 2,
+       "reloadTicks": 68,
+       "targets": [
+        "Ground",
+        "GroundActor",
+        "Water",
+        "WaterActor"
+       ],
+       "hits": [
+        "Ground",
+        "Water"
+       ],
+       "antiAir": false,
+       "antiGround": true
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "key": "saudi-arabia",
+   "catalogId": "saudi-arabia",
+   "internalName": "saudi",
+   "name": "Saudi Arabia",
+   "title": "Red Sea Command",
+   "side": "Allies",
+   "kind": "modern",
+   "availability": "active",
+   "doctrine": "Expeditionary",
+   "description": "Saudi Arabia: Networked Defense\nSpecial Unit: M1A2S\nSpecial Unit: Mobile Air Defense System",
+   "url": "https://rtsai.net/factions/saudi-arabia?mode=ra",
+   "signature": "m1a2s",
+   "roster": [
+    {
+     "actor": "sang",
+     "catalogUnitId": "sang",
+     "name": "Saudi National Guard",
+     "domain": "Infantry",
+     "role": "Line infantry",
+     "exclusive": true,
+     "signature": true,
+     "url": "https://rtsai.net/units/sang?mode=ra",
+     "rulesLoaded": true,
+     "cost": 180,
+     "buildTimeSeconds": 4.3,
+     "hitPoints": 7800,
+     "armor": "None",
+     "speed": 58,
+     "sightCells": 4,
+     "passengers": 0,
+     "power": 0,
+     "roles": [
+      "line-infantry",
+      "rifle"
+     ],
+     "counters": [
+      "infantry"
+     ],
+     "targets": "Ground only",
+     "antiAir": false,
+     "antiGround": true,
+     "prerequisites": [],
+     "description": "Durable rifle infantry with visible three-round tracer bursts. Deploy to brace for more range, faster fire and reduced incoming damage.\n  Strong vs Infantry\n  Weak vs Armor",
+     "weapons": [
+      {
+       "name": "RedSeaGuardRifle",
+       "rangeCells": 5.5,
+       "minRangeCells": 0,
+       "damage": 920,
+       "burst": 3,
+       "reloadTicks": 34,
+       "targets": [
+        "Ground",
+        "GroundActor",
+        "Water",
+        "WaterActor"
+       ],
+       "hits": [
+        "Ground",
+        "Water"
+       ],
+       "antiAir": false,
+       "antiGround": true
+      }
+     ]
+    },
+    {
+     "actor": "m1a2s",
+     "catalogUnitId": "m1a2s",
+     "name": "M1A2S",
+     "domain": "Vehicles",
+     "role": "Heavy armor",
+     "exclusive": true,
+     "signature": true,
+     "url": "https://rtsai.net/units/m1a2s?mode=ra",
+     "rulesLoaded": true,
+     "cost": 1250,
+     "buildTimeSeconds": 30,
+     "hitPoints": 52000,
+     "armor": "Heavy",
+     "speed": 82,
+     "sightCells": 6,
+     "passengers": 0,
+     "power": 0,
+     "roles": [
+      "armor",
+      "frontline",
+      "main-battle-tank"
+     ],
+     "counters": [
+      "armor",
+      "building"
+     ],
+     "targets": "Ground only",
+     "antiAir": false,
+     "antiGround": true,
+     "prerequisites": [
+      "Service Depot"
+     ],
+     "description": "Modern main battle tank with strong armor and accurate direct fire.",
+     "weapons": [
+      {
+       "name": "RedSeaAbrams120mm",
+       "rangeCells": 6,
+       "minRangeCells": 0,
+       "damage": 8500,
+       "burst": 1,
+       "reloadTicks": 72,
+       "targets": [
+        "Ground",
+        "GroundActor",
+        "Water",
+        "WaterActor"
+       ],
+       "hits": [
+        "Ground",
+        "Water"
+       ],
+       "antiAir": false,
+       "antiGround": true
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "key": "yemen",
+   "catalogId": "yemen",
+   "internalName": "yemen",
+   "name": "Yemen",
+   "title": "Red Sea Resistance",
+   "side": "Soviet",
+   "kind": "modern",
+   "availability": "active",
+   "doctrine": "Asymmetric defense",
+   "description": "Yemen: Dispersed Coastal Defense\nSpecial Unit: Armed Technical\nSpecial Unit: Samad Drone\nSpecial Unit: Mobile Missile Launcher",
+   "url": "https://rtsai.net/factions/yemen?mode=ra",
+   "signature": "tech",
+   "roster": [
+    {
+     "actor": "ymr",
+     "catalogUnitId": null,
+     "name": "Yemeni Mountain Rifleman",
+     "domain": "Infantry",
+     "role": "Line infantry, Rifle",
+     "exclusive": true,
+     "signature": false,
+     "url": null,
+     "rulesLoaded": true,
+     "cost": 75,
+     "buildTimeSeconds": 1.8,
+     "hitPoints": 4200,
+     "armor": "None",
+     "speed": 66,
+     "sightCells": 4,
+     "passengers": 0,
+     "power": 0,
+     "roles": [
+      "line-infantry",
+      "rifle"
+     ],
+     "counters": [
+      "infantry"
+     ],
+     "targets": "Ground only",
+     "antiAir": false,
+     "antiGround": true,
+     "prerequisites": [],
+     "description": "Inexpensive ambush infantry with a dusty two-shot volley that camouflages while stationary.\n  Strong in Numbers and Ambushes\n  Weak vs Vehicles",
+     "weapons": [
+      {
+       "name": "RedSeaMountainRifle",
+       "rangeCells": 5,
+       "minRangeCells": 0,
+       "damage": 650,
+       "burst": 2,
+       "reloadTicks": 36,
+       "targets": [
+        "Ground",
+        "GroundActor",
+        "Water",
+        "WaterActor"
+       ],
+       "hits": [
+        "Ground",
+        "Water"
+       ],
+       "antiAir": false,
+       "antiGround": true
+      }
+     ]
+    },
+    {
+     "actor": "yrpg",
+     "catalogUnitId": null,
+     "name": "Yemeni RPG Hunter",
+     "domain": "Infantry",
+     "role": "Anti armor, Line infantry",
+     "exclusive": true,
+     "signature": false,
+     "url": null,
+     "rulesLoaded": true,
+     "cost": 325,
+     "buildTimeSeconds": 7.8,
+     "hitPoints": 4300,
+     "armor": "None",
+     "speed": 61,
+     "sightCells": 4,
+     "passengers": 0,
+     "power": 0,
+     "roles": [
+      "anti-armor",
+      "line-infantry"
+     ],
+     "counters": [
+      "armor",
+      "building"
+     ],
+     "targets": "Ground only",
+     "antiAir": false,
+     "antiGround": true,
+     "prerequisites": [],
+     "description": "Mobile short-range anti-armor infantry. Drone guidance improves range and reload speed.\n  Strong vs Light and Medium Armor\n  Weak at Long Range",
+     "weapons": [
+      {
+       "name": "RedSeaRPG",
+       "rangeCells": 4.25,
+       "minRangeCells": 0.75,
+       "damage": 9200,
+       "burst": 1,
+       "reloadTicks": 75,
+       "targets": [
+        "Ground",
+        "GroundActor",
+        "Water",
+        "WaterActor"
+       ],
+       "hits": [
+        "Ground",
+        "Water"
+       ],
+       "antiAir": false,
+       "antiGround": true
+      }
+     ]
+    },
+    {
+     "actor": "tech",
+     "catalogUnitId": "tech",
+     "name": "Armed Technical",
+     "domain": "Vehicles",
+     "role": "Mobile harassment",
+     "exclusive": true,
+     "signature": true,
+     "url": "https://rtsai.net/units/tech?mode=ra",
+     "rulesLoaded": true,
+     "cost": 350,
+     "buildTimeSeconds": 8.4,
+     "hitPoints": 10500,
+     "armor": "Light",
+     "speed": 145,
+     "sightCells": 7,
+     "passengers": 1,
+     "power": 0,
+     "roles": [
+      "light-vehicle",
+      "reconnaissance",
+      "scout"
+     ],
+     "counters": [
+      "infantry"
+     ],
+     "targets": "Ground only",
+     "antiAir": false,
+     "antiGround": true,
+     "prerequisites": [],
+     "description": "Fast, inexpensive raiding vehicle with minimal protection.",
+     "weapons": [
+      {
+       "name": "M60mg",
+       "rangeCells": 4,
+       "minRangeCells": 0,
+       "damage": 1000,
+       "burst": 5,
+       "reloadTicks": 30,
+       "targets": [
+        "Ground",
+        "GroundActor",
+        "Water",
+        "WaterActor"
+       ],
+       "hits": [
+        "Ground",
+        "Water"
+       ],
+       "antiAir": false,
+       "antiGround": true
+      }
+     ]
+    },
+    {
+     "actor": "samad",
+     "catalogUnitId": "samad",
+     "name": "Samad Drone",
+     "domain": "Aircraft",
+     "role": "Terminal strike drone",
+     "exclusive": true,
+     "signature": true,
+     "url": "https://rtsai.net/units/samad?mode=ra",
+     "rulesLoaded": true,
+     "cost": 700,
+     "buildTimeSeconds": 16.8,
+     "hitPoints": 3200,
+     "armor": "Light",
+     "speed": 128,
+     "sightCells": 7,
+     "passengers": 0,
+     "power": 0,
+     "roles": [
+      "close-air-support",
+      "strike-aircraft"
+     ],
+     "counters": [
+      "armor",
+      "building"
+     ],
+     "targets": "Ground only",
+     "antiAir": false,
+     "antiGround": true,
+     "prerequisites": [],
+     "description": "One-way loitering munition with a committed terminal dive. Cannot return or rearm.",
+     "weapons": [
+      {
+       "name": "RedSeaDroneStrike",
+       "rangeCells": 2,
+       "minRangeCells": 0,
+       "damage": 14000,
+       "burst": 1,
+       "reloadTicks": 1,
+       "targets": [
+        "Ground",
+        "GroundActor",
+        "Water",
+        "WaterActor"
+       ],
+       "hits": [
+        "Ground",
+        "Water"
+       ],
+       "antiAir": false,
+       "antiGround": true
+      }
+     ]
+    },
+    {
+     "actor": "pbox",
+     "catalogUnitId": null,
+     "name": "Pillbox",
+     "domain": "Defenses",
+     "role": "Defense",
+     "exclusive": false,
+     "signature": false,
+     "url": null,
+     "rulesLoaded": true,
+     "cost": 600,
+     "buildTimeSeconds": 14.4,
+     "hitPoints": 40000,
+     "armor": "Heavy",
+     "speed": 0,
+     "sightCells": 6,
+     "passengers": 1,
+     "power": -20,
+     "roles": [],
+     "counters": [],
+     "targets": "Garrison fire only",
+     "antiAir": false,
+     "antiGround": false,
+     "prerequisites": [
+      "Allied Barracks"
+     ],
+     "description": "Static defense with a fireport for\na garrisoned soldier.\nCan detect cloaked units.\n  Strong vs Infantry and Light armor\n  Weak vs Tanks and Aircraft",
+     "weapons": []
+    },
+    {
+     "actor": "sam",
+     "catalogUnitId": null,
+     "name": "SAM Site",
+     "domain": "Defenses",
+     "role": "Base protection, Defense",
+     "exclusive": false,
+     "signature": false,
+     "url": null,
+     "rulesLoaded": true,
+     "cost": 700,
+     "buildTimeSeconds": 16.8,
+     "hitPoints": 40000,
+     "armor": "Heavy",
+     "speed": 0,
+     "sightCells": 8,
+     "passengers": 0,
+     "power": -40,
+     "roles": [
+      "base-protection",
+      "defense",
+      "emplacement"
+     ],
+     "counters": [
+      "aircraft",
+      "armor",
+      "infantry"
+     ],
+     "targets": "Air only",
+     "antiAir": true,
+     "antiGround": false,
+     "prerequisites": [
+      "Radar Dome"
+     ],
+     "description": "Anti-Air base defense.\nRequires power to operate.\n  Strong vs Aircraft\n  Weak vs Ground units",
+     "weapons": [
+      {
+       "name": "Nike",
+       "rangeCells": 7.5,
+       "minRangeCells": 0.5,
+       "damage": 4500,
+       "burst": 1,
+       "reloadTicks": 15,
+       "targets": [
+        "AirborneActor"
+       ],
+       "hits": [
+        "Air"
+       ],
+       "antiAir": true,
+       "antiGround": false
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "key": "rules:england",
+   "catalogId": null,
+   "internalName": "england",
+   "name": "England",
+   "title": null,
+   "side": "Allies",
+   "kind": "original",
+   "availability": "active",
+   "doctrine": null,
+   "description": "England: Counterintelligence\nSpecial Unit: British Spy\nSpecial Unit: Mobile Gap Generator",
+   "url": null,
+   "signature": null,
+   "roster": [
+    {
+     "actor": "e1",
+     "catalogUnitId": null,
+     "name": "Rifle Infantry",
+     "domain": "Infantry",
+     "role": "Line infantry, Rifle",
+     "exclusive": false,
+     "signature": false,
+     "url": null,
+     "rulesLoaded": true,
+     "cost": 100,
+     "buildTimeSeconds": 2.4,
+     "hitPoints": 5000,
+     "armor": "None",
+     "speed": 54,
+     "sightCells": 4,
+     "passengers": 0,
+     "power": 0,
+     "roles": [
+      "line-infantry",
+      "rifle"
+     ],
+     "counters": [
+      "infantry"
+     ],
+     "targets": "Ground only",
+     "antiAir": false,
+     "antiGround": true,
+     "prerequisites": [],
+     "description": "General-purpose infantry.\n  Strong vs Infantry\n  Weak vs Vehicles and Aircraft",
+     "weapons": [
+      {
+       "name": "M1Carbine",
+       "rangeCells": 5,
+       "minRangeCells": 0,
+       "damage": 1000,
+       "burst": 1,
+       "reloadTicks": 20,
+       "targets": [
+        "Ground",
+        "GroundActor",
+        "Water",
+        "WaterActor"
+       ],
+       "hits": [
+        "Ground",
+        "Water"
+       ],
+       "antiAir": false,
+       "antiGround": true
+      },
+      {
+       "name": "Vulcan",
+       "rangeCells": 6,
+       "minRangeCells": 0,
+       "damage": 6000,
+       "burst": 1,
+       "reloadTicks": 35,
+       "targets": [
+        "Ground",
+        "GroundActor",
+        "Water",
+        "WaterActor"
+       ],
+       "hits": [
+        "Ground",
+        "Water"
+       ],
+       "antiAir": false,
+       "antiGround": true
+      }
+     ]
+    },
+    {
+     "actor": "spy.england",
+     "catalogUnitId": null,
+     "name": "British Spy",
+     "domain": "Infantry",
+     "role": "Infantry",
+     "exclusive": true,
+     "signature": false,
+     "url": null,
+     "rulesLoaded": true,
+     "cost": 250,
+     "buildTimeSeconds": 6,
+     "hitPoints": 2500,
+     "armor": "None",
+     "speed": 54,
+     "sightCells": 5,
+     "passengers": 0,
+     "power": 0,
+     "roles": [],
+     "counters": [],
+     "targets": "Ground only",
+     "antiAir": false,
+     "antiGround": true,
+     "prerequisites": [
+      "Radar Dome"
+     ],
+     "description": "Infiltrates enemy structures for intel or\nsabotage. Exact effect depends on the\nbuilding infiltrated.\nLoses disguise when attacking.\nCan detect spies.\n  Strong vs Infantry\n  Weak vs Vehicles and Aircraft\n  Special Ability: Disguised",
+     "weapons": [
+      {
+       "name": "SilencedPPK",
+       "rangeCells": 2.5,
+       "minRangeCells": 0,
+       "damage": 15000,
+       "burst": 1,
+       "reloadTicks": 80,
+       "targets": [
+        "Barrel",
+        "Ground",
+        "Infantry"
+       ],
+       "hits": [
+        "Ground",
+        "Infantry"
+       ],
+       "antiAir": false,
+       "antiGround": true
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

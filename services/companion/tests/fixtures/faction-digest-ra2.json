@@ -1,0 +1,723 @@
+{
+ "schema": "openra-ai.faction-catalog.live/1",
+ "source": "fixture: OpenRA.Utility --check-faction-catalog --digest, trimmed",
+ "mode": "ra2",
+ "modeName": "Red Alert 2",
+ "engineVersion": "{DEV_VERSION}",
+ "catalogRevision": "2026-09-12.1",
+ "catalogAvailable": true,
+ "experience": {
+  "title": "Red Alert 2 — Modern Factions",
+  "fingerprint": "afd92065fe63c63ea80ba0326393f6f9308f228a918f92954a6ed713c258cce2"
+ },
+ "otherModeFactions": [
+  {
+   "id": "saudi-arabia",
+   "name": "Saudi Arabia",
+   "availableIn": [
+    "ra"
+   ]
+  },
+  {
+   "id": "yemen",
+   "name": "Yemen",
+   "availableIn": [
+    "ra"
+   ]
+  }
+ ],
+ "factions": [
+  {
+   "key": "china",
+   "catalogId": "china",
+   "internalName": "china",
+   "name": "China",
+   "title": "Haitian Network",
+   "side": "Allies",
+   "kind": "modern",
+   "availability": "active",
+   "doctrine": "Networked combined arms",
+   "description": "Networked combined arms. Support vehicles are fragile;\nisolated tanks lose the network bonus.",
+   "url": "https://rtsai.net/factions/china?mode=ra2",
+   "signature": "r2cnrifle",
+   "roster": [
+    {
+     "actor": "r2cnrifle",
+     "catalogUnitId": "cnrifle",
+     "name": "Combined Arms Rifleman",
+     "domain": "Infantry",
+     "role": "Line infantry",
+     "exclusive": true,
+     "signature": true,
+     "url": "https://rtsai.net/units/cnrifle?mode=ra2",
+     "rulesLoaded": true,
+     "cost": 180,
+     "buildTimeSeconds": 4.3,
+     "hitPoints": 115,
+     "armor": "None",
+     "speed": 60,
+     "sightCells": 5,
+     "passengers": 0,
+     "power": 0,
+     "roles": [
+      "line-infantry"
+     ],
+     "counters": [],
+     "targets": "Ground only",
+     "antiAir": false,
+     "antiGround": true,
+     "prerequisites": [
+      "Barracks"
+     ],
+     "description": "Affordable line infantry.\nNetwork support improves sustained fire.\nStrong vs infantry; vulnerable to armor and splash damage.",
+     "weapons": [
+      {
+       "name": "R2ChinaRifle",
+       "rangeCells": 5,
+       "minRangeCells": 0,
+       "damage": 9,
+       "burst": 2,
+       "reloadTicks": 26,
+       "targets": [
+        "Ground",
+        "Water"
+       ],
+       "hits": [
+        "Ground",
+        "Water"
+       ],
+       "antiAir": false,
+       "antiGround": true
+      }
+     ]
+    },
+    {
+     "actor": "r2qilin",
+     "catalogUnitId": "cnqilin",
+     "name": "Qilin Battle Tank",
+     "domain": "Vehicles",
+     "role": "Precision armor",
+     "exclusive": true,
+     "signature": true,
+     "url": "https://rtsai.net/units/cnqilin?mode=ra2",
+     "rulesLoaded": true,
+     "cost": 850,
+     "buildTimeSeconds": 20.4,
+     "hitPoints": 350,
+     "armor": "Heavy",
+     "speed": 100,
+     "sightCells": 8,
+     "passengers": 0,
+     "power": 0,
+     "roles": [
+      "main-battle-tank"
+     ],
+     "counters": [],
+     "targets": "Ground only",
+     "antiAir": false,
+     "antiGround": true,
+     "prerequisites": [
+      "War Factory"
+     ],
+     "description": "Front-line armor. Nearby Lynx reduces reload time by 15%.",
+     "weapons": [
+      {
+       "name": "R2QilinGun",
+       "rangeCells": 5,
+       "minRangeCells": 0,
+       "damage": 68,
+       "burst": 1,
+       "reloadTicks": 65,
+       "targets": [
+        "Ground",
+        "Water"
+       ],
+       "hits": [
+        "Ground",
+        "Water"
+       ],
+       "antiAir": false,
+       "antiGround": true
+      }
+     ]
+    },
+    {
+     "actor": "r2mantis",
+     "catalogUnitId": null,
+     "name": "Mantis Air Defense",
+     "domain": "Vehicles",
+     "role": "Anti air",
+     "exclusive": true,
+     "signature": false,
+     "url": null,
+     "rulesLoaded": true,
+     "cost": 950,
+     "buildTimeSeconds": 22.8,
+     "hitPoints": 230,
+     "armor": "Light",
+     "speed": 100,
+     "sightCells": 8,
+     "passengers": 0,
+     "power": 0,
+     "roles": [
+      "anti-air"
+     ],
+     "counters": [],
+     "targets": "Air only",
+     "antiAir": true,
+     "antiGround": false,
+     "prerequisites": [
+      "War Factory"
+     ],
+     "description": "Mobile anti-air missiles. Cannot attack ground targets.",
+     "weapons": [
+      {
+       "name": "R2AirDefense",
+       "rangeCells": 10,
+       "minRangeCells": 0,
+       "damage": 45,
+       "burst": 2,
+       "reloadTicks": 90,
+       "targets": [
+        "Air"
+       ],
+       "hits": [
+        "Air"
+       ],
+       "antiAir": true,
+       "antiGround": false
+      }
+     ]
+    },
+    {
+     "actor": "r2cloud",
+     "catalogUnitId": "cncloud",
+     "name": "Cloud Recon Drone",
+     "domain": "Aircraft",
+     "role": "Reconnaissance and strike",
+     "exclusive": true,
+     "signature": true,
+     "url": "https://rtsai.net/units/cncloud?mode=ra2",
+     "rulesLoaded": true,
+     "cost": 1000,
+     "buildTimeSeconds": 24,
+     "hitPoints": 120,
+     "armor": "Light",
+     "speed": 180,
+     "sightCells": 11,
+     "passengers": 0,
+     "power": 0,
+     "roles": [
+      "strike-aircraft"
+     ],
+     "counters": [],
+     "targets": "Ground only",
+     "antiAir": false,
+     "antiGround": true,
+     "prerequisites": [
+      "War Factory",
+      "Radar"
+     ],
+     "description": "Long-range reconnaissance with light ground attack. Vulnerable\nto anti-air.",
+     "weapons": [
+      {
+       "name": "R2DroneMissile",
+       "rangeCells": 6,
+       "minRangeCells": 0,
+       "damage": 35,
+       "burst": 1,
+       "reloadTicks": 140,
+       "targets": [
+        "Ground",
+        "Water"
+       ],
+       "hits": [
+        "Ground",
+        "Water"
+       ],
+       "antiAir": false,
+       "antiGround": true
+      }
+     ]
+    },
+    {
+     "actor": "r2haiwang",
+     "catalogUnitId": "cnhaiwang",
+     "name": "Haiwang Drone Carrier",
+     "domain": "Navy",
+     "role": "Carrier and maritime command",
+     "exclusive": true,
+     "signature": true,
+     "url": "https://rtsai.net/units/cnhaiwang?mode=ra2",
+     "rulesLoaded": true,
+     "cost": 2400,
+     "buildTimeSeconds": 57.6,
+     "hitPoints": 850,
+     "armor": "Heavy",
+     "speed": 60,
+     "sightCells": 7,
+     "passengers": 0,
+     "power": 0,
+     "roles": [
+      "artillery"
+     ],
+     "counters": [],
+     "targets": "Ground only",
+     "antiAir": false,
+     "antiGround": true,
+     "prerequisites": [
+      "Naval Yard",
+      "Battle Lab"
+     ],
+     "description": "Launches three strike drones that return and replenish.\nLong-range pressure against tanks and structures.\nSlow and defenseless against submarines or aircraft.",
+     "weapons": [
+      {
+       "name": "HornetLauncher",
+       "rangeCells": 25,
+       "minRangeCells": 0,
+       "damage": 0,
+       "burst": 1,
+       "reloadTicks": 30,
+       "targets": [
+        "Ground",
+        "Water"
+       ],
+       "hits": [
+        "Ground",
+        "Water"
+       ],
+       "antiAir": false,
+       "antiGround": true
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "key": "iran",
+   "catalogId": "iran",
+   "internalName": "iran",
+   "name": "Iran",
+   "title": "Distributed Denial",
+   "side": "Soviets",
+   "kind": "modern",
+   "availability": "active",
+   "doctrine": "Layered denial",
+   "description": "Layered denial. Long-range launchers have a minimum range and\nneed armor and air-defense escorts.",
+   "url": "https://rtsai.net/factions/iran?mode=ra2",
+   "signature": "r2karrar",
+   "roster": [
+    {
+     "actor": "r2karrar",
+     "catalogUnitId": "irkarr",
+     "name": "Karrar Battle Tank",
+     "domain": "Vehicles",
+     "role": "Main battle tank",
+     "exclusive": true,
+     "signature": true,
+     "url": "https://rtsai.net/units/irkarr?mode=ra2",
+     "rulesLoaded": true,
+     "cost": 900,
+     "buildTimeSeconds": 21.6,
+     "hitPoints": 420,
+     "armor": "Heavy",
+     "speed": 85,
+     "sightCells": 8,
+     "passengers": 0,
+     "power": 0,
+     "roles": [
+      "main-battle-tank"
+     ],
+     "counters": [],
+     "targets": "Ground only",
+     "antiAir": false,
+     "antiGround": true,
+     "prerequisites": [
+      "War Factory"
+     ],
+     "description": "Durable escort tank. Strong against armor; slow to reposition.",
+     "weapons": [
+      {
+       "name": "R2KarrarGun",
+       "rangeCells": 5.75,
+       "minRangeCells": 0,
+       "damage": 90,
+       "burst": 1,
+       "reloadTicks": 75,
+       "targets": [
+        "Ground",
+        "Water"
+       ],
+       "hits": [
+        "Ground",
+        "Water"
+       ],
+       "antiAir": false,
+       "antiGround": true
+      }
+     ]
+    },
+    {
+     "actor": "r2raad",
+     "catalogUnitId": "irraad",
+     "name": "Raad Air Defense",
+     "domain": "Vehicles",
+     "role": "Mobile air defense",
+     "exclusive": true,
+     "signature": true,
+     "url": "https://rtsai.net/units/irraad?mode=ra2",
+     "rulesLoaded": true,
+     "cost": 1000,
+     "buildTimeSeconds": 24,
+     "hitPoints": 260,
+     "armor": "Light",
+     "speed": 100,
+     "sightCells": 8,
+     "passengers": 0,
+     "power": 0,
+     "roles": [
+      "anti-air"
+     ],
+     "counters": [],
+     "targets": "Air only",
+     "antiAir": true,
+     "antiGround": false,
+     "prerequisites": [
+      "War Factory"
+     ],
+     "description": "Long-range mobile air defense. Protects rocket artillery from\naircraft.",
+     "weapons": [
+      {
+       "name": "R2AirDefense",
+       "rangeCells": 10,
+       "minRangeCells": 0,
+       "damage": 45,
+       "burst": 2,
+       "reloadTicks": 90,
+       "targets": [
+        "Air"
+       ],
+       "hits": [
+        "Air"
+       ],
+       "antiAir": true,
+       "antiGround": false
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "key": "turkey",
+   "catalogId": "turkey",
+   "internalName": "turkey",
+   "name": "Türkiye",
+   "title": "Anatolian Guard",
+   "side": "Allies",
+   "kind": "modern",
+   "availability": "active",
+   "doctrine": "Mobile defense",
+   "description": "Combined arms: 16 Turkish units and three defenses. Mechanized\ninfantry, drones and naval escorts; keep support vehicles\nclose.",
+   "url": "https://rtsai.net/factions/turkey?mode=ra2",
+   "signature": "r2bozkir",
+   "roster": [
+    {
+     "actor": "r2bozkir",
+     "catalogUnitId": "bozkir",
+     "name": "Bozkir Battle Tank",
+     "domain": "Vehicles",
+     "role": "Armored spearhead",
+     "exclusive": true,
+     "signature": true,
+     "url": "https://rtsai.net/units/bozkir?mode=ra2",
+     "rulesLoaded": true,
+     "cost": 950,
+     "buildTimeSeconds": 22.8,
+     "hitPoints": 400,
+     "armor": "Heavy",
+     "speed": 100,
+     "sightCells": 8,
+     "passengers": 0,
+     "power": 0,
+     "roles": [
+      "main-battle-tank"
+     ],
+     "counters": [],
+     "targets": "Ground only",
+     "antiAir": false,
+     "antiGround": true,
+     "prerequisites": [
+      "War Factory"
+     ],
+     "description": "Armored spearhead. Takes 15% less damage near a Sancak support\nvehicle.",
+     "weapons": [
+      {
+       "name": "R2BozkirGun",
+       "rangeCells": 5,
+       "minRangeCells": 0,
+       "damage": 80,
+       "burst": 1,
+       "reloadTicks": 70,
+       "targets": [
+        "Ground",
+        "Water"
+       ],
+       "hits": [
+        "Ground",
+        "Water"
+       ],
+       "antiAir": false,
+       "antiGround": true
+      }
+     ]
+    },
+    {
+     "actor": "r2gokkalkan",
+     "catalogUnitId": null,
+     "name": "Gokkalkan Air Defense",
+     "domain": "Vehicles",
+     "role": "Anti air",
+     "exclusive": true,
+     "signature": false,
+     "url": null,
+     "rulesLoaded": true,
+     "cost": 950,
+     "buildTimeSeconds": 22.8,
+     "hitPoints": 240,
+     "armor": "Light",
+     "speed": 110,
+     "sightCells": 8,
+     "passengers": 0,
+     "power": 0,
+     "roles": [
+      "anti-air"
+     ],
+     "counters": [],
+     "targets": "Air only",
+     "antiAir": true,
+     "antiGround": false,
+     "prerequisites": [
+      "War Factory"
+     ],
+     "description": "Mobile missile air defense. Strong vs aircraft; cannot attack\nground targets.\nEscort tanks and transports.",
+     "weapons": [
+      {
+       "name": "R2AirDefense",
+       "rangeCells": 10,
+       "minRangeCells": 0,
+       "damage": 45,
+       "burst": 2,
+       "reloadTicks": 90,
+       "targets": [
+        "Air"
+       ],
+       "hits": [
+        "Air"
+       ],
+       "antiAir": true,
+       "antiGround": false
+      }
+     ]
+    },
+    {
+     "actor": "r2kuzgun",
+     "catalogUnitId": "kuzgunm",
+     "name": "Kuzgun Recon Drone",
+     "domain": "Aircraft",
+     "role": "Uncrewed strike aircraft",
+     "exclusive": true,
+     "signature": true,
+     "url": "https://rtsai.net/units/kuzgunm?mode=ra2",
+     "rulesLoaded": true,
+     "cost": 1000,
+     "buildTimeSeconds": 24,
+     "hitPoints": 130,
+     "armor": "Light",
+     "speed": 180,
+     "sightCells": 11,
+     "passengers": 0,
+     "power": 0,
+     "roles": [
+      "strike-aircraft"
+     ],
+     "counters": [],
+     "targets": "Ground only",
+     "antiAir": false,
+     "antiGround": true,
+     "prerequisites": [
+      "War Factory",
+      "Radar"
+     ],
+     "description": "Reconnaissance and light strike support. Benefits from a\nnearby Sancak screen.",
+     "weapons": [
+      {
+       "name": "R2DroneMissile",
+       "rangeCells": 6,
+       "minRangeCells": 0,
+       "damage": 35,
+       "burst": 1,
+       "reloadTicks": 140,
+       "targets": [
+        "Ground",
+        "Water"
+       ],
+       "hits": [
+        "Ground",
+        "Water"
+       ],
+       "antiAir": false,
+       "antiGround": true
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "key": "rules:america",
+   "catalogId": null,
+   "internalName": "america",
+   "name": "America",
+   "title": null,
+   "side": "Allies",
+   "kind": "original",
+   "availability": "active",
+   "doctrine": null,
+   "description": "America\nSpecial Ability: Paratroopers",
+   "url": null,
+   "signature": null,
+   "roster": [
+    {
+     "actor": "e1",
+     "catalogUnitId": null,
+     "name": "G.I.",
+     "domain": "Infantry",
+     "role": "Line infantry",
+     "exclusive": false,
+     "signature": false,
+     "url": null,
+     "rulesLoaded": true,
+     "cost": 200,
+     "buildTimeSeconds": 4.8,
+     "hitPoints": 125,
+     "armor": "None",
+     "speed": 60,
+     "sightCells": 5,
+     "passengers": 0,
+     "power": 0,
+     "roles": [
+      "line-infantry"
+     ],
+     "counters": [],
+     "targets": "Ground only",
+     "antiAir": false,
+     "antiGround": true,
+     "prerequisites": [],
+     "description": "General-purpose infantry.\n  Strong vs Infantry\n  Weak vs Vehicles, Aircraft",
+     "weapons": [
+      {
+       "name": "M60",
+       "rangeCells": 4,
+       "minRangeCells": 0,
+       "damage": 20,
+       "burst": 1,
+       "reloadTicks": 20,
+       "targets": [
+        "Ground",
+        "Water"
+       ],
+       "hits": [
+        "Ground",
+        "Water"
+       ],
+       "antiAir": false,
+       "antiGround": true
+      },
+      {
+       "name": "M60E",
+       "rangeCells": 4,
+       "minRangeCells": 0,
+       "damage": 25,
+       "burst": 1,
+       "reloadTicks": 20,
+       "targets": [
+        "Ground",
+        "Water"
+       ],
+       "hits": [
+        "Ground",
+        "Water"
+       ],
+       "antiAir": false,
+       "antiGround": true
+      },
+      {
+       "name": "para",
+       "rangeCells": 5,
+       "minRangeCells": 0,
+       "damage": 15,
+       "burst": 1,
+       "reloadTicks": 15,
+       "targets": [
+        "Ground",
+        "Water"
+       ],
+       "hits": [
+        "Ground",
+        "Water"
+       ],
+       "antiAir": false,
+       "antiGround": true
+      },
+      {
+       "name": "paraE",
+       "rangeCells": 7,
+       "minRangeCells": 0,
+       "damage": 25,
+       "burst": 1,
+       "reloadTicks": 15,
+       "targets": [
+        "Ground",
+        "Water"
+       ],
+       "hits": [
+        "Ground",
+        "Water"
+       ],
+       "antiAir": false,
+       "antiGround": true
+      }
+     ]
+    },
+    {
+     "actor": "amradr",
+     "catalogUnitId": null,
+     "name": "American Airforce Command Headquarters",
+     "domain": "Buildings",
+     "role": "Structure",
+     "exclusive": true,
+     "signature": false,
+     "url": null,
+     "rulesLoaded": true,
+     "cost": 1000,
+     "buildTimeSeconds": 24,
+     "hitPoints": 600,
+     "armor": "Steel",
+     "speed": 0,
+     "sightCells": 10,
+     "passengers": 0,
+     "power": -50,
+     "roles": [],
+     "counters": [],
+     "targets": "Unarmed",
+     "antiAir": false,
+     "antiGround": false,
+     "prerequisites": [
+      "Ore Refinery"
+     ],
+     "description": "Provides radar\nSupports 4 aircraft.",
+     "weapons": []
+    }
+   ]
+  }
+ ]
+}

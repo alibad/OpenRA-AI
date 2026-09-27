@@ -10,6 +10,7 @@ from collections.abc import Callable
 
 from .brain import BrainArbiter, BrainOwner, GoalBlackboard, default_blackboard_path
 from .controller import TacticalController, controller_state
+from .faction_catalog import FactionKnowledge
 from .feedback import FeedbackStore
 from .insights import InsightEngine
 from .models import (
@@ -229,6 +230,7 @@ class Companion:
         if insights is None:
             self.insights.configure_pace(self.router.settings.notification_pace)
         self.latest_snapshot: GameSnapshot | None = None
+        self.faction_knowledge = FactionKnowledge.load()
         self.enabled = self.router.settings.companion_enabled
         self.muted = not self.router.settings.voice_enabled
         self.auto_act_enabled = self.router.settings.auto_act_enabled
@@ -611,6 +613,12 @@ class Companion:
             } if insight.key == "storage_pressure" else {}),
         }
 
+    def catalog_mode(self) -> str:
+        """Game mode for catalog answers: the live match, else the mode the game last described."""
+        if self.latest_snapshot is not None:
+            return self.latest_snapshot.mod_id
+        return self.faction_knowledge.last_mode or "ra"
+
     def ask(self, question: str) -> CompanionResponse:
         question = question.strip()
         if not question:
@@ -622,18 +630,23 @@ class Companion:
         if snapshot is None:
             return CompanionResponse("I don't have a live game snapshot yet.", "deterministic-fallback", utterance_id=generation, metadata={"degraded": True})
         started = time.perf_counter()
+        payload: dict = {"player_question": question, "snapshot": snapshot.compact()}
+        # Named factions/units get mode-filtered catalog and rules facts so the model cannot borrow another mode's roster.
+        catalog = self.faction_knowledge.context(question, snapshot.mod_id)
+        if catalog is not None:
+            payload["faction_catalog"] = catalog
         try:
             images, views = ([], []) if self.router.settings.vision_model == "local-no-vision" else self._vision_inputs(snapshot)
             if images:
                 result = self.router.vision_many(
                     SYSTEM_PROMPT + "\n" + FULL_VISION_PROMPT + "\nCONTEXT:\n" +
-                    json.dumps({"player_question": question, "snapshot": snapshot.compact(), "vision_views": views}, separators=(",", ":")),
+                    json.dumps({**payload, "vision_views": views}, separators=(",", ":")),
                     images,
                 )
             else:
                 result = self.router.chat([
                     {"role": "system", "content": SYSTEM_PROMPT},
-                    {"role": "user", "content": json.dumps({"player_question": question, "snapshot": snapshot.compact()}, separators=(",", ":"))},
+                    {"role": "user", "content": json.dumps(payload, separators=(",", ":"))},
                 ])
             metadata = {"model": result.model}
             if views:
@@ -1864,6 +1877,11 @@ class Companion:
         generation = self._begin()
         if not self.enabled:
             return CompanionResponse("", "disabled", utterance_id=generation)
+        catalog_answer = self.faction_knowledge.answer(instruction, self.catalog_mode())
+        if catalog_answer is not None:
+            # Grounded in the shared catalog and the loaded rules; works in menus and never reads match state.
+            return CompanionResponse(catalog_answer.text, "faction-catalog", utterance_id=generation,
+                                     metadata={"catalog": catalog_answer.metadata})
         snapshot = self.latest_snapshot
         if snapshot is None:
             return CompanionResponse(

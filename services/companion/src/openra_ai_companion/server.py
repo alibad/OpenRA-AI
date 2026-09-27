@@ -194,6 +194,12 @@ class CompanionHandler(BaseHTTPRequestHandler):
             self._json(HTTPStatus.OK, status)
         elif path == "/v1/config":
             self._json(HTTPStatus.OK, self.companion.router.settings.as_dict())
+        elif path == "/v1/factions":
+            query = parse_qs(urlparse(self.path).query)
+            knowledge = self.companion.faction_knowledge
+            question = (query.get("q") or [""])[0]
+            mode = (query.get("mode") or [self.companion.catalog_mode()])[0]
+            self._json(HTTPStatus.OK, {**knowledge.status(), "mode": mode, "lookup": knowledge.lookup(question, mode)})
         elif path == "/v1/catalog":
             catalogue = self.companion.router.catalogue()
             manager = getattr(self.server, "local_ai_manager", None)
@@ -293,6 +299,10 @@ class CompanionHandler(BaseHTTPRequestHandler):
             if path == "/v1/content/ra2/import":
                 self._payload()
                 self._json(HTTPStatus.OK, import_owned_ra2())
+            elif path == "/v1/factions/live":
+                # Rules-derived catalog facts from the running game (static knowledge, no match state).
+                digest = json.loads(self._payload(limit=4_000_000) or b"{}")
+                self._json(HTTPStatus.OK, self.companion.faction_knowledge.update_live(digest))
             elif path in {"/v1/local-ai/install", "/v1/local-ai/retry"}:
                 self._payload()
                 manager = getattr(self.server, "local_ai_manager", None)
