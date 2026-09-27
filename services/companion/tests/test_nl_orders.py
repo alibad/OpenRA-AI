@@ -271,6 +271,17 @@ class CompanionRoutingTests(unittest.TestCase):
         self.assertIsNone(companion.pending_action())
         self.assertEqual(len(router.calls), 1)
 
+    def test_unusable_answers_are_replaced_with_live_facts(self) -> None:
+        looping = " ".join(["the base is fine"] * 8)
+        for reply in ('{"mode":"answer","answer":"ok"}', looping, ""):
+            with self.subTest(reply=reply[:20]):
+                companion, _, _ = self.companion(reply or " ")
+                snapshot = fixture("ra-england-army")
+                companion.update_snapshot(snapshot)
+                response = companion.handle_player_input("how much money do we have")
+                self.assertTrue(response.metadata.get("sanitized"))
+                self.assertIn(f"${snapshot.cash:,}", response.text)
+
     def test_unit_orders_are_not_mistaken_for_strategy_switches(self) -> None:
         self.assertEqual(detect_strategy_intent("set the tanks to defensive stance")[0], "set")
         self.assertFalse(nl_orders.is_strategy_command("set the tanks to defensive stance"))

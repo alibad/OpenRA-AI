@@ -195,6 +195,7 @@ def main() -> int:
     parser.add_argument("--label", default="")
     parser.add_argument("--resume", action="store_true")
     parser.add_argument("--grade-only", action="store_true", help="re-grade an existing outcomes.jsonl in --output")
+    parser.add_argument("--stride", type=int, default=1, help="evaluate every Nth selected case (for slow planner runs)")
     args = parser.parse_args()
     if args.worker:
         return worker(args)
@@ -207,6 +208,9 @@ def main() -> int:
     if args.only:
         wanted = {value.strip() for value in args.only.split(",") if value.strip()}
         all_cases = [case for case in all_cases if wanted & {case["id"], case["fixture"], case["variant"], case["category"], case["split"]}]
+    if args.stride > 1:
+        # Deterministic systematic sample for slow paths (every Nth case).
+        all_cases = all_cases[:: args.stride]
     output: Path = args.output
     output.mkdir(parents=True, exist_ok=True)
     outcomes_path = output / "outcomes.jsonl"

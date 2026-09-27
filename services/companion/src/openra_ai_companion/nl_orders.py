@@ -2065,6 +2065,31 @@ def safe_reply(snapshot: GameSnapshot, reply: str, fallback: str) -> str:
     return humanized if humanized.endswith((".", "?", "!")) else humanized + "."
 
 
+def answer_is_malformed(text: str) -> bool:
+    """True for free-text answers that must not be shown (empty, raw JSON, loops)."""
+    stripped = text.strip()
+    return (
+        not stripped
+        or len(stripped) > 600
+        or stripped.startswith(("{", "["))
+        or "```" in stripped
+        or bool(re.search(r"\"(intent|mode|steps|commands|answer)\"\s*:", stripped))
+        or is_repetitive(stripped)
+    )
+
+
+def status_line(snapshot: GameSnapshot) -> str:
+    """A factual, deterministic answer used when a model answer is unusable."""
+    units = [unit for unit in snapshot.units if not is_husk(unit) and unit.speed > 0]
+    power = snapshot.power_provided - snapshot.power_drained
+    enemies = len(snapshot.visible_enemies) + len(snapshot.visible_enemy_buildings)
+    return (
+        f"You have ${snapshot.cash:,}, power {power:+}, {len(units)} unit{'s' if len(units) != 1 else ''} and "
+        f"{len(snapshot.buildings)} building{'s' if len(snapshot.buildings) != 1 else ''}; "
+        f"{enemies or 'no'} enem{'ies' if enemies != 1 else 'y'} in sight."
+    )
+
+
 def is_repetitive(text: str) -> bool:
     words = re.findall(r"[a-z0-9']+", text.lower())
     if len(words) < 12:

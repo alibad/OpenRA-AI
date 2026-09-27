@@ -653,7 +653,12 @@ class Companion:
                     "views": views,
                     "fallback": None if result.vision_used else "structured-context",
                 }
-            response = CompanionResponse(snapshot.humanize_text(result.text), "ai-layer", utterance_id=generation, latency_ms=result.latency_ms, metadata=metadata)
+            text = snapshot.humanize_text(result.text)
+            if nl_orders.answer_is_malformed(text):
+                # Small local models occasionally loop or emit raw JSON; never show that.
+                metadata["sanitized"] = True
+                text = nl_orders.status_line(snapshot)
+            response = CompanionResponse(text, "ai-layer", utterance_id=generation, latency_ms=result.latency_ms, metadata=metadata)
         except RouterError as exc:
             response = CompanionResponse("The AI router is unavailable; I can still watch for critical deterministic alerts.", "deterministic-fallback", utterance_id=generation, latency_ms=round((time.perf_counter() - started) * 1000), metadata={"degraded": True, "reason": str(exc)})
         if self._interrupted(generation):
