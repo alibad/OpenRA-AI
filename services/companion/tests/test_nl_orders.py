@@ -307,6 +307,17 @@ class CompanionRoutingTests(unittest.TestCase):
             "item_type": "dome", "queued": False, "ticks": 0,
         }])
 
+    def test_validator_rejects_placing_an_unfinished_building(self) -> None:
+        # The documented failure: a model proposed placement before production finished.
+        queued = fixture("ra-england-power-queued")
+        with self.assertRaisesRegex(ValueError, "not finished production"):
+            Companion._validate_action_commands(queued, [{"action": "place_building", "item_type": "powr"}])
+        ready = fixture("ra-england-power-ready")
+        self.assertEqual(
+            Companion._validate_action_commands(ready, [{"action": "place_building", "item_type": "powr"}])[0].action,
+            "place_building",
+        )
+
     def test_player_orders_are_not_trimmed_by_auto_economy_caps(self) -> None:
         snapshot = fixture("ra2-iraq-army")
         values = [{"action": "train", "item_type": "e2"}] * 5

@@ -886,6 +886,14 @@ class Companion:
                 planned_units[command.item_type] = planned_count + 1
             if command.action == "place_building" and command.item_type not in in_production:
                 raise ValueError(f"'{command.item_type}' is not in a production queue")
+            if command.action == "place_building" and not any(
+                str(item.get("item", "")).lower() == command.item_type
+                and (float(item.get("progress", 0)) >= 0.999 or int(item.get("remaining_ticks", 1)) <= 0)
+                for item in snapshot.production
+            ):
+                # OpenRA only places finished structures; a premature proposal would
+                # always be rejected on the game thread after the player confirmed it.
+                raise ValueError(f"'{command.item_type}' has not finished production yet")
             if command.action == "cancel_production" and command.item_type not in in_production:
                 raise ValueError(f"'{command.item_type}' is not in a production queue")
             if command.action == "use_support_power":

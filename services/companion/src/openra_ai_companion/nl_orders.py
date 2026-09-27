@@ -891,6 +891,15 @@ def parse_steps(text: str) -> tuple[list[Step], str]:
             return [], f"unparsed clause: {clause}"
         if subject and not step.units and step.action not in {"train", "build", "place", "cancel", "sell", "repair", "rally", "primary", "power_down"}:
             step.units = subject
+        if step.action in {"train", "build"} and re.search(r"\s(?:and|plus|,)\s", f" {step.item} "):
+            # "build a power plant and a barracks", "5 conscripts and 2 tesla troopers"
+            parts = [part.strip() for part in re.split(r"\s+(?:and|plus)\s+|\s*,\s*", step.item) if part.strip()]
+            for index, part in enumerate(parts):
+                count, item = _strip_count(part)
+                if index == 0 and not count:
+                    count = step.count
+                steps.append(Step(step.action, count=count, item=item, source="parser"))
+            continue
         steps.append(step)
     return steps[:4], ""
 
@@ -922,9 +931,14 @@ def _parse_clause(clause: str) -> Step | None:
         building = ""
         owner_first = re.search(rf"^(?:set|move|put|place|change)?\s*(?:the\s+|my\s+|our\s+)?(.+?)\s+rally(?: point)?s?\s+\b{_TARGET_PREPOSITIONS}\b\s+(.+)$", c)
         owner_after = re.search(rf"\brally(?: point)?s?\b(?:\s+(?:for|of|on)\s+(?:the\s+|my\s+|our\s+|all\s+)?(.+?))?\s+\b{_TARGET_PREPOSITIONS}\b\s+(.+)$", c)
+        owner_object = re.search(rf"^rally\s+(?:the\s+|my\s+|our\s+)?(?!point\b)(.+?)\s+\b{_TARGET_PREPOSITIONS}\b\s+(.+)$", c)
         if owner_first and owner_first.group(1).strip() not in {"set", "the", "a", ""}:
             building = owner_first.group(1).strip()
             target = owner_first.group(2).strip()
+        elif owner_object and not re.match(r"^(for|of|on)\b", owner_object.group(1)):
+            # "rally the war factory to 40,40"
+            building = owner_object.group(1).strip()
+            target = owner_object.group(2).strip()
         elif owner_after:
             building = (owner_after.group(1) or "").strip()
             target = owner_after.group(2).strip()
@@ -1029,7 +1043,7 @@ def _parse_clause(clause: str) -> Step | None:
     found = re.match(r"^(?:have\s+|send\s+|use\s+|order\s+)?(?:the\s+|my\s+|our\s+)?(.+?)\s+(?:to\s+)?(?:guard|protect|escort|cover|shadow|follow and protect|babysit)\s+(?:the\s+|my\s+|our\s+)?(.+)$", c)
     if found and not re.match(r"^(guard|protect|escort|cover)$", found.group(1)):
         return Step("guard", units=found.group(1).strip(), target=found.group(2).strip(), source="parser")
-    found = re.match(r"^(?:guard|protect|escort|cover|shadow|babysit)\s+(?:the\s+|my\s+|our\s+)?(.+?)(?:\s+with\s+(?:the\s+|my\s+|our\s+)?(.+))?$", c)
+    found = re.match(r"^(?:guard|protect|escort|cover|shadow|babysit|defend)\s+(?:the\s+|my\s+|our\s+)?(.+?)(?:\s+with\s+(?:the\s+|my\s+|our\s+)?(.+))?$", c)
     if found:
         target = found.group(1).strip()
         if re.fullmatch(r"(base|the base|our base|home|hq)", target):
@@ -1461,7 +1475,7 @@ class Grounder:
             waiting = self.name(str(busy.get("item", "")))
             self.notes.append(f"the finished {waiting} still needs placing first")
         self.notes.append(f"I'll offer to place the {name} when it's finished")
-        return [{"action": "build", "item_type": item}], f"Build a {name}"
+        return [{"action": "build", "item_type": item}], f"Build {'an' if name[:1].lower() in 'aeiou' else 'a'} {name}"
 
     def _unit_step(self, item: str, queued: list[dict], step: Step) -> tuple[list[dict], str]:
         # An explicit player order is not trimmed by AUTO's economy heuristics; the
@@ -1669,6 +1683,14 @@ class Grounder:
         text = normalize(step.target)
         if _is_place_reference(text) or re.search(r"\bbase\b", text):
             step.action = "attack_move"
+            return self._move(step)
+        group = re.sub(r"\b(the|all|of|them|visible|those|these)\b", " ", text)
+        if _collapse(group) in {"everything", "everyone", "everybody", "enemy", "enemies", "enemy units", "enemy forces",
+                                "enemy army", "their army", "their units", "their forces", "hostiles", ""} and \
+                re.search(r"\b(everything|everyone|everybody|all|enemies|forces|army|hostiles|units)\b", text) and snapshot.visible_enemies:
+            # A group target is an attack-move into the visible enemies, not one duel.
+            step.action = "attack_move"
+            step.target = "the visible enemy units"
             return self._move(step)
         units = self.select_units(step.units or "army", purpose="attack", count=step.count)
         origin = centroid(units)

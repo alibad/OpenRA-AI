@@ -63,6 +63,20 @@ alerts are also worded locally and emit only when the condition begins. If a
 route is unavailable, critical events retain a deterministic fallback line and
 player questions report degraded status.
 
+## Player orders
+
+Spoken and typed orders never ask a model for executable commands. A
+deterministic parser handles explicit phrasing without any model call. Other
+orders use one request whose `response_format` is a strict JSON schema; the
+local llama.cpp runtime compiles that schema into a grammar, so output cannot
+be malformed or name an action outside the order surface. The model returns
+only an allowlisted verb plus free-text references to units, an item and a
+target. Python grounds those references against the fog-respecting snapshot,
+validates the result, and waits for a separate confirmation; OpenRA validates
+it again on the game thread. External endpoints receive the same schema and are
+retried with `json_object` or prompt-only JSON if they reject it. See
+[natural-language-orders.md](natural-language-orders.md) for the evaluation.
+
 ## Data boundary
 
 The model can receive cash, power, production, owned assets, explored percent,
