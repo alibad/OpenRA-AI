@@ -26,6 +26,9 @@ import edge_tts
 ROOT = Path(__file__).resolve().parents[1]
 OUTPUT = ROOT / "engine" / "openra" / "mods" / "ra" / "bits"
 PROVENANCE = ROOT / "assets" / "red-sea-2026" / "voice-provenance.json"
+# RA2-only lines ship with the RA2 overlay; the Classic engine bits stay untouched.
+RA2_OUTPUT = ROOT / "apps" / "installer" / "ra2" / "modern-factions" / "audio"
+RA2_PROVENANCE = ROOT / "assets" / "red-sea-2026" / "ra2-voice-provenance.json"
 
 
 @dataclass(frozen=True)
@@ -98,6 +101,28 @@ LINES = (
 )
 
 
+# Red Alert 2 vehicle and naval crews. Classic had Arabic-only vehicle
+# acknowledgements and no Red Sea naval voices; RA2 pairs each with English.
+RA2_LINES = (
+    VoiceLine("rsa-veh-select-ar.wav", "ar-SA", "ar-SA-HamedNeural", "طاقم المدرعة جاهز.", "Saudi vehicle crew", False),
+    VoiceLine("rsa-veh-select-en.wav", "en-US", "en-US-GuyNeural", "Armor crew ready.", "Saudi vehicle crew", False),
+    VoiceLine("rsa-veh-action-ar.wav", "ar-SA", "ar-SA-HamedNeural", "تم الاستلام، نتحرك.", "Saudi vehicle crew", False),
+    VoiceLine("rsa-veh-action-en.wav", "en-US", "en-US-GuyNeural", "Copy. Moving out.", "Saudi vehicle crew", False),
+    VoiceLine("rsa-naval-select-ar.wav", "ar-SA", "ar-SA-HamedNeural", "السفينة جاهزة، الحساسات تعمل.", "Saudi naval crew", False),
+    VoiceLine("rsa-naval-select-en.wav", "en-US", "en-US-GuyNeural", "Bridge here. Sensors up.", "Saudi naval crew", False),
+    VoiceLine("rsa-naval-action-ar.wav", "ar-SA", "ar-SA-HamedNeural", "تغيير المسار الآن.", "Saudi naval crew", False),
+    VoiceLine("rsa-naval-action-en.wav", "en-US", "en-US-GuyNeural", "Coming about. Steady.", "Saudi naval crew", False),
+    VoiceLine("rye-veh-select-ar.wav", "ar-YE", "ar-YE-SalehNeural", "الطاقم جاهز على الطريق.", "Yemeni vehicle crew", False),
+    VoiceLine("rye-veh-select-en.wav", "en-US", "en-US-GuyNeural", "Crew ready. Engine running.", "Yemeni vehicle crew", False),
+    VoiceLine("rye-veh-action-ar.wav", "ar-YE", "ar-YE-SalehNeural", "نتحرك بسرعة.", "Yemeni vehicle crew", False),
+    VoiceLine("rye-veh-action-en.wav", "en-US", "en-US-GuyNeural", "Moving fast. Stay low.", "Yemeni vehicle crew", False),
+    VoiceLine("rye-naval-select-ar.wav", "ar-YE", "ar-YE-SalehNeural", "الزورق جاهز، الرابط متصل.", "Yemeni coastal crew", False),
+    VoiceLine("rye-naval-select-en.wav", "en-US", "en-US-GuyNeural", "Boat ready. Link is up.", "Yemeni coastal crew", False),
+    VoiceLine("rye-naval-action-ar.wav", "ar-YE", "ar-YE-SalehNeural", "نقترب من الساحل.", "Yemeni coastal crew", False),
+    VoiceLine("rye-naval-action-en.wav", "en-US", "en-US-GuyNeural", "Closing on the coast.", "Yemeni coastal crew", False),
+)
+
+
 def radio_finish(path: Path, enabled: bool) -> None:
     with wave.open(str(path), "rb") as source:
         rate = source.getframerate()
@@ -131,9 +156,9 @@ def radio_finish(path: Path, enabled: bool) -> None:
         target.writeframes(encoded)
 
 
-async def synthesize(line: VoiceLine, ffmpeg: str, temporary: Path) -> dict[str, object]:
+async def synthesize(line: VoiceLine, ffmpeg: str, temporary: Path, output: Path = OUTPUT) -> dict[str, object]:
     mp3 = temporary / (Path(line.filename).stem + ".mp3")
-    wav = OUTPUT / line.filename
+    wav = output / line.filename
     communicator = edge_tts.Communicate(line.text, line.voice, rate="-6%", pitch="-2Hz")
     await communicator.save(str(mp3))
 
@@ -160,26 +185,28 @@ async def synthesize(line: VoiceLine, ffmpeg: str, temporary: Path) -> dict[str,
         }
 
 
-async def run(selected: set[str] | None = None) -> None:
+async def run(selected: set[str] | None = None, ra2: bool = False) -> None:
     ffmpeg = shutil.which("ffmpeg")
     if not ffmpeg:
         raise RuntimeError("ffmpeg is required to master the generated voices")
-    OUTPUT.mkdir(parents=True, exist_ok=True)
-    PROVENANCE.parent.mkdir(parents=True, exist_ok=True)
-    lines = [line for line in LINES if not selected or line.filename in selected]
+    output, provenance, source = (RA2_OUTPUT, RA2_PROVENANCE, RA2_LINES) if ra2 else (OUTPUT, PROVENANCE, LINES)
+    output.mkdir(parents=True, exist_ok=True)
+    provenance.parent.mkdir(parents=True, exist_ok=True)
+    lines = [line for line in source if not selected or line.filename in selected]
     with tempfile.TemporaryDirectory(prefix="openra-red-sea-voice-") as directory:
         records = []
         for line in lines:
             print(f"Synthesizing {line.filename} ({line.voice})")
-            records.append(await synthesize(line, ffmpeg, Path(directory)))
-    PROVENANCE.write_text(json.dumps({"generator": "edge-tts + ffmpeg", "lines": records}, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+            records.append(await synthesize(line, ffmpeg, Path(directory), output))
+    provenance.write_text(json.dumps({"generator": "edge-tts + ffmpeg", "lines": records}, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
 
 
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("filenames", nargs="*")
+    parser.add_argument("--ra2", action="store_true", help="Generate the RA2 vehicle/naval crew lines into the RA2 overlay")
     args = parser.parse_args()
-    asyncio.run(run(set(args.filenames) or None))
+    asyncio.run(run(set(args.filenames) or None, args.ra2))
     return 0
 
 
