@@ -95,11 +95,25 @@ def production_name(value: str) -> str:
 def humanize_text(text: str, names: dict[str, str] | None = None) -> str:
     """Replace any leaked actor type IDs in player-facing model text."""
     result = text
-    for internal_id, name in sorted((actor_names() if names is None else names).items(), key=lambda item: len(item[0]), reverse=True):
+    catalog = actor_names() if names is None else names
+    # Display names can contain their own id as an ordinary word ("Radar Dome" for
+    # "dome", "Attack Dog" for "dog"). Protect those names so they are not
+    # expanded a second time into "Radar Radar Dome".
+    protected: dict[str, str] = {}
+    for internal_id, name in sorted(catalog.items(), key=lambda item: len(item[1]), reverse=True):
+        if not re.search(rf"(?<![A-Za-z0-9]){re.escape(internal_id)}(?![A-Za-z0-9])", name, flags=re.IGNORECASE):
+            continue
+        token = f"\u0000{len(protected)}\u0000"
+        result, count = re.subn(re.escape(name), token, result, flags=re.IGNORECASE)
+        if count:
+            protected[token] = name
+    for internal_id, name in sorted(catalog.items(), key=lambda item: len(item[0]), reverse=True):
         result = re.sub(
             rf"(?<![A-Za-z0-9]){re.escape(internal_id)}(?![A-Za-z0-9])",
             name,
             result,
             flags=re.IGNORECASE,
         )
+    for token, name in protected.items():
+        result = result.replace(token, name)
     return result

@@ -621,6 +621,9 @@ class ActionProposal:
     expected_tick: int
     commands: tuple[ActionCommand, ...]
     created_at: float
+    # Explicit player orders are validated against the player's own request
+    # rather than AUTO's economy heuristics, and can never use support powers.
+    player_request: bool = False
 
     def as_dict(self) -> dict[str, Any]:
         return {
