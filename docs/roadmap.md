@@ -13,6 +13,9 @@ Updated 12 September 2026. This is the handoff roadmap for the next build cycle.
 ## Next milestone — first public dual-mode release
 
 1. Finish the catalog integration: add full roster coverage incrementally, expose the catalog in the installed companion/game surfaces, and keep engine rules authoritative for balance and mechanics.
+   In development (28 September): the native Faction Catalog and companion catalog answers read the staged
+   catalog in Windows and macOS layouts and take every number from the loaded rules; per-mode consistency is
+   enforced by `scripts/validate-faction-catalog.py`. See [in-game-catalog.md](in-game-catalog.md).
 2. Complete the faction experience: add accurate RA2 captures, improve portraits and story art, verify licensing/provenance, and add missions, counterplay and AI behavior per faction.
 3. Finish installer acceptance: clean-machine install without Python/.NET, Classic first run, owned RA2 import, missing-content/retry flows, secondary Steam library, offline local AI, explicit external provider, upgrade, uninstall, saves and settings preservation.
 4. Produce release evidence: exact product/engine commits, artifact sizes and SHA-256 digests, Windows Authenticode result, and independent macOS signing/notarization/stapling evidence.
@@ -23,6 +26,7 @@ Updated 12 September 2026. This is the handoff roadmap for the next build cycle.
 
 - Add Saudi Arabia and Yemen to the RA2 overlay when their rules, art, AI and balance are actually complete.
 - Render the shared faction/unit catalog inside the native game and companion, with mode-aware details and deep links back to the web.
+  Implemented and verified in development; not yet in a public release.
 - Add replay-backed faction balance tests, headless AI match evaluation, and deterministic mission acceptance.
 - Establish a polished media pipeline for original concept art, UI portraits, sprites, live captures, audio and accessibility review.
 - Add release update, rollback, repair and uninstall diagnostics for installed users.
