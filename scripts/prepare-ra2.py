@@ -92,6 +92,18 @@ def trim_off_map_fences(text: str) -> str:
     return re.sub(r"^\t[^\t\n][^\n]*\n(?:\t\t[^\n]*\n)*", keep_actor, text, flags=re.MULTILINE)
 
 
+def integrate_faction_catalog(manifest: Path, engine: Path) -> None:
+    """Offer the engine's native Faction Catalog in RA2 when that engine ships it.
+
+    The panel and its messages live in the engine's common chrome, like the main
+    menu itself. Older engines without the catalog keep the previous manifest.
+    """
+    if not (engine / "mods/common/chrome/faction-catalog.yaml").is_file():
+        return
+    replace_once(manifest, "\tcommon|chrome/mainmenu.yaml\n", "\tcommon|chrome/mainmenu.yaml\n\tcommon|chrome/faction-catalog.yaml\n")
+    replace_once(manifest, "\tcommon|fluent/chrome.ftl\n", "\tcommon|fluent/chrome.ftl\n\tcommon|fluent/faction-catalog.ftl\n")
+
+
 def integrate(source: Path, engine: Path, version: str) -> None:
     mod = source / "mods/ra2"
     manifest = mod / "mod.yaml"
@@ -101,6 +113,7 @@ def integrate(source: Path, engine: Path, version: str) -> None:
     replace_once(manifest, "Rules:\n", "Rules:\n\tra2|rules/companion.yaml\n")
     replace_once(manifest, "PackageFormats:", "Include: experiences.yaml\n\nPackageFormats:")
     replace_once(manifest, "ChromeLayout:\n", "ChromeLayout:\n\tra2|chrome/experience-composer.yaml\n\tra2|chrome/experience-review.yaml\n\tcommon|chrome/earth-mission-studio.yaml\n")
+    integrate_faction_catalog(manifest, engine)
     for name in ("experience-composer.yaml", "experience-review.yaml"):
         shutil.copy2(engine / "mods/ra/chrome" / name, mod / "chrome" / name)
     (mod / "rules/companion.yaml").write_text("^BaseWorld:\n\tCompanionBridge:\n")
