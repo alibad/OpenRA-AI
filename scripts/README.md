@@ -31,3 +31,12 @@ live here. These scripts are the replacement for hosted workflows.
 - `smoke-windows-package.ps1 -RequireAI` unpacks that ZIP, starts a real
   headless match using only bundled executables, verifies the live bridge and
   AI response, and cleans up its processes.
+- `build-usa-concept-board.py` renders the United States (`usa`) Checkpoint B
+  concept and silhouette boards from original low-poly geometry in
+  `usa_concept_actors.py` (renderer in `usa_concept_models.py`, OpenRA
+  player-colour remap port in `usa_concept_render.py`). It needs a built engine
+  checkout and a read-only directory containing owned Red Alert content
+  (`Content/ra/v2`) for palettes, terrain statistics and stock scale
+  references; boards and a checksummed `manifest.json` are written to the
+  engine's `docs/concept/usa/`. Concept art only - it produces no SHP, rules
+  or sequences.
