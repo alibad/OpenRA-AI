@@ -20,7 +20,13 @@ import time
 
 from openra_ai_companion.bridge import OpenRABridge
 from openra_ai_companion.models import ActionCommand
+from native_fixture import ExactMoveCheck, TickBudget, link_directory, run_with_startup_retry, startup_failure
 from ra2_turkey_assets import TURKEY_UNITS, DEFENSES
+
+# The amphibious IFV and three ships, each with a distinct clear water cell (MPos).
+WATER_DESTINATIONS={a:(25+i*5,115) for i,a in enumerate(("r2deniz","r2poyraz","r2ege","r2marmara"))}
+# 140 seconds of game time at normal speed (the former wall-clock allowance).
+GAME_SECONDS=140
 
 SPEC = importlib.util.spec_from_file_location("review", Path(__file__).with_name("validate-ra2-faction-art.py"))
 ART = importlib.util.module_from_spec(SPEC)
@@ -72,7 +78,7 @@ def fixture(resources, profile, *, visual=False, scene="infantry"):
 def run(resources,binaries,content,output,visual=False,scene="infantry"):
     output.mkdir(parents=True,exist_ok=True)
     profile=Path(tempfile.mkdtemp(prefix="turkey-",dir=output))
-    (profile/"Content").symlink_to(content,target_is_directory=True)
+    link_directory(profile/"Content",content)
     fixture(resources,profile,visual=visual,scene=scene)
     with socket.socket() as sock:
         sock.bind(("127.0.0.1",0)); port=sock.getsockname()[1]
@@ -87,11 +93,14 @@ def run(resources,binaries,content,output,visual=False,scene="infantry"):
         process=subprocess.Popen(cmd,cwd=binaries,env=env,stdout=log,stderr=subprocess.STDOUT)
         bridge=OpenRABridge(f"127.0.0.1:{port}",timeout=1)
         try:
-            deadline=time.monotonic()+140
-            phase="queue"; placed=set(); sent=set(); naval_moved=set(); cargo_loaded=False; cleared=set()
-            while process.poll() is None and time.monotonic()<deadline:
+            budget=TickBudget.from_seconds(GAME_SECONDS); report["budget"]=budget.as_dict()
+            phase="queue"; placed=set(); sent=set(); cargo_loaded=False; cleared=set(); water=None
+            phase_ticks=report.setdefault("phase_ticks",{})
+            while process.poll() is None and budget.wall_ok():
                 try:
                     state=bridge.observe()
+                    phase_ticks.setdefault(phase,state.tick)
+                    budget.check(state.tick,phase)
                     units={u.kind:u for u in state.units}
                     structures={b.kind:b for b in state.buildings}
                     report["last_state"]={"tick":state.tick,"units":sorted(units),"buildings":sorted(structures),"production":state.production,"cash":state.cash}
@@ -146,23 +155,25 @@ def run(resources,binaries,content,output,visual=False,scene="infantry"):
                     if phase=="unload" and "r2trrifle" in units and units["r2aras"].passenger_count<=0:
                         report["cargo_round_trip"]=cargo_loaded
                         # Distinct clear water cells for all ships and the amphibian.
-                        for i,a in enumerate(("r2deniz","r2poyraz","r2ege","r2marmara")):
-                            dest=(25+i*5,115)
-                            bridge.execute_actions("water-"+a,state.tick,(ActionCommand("move",actor_id=units[a].actor_id,target_x=dest[0],target_y=dest[1]),))
+                        water=ExactMoveCheck("water",WATER_DESTINATIONS)
+                        water.dispatch(bridge,state.tick,units)
                         phase="water"
                     if phase=="water":
-                        for i,a in enumerate(("r2deniz","r2poyraz","r2ege","r2marmara")):
-                            if (units[a].cell_x,units[a].cell_y)==(25+i*5,115): naval_moved.add(a)
-                        if len(naval_moved)==4:
-                            report.update(passed=True,tick=state.tick,defenses=sorted(placed),water_movement=sorted(naval_moved))
+                        arrived=water.update(bridge,state.tick,units)
+                        report["water"]=water.as_dict()
+                        if arrived:
+                            report.update(passed=True,tick=state.tick,defenses=sorted(placed),water_movement=sorted(water.arrived))
                             break
                     report["phase"]=phase
                     bridge.update_companion_status("ready","Isolated Turkey verification",muted=True)
                 except RuntimeError as exc: report["last_connection_error"]=str(exc)
                 time.sleep(.15)
-            if not report["passed"]: report["error"]="Timed out or process exited in "+phase
+            if not report["passed"]:
+                report["error"]=budget.failure(phase,process.poll() is None)
+                if not phase_ticks and process.poll() is not None: startup_failure(report,profile)
         except Exception as exc: report["error"]=str(exc)
         finally:
+            report["wall_seconds"]=budget.elapsed() if "budget" in report else None
             bridge.close()
             if process.poll() is None:
                 process.terminate()
@@ -179,4 +190,4 @@ if __name__=="__main__":
     parser.add_argument("--visual",action="store_true")
     parser.add_argument("--visual-scene",choices=("infantry","armor","navy"),default="infantry")
     args=parser.parse_args()
-    raise SystemExit(0 if run(*(getattr(args,k).resolve() for k in ("resources","binaries","content","output")),args.visual,args.visual_scene) else 1)
+    raise SystemExit(0 if run_with_startup_retry(run,*(getattr(args,k).resolve() for k in ("resources","binaries","content","output")),args.visual,args.visual_scene) else 1)
