@@ -19,12 +19,20 @@ SOURCE = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(SOURCE)
 
 FLAG_SIZE = (30, 15)
-MODERN_FLAGS = (("china", 192, 128), ("iran", 226, 33), ("turkey", 226, 113))
+MODERN_FLAGS = (("china", 192, 128), ("iran", 226, 33), ("turkey", 226, 113), ("saudi", 226, 1), ("yemen", 226, 17))
+MODERN_COUNTRIES = ("china", "iran", "turkey", "saudi", "yemen")
+# Original Red Sea weapon/naval SFX from the engine generators, reused by the
+# RA2 Saudi Arabia and Yemen packs. Mission radio lines are not copied.
+RED_SEA_SFX = ("redsea-guard-rifle", "redsea-atgm-launch", "redsea-suppressed", "redsea-m1-fire",
+               "redsea-interceptor", "redsea-f15-missile", "redsea-ah64-cannon", "redsea-ah64-rocket",
+               "redsea-mountain-rifle", "redsea-rpg-launch", "redsea-remote-charge", "redsea-mobile-launch",
+               "redsea-drone-strike", "redsea-drone-impact", "redsea-drone-loiter")
+NAVAL_SFX = ("radar-sweep", "ciws-burst", "missile-launch", "naval-alarm")
 
 
 def combined_replacements(modern: Path) -> str:
     prerequisites = {}
-    for country in ("china", "iran", "turkey"):
+    for country in MODERN_COUNTRIES:
         actor = None
         source = modern / (country + "-replacements.yaml")
         for line in source.read_text().splitlines():
@@ -132,11 +140,17 @@ def integrate(source: Path, engine: Path, version: str) -> None:
     shutil.copy2(engine / "mods/ra/uibits/experience-previews/unit-composition-doctrine-ai.png",
                  mod / "modern-factions/previews/combined-arms-ai.png")
     # Reuse original bilingual faction performances, not proprietary RA1 audio.
+    # RA2-only Saudi/Yemen voice lines ship in the overlay's audio directory.
     faction_audio = mod / "modern-factions/audio"
-    faction_audio.mkdir()
-    for pattern in ("tr-*.wav", "rcn-*.wav", "china-role-*.wav", "china-network-*.wav", "iran-*.wav", "shadow-*.wav"):
+    faction_audio.mkdir(exist_ok=True)
+    for pattern in ("tr-*.wav", "rcn-*.wav", "china-role-*.wav", "china-network-*.wav", "iran-*.wav", "shadow-*.wav",
+                    "rsa-*.wav", "rye-*.wav"):
         for voice in (engine / "mods/ra/bits").glob(pattern):
             shutil.copy2(voice, faction_audio / voice.name)
+    for name in RED_SEA_SFX:
+        shutil.copy2(engine / "mods/ra/bits" / (name + ".wav"), faction_audio / (name + ".wav"))
+    for name in NAVAL_SFX:
+        shutil.copy2(engine / "mods/ra/bits/naval" / (name + ".wav"), faction_audio / ("naval-" + name + ".wav"))
     shutil.copy2(modern / "experiences.yaml", mod / "experiences.yaml")
     # Upstream carrier declares RevealsShroud twice. It becomes an ambiguous
     # merge when the Turkey pack adds its faction exclusion to that actor.
@@ -145,10 +159,10 @@ def integrate(source: Path, engine: Path, version: str) -> None:
                  "\tMobile:\n\t\tTurnSpeed: 4\n\t\tSpeed: 60\n\tAttackFrontal:")
     # Model sequences are manifest-level data. Unused models are harmless when
     # a pack is off; gameplay rules/weapons/sprite sequences remain conditional.
-    replace_once(manifest, "ModelSequences:\n", "ModelSequences:\n\tra2|modern-factions/voxels.yaml\n\tra2|modern-factions/turkey-voxels.yaml\n\tra2|modern-factions/china-voxels.yaml\n\tra2|modern-factions/iran-voxels.yaml\n")
-    replace_once(manifest, "FluentMessages:\n", "FluentMessages:\n\tra2|modern-factions/messages.ftl\n\tra2|modern-factions/turkey-messages.ftl\n\tra2|modern-factions/china-messages.ftl\n\tra2|modern-factions/iran-messages.ftl\n")
+    replace_once(manifest, "ModelSequences:\n", "ModelSequences:\n\tra2|modern-factions/voxels.yaml\n\tra2|modern-factions/turkey-voxels.yaml\n\tra2|modern-factions/china-voxels.yaml\n\tra2|modern-factions/iran-voxels.yaml\n\tra2|modern-factions/saudi-voxels.yaml\n\tra2|modern-factions/yemen-voxels.yaml\n")
+    replace_once(manifest, "FluentMessages:\n", "FluentMessages:\n\tra2|modern-factions/messages.ftl\n\tra2|modern-factions/turkey-messages.ftl\n\tra2|modern-factions/china-messages.ftl\n\tra2|modern-factions/iran-messages.ftl\n\tra2|modern-factions/saudi-messages.ftl\n\tra2|modern-factions/yemen-messages.ftl\n")
     metrics = mod / "metrics.yaml"
-    metrics.write_text(metrics.read_text().replace("Metrics:\n", "Metrics:\n\tFactionSuffix-china: allies\n\tFactionSuffix-turkey: allies\n\tFactionSuffix-iran: soviets\n", 1))
+    metrics.write_text(metrics.read_text().replace("Metrics:\n", "Metrics:\n\tFactionSuffix-china: allies\n\tFactionSuffix-turkey: allies\n\tFactionSuffix-iran: soviets\n\tFactionSuffix-saudi: allies\n\tFactionSuffix-yemen: soviets\n", 1))
     # Extend the upstream UI atlas at build time, reusing our existing country
     # flags. Do not ship a replacement that could lose any stock UI regions.
     buttons = mod / "uibits/buttons.png"

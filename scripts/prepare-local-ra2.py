@@ -18,6 +18,7 @@ def prepare_local(engine: Path) -> Path:
     inputs += sorted((ROOT / "apps/installer/ra2").rglob("*"))
     inputs += sorted((engine / "mods/ra/chrome").glob("*.yaml"))
     inputs += sorted((engine / "mods/ra/bits").glob("*.wav"))
+    inputs += sorted((engine / "mods/ra/bits/naval").glob("*.wav"))
     inputs += [engine / "mods/ra/uibits/glyphs-redsea.png", engine / "mods/ts/uibits/glyphs.png",
                engine / "mods/ra/uibits/experience-previews/unit-composition-doctrine-ai.png"]
     for path in inputs:
