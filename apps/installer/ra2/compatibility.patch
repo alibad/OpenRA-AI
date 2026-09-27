@@ -383,14 +383,17 @@
  			Y: 260
  			Width: 250
  			Height: 55
-@@ -75,12 +75,12 @@
+@@ -75,12 +75,14 @@
  							Y: 2
- 						Label@LABEL:
+-						Label@LABEL:
++						LabelWithTooltip@LABEL:
  							X: 34
 -							Width: PARENT_RIGHT
 +							Width: PARENT_WIDTH
  							Height: 25
  							Shadow: True
++							TooltipContainer: TOOLTIP_CONTAINER
++							TooltipTemplate: SIMPLE_TOOLTIP
  						Label@NOFLAG_LABEL:
  							X: 5
 -							Width: PARENT_RIGHT
@@ -398,7 +401,7 @@
  							Height: 25
  							Shadow: True
  				Container@REPLAY_PLAYER:
-@@ -187,33 +187,33 @@
+@@ -187,33 +189,33 @@
  				Container@GRAPH_BG:
  					Y: 30
  					X: 0
@@ -439,7 +442,7 @@
  									Font: Bold
  									Text: Player
  									Align: Left
-@@ -222,7 +222,7 @@
+@@ -222,7 +224,7 @@
  									X: 155
  									Y: 0
  									Width: 80
@@ -448,7 +451,7 @@
  									Font: Bold
  									Text: Cash
  									Align: Right
-@@ -231,7 +231,7 @@
+@@ -231,7 +233,7 @@
  									X: 235
  									Y: 0
  									Width: 80
@@ -457,7 +460,7 @@
  									Font: Bold
  									Text: Power
  									Align: Center
-@@ -240,7 +240,7 @@
+@@ -240,7 +242,7 @@
  									X: 315
  									Y: 0
  									Width: 40
@@ -466,7 +469,7 @@
  									Font: Bold
  									Text: Kills
  									Align: Right
-@@ -249,7 +249,7 @@
+@@ -249,7 +251,7 @@
  									X: 355
  									Y: 0
  									Width: 60
@@ -475,7 +478,7 @@
  									Font: Bold
  									Text: Deaths
  									Align: Right
-@@ -258,7 +258,7 @@
+@@ -258,7 +260,7 @@
  									X: 415
  									Y: 0
  									Width: 80
@@ -484,7 +487,7 @@
  									Font: Bold
  									Text: Destroyed
  									Align: Right
-@@ -267,7 +267,7 @@
+@@ -267,7 +269,7 @@
  									X: 495
  									Y: 0
  									Width: 80
@@ -493,7 +496,7 @@
  									Font: Bold
  									Text: Lost
  									Align: Right
-@@ -276,7 +276,7 @@
+@@ -276,7 +278,7 @@
  									X: 575
  									Y: 0
  									Width: 60
@@ -502,7 +505,7 @@
  									Font: Bold
  									Text: Score
  									Align: Right
-@@ -285,7 +285,7 @@
+@@ -285,7 +287,7 @@
  									X: 635
  									Y: 0
  									Width: 60
@@ -511,7 +514,7 @@
  									Font: Bold
  									Text: APM
  									Align: Right
-@@ -294,32 +294,32 @@
+@@ -294,32 +296,32 @@
  							X: 0
  							Y: 0
  							Width: 640
@@ -551,7 +554,7 @@
  									Font: Bold
  									Text: Cash
  									Align: Right
-@@ -327,7 +327,7 @@
+@@ -327,7 +329,7 @@
  								Label@INCOME_HEADER:
  									X: 235
  									Width: 80
@@ -560,7 +563,7 @@
  									Font: Bold
  									Text: Income
  									Align: Right
-@@ -335,7 +335,7 @@
+@@ -335,7 +337,7 @@
  								Label@ASSETS_HEADER:
  									X: 315
  									Width: 80
@@ -569,7 +572,7 @@
  									Font: Bold
  									Text: Assets
  									Align: Right
-@@ -343,7 +343,7 @@
+@@ -343,7 +345,7 @@
  								Label@EARNED_HEADER:
  									X: 395
  									Width: 80
@@ -578,7 +581,7 @@
  									Font: Bold
  									Text: Earned
  									Align: Right
-@@ -351,7 +351,7 @@
+@@ -351,7 +353,7 @@
  								Label@SPENT_HEADER:
  									X: 475
  									Width: 80
@@ -587,7 +590,7 @@
  									Font: Bold
  									Text: Spent
  									Align: Right
-@@ -359,7 +359,7 @@
+@@ -359,7 +361,7 @@
  								Label@HARVESTERS_HEADER:
  									X: 555
  									Width: 80
@@ -596,7 +599,7 @@
  									Font: Bold
  									Text: Harvesters
  									Align: Right
-@@ -368,26 +368,26 @@
+@@ -368,26 +370,26 @@
  							X: 0
  							Y: 0
  							Width: 400
@@ -629,7 +632,7 @@
  									Font: Bold
  									Text: Player
  									Align: Left
-@@ -396,7 +396,7 @@
+@@ -396,7 +398,7 @@
  									X: 155
  									Y: 0
  									Width: 100
@@ -638,7 +641,7 @@
  									Font: Bold
  									Text: Production
  									Shadow: True
-@@ -404,26 +404,26 @@
+@@ -404,26 +406,26 @@
  							X: 0
  							Y: 0
  							Width: 400
@@ -671,7 +674,7 @@
  									Font: Bold
  									Text: Player
  									Align: Left
-@@ -432,7 +432,7 @@
+@@ -432,7 +434,7 @@
  									X: 155
  									Y: 0
  									Width: 100
@@ -680,7 +683,7 @@
  									Font: Bold
  									Text: Support Powers
  									Shadow: True
-@@ -440,26 +440,26 @@
+@@ -440,26 +442,26 @@
  							X: 0
  							Y: 0
  							Width: 400
@@ -713,7 +716,7 @@
  									Font: Bold
  									Text: Player
  									Align: Left
-@@ -468,7 +468,7 @@
+@@ -468,7 +470,7 @@
  									X: 160
  									Y: 0
  									Width: 100
@@ -722,7 +725,7 @@
  									Font: Bold
  									Text: Army
  									Shadow: True
-@@ -476,26 +476,26 @@
+@@ -476,26 +478,26 @@
  							X: 0
  							Y: 0
  							Width: 760
@@ -755,7 +758,7 @@
  									Font: Bold
  									Text: Player
  									Align: Left
-@@ -504,7 +504,7 @@
+@@ -504,7 +506,7 @@
  									X: 155
  									Y: 0
  									Width: 75
@@ -764,7 +767,7 @@
  									Font: Bold
  									Text: Destroyed
  									Align: Right
-@@ -513,7 +513,7 @@
+@@ -513,7 +515,7 @@
  									X: 230
  									Y: 0
  									Width: 75
@@ -773,7 +776,7 @@
  									Font: Bold
  									Text: Lost
  									Align: Right
-@@ -522,7 +522,7 @@
+@@ -522,7 +524,7 @@
  									X: 310
  									Y: 0
  									Width: 75
@@ -782,7 +785,7 @@
  									Font: Bold
  									Text: U. Killed
  									Align: Right
-@@ -531,7 +531,7 @@
+@@ -531,7 +533,7 @@
  									X: 385
  									Y: 0
  									Width: 75
@@ -791,7 +794,7 @@
  									Font: Bold
  									Text: U. Lost
  									Align: Right
-@@ -540,7 +540,7 @@
+@@ -540,7 +542,7 @@
  									X: 460
  									Y: 0
  									Width: 75
@@ -800,7 +803,7 @@
  									Font: Bold
  									Text: B. Killed
  									Align: Right
-@@ -549,7 +549,7 @@
+@@ -549,7 +551,7 @@
  									X: 535
  									Y: 0
  									Width: 75
@@ -809,7 +812,7 @@
  									Font: Bold
  									Text: B. Lost
  									Align: Right
-@@ -558,7 +558,7 @@
+@@ -558,7 +560,7 @@
  									X: 610
  									Y: 0
  									Width: 90
@@ -818,7 +821,7 @@
  									Font: Bold
  									Text: Army Value
  									Align: Right
-@@ -567,7 +567,7 @@
+@@ -567,7 +569,7 @@
  									X: 700
  									Y: 0
  									Width: 60
@@ -827,7 +830,7 @@
  									Font: Bold
  									Text: Vision
  									Align: Right
-@@ -575,7 +575,7 @@
+@@ -575,7 +577,7 @@
  				ScrollPanel@PLAYER_STATS_PANEL:
  					X: 0
  					Y: 55
@@ -836,7 +839,7 @@
  					Height: 250
  					TopBottomSpacing: 0
  					BorderWidth: 0
-@@ -593,20 +593,20 @@
+@@ -593,20 +595,20 @@
  									X: 0
  									Y: 0
  									Color: 00000090
@@ -863,7 +866,7 @@
  									Font: Bold
  									Shadow: True
  						ScrollItem@BASIC_PLAYER_TEMPLATE:
-@@ -619,13 +619,13 @@
+@@ -619,13 +621,13 @@
  								ColorBlock@PLAYER_COLOR:
  									X: 0
  									Y: 0
@@ -883,7 +886,7 @@
  								Image@FLAG:
  									X: 2
  									Y: 2
-@@ -635,63 +635,63 @@
+@@ -635,63 +637,63 @@
  									X: 35
  									Y: 0
  									Width: 120
@@ -956,7 +959,7 @@
  									Align: Right
  									Shadow: True
  						ScrollItem@ECONOMY_PLAYER_TEMPLATE:
-@@ -704,13 +704,13 @@
+@@ -704,13 +706,13 @@
  								ColorBlock@PLAYER_COLOR:
  									X: 0
  									Y: 0
@@ -976,7 +979,7 @@
  								Image@FLAG:
  									X: 2
  									Y: 2
-@@ -720,49 +720,49 @@
+@@ -720,49 +722,49 @@
  									X: 35
  									Y: 0
  									Width: 120
@@ -1033,7 +1036,7 @@
  									Align: Right
  									Shadow: True
  						ScrollItem@PRODUCTION_PLAYER_TEMPLATE:
-@@ -775,13 +775,13 @@
+@@ -775,13 +777,13 @@
  								ColorBlock@PLAYER_COLOR:
  									X: 0
  									Y: 0
@@ -1053,7 +1056,7 @@
  								Image@FLAG:
  									X: 2
  									Y: 2
-@@ -791,14 +791,14 @@
+@@ -791,14 +793,14 @@
  									X: 35
  									Y: 0
  									Width: 120
@@ -1070,7 +1073,7 @@
  									TooltipContainer: TOOLTIP_CONTAINER
  						ScrollItem@SUPPORT_POWERS_PLAYER_TEMPLATE:
  							X: 0
-@@ -810,13 +810,13 @@
+@@ -810,13 +812,13 @@
  								ColorBlock@PLAYER_COLOR:
  									X: 0
  									Y: 0
@@ -1090,7 +1093,7 @@
  								Image@FLAG:
  									X: 2
  									Y: 2
-@@ -826,14 +826,14 @@
+@@ -826,14 +828,14 @@
  									X: 35
  									Y: 0
  									Width: 120
@@ -1107,7 +1110,7 @@
  									TooltipContainer: TOOLTIP_CONTAINER
  						ScrollItem@ARMY_PLAYER_TEMPLATE:
  							X: 0
-@@ -845,32 +845,32 @@
+@@ -845,32 +847,32 @@
  								ColorBlock@PLAYER_COLOR:
  									X: 0
  									Y: 0
@@ -1149,7 +1152,7 @@
  									TooltipContainer: TOOLTIP_CONTAINER
  						ScrollItem@COMBAT_PLAYER_TEMPLATE:
  							X: 0
-@@ -882,13 +882,13 @@
+@@ -882,13 +884,13 @@
  								ColorBlock@PLAYER_COLOR:
  									X: 0
  									Y: 0
@@ -1169,7 +1172,7 @@
  								Image@FLAG:
  									X: 2
  									Y: 2
-@@ -898,83 +898,83 @@
+@@ -898,83 +900,83 @@
  									X: 35
  									Y: 0
  									Width: 120
@@ -1268,7 +1271,7 @@
  							ValueFormat: ${0}
  							YAxisValueFormat: ${0:F0}
  							XAxisSize: 40
-@@ -986,21 +986,21 @@
+@@ -986,21 +988,21 @@
  				Container@ARMY_VALUE_GRAPH_CONTAINER:
  					X: 0
  					Y: 30
