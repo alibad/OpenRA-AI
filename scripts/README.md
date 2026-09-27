@@ -31,3 +31,10 @@ live here. These scripts are the replacement for hosted workflows.
 - `smoke-windows-package.ps1 -RequireAI` unpacks that ZIP, starts a real
   headless match using only bundled executables, verifies the live bridge and
   AI response, and cleans up its processes.
+- `balance_harness.py` runs seeded, parallel, headless bot-vs-bot campaigns
+  from `balance_campaigns.json` and writes replays, per-match telemetry,
+  `summary.json` and `report.md`. It changes only disposable map copies and a
+  private manifest copy (unthrottled simulation); see its module docstring and
+  `docs/balance-baseline-2026-09.md`.
+- `native_fixture.py` holds the shared game-time budgets, exact-destination
+  movement checks and Windows-safe paths/links used by the RA2 validators.
