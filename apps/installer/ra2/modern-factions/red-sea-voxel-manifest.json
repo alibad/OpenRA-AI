@@ -1,0 +1,514 @@
+{
+  "format": "VXL/HVA",
+  "normals": "RedAlert2",
+  "remap_indices": [
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
+    25,
+    26,
+    27,
+    28,
+    29,
+    30,
+    31
+  ],
+  "geometry_sources": [
+    "scripts/red_sea_directional_vehicle.py",
+    "scripts/ra2_red_sea_assets.py"
+  ],
+  "palettes": {
+    "saudi": {
+      "file": "saudi-art/saudi-voxels.pal",
+      "sha256": "c11f466091fb538270c379c95a97fdfa0475979b2d72c3b61134abb4e1e1d5eb"
+    },
+    "yemen": {
+      "file": "yemen-art/yemen-voxels.pal",
+      "sha256": "b1b8b3f2727254b8e9638ef86e8060d0e805f3d9c51071844c31f5ef7622a62e"
+    }
+  },
+  "models": {
+    "r2m1a2s": {
+      "country": "saudi",
+      "size": [
+        45,
+        33,
+        15
+      ],
+      "origin": [
+        -22,
+        -16,
+        -1
+      ],
+      "occupied_voxels": 8759,
+      "remap_voxels": 170,
+      "animation_frames": 1,
+      "sha256": "1e290607346ffef4a8f846e72a5ec4390a5e9487a7c6bae68c5d1e1881cc790d"
+    },
+    "r2m1a2stur": {
+      "country": "saudi",
+      "size": [
+        47,
+        23,
+        10
+      ],
+      "origin": [
+        -13,
+        -11,
+        10
+      ],
+      "occupied_voxels": 1825,
+      "remap_voxels": 162,
+      "animation_frames": 1,
+      "sha256": "65cc8f927c654640f3cbc93d7997e22ac8bc4b3e679bd88b04c07c1fd6875017"
+    },
+    "r2sads": {
+      "country": "saudi",
+      "size": [
+        37,
+        27,
+        17
+      ],
+      "origin": [
+        -17,
+        -13,
+        -1
+      ],
+      "occupied_voxels": 4564,
+      "remap_voxels": 102,
+      "animation_frames": 1,
+      "sha256": "a48682d4aea3d46b5c17d625de5093ab811a92031f727704b952000c9efbdf8c"
+    },
+    "r2sadstur": {
+      "country": "saudi",
+      "size": [
+        27,
+        17,
+        14
+      ],
+      "origin": [
+        -7,
+        -8,
+        7
+      ],
+      "occupied_voxels": 1114,
+      "remap_voxels": 32,
+      "animation_frames": 1,
+      "sha256": "11e2d79a40f7f7a01b20669c377b430acbaf8e11c4a3acd4ee7ed5b244ed545b"
+    },
+    "r2caesar": {
+      "country": "saudi",
+      "size": [
+        49,
+        27,
+        20
+      ],
+      "origin": [
+        -21,
+        -13,
+        -1
+      ],
+      "occupied_voxels": 5912,
+      "remap_voxels": 238,
+      "animation_frames": 1,
+      "sha256": "a9f49f18219640c04773a96037e3167fd094ea3e80fa64f4931d826303b52c2a"
+    },
+    "r2bradley": {
+      "country": "saudi",
+      "size": [
+        40,
+        31,
+        16
+      ],
+      "origin": [
+        -19,
+        -15,
+        0
+      ],
+      "occupied_voxels": 7100,
+      "remap_voxels": 162,
+      "animation_frames": 1,
+      "sha256": "dd092126d5cf38dc3450a1186809f03679e65b42baabfcbb998c9360b3500caa"
+    },
+    "r2bradleytur": {
+      "country": "saudi",
+      "size": [
+        27,
+        18,
+        10
+      ],
+      "origin": [
+        -7,
+        -10,
+        11
+      ],
+      "occupied_voxels": 679,
+      "remap_voxels": 45,
+      "animation_frames": 1,
+      "sha256": "19d5a4282ddf417942f66815625b4e6469fb4952dc1b3a6dc46174a032e25111"
+    },
+    "r2f15sa": {
+      "country": "saudi",
+      "size": [
+        64,
+        53,
+        17
+      ],
+      "origin": [
+        -29,
+        -26,
+        0
+      ],
+      "occupied_voxels": 3481,
+      "remap_voxels": 105,
+      "animation_frames": 1,
+      "sha256": "7700b8b0171efcc830cc6601d73c32b476fae3fe40cd2040c515a6684ce7d3f0"
+    },
+    "r2ah64sa": {
+      "country": "saudi",
+      "size": [
+        62,
+        33,
+        22
+      ],
+      "origin": [
+        -35,
+        -16,
+        0
+      ],
+      "occupied_voxels": 2867,
+      "remap_voxels": 182,
+      "animation_frames": 1,
+      "sha256": "2bfa0263f947f8e3cb21350ea5c9b28d3ffeae802028d0efa90b19ef112c8aab"
+    },
+    "r2ah64satur": {
+      "country": "saudi",
+      "size": [
+        59,
+        59,
+        6
+      ],
+      "origin": [
+        -29,
+        -29,
+        14
+      ],
+      "occupied_voxels": 670,
+      "remap_voxels": 54,
+      "animation_frames": 8,
+      "sha256": "40ac5c0188ce1548176d4a7226dc8ffe8be26d841f120e67f8de275cfe4db6a7"
+    },
+    "r2sadiq": {
+      "country": "saudi",
+      "size": [
+        46,
+        17,
+        20
+      ],
+      "origin": [
+        -23,
+        -8,
+        -1
+      ],
+      "occupied_voxels": 1835,
+      "remap_voxels": 106,
+      "animation_frames": 1,
+      "sha256": "4928b1baf883885a5df3e912cdccc935681472e2dc40ab97a0a89a8435fa1346"
+    },
+    "r2sadiqtur": {
+      "country": "saudi",
+      "size": [
+        15,
+        7,
+        8
+      ],
+      "origin": [
+        -4,
+        -3,
+        6
+      ],
+      "occupied_voxels": 157,
+      "remap_voxels": 24,
+      "animation_frames": 1,
+      "sha256": "6f1a0d2837bab91d72dcee06391d7a4422143b1686a249cf2ecae993150f6d87"
+    },
+    "r2riyadh": {
+      "country": "saudi",
+      "size": [
+        68,
+        23,
+        29
+      ],
+      "origin": [
+        -34,
+        -11,
+        -1
+      ],
+      "occupied_voxels": 4959,
+      "remap_voxels": 210,
+      "animation_frames": 1,
+      "sha256": "9882961cee62fa0721f95315f0175e356c03d84278d377e95193f68e6d2f1645"
+    },
+    "r2riyadhtur": {
+      "country": "saudi",
+      "size": [
+        17,
+        9,
+        8
+      ],
+      "origin": [
+        -4,
+        -4,
+        6
+      ],
+      "occupied_voxels": 237,
+      "remap_voxels": 34,
+      "animation_frames": 1,
+      "sha256": "490a3255712df54562cbef6e923d34fb6ecd4a14395415fb8e3b75c1b48f57f1"
+    },
+    "r2jubail": {
+      "country": "saudi",
+      "size": [
+        73,
+        25,
+        29
+      ],
+      "origin": [
+        -36,
+        -12,
+        -1
+      ],
+      "occupied_voxels": 6555,
+      "remap_voxels": 418,
+      "animation_frames": 1,
+      "sha256": "1da806f8838c5d8434335a69b8e76b618250ef8e050aa80240f8592e2e9e2787"
+    },
+    "r2technical": {
+      "country": "yemen",
+      "size": [
+        30,
+        23,
+        15
+      ],
+      "origin": [
+        -14,
+        -11,
+        -1
+      ],
+      "occupied_voxels": 2540,
+      "remap_voxels": 129,
+      "animation_frames": 1,
+      "sha256": "c5a42570457444eafcb40408c6d3fad8167ee5202b5090252611708a9d7888ed"
+    },
+    "r2technicaltur": {
+      "country": "yemen",
+      "size": [
+        22,
+        11,
+        11
+      ],
+      "origin": [
+        -5,
+        -5,
+        6
+      ],
+      "occupied_voxels": 243,
+      "remap_voxels": 28,
+      "animation_frames": 1,
+      "sha256": "d2876c0190dc0cf776e129a3373188ab3393810052e4ae7ba52563f9df04ac61"
+    },
+    "r2ytechrr": {
+      "country": "yemen",
+      "size": [
+        30,
+        23,
+        15
+      ],
+      "origin": [
+        -14,
+        -11,
+        -1
+      ],
+      "occupied_voxels": 2540,
+      "remap_voxels": 129,
+      "animation_frames": 1,
+      "sha256": "c5a42570457444eafcb40408c6d3fad8167ee5202b5090252611708a9d7888ed"
+    },
+    "r2ytechrrtur": {
+      "country": "yemen",
+      "size": [
+        29,
+        9,
+        12
+      ],
+      "origin": [
+        -11,
+        -4,
+        6
+      ],
+      "occupied_voxels": 332,
+      "remap_voxels": 20,
+      "animation_frames": 1,
+      "sha256": "242274fc28ebea2ef65458f109f44e08a3df056215440ebce2a146d660d5eb52"
+    },
+    "r2yzu": {
+      "country": "yemen",
+      "size": [
+        30,
+        23,
+        15
+      ],
+      "origin": [
+        -14,
+        -11,
+        -1
+      ],
+      "occupied_voxels": 2540,
+      "remap_voxels": 129,
+      "animation_frames": 1,
+      "sha256": "c5a42570457444eafcb40408c6d3fad8167ee5202b5090252611708a9d7888ed"
+    },
+    "r2yzutur": {
+      "country": "yemen",
+      "size": [
+        23,
+        11,
+        14
+      ],
+      "origin": [
+        -5,
+        -5,
+        6
+      ],
+      "occupied_voxels": 366,
+      "remap_voxels": 18,
+      "animation_frames": 1,
+      "sha256": "873fd21e708d68ed745f6ea9d5e1fe5570e09bb49491a82b19b547b2bf94f254"
+    },
+    "r2ymlr": {
+      "country": "yemen",
+      "size": [
+        38,
+        27,
+        23
+      ],
+      "origin": [
+        -18,
+        -13,
+        -1
+      ],
+      "occupied_voxels": 5097,
+      "remap_voxels": 273,
+      "animation_frames": 1,
+      "sha256": "0b56713d7ad00c923b483ec307c07b44769d85ee8a675814715f867cde554cbe"
+    },
+    "r2ymlrempty": {
+      "country": "yemen",
+      "size": [
+        38,
+        27,
+        18
+      ],
+      "origin": [
+        -18,
+        -13,
+        -1
+      ],
+      "occupied_voxels": 4627,
+      "remap_voxels": 273,
+      "animation_frames": 1,
+      "sha256": "db22a4498c31937c5fdf6c24f71899fbfae5df22509ee05be5839da8fb77dd92"
+    },
+    "r2samad": {
+      "country": "yemen",
+      "size": [
+        41,
+        39,
+        12
+      ],
+      "origin": [
+        -19,
+        -19,
+        0
+      ],
+      "occupied_voxels": 859,
+      "remap_voxels": 66,
+      "animation_frames": 1,
+      "sha256": "8246360ae193da0c09e0a55986c16b8e66aefc590541af368f209bad14569b97"
+    },
+    "r2hodeidah": {
+      "country": "yemen",
+      "size": [
+        50,
+        17,
+        20
+      ],
+      "origin": [
+        -25,
+        -8,
+        -1
+      ],
+      "occupied_voxels": 2509,
+      "remap_voxels": 227,
+      "animation_frames": 1,
+      "sha256": "d81a7429d99cb3763aa439cdf6a1ede6f2b03269f297397d6ef9b82e4fe8ef31"
+    },
+    "r2sahaab": {
+      "country": "yemen",
+      "size": [
+        34,
+        13,
+        12
+      ],
+      "origin": [
+        -17,
+        -6,
+        -1
+      ],
+      "occupied_voxels": 806,
+      "remap_voxels": 88,
+      "animation_frames": 1,
+      "sha256": "7be757a4da19241bd49a4f33f3c1295cc2718dc6ae7f3b6efecbfe36c5df17d6"
+    },
+    "r2mokha": {
+      "country": "yemen",
+      "size": [
+        47,
+        17,
+        25
+      ],
+      "origin": [
+        -23,
+        -8,
+        -1
+      ],
+      "occupied_voxels": 2362,
+      "remap_voxels": 346,
+      "animation_frames": 1,
+      "sha256": "4d5b79f0aa93905aada70934bdb8e8797ae865e7fbb6825863c477e2b2696323"
+    },
+    "r2mokhatur": {
+      "country": "yemen",
+      "size": [
+        14,
+        7,
+        8
+      ],
+      "origin": [
+        -4,
+        -3,
+        6
+      ],
+      "occupied_voxels": 160,
+      "remap_voxels": 24,
+      "animation_frames": 1,
+      "sha256": "ce2be85fc6136bb839a04ec02679c112ffdb75311b6e203a1da127f61b607fa3"
+    }
+  }
+}
