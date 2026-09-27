@@ -371,5 +371,55 @@ class StructuredRouterTests(unittest.TestCase):
             router.chat_structured([{"role": "user", "content": "hi"}], nl_orders.ORDER_SCHEMA)
 
 
+class ExternalProviderPathTests(unittest.TestCase):
+    """Companion -> loopback gateway in External mode -> OpenAI-compatible provider (mock, no real key)."""
+
+    def run_external(self, *, reject_json_schema: bool) -> tuple[object, list[dict]]:
+        import sys
+        import tempfile
+
+        from openra_ai_companion.local_runtime import GatewayServer, RuntimeConfig, protect_secret
+
+        sys.path.insert(0, str(FIXTURES.parent))
+        import mock_provider
+
+        provider = mock_provider.start(reject_json_schema=reject_json_schema)
+        config = RuntimeConfig(
+            mode="external",
+            endpoint=f"http://127.0.0.1:{provider.server_port}/v1",
+            protected_api_key=protect_secret("mock-key-not-real"),
+        )
+        with tempfile.TemporaryDirectory() as directory:
+            gateway = GatewayServer(("127.0.0.1", 0), Path(directory), config)
+            threading.Thread(target=gateway.serve_forever, daemon=True).start()
+            try:
+                settings = Settings(
+                    router_url=f"http://127.0.0.1:{gateway.server_port}", model_provider="custom",
+                    text_model="mock-gpt", vision_model="mock-gpt",
+                )
+                companion = Companion(router=AIRouter(settings))
+                companion.update_snapshot(fixture("ra-england-army"))
+                response = companion.handle_player_input("move the tanks north")
+                return response, list(provider.RequestHandlerClass.requests)
+            finally:
+                gateway.shutdown()
+                gateway.server_close()
+                provider.shutdown()
+                provider.server_close()
+
+    def test_external_provider_receives_schema_request_and_key_through_gateway(self) -> None:
+        response, requests = self.run_external(reject_json_schema=False)
+        self.assertEqual(response.source, "action-proposal")
+        self.assertEqual(response.metadata["nl"]["path"], "model")
+        self.assertEqual([request["response_format"] for request in requests], ["json_schema"])
+        self.assertEqual(requests[0]["model"], "mock-gpt")
+        self.assertEqual(requests[0]["authorization"], "Bearer mock-key-not-real")
+
+    def test_external_provider_without_json_schema_falls_back_to_json_object(self) -> None:
+        response, requests = self.run_external(reject_json_schema=True)
+        self.assertEqual(response.source, "action-proposal")
+        self.assertEqual([request["response_format"] for request in requests], ["json_schema", "json_object"])
+
+
 if __name__ == "__main__":
     unittest.main()
