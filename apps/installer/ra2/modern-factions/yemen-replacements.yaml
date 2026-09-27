@@ -1,0 +1,60 @@
+# Shared engineers, dog, miner, MCV, Flak Track and landing craft remain.
+e2:
+	Buildable:
+		Prerequisites: ~nahand, ~!faction.yemen
+
+flakt:
+	Buildable:
+		Prerequisites: naradr, ~nahand, ~!faction.yemen
+
+shk:
+	Buildable:
+		Prerequisites: ~nahand, ~!faction.yemen
+
+ivan:
+	Buildable:
+		Prerequisites: naradr, ~nahand, ~!faction.yemen
+
+yuri:
+	Buildable:
+		Prerequisites: natech, ~nahand, ~!faction.yemen
+
+dron:
+	Buildable:
+		Prerequisites: ~naweap, ~!faction.yemen
+
+htnk:
+	Buildable:
+		Prerequisites: ~naweap, ~!faction.yemen
+
+apoc:
+	Buildable:
+		Prerequisites: ~naweap, natech, ~!faction.yemen
+
+zep:
+	Buildable:
+		Prerequisites: ~naweap, natech, ~!faction.yemen
+
+sub:
+	Buildable:
+		Prerequisites: ~nayard, ~!faction.yemen
+
+hyd:
+	Buildable:
+		Prerequisites: naradr, ~nayard, ~!faction.yemen
+
+sqd:
+	Buildable:
+		Prerequisites: natech, ~nayard, ~!faction.yemen
+
+nalasr:
+	Buildable:
+		Prerequisites: barracks, ~structures.soviets, ~!faction.yemen
+
+naflak:
+	Buildable:
+		Prerequisites: barracks, ~structures.soviets, ~!faction.yemen
+
+tesla:
+	Buildable:
+		Prerequisites: naradr, ~structures.soviets, ~!faction.yemen

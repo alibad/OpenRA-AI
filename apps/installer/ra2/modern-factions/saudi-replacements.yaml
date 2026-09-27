@@ -1,0 +1,68 @@
+# Replace combat roles only for Saudi Arabia. Preserve every original country gate.
+e1:
+	Buildable:
+		Prerequisites: ~gapile, ~!faction.saudi
+
+jumpjet:
+	Buildable:
+		Prerequisites: ~gapile, radar, ~!faction.saudi
+
+tany:
+	Buildable:
+		Prerequisites: gatech, ~gapile, ~!faction.saudi
+
+cleg:
+	Buildable:
+		Prerequisites: ~gapile, gatech, ~!faction.saudi
+
+mtnk:
+	Buildable:
+		Prerequisites: ~gaweap, ~!faction.saudi
+
+fv:
+	Buildable:
+		Prerequisites: ~gaweap, ~!faction.saudi
+
+sref:
+	Buildable:
+		Prerequisites: gatech, ~gaweap, ~!faction.saudi
+
+mgtk:
+	Buildable:
+		Prerequisites: gatech, ~gaweap, ~!faction.saudi
+
+shad:
+	Buildable:
+		Prerequisites: ~gaweap, ~!faction.saudi
+
+orca:
+	Buildable:
+		Prerequisites: ~aircraft.harrier, ~!faction.saudi
+
+dest:
+	Buildable:
+		Prerequisites: ~gayard, ~!faction.saudi
+
+aegis:
+	Buildable:
+		Prerequisites: radar, ~gayard, ~!faction.saudi
+
+dlph:
+	Buildable:
+		Prerequisites: gatech, ~gayard, ~!faction.saudi
+
+carrier:
+	Buildable:
+		Prerequisites: gatech, ~gayard, ~!faction.saudi
+
+gapill:
+	Buildable:
+		Prerequisites: barracks, ~structures.allies, ~!faction.saudi
+
+nasam:
+	Buildable:
+		Prerequisites: barracks, ~structures.allies, ~!faction.saudi
+
+atesla:
+	Buildable:
+		Prerequisites: power, radar, ~structures.allies, ~!faction.saudi

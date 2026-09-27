@@ -1,0 +1,191 @@
+r2ymr:
+	Inherits@MC: ^MindControllable
+	Defaults:
+		Filename: ra2|modern-factions/yemen-art/r2ymr.shp
+		Offset: 0, -11, 16
+	stand:
+		Facings: 8
+	run:
+		Start: 8
+		Length: 6
+		Facings: 8
+		Tick: 80
+	shoot:
+		Start: 56
+		Length: 4
+		Facings: 8
+		Tick: 80
+	idle1:
+		Start: 96
+		Length: 8
+	idle2:
+		Start: 104
+		Length: 8
+	die1:
+		Start: 88
+		Length: 8
+	die2:
+		Start: 88
+		Length: 8
+	icon:
+		Filename: ra2|modern-factions/icons/r2ymr.png
+		Offset: 0, 0
+
+r2yrpg:
+	Inherits@MC: ^MindControllable
+	Defaults:
+		Filename: ra2|modern-factions/yemen-art/r2yrpg.shp
+		Offset: 0, -11, 16
+	stand:
+		Facings: 8
+	run:
+		Start: 8
+		Length: 6
+		Facings: 8
+		Tick: 80
+	shoot:
+		Start: 56
+		Length: 4
+		Facings: 8
+		Tick: 80
+	idle1:
+		Start: 96
+		Length: 8
+	idle2:
+		Start: 104
+		Length: 8
+	die1:
+		Start: 88
+		Length: 8
+	die2:
+		Start: 88
+		Length: 8
+	icon:
+		Filename: ra2|modern-factions/icons/r2yrpg.png
+		Offset: 0, 0
+
+r2yspot:
+	Inherits@MC: ^MindControllable
+	Defaults:
+		Filename: ra2|modern-factions/yemen-art/r2yspot.shp
+		Offset: 0, -11, 16
+	stand:
+		Facings: 8
+	run:
+		Start: 8
+		Length: 6
+		Facings: 8
+		Tick: 80
+	shoot:
+		Start: 56
+		Length: 4
+		Facings: 8
+		Tick: 80
+	idle1:
+		Start: 96
+		Length: 8
+	idle2:
+		Start: 104
+		Length: 8
+	die1:
+		Start: 88
+		Length: 8
+	die2:
+		Start: 88
+		Length: 8
+	icon:
+		Filename: ra2|modern-factions/icons/r2yspot.png
+		Offset: 0, 0
+
+r2wadighost:
+	Inherits@MC: ^MindControllable
+	Defaults:
+		Filename: ra2|modern-factions/yemen-art/r2wadighost.shp
+		Offset: 0, -11, 16
+	stand:
+		Facings: 8
+	run:
+		Start: 8
+		Length: 6
+		Facings: 8
+		Tick: 80
+	shoot:
+		Start: 56
+		Length: 4
+		Facings: 8
+		Tick: 80
+	idle1:
+		Start: 96
+		Length: 8
+	idle2:
+		Start: 104
+		Length: 8
+	die1:
+		Start: 88
+		Length: 8
+	die2:
+		Start: 88
+		Length: 8
+	icon:
+		Filename: ra2|modern-factions/icons/r2wadighost.png
+		Offset: 0, 0
+
+r2ybunker:
+	Defaults:
+		Filename: ra2|modern-factions/yemen-art/r2ybunker.shp
+		Offset: 0, -19, 19
+	idle:
+	damaged-idle:
+	turret:
+		Start: 1
+		Facings: 32
+	damaged-turret:
+		Start: 1
+		Facings: 32
+	make:
+		Start: 33
+		Length: 8
+		Tick: 80
+	icon:
+		Filename: ra2|modern-factions/icons/r2ybunker.png
+		Offset: 0, 0
+
+r2yzunest:
+	Defaults:
+		Filename: ra2|modern-factions/yemen-art/r2yzunest.shp
+		Offset: 0, -19, 19
+	idle:
+	damaged-idle:
+	turret:
+		Start: 1
+		Facings: 32
+	damaged-turret:
+		Start: 1
+		Facings: 32
+	make:
+		Start: 33
+		Length: 8
+		Tick: 80
+	icon:
+		Filename: ra2|modern-factions/icons/r2yzunest.png
+		Offset: 0, 0
+
+r2ycoastal:
+	Defaults:
+		Filename: ra2|modern-factions/yemen-art/r2ycoastal.shp
+		Offset: 0, -19, 19
+	idle:
+	damaged-idle:
+	turret:
+		Start: 1
+		Facings: 32
+	damaged-turret:
+		Start: 1
+		Facings: 32
+	make:
+		Start: 33
+		Length: 8
+		Tick: 80
+	icon:
+		Filename: ra2|modern-factions/icons/r2ycoastal.png
+		Offset: 0, 0

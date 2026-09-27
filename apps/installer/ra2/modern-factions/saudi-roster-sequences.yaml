@@ -1,0 +1,194 @@
+r2sang:
+	Inherits@MC: ^MindControllable
+	Defaults:
+		Filename: ra2|modern-factions/saudi-art/r2sang.shp
+		Offset: 0, -11, 16
+	stand:
+		Facings: 8
+	run:
+		Start: 8
+		Length: 6
+		Facings: 8
+		Tick: 80
+	shoot:
+		Start: 56
+		Length: 4
+		Facings: 8
+		Tick: 80
+	idle1:
+		Start: 96
+		Length: 8
+	idle2:
+		Start: 104
+		Length: 8
+	die1:
+		Start: 88
+		Length: 8
+	die2:
+		Start: 88
+		Length: 8
+	icon:
+		Filename: ra2|modern-factions/icons/r2sang.png
+		Offset: 0, 0
+
+r2saat:
+	Inherits@MC: ^MindControllable
+	Defaults:
+		Filename: ra2|modern-factions/saudi-art/r2saat.shp
+		Offset: 0, -11, 16
+	stand:
+		Facings: 8
+	run:
+		Start: 8
+		Length: 6
+		Facings: 8
+		Tick: 80
+	shoot:
+		Start: 56
+		Length: 4
+		Facings: 8
+		Tick: 80
+	idle1:
+		Start: 96
+		Length: 8
+	idle2:
+		Start: 104
+		Length: 8
+	die1:
+		Start: 88
+		Length: 8
+	die2:
+		Start: 88
+		Length: 8
+	icon:
+		Filename: ra2|modern-factions/icons/r2saat.png
+		Offset: 0, 0
+
+r2sajtac:
+	Inherits@MC: ^MindControllable
+	Defaults:
+		Filename: ra2|modern-factions/saudi-art/r2sajtac.shp
+		Offset: 0, -11, 16
+	stand:
+		Facings: 8
+	run:
+		Start: 8
+		Length: 6
+		Facings: 8
+		Tick: 80
+	shoot:
+		Start: 56
+		Length: 4
+		Facings: 8
+		Tick: 80
+	idle1:
+		Start: 96
+		Length: 8
+	idle2:
+		Start: 104
+		Length: 8
+	die1:
+		Start: 88
+		Length: 8
+	die2:
+		Start: 88
+		Length: 8
+	icon:
+		Filename: ra2|modern-factions/icons/r2sajtac.png
+		Offset: 0, 0
+
+r2falcon:
+	Inherits@MC: ^MindControllable
+	Defaults:
+		Filename: ra2|modern-factions/saudi-art/r2falcon.shp
+		Offset: 0, -11, 16
+	stand:
+		Facings: 8
+	run:
+		Start: 8
+		Length: 6
+		Facings: 8
+		Tick: 80
+	shoot:
+		Start: 56
+		Length: 4
+		Facings: 8
+		Tick: 80
+	idle1:
+		Start: 96
+		Length: 8
+	idle2:
+		Start: 104
+		Length: 8
+	die1:
+		Start: 88
+		Length: 8
+	die2:
+		Start: 88
+		Length: 8
+	icon:
+		Filename: ra2|modern-factions/icons/r2falcon.png
+		Offset: 0, 0
+	strike:
+		Filename: ra2|modern-factions/icons/r2f15sa.png
+		Offset: 0, 0
+
+r2saguard:
+	Defaults:
+		Filename: ra2|modern-factions/saudi-art/r2saguard.shp
+		Offset: 0, -19, 19
+	idle:
+	damaged-idle:
+	turret:
+		Start: 1
+		Facings: 32
+	damaged-turret:
+		Start: 1
+		Facings: 32
+	make:
+		Start: 33
+		Length: 8
+		Tick: 80
+	icon:
+		Filename: ra2|modern-factions/icons/r2saguard.png
+		Offset: 0, 0
+
+r2sapatriot:
+	Defaults:
+		Filename: ra2|modern-factions/saudi-art/r2sapatriot.shp
+		Offset: 0, -19, 19
+	idle:
+	damaged-idle:
+	turret:
+		Start: 1
+		Facings: 32
+	damaged-turret:
+		Start: 1
+		Facings: 32
+	make:
+		Start: 33
+		Length: 8
+		Tick: 80
+	icon:
+		Filename: ra2|modern-factions/icons/r2sapatriot.png
+		Offset: 0, 0
+
+r2satow:
+	Defaults:
+		Filename: ra2|modern-factions/saudi-art/r2satow.shp
+		Offset: 0, -19, 19
+	idle:
+	damaged-idle:
+	turret:
+		Start: 1
+		Facings: 32
+	damaged-turret:
+		Start: 1
+		Facings: 32
+	make:
+		Start: 33
+		Length: 8
+		Tick: 80
+	icon:
+		Filename: ra2|modern-factions/icons/r2satow.png
+		Offset: 0, 0

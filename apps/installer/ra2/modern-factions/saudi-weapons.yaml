@@ -1,0 +1,350 @@
+# Guided Saudi weapons carry an extra damage warhead that applies only to
+# actors currently marked by a JTAC laser (R2Lased). Unguided fire gains nothing.
+R2GuardRifle:
+	Inherits: M60
+	Range: 5c0
+	ReloadDelay: 34
+	Burst: 3
+	BurstDelays: 3
+	Report: ra2|modern-factions/audio/redsea-guard-rifle.wav
+	Warhead@1Dam: SpreadDamage
+		Damage: 9
+
+R2SaudiATGM:
+	Inherits: Maverick
+	Range: 8c0
+	MinRange: 2c0
+	ReloadDelay: 110
+	Report: ra2|modern-factions/audio/redsea-atgm-launch.wav
+	Projectile: Missile
+		Speed: 256
+		MinimumLaunchAngle: 0
+		MaximumLaunchAngle: 32
+		CruiseAltitude: 768
+		RangeLimit: 12c0
+	Warhead@1Dam: SpreadDamage
+		Damage: 100
+		Versus:
+			None: 15
+			Flak: 20
+			Plate: 25
+			Light: 110
+			Medium: 120
+			Heavy: 130
+			Wood: 55
+			Steel: 50
+			Concrete: 40
+	Warhead@lased: SpreadDamage
+		Spread: 128
+		Damage: 30
+		ValidTargets: R2Lased
+		DamageTypes: Prone50Percent, TriggerProne, ExplosionDeath
+	Warhead@2Eff: CreateEffect
+		ImpactSounds: ra2|modern-factions/audio/redsea-drone-impact.wav
+
+R2JTACLaser:
+	Range: 9c0
+	ReloadDelay: 100
+	TargetActorCenter: true
+	ValidTargets: Ground, Water
+	Projectile: LaserZap
+		Width: 22
+		Duration: 14
+		ZOffset: 2047
+		Color: FF3A30C0
+		SecondaryBeam: true
+		SecondaryBeamWidth: 64
+		SecondaryBeamZOffset: 2047
+		SecondaryBeamColor: FF3A3030
+	Warhead@mark: GrantExternalCondition
+		Condition: r2-lased
+		Duration: 200
+		Range: 0c512
+		ValidRelationships: Enemy, Neutral
+		ValidTargets: Ground, Water
+
+R2FalconRifle:
+	Inherits: M60
+	Range: 7c0
+	ReloadDelay: 40
+	Burst: 2
+	BurstDelays: 8
+	Report: ra2|modern-factions/audio/redsea-suppressed.wav
+	Warhead@1Dam: SpreadDamage
+		Damage: 45
+		Versus:
+			None: 100
+			Flak: 90
+			Plate: 80
+			Light: 45
+			Medium: 25
+			Heavy: 15
+			Wood: 20
+			Steel: 15
+			Concrete: 10
+
+R2PrecisionBomb:
+	ReloadDelay: 10
+	Range: 5c0
+	ValidTargets: Ground, Water
+	Report: ra2|modern-factions/audio/redsea-f15-missile.wav
+	Projectile: GravityBomb
+		Image: zbomb
+		Palette: player
+		IsPlayerPalette: true
+		Velocity: 0, 0, -80
+		Acceleration: 0, 0, -8
+		Shadow: true
+	Warhead@1Dam: SpreadDamage
+		Spread: 384
+		Damage: 400
+		Falloff: 100, 43, 11, 0
+		ValidTargets: Ground, Water
+		Versus:
+			None: 55
+			Flak: 60
+			Plate: 70
+			Light: 115
+			Medium: 100
+			Heavy: 92
+			Wood: 105
+			Steel: 90
+			Concrete: 80
+		DamageTypes: Prone50Percent, TriggerProne, ExplosionDeath
+	Warhead@lased: SpreadDamage
+		Spread: 384
+		Damage: 140
+		ValidTargets: R2Lased
+		DamageTypes: Prone50Percent, TriggerProne, ExplosionDeath
+	Warhead@2Eff: CreateEffect
+		Explosions: verylarge_clsn
+		ImpactSounds: ra2|modern-factions/audio/redsea-drone-impact.wav
+		ValidTargets: Ground, Water
+
+R2AbramsGun:
+	Inherits: 120mm
+	Range: 6c0
+	ReloadDelay: 80
+	Report: ra2|modern-factions/audio/redsea-m1-fire.wav
+	Warhead@1Dam: SpreadDamage
+		Damage: 105
+
+R2SADSInterceptor:
+	Inherits: R2AirDefense
+	Range: 12c0
+	Burst: 2
+	BurstDelays: 10
+	ReloadDelay: 120
+	Report: ra2|modern-factions/audio/redsea-interceptor.wav
+	Projectile: Missile
+		RangeLimit: 18c0
+	Warhead@1Dam: SpreadDamage
+		Damage: 50
+
+R2CaesarShell:
+	Inherits: 155mm
+	Range: 13c0
+	MinRange: 4c0
+	ReloadDelay: 150
+	Projectile: Bullet
+		LaunchAngle: 62
+		Speed: 240
+	Warhead@1Dam: SpreadDamage
+		Damage: 90
+		Spread: 341
+	Warhead@lased: SpreadDamage
+		Spread: 128
+		Damage: 45
+		ValidTargets: R2Lased
+		DamageTypes: Prone50Percent, TriggerProne, ExplosionDeath
+
+R2BradleyCannon:
+	Inherits: 20mm
+	Range: 6c0
+	Burst: 3
+	BurstDelays: 3
+	ReloadDelay: 30
+	ValidTargets: Ground, Water
+	Warhead@1Dam: SpreadDamage
+		Damage: 14
+		ValidTargets: Ground, Water
+		Versus:
+			None: 100
+			Flak: 80
+			Plate: 70
+			Light: 90
+			Medium: 45
+			Heavy: 25
+	Warhead@2Eff: CreateEffect
+		ValidTargets: Ground, Water
+
+R2BradleyTOW:
+	Inherits: R2SaudiATGM
+	Range: 7c0
+	MinRange: 1c512
+	ReloadDelay: 220
+	Warhead@1Dam: SpreadDamage
+		Damage: 80
+
+R2F15AAM:
+	Inherits: R2AirDefense
+	Range: 9c0
+	ReloadDelay: 40
+	Report: ra2|modern-factions/audio/redsea-f15-missile.wav
+	Projectile: Missile
+		Speed: 450
+		RangeLimit: 16c0
+		MinimumLaunchAngle: 0
+		MaximumLaunchAngle: 0
+	Warhead@1Dam: SpreadDamage
+		Damage: 60
+
+R2F15Strike:
+	Inherits: Maverick
+	Range: 8c0
+	MinRange: 2c0
+	ReloadDelay: 60
+	Report: ra2|modern-factions/audio/redsea-f15-missile.wav
+	Warhead@1Dam: SpreadDamage
+		Damage: 90
+		Versus:
+			None: 25
+			Flak: 30
+			Plate: 35
+			Light: 100
+			Medium: 110
+			Heavy: 110
+			Wood: 100
+			Steel: 90
+			Concrete: 80
+	Warhead@lased: SpreadDamage
+		Spread: 128
+		Damage: 30
+		ValidTargets: R2Lased
+		DamageTypes: Prone50Percent, TriggerProne, ExplosionDeath
+
+R2ApacheCannon:
+	Inherits: 20mm
+	Range: 5c0
+	Burst: 3
+	BurstDelays: 2
+	ReloadDelay: 16
+	ValidTargets: Ground, Water
+	Report: ra2|modern-factions/audio/redsea-ah64-cannon.wav
+	Warhead@1Dam: SpreadDamage
+		Damage: 16
+		ValidTargets: Ground, Water
+		Versus:
+			None: 100
+			Flak: 90
+			Plate: 80
+			Light: 80
+			Medium: 45
+			Heavy: 20
+	Warhead@2Eff: CreateEffect
+		ValidTargets: Ground, Water
+
+R2ApacheRockets:
+	Inherits: Maverick
+	Range: 7c0
+	ReloadDelay: 120
+	Burst: 2
+	BurstDelays: 8
+	Report: ra2|modern-factions/audio/redsea-ah64-rocket.wav
+	Warhead@1Dam: SpreadDamage
+		Damage: 55
+		Versus:
+			None: 20
+			Flak: 25
+			Plate: 30
+			Light: 100
+			Medium: 110
+			Heavy: 110
+			Wood: 70
+			Steel: 60
+			Concrete: 50
+	Warhead@lased: SpreadDamage
+		Spread: 128
+		Damage: 20
+		ValidTargets: R2Lased
+		DamageTypes: Prone50Percent, TriggerProne, ExplosionDeath
+
+R2SadiqCannon:
+	Inherits: 20mm
+	Range: 6c0
+	Burst: 3
+	BurstDelays: 2
+	ReloadDelay: 22
+	ValidTargets: Water, Ground
+	Report: ra2|modern-factions/audio/naval-ciws-burst.wav
+	Warhead@1Dam: SpreadDamage
+		Damage: 14
+		ValidTargets: Water, Ground
+		Versus:
+			None: 100
+			Flak: 90
+			Plate: 80
+			Light: 150
+			Medium: 60
+			Heavy: 35
+	Warhead@2Eff: CreateEffect
+		ValidTargets: Ground, Water
+
+R2FrigateGun:
+	Inherits: 155mm
+	Range: 10c0
+	MinRange: 1c512
+	ReloadDelay: 90
+	Warhead@1Dam: SpreadDamage
+		Damage: 75
+
+R2FrigateCIWS:
+	Inherits: FlakTrackAAGun
+	Range: 7c0
+	ReloadDelay: 15
+	Report: ra2|modern-factions/audio/naval-ciws-burst.wav
+	Warhead@1Dam: SpreadDamage
+		Damage: 22
+
+R2FrigateASW:
+	Inherits: Maverick
+	Range: 6c0
+	ReloadDelay: 90
+	ValidTargets: Underwater
+	Projectile: Bullet
+		Speed: 350
+	Warhead@1Dam: SpreadDamage
+		ValidTargets: Underwater
+		Damage: 45
+
+R2GuardTowerMG:
+	Inherits: M60
+	Range: 6c0
+	Burst: 3
+	BurstDelays: 3
+	ReloadDelay: 22
+	Warhead@1Dam: SpreadDamage
+		Damage: 12
+
+R2PatriotMissile:
+	Inherits: R2AirDefense
+	Range: 14c0
+	MinRange: 2c0
+	Burst: 2
+	BurstDelays: 10
+	ReloadDelay: 160
+	Report: ra2|modern-factions/audio/redsea-interceptor.wav
+	Projectile: Missile
+		RangeLimit: 20c0
+	Warhead@1Dam: SpreadDamage
+		Damage: 60
+
+R2TOWMissile:
+	Inherits: R2SaudiATGM
+	Range: 9c0
+	MinRange: 2c0
+	ReloadDelay: 100
+	Projectile: Missile
+		RangeLimit: 13c0
+	Warhead@1Dam: SpreadDamage
+		Damage: 95

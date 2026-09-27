@@ -5,7 +5,7 @@ ExperienceCatalog:
 		ra2-modern-foundation:
 			Title: RA2 modern faction foundation
 			Description: Native voxel rendering, original material palette and shared modern unit weapons.
-			Effects: Supports the three modern country packs without changing original RA2 actors.
+			Effects: Supports the five modern country packs without changing original RA2 actors.
 			Tradeoffs: Internal dependency; no selectable faction by itself.
 			Scope: Modern country units only.
 			Category: Faction packs
@@ -103,6 +103,64 @@ ExperienceCatalog:
 					Navy: r2poyraz, r2ege, r2marmara, lcrf
 					Buildings: gacnst, gapowr, garefn, gaweap, gapile, gaairc, gayard, gatech, gadept
 					Defenses: r2hisar, r2siper, r2boran
+		ra2-saudi:
+			Title: Saudi Arabia
+			Description: Expeditionary combined arms with JTAC-guided strikes, heavy armor, multirole aircraft and a self-replenishing fleet.
+			Effects: Adds Saudi Arabia to faction selection and the Allies random pool.
+			Tradeoffs: Expensive platforms and slow specialists punish attrition; laser guidance needs a fragile JTAC in sight.
+			Scope: 13 combat/support units and three defenses; shared Allied economy and utilities. Preview balance.
+			Category: Faction packs
+			Version: 1
+			Source: Original OpenRA AI Red Sea meshes, animated native sprites, voxels and bilingual voices
+			License: GPL-3.0-or-later code and original project art
+			Kind: Faction
+			Dependencies: ra2-modern-foundation
+			Rules: ra2|modern-factions/saudi.yaml, ra2|modern-factions/saudi-roster.yaml, ra2|modern-factions/saudi-ai.yaml, ra2|modern-factions/saudi-roles.yaml, ra2|modern-factions/saudi-audio.yaml
+			Sequences: ra2|modern-factions/saudi-sequences.yaml, ra2|modern-factions/saudi-roster-sequences.yaml
+			Voices: ra2|modern-factions/saudi-voices.yaml
+			Weapons: ra2|modern-factions/saudi-weapons.yaml
+			Faction:
+				InternalName: saudi
+				Side: Allies
+				RandomPool: random-allies
+				Doctrine: expeditionary
+				Preview: ra2|modern-factions/previews/saudi.png
+				Roster:
+					Infantry: r2sang, r2saat, r2sajtac, r2falcon, engineer, dog, spy
+					Vehicles: r2m1a2s, r2sads, r2caesar, r2bradley, cmin, amcv
+					Aircraft: r2f15sa, r2ah64sa
+					Navy: r2sadiq, r2riyadh, r2jubail, lcrf
+					Buildings: gacnst, gapowr, garefn, gaweap, gapile, gaairc, gayard, gatech, gadept
+					Defenses: r2saguard, r2sapatriot, r2satow
+		ra2-yemen:
+			Title: Yemen
+			Description: Dispersed coastal defense with camouflaged infantry and positions, guided rockets, technicals, one-way drones and linked boats.
+			Effects: Adds Yemen to faction selection and the Soviets random pool.
+			Tradeoffs: Light, cheap units lose long exposed trades with heavy armor; boats and launchers depend on spotters and surveillance links.
+			Scope: 12 combat/support units and three defenses; shared Soviet economy and utilities. Preview balance.
+			Category: Faction packs
+			Version: 1
+			Source: Original OpenRA AI Red Sea meshes, animated native sprites, voxels and bilingual voices
+			License: GPL-3.0-or-later code and original project art
+			Kind: Faction
+			Dependencies: ra2-modern-foundation
+			Rules: ra2|modern-factions/yemen.yaml, ra2|modern-factions/yemen-roster.yaml, ra2|modern-factions/yemen-ai.yaml, ra2|modern-factions/yemen-roles.yaml, ra2|modern-factions/yemen-audio.yaml
+			Sequences: ra2|modern-factions/yemen-sequences.yaml, ra2|modern-factions/yemen-roster-sequences.yaml
+			Voices: ra2|modern-factions/yemen-voices.yaml
+			Weapons: ra2|modern-factions/yemen-weapons.yaml
+			Faction:
+				InternalName: yemen
+				Side: Soviets
+				RandomPool: random-soviets
+				Doctrine: asymmetric-defense
+				Preview: ra2|modern-factions/previews/yemen.png
+				Roster:
+					Infantry: r2ymr, r2yrpg, r2yspot, r2wadighost, engineer, dog
+					Vehicles: r2technical, r2ytechrr, r2yzu, r2ymlr, htk, harv, smcv
+					Aircraft: r2samad
+					Navy: r2hodeidah, r2sahaab, r2mokha, sapc
+					Buildings: nacnst, napowr, narefn, naweap, nahand, naradr, nayard, natech, nadept
+					Defenses: r2ybunker, r2yzunest, r2ycoastal
 		ra2-combined-arms-ai:
 			Title: Combined-arms AI
 			Preview: ra2|modern-factions/previews/combined-arms-ai.png
@@ -129,8 +187,8 @@ ExperienceCatalog:
 	Profiles:
 		ra2-modern:
 			Title: Red Alert 2 — Modern Factions
-			Description: Three full modern rosters join the original nine countries, with role-based bot armies and the shared AI assistant. Preview balance.
-			Components: ra2-china, ra2-iran, ra2-turkey, ra2-combined-arms-ai
+			Description: Five full modern rosters join the original nine countries, with role-based bot armies and the shared AI assistant. Preview balance.
+			Components: ra2-china, ra2-iran, ra2-turkey, ra2-saudi, ra2-yemen, ra2-combined-arms-ai
 		ra2-original-combined-arms:
 			Title: Red Alert 2 — Original Armies, Smarter Bots
 			Description: Original nine countries and original unit statistics, with role-based bot production and adjustable formations.

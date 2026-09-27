@@ -1,0 +1,61 @@
+R2YemeninfantryVoice:
+	Inherits: ^InfantryDeath
+	DefaultVariant: .wav
+	Voices:
+		Select: ra2|modern-factions/audio/rye-inf-select-ar, ra2|modern-factions/audio/rye-inf-select-en
+		Move: ra2|modern-factions/audio/rye-inf-action-ar, ra2|modern-factions/audio/rye-inf-action-en
+		Attack: ra2|modern-factions/audio/rye-inf-action-ar, ra2|modern-factions/audio/rye-inf-action-en
+		Action: ra2|modern-factions/audio/rye-inf-action-ar, ra2|modern-factions/audio/rye-inf-action-en
+		Die: igidia, igidib, igidic
+
+R2YemenspotterVoice:
+	Inherits: ^InfantryDeath
+	DefaultVariant: .wav
+	Voices:
+		Select: ra2|modern-factions/audio/rye-spot-select-ar, ra2|modern-factions/audio/rye-spot-select-en
+		Move: ra2|modern-factions/audio/rye-inf-action-ar, ra2|modern-factions/audio/rye-inf-action-en
+		Attack: ra2|modern-factions/audio/rye-spot-action-ar, ra2|modern-factions/audio/rye-spot-action-en
+		Action: ra2|modern-factions/audio/rye-spot-action-ar, ra2|modern-factions/audio/rye-spot-action-en
+		Die: igidia, igidib, igidic
+
+R2YemenghostVoice:
+	Inherits: ^InfantryDeath
+	DefaultVariant: .wav
+	Voices:
+		Select: ra2|modern-factions/audio/rye-ghost-select-ar, ra2|modern-factions/audio/rye-ghost-select-en
+		Move: ra2|modern-factions/audio/rye-ghost-move-ar, ra2|modern-factions/audio/rye-ghost-move-en
+		Attack: ra2|modern-factions/audio/rye-ghost-action-ar, ra2|modern-factions/audio/rye-ghost-action-en
+		Action: ra2|modern-factions/audio/rye-ghost-action-ar, ra2|modern-factions/audio/rye-ghost-action-en
+		Demolish: ra2|modern-factions/audio/rye-ghost-action-ar, ra2|modern-factions/audio/rye-ghost-action-en
+		Build: ra2|modern-factions/audio/rye-ghost-build-ar, ra2|modern-factions/audio/rye-ghost-build-en
+		Die: igidia, igidib, igidic
+
+R2YemenvehicleVoice:
+	Inherits: ^InfantryDeath
+	DefaultVariant: .wav
+	Voices:
+		Select: ra2|modern-factions/audio/rye-veh-select-ar, ra2|modern-factions/audio/rye-veh-select-en
+		Move: ra2|modern-factions/audio/rye-veh-action-ar, ra2|modern-factions/audio/rye-veh-action-en
+		Attack: ra2|modern-factions/audio/rye-veh-action-ar, ra2|modern-factions/audio/rye-veh-action-en
+		Action: ra2|modern-factions/audio/rye-veh-action-ar, ra2|modern-factions/audio/rye-veh-action-en
+		Die: igidia, igidib, igidic
+
+R2YemendroneVoice:
+	Inherits: ^InfantryDeath
+	DefaultVariant: .wav
+	Voices:
+		Select: ra2|modern-factions/audio/rye-drone-select-ar, ra2|modern-factions/audio/rye-drone-select-en
+		Move: ra2|modern-factions/audio/rye-drone-action-ar, ra2|modern-factions/audio/rye-drone-action-en
+		Attack: ra2|modern-factions/audio/rye-drone-action-ar, ra2|modern-factions/audio/rye-drone-action-en
+		Action: ra2|modern-factions/audio/rye-drone-action-ar, ra2|modern-factions/audio/rye-drone-action-en
+		Die: igidia, igidib, igidic
+
+R2YemennavalVoice:
+	Inherits: ^InfantryDeath
+	DefaultVariant: .wav
+	Voices:
+		Select: ra2|modern-factions/audio/rye-naval-select-ar, ra2|modern-factions/audio/rye-naval-select-en
+		Move: ra2|modern-factions/audio/rye-naval-action-ar, ra2|modern-factions/audio/rye-naval-action-en
+		Attack: ra2|modern-factions/audio/rye-naval-action-ar, ra2|modern-factions/audio/rye-naval-action-en
+		Action: ra2|modern-factions/audio/rye-naval-action-ar, ra2|modern-factions/audio/rye-naval-action-en
+		Die: igidia, igidib, igidic
