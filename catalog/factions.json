@@ -7,6 +7,11 @@
     "engineCommit": "dde7f13cb1d432a98aa121a5fd8826ff3842bcf0",
     "productCommit": "8fc59f71ab71a5e4834f8476506a65c01d734a05"
   },
+  "links": {
+    "origin": "https://rtsai.net",
+    "faction": "/factions/{factionId}?mode={mode}",
+    "unit": "/units/{unitId}?mode={mode}"
+  },
   "modes": [
     {
       "id": "ra",
