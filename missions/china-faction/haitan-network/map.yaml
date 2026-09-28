@@ -231,6 +231,10 @@ Actors:
 		Location: 76,55
 		Owner: Neutral
 
-Rules: ra|rules/campaign-rules.yaml, ra|rules/campaign-tooltips.yaml, ra|rules/campaign-palettes.yaml, rules.yaml
+Rules: ra|rules/campaign-rules.yaml, ra|rules/campaign-tooltips.yaml, ra|rules/campaign-palettes.yaml, ra|experiences/components/faction-doctrine-contract.yaml, ra|experiences/components/carrier-and-drone-wing.yaml, ra|rules/china.yaml, ra|experiences/factions/china.yaml, rules.yaml
+
+Weapons: ra|weapons/china.yaml
+
+Sequences: ra|sequences/china.yaml
 
 FluentMessages: ra|fluent/lua.ftl, ra|fluent/campaign.ftl, map.ftl

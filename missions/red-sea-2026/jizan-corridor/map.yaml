@@ -200,6 +200,10 @@ Actors:
 		Location: 74,22
 		Owner: Neutral
 
-Rules: ra|rules/campaign-rules.yaml, ra|rules/campaign-tooltips.yaml, ra|rules/campaign-palettes.yaml, rules.yaml
+Rules: ra|rules/campaign-rules.yaml, ra|rules/campaign-tooltips.yaml, ra|rules/campaign-palettes.yaml, ra|experiences/components/faction-doctrine-contract.yaml, ra|rules/red-sea.yaml, ra|rules/naval-systems.yaml, ra|experiences/factions/saudi-arabia.yaml, ra|experiences/factions/yemen.yaml, rules.yaml
+
+Weapons: ra|weapons/red-sea.yaml, ra|weapons/naval-systems.yaml
+
+Sequences: ra|sequences/red-sea.yaml, ra|sequences/naval-systems.yaml
 
 FluentMessages: ra|fluent/lua.ftl, ra|fluent/campaign.ftl, map.ftl
