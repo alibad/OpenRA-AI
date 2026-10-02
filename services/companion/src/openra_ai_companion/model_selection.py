@@ -55,8 +55,21 @@ class Hardware:
         return max(0, min(self.total_bytes - 4 * GIB, self.available_bytes - 2 * GIB, 8 * GIB))
 
 
+def is_hosted_brain(profile: dict) -> bool:
+    """A voice-only profile: the thinking runs on the hosted proxy, speech stays local."""
+    return profile.get("brain") == "hosted"
+
+
+def voice_only_profile(manifest: dict) -> dict:
+    for profile in manifest.get("model_profiles", []):
+        if is_hosted_brain(profile) and profile.get("validated") is True:
+            return dict(profile)
+    return {}
+
+
 def choose_profile(manifest: dict, hardware: Hardware, preference: str = "auto") -> dict:
-    profiles = manifest.get("model_profiles", [])
+    # Voice-only profiles are chosen by the hosted mode, never as a local brain.
+    profiles = [profile for profile in manifest.get("model_profiles", []) if not is_hosted_brain(profile)]
     if not profiles:
         return {}
     eligible = [profile for profile in profiles if profile.get("validated") is True]
@@ -113,6 +126,10 @@ def validate_profiles(manifest: dict) -> None:
             raise ValueError("Invalid model profile component references")
         seen.add(profile["id"])
         destinations = {entry["destination"] for entry in entries if entry["id"] in profile["components"]}
+        if is_hosted_brain(profile):
+            if profile.get("model") or profile.get("projector") or profile["memory_bytes"] <= 0:
+                raise ValueError("A hosted-brain profile carries voice models only")
+            continue
         if profile["model"] not in destinations or (profile.get("projector") and profile["projector"] not in destinations):
             raise ValueError("Invalid model profile paths")
         if not 512 <= profile["context_length"] <= 8192 or profile["memory_bytes"] <= 0:

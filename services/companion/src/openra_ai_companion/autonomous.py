@@ -16,6 +16,7 @@ from agents.mcp import MCPServerStdio
 
 from .agent_models import (
     LOCAL_MODEL,
+    GATEWAY_PROVIDERS,
     LOCAL_PROVIDER,
     LOCAL_ROUTER_URL,
     agent_model_settings,
@@ -630,7 +631,7 @@ async def autoplay(
     reuse_engine: bool = False,
 ) -> AutoplayResult:
     provider = provider.strip().lower()
-    if provider != LOCAL_PROVIDER:
+    if provider not in GATEWAY_PROVIDERS:
         _reuse_project_key()
         os.environ.setdefault("OPENAI_AGENTS_DONT_LOG_MODEL_DATA", "1")
         os.environ.setdefault("OPENAI_AGENTS_DONT_LOG_TOOL_DATA", "1")
@@ -714,6 +715,7 @@ async def autoplay(
                     # with enough headroom for the complete prompt.
                     max_tokens=LOCAL_AUTOPLAY_MAX_TOKENS if model_runtime.local else 1800,
                     reasoning_effort="medium",
+                    gateway=model_runtime.gateway,
                 ),
             )
 

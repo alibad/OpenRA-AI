@@ -17,10 +17,20 @@ import urllib.error
 import urllib.request
 import wave
 from ctypes import wintypes
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, replace
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
+
+from .hosted_gateway import (
+    DEFAULT_HOSTED_ENDPOINT,
+    FALLBACK_STATES,
+    HOSTED_MODEL,
+    HostedClient,
+    hosted_endpoint,
+    prepare_hosted_body,
+    prepare_local_body,
+)
 
 
 LOCAL_CHAT_PORT = int(os.environ.get("OPENRA_AI_LOCAL_CHAT_PORT", "4001"))
@@ -91,6 +101,9 @@ def unprotect_secret(value: str) -> str:
         del source_buffer
 
 
+AI_MODES = ("local", "external", "hosted")
+
+
 @dataclass(frozen=True)
 class RuntimeConfig:
     mode: str = "local"
@@ -101,6 +114,9 @@ class RuntimeConfig:
     transcribe_model: str = "whisper-1"
     speech_model: str = "gpt-4o-mini-tts"
     speech_voice: str = "alloy"
+    # Hosted mode: the rtsai.net proxy and its DPAPI-protected install token.
+    hosted_endpoint: str = DEFAULT_HOSTED_ENDPOINT
+    protected_install_token: str = ""
 
     @classmethod
     def load(cls, path: Path | None = None) -> "RuntimeConfig":
@@ -111,9 +127,13 @@ class RuntimeConfig:
         allowed = set(cls.__dataclass_fields__)
         return cls(**{key: value[key] for key in allowed if key in value}).validated()
 
+    @classmethod
+    def exists(cls, path: Path | None = None) -> bool:
+        return (path or provider_config_path()).is_file()
+
     def validated(self) -> "RuntimeConfig":
-        if self.mode not in {"local", "external"}:
-            raise ValueError("AI mode must be local or external")
+        if self.mode not in AI_MODES:
+            raise ValueError("AI mode must be local, external, or hosted")
         endpoint = self.endpoint.rstrip("/")
         if self.mode == "external" and not endpoint.startswith(("http://", "https://")):
             raise ValueError("External AI endpoint must be an absolute HTTP(S) URL")
@@ -132,6 +152,14 @@ class RuntimeConfig:
     def api_key(self) -> str:
         return unprotect_secret(self.protected_api_key)
 
+    @property
+    def install_token(self) -> str:
+        try:
+            return unprotect_secret(self.protected_install_token)
+        except (ValueError, OSError):
+            # A token encrypted for another Windows user is useless here; re-register.
+            return ""
+
 
 def _merge_companion_settings(config: RuntimeConfig) -> None:
     path = companion_settings_path()
@@ -142,15 +170,26 @@ def _merge_companion_settings(config: RuntimeConfig) -> None:
     if not isinstance(settings, dict):
         settings = {}
     local = config.mode == "local"
-    settings.update({
-        "router_url": f"http://127.0.0.1:{DEFAULT_PORT}",
-        "model_provider": "local" if local else "custom",
-        "text_model": "local-coder" if local else config.text_model,
-        "vision_model": "local-coder" if local else config.vision_model,
-        "transcribe_model": "local-whisper" if local else config.transcribe_model,
-        "speech_model": "local-kokoro" if local else config.speech_model,
-        "speech_voice": "alloy" if local else config.speech_voice,
-    })
+    if config.mode == "hosted":
+        settings.update({
+            "router_url": f"http://127.0.0.1:{DEFAULT_PORT}",
+            "model_provider": "hosted",
+            "text_model": HOSTED_MODEL,
+            "vision_model": HOSTED_MODEL,
+            "transcribe_model": "local-whisper",
+            "speech_model": "local-kokoro",
+            "speech_voice": "alloy",
+        })
+    else:
+        settings.update({
+            "router_url": f"http://127.0.0.1:{DEFAULT_PORT}",
+            "model_provider": "local" if local else "custom",
+            "text_model": "local-coder" if local else config.text_model,
+            "vision_model": "local-coder" if local else config.vision_model,
+            "transcribe_model": "local-whisper" if local else config.transcribe_model,
+            "speech_model": "local-kokoro" if local else config.speech_model,
+            "speech_voice": "alloy" if local else config.speech_voice,
+        })
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(settings, indent=2) + "\n", encoding="utf-8")
 
@@ -162,45 +201,105 @@ class RuntimeProcesses:
         self.runtime_root = runtime_root or install_root / "ai" / "runtime"
         self.children: list[subprocess.Popen] = []
         self.profile = profile or {}
+        self._chat_process: subprocess.Popen | None = None
+        self._lock = threading.Lock()
 
-    def start(self) -> None:
-        if self.config.mode != "local":
-            return
+    def _paths(self) -> dict[str, Path | None]:
         ai_root = self.install_root / "ai"
         executable_suffix = ".exe" if os.name == "nt" else ""
-        llama = self.runtime_root / "llama" / f"llama-server{executable_suffix}"
-        whisper = self.runtime_root / "whisper" / f"whisper-server{executable_suffix}"
-        model = ai_root / self.profile.get("model", "models/llm/Qwen3VL-2B-Instruct-Q4_K_M.gguf")
+        model = self.profile.get("model", "models/llm/Qwen3VL-2B-Instruct-Q4_K_M.gguf") if self.profile else "models/llm/Qwen3VL-2B-Instruct-Q4_K_M.gguf"
         projector_path = self.profile.get("projector") if self.profile else "models/llm/mmproj-Qwen3VL-2B-Instruct-Q8_0.gguf"
-        projector = ai_root / projector_path if projector_path else None
-        whisper_model = ai_root / "models" / "stt" / "ggml-base.en.bin"
-        missing = [path for path in (llama, whisper, model, projector, whisper_model) if path and not path.is_file()]
+        return {
+            "llama": self.runtime_root / "llama" / f"llama-server{executable_suffix}",
+            "whisper": self.runtime_root / "whisper" / f"whisper-server{executable_suffix}",
+            "model": ai_root / model if model else None,
+            "projector": ai_root / projector_path if projector_path else None,
+            "whisper_model": ai_root / "models" / "stt" / "ggml-base.en.bin",
+        }
+
+    @property
+    def local_chat_installed(self) -> bool:
+        paths = self._paths()
+        return all(path is not None and path.is_file() for path in (paths["llama"], paths["model"])) and (
+            paths["projector"] is None or paths["projector"].is_file()
+        )
+
+    @property
+    def local_vision(self) -> bool:
+        return self._paths()["projector"] is not None
+
+    @property
+    def voice_installed(self) -> bool:
+        paths = self._paths()
+        return bool(paths["whisper"] and paths["whisper"].is_file() and paths["whisper_model"] and paths["whisper_model"].is_file())
+
+    def _chat_command(self) -> tuple[list[str], Path]:
+        paths = self._paths()
+        llama, model, projector = paths["llama"], paths["model"], paths["projector"]
+        assert llama is not None and model is not None
+        return [
+            str(llama), "--model", str(model),
+            *(["--mmproj", str(projector)] if projector else []),
+            "--host", "127.0.0.1", "--port", str(LOCAL_CHAT_PORT),
+            "--ctx-size", str(self.profile.get("context_length") or 8192),
+            "--threads", str(max(1, min(4, (os.cpu_count() or 4) // 2))),
+            "--threads-batch", str(max(1, min(4, (os.cpu_count() or 4) // 2))),
+            "--alias", "local-coder",
+            "--parallel", "1",
+            "--chat-template-kwargs", '{"enable_thinking":false}',
+            "--jinja", "--no-webui",
+        ], llama.parent
+
+    def _whisper_command(self) -> tuple[list[str], Path]:
+        paths = self._paths()
+        whisper, whisper_model = paths["whisper"], paths["whisper_model"]
+        assert whisper is not None and whisper_model is not None
+        return [
+            str(whisper), "--model", str(whisper_model), "--host", "127.0.0.1",
+            "--port", str(LOCAL_TRANSCRIBE_PORT), "--language", "en",
+            *(["--no-gpu"] if os.name == "nt" else []),
+        ], whisper.parent
+
+    def start(self) -> None:
+        if self.config.mode == "hosted":
+            # Hosted thinking needs no local model in memory. Speech recognition
+            # starts when the voice pack is installed; the local chat model only
+            # starts on demand as a fallback (start_local_chat).
+            if self.voice_installed:
+                command, cwd = self._whisper_command()
+                self.children.append(subprocess.Popen(command, cwd=cwd, creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0)))
+            return
+        if self.config.mode != "local":
+            return
+        paths = self._paths()
+        missing = [path for path in (paths["llama"], paths["whisper"], paths["model"], paths["projector"], paths["whisper_model"])
+                   if path and not path.is_file()]
         if missing:
             raise FileNotFoundError("Local AI is selected but its payload is incomplete: " + ", ".join(str(p) for p in missing))
 
         creation_flags = getattr(subprocess, "CREATE_NO_WINDOW", 0)
         try:
-            self.children.append(subprocess.Popen([
-                str(llama), "--model", str(model),
-                *(["--mmproj", str(projector)] if projector else []),
-                "--host", "127.0.0.1", "--port", str(LOCAL_CHAT_PORT),
-                "--ctx-size", str(self.profile.get("context_length", 8192)),
-                "--threads", str(max(1, min(4, (os.cpu_count() or 4) // 2))),
-                "--threads-batch", str(max(1, min(4, (os.cpu_count() or 4) // 2))),
-                "--alias", "local-coder",
-                "--parallel", "1",
-                "--chat-template-kwargs", '{"enable_thinking":false}',
-                "--jinja", "--no-webui",
-            ], cwd=llama.parent, creationflags=creation_flags))
-            self.children.append(subprocess.Popen([
-                str(whisper), "--model", str(whisper_model), "--host", "127.0.0.1",
-                "--port", str(LOCAL_TRANSCRIBE_PORT), "--language", "en",
-                *(["--no-gpu"] if os.name == "nt" else []),
-            ], cwd=whisper.parent, creationflags=creation_flags))
+            command, cwd = self._chat_command()
+            self._chat_process = subprocess.Popen(command, cwd=cwd, creationflags=creation_flags)
+            self.children.append(self._chat_process)
+            command, cwd = self._whisper_command()
+            self.children.append(subprocess.Popen(command, cwd=cwd, creationflags=creation_flags))
             self._wait_until_ready()
         except Exception:
             self.stop()
             raise
+
+    def start_local_chat(self) -> bool:
+        """Start the installed local model as the hosted fallback. Returns False when it is not installed."""
+        with self._lock:
+            if self._chat_process is not None and self._chat_process.poll() is None:
+                return True
+            if not self.local_chat_installed:
+                return False
+            command, cwd = self._chat_command()
+            self._chat_process = subprocess.Popen(command, cwd=cwd, creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0))
+            self.children.append(self._chat_process)
+            return True
 
     def _wait_until_ready(self) -> None:
         urls = (
@@ -258,13 +357,59 @@ def _pid_alive(pid: int) -> bool:
 class GatewayServer(ThreadingHTTPServer):
     daemon_threads = True
 
-    def __init__(self, address: tuple[str, int], install_root: Path, config: RuntimeConfig, profile: dict | None = None):
+    def __init__(
+        self,
+        address: tuple[str, int],
+        install_root: Path,
+        config: RuntimeConfig,
+        profile: dict | None = None,
+        processes: RuntimeProcesses | None = None,
+        config_path: Path | None = None,
+    ):
         super().__init__(address, GatewayHandler)
         self.install_root = install_root
         self.config = config
         self.profile = profile or {}
+        self.processes = processes or RuntimeProcesses(install_root, config, profile=self.profile)
+        self.config_path = config_path or provider_config_path()
         self._kokoro = None
         self._tts_lock = threading.Lock()
+        self._chat_health = (0.0, False)
+        self.hosted = (
+            HostedClient(hosted_endpoint(config.hosted_endpoint), self._load_install_token, self._save_install_token)
+            if config.mode == "hosted" else None
+        )
+
+    def _load_install_token(self) -> str:
+        if RuntimeConfig.exists(self.config_path):
+            return RuntimeConfig.load(self.config_path).install_token
+        return self.config.install_token
+
+    def _save_install_token(self, token: str) -> None:
+        """Persist the install token under DPAPI without touching the rest of provider.json."""
+        if RuntimeConfig.exists(self.config_path):
+            current = RuntimeConfig.load(self.config_path)
+        else:
+            current = replace(self.config, mode="hosted")
+        replace(current, protected_install_token=protect_secret(token)).save(self.config_path)
+
+    def local_chat_ready(self) -> bool:
+        checked_at, ready = self._chat_health
+        if time.monotonic() - checked_at < 2.0:
+            return ready
+        try:
+            with urllib.request.urlopen(f"http://127.0.0.1:{LOCAL_CHAT_PORT}/health", timeout=0.5) as response:
+                ready = response.status < 500
+        except (OSError, TimeoutError, urllib.error.URLError):
+            ready = False
+        self._chat_health = (time.monotonic(), ready)
+        return ready
+
+    def local_fallback(self) -> bool:
+        """True when the installed local model can answer now; starts it on first need."""
+        if not self.processes.start_local_chat():
+            return False
+        return self.local_chat_ready()
 
     def speech(self, text: str, voice: str) -> bytes:
         ai_root = self.install_root / "ai"
@@ -298,10 +443,12 @@ class GatewayHandler(BaseHTTPRequestHandler):
     def log_message(self, format: str, *args) -> None:
         print("local-ai: " + format % args, flush=True)
 
-    def _write(self, status: int, payload: bytes, content_type: str) -> None:
+    def _write(self, status: int, payload: bytes, content_type: str, headers: dict[str, str] | None = None) -> None:
         self.send_response(status)
         self.send_header("Content-Type", content_type)
         self.send_header("Content-Length", str(len(payload)))
+        for name, value in (headers or {}).items():
+            self.send_header(name, value)
         self.end_headers()
         self.wfile.write(payload)
 
@@ -310,7 +457,37 @@ class GatewayHandler(BaseHTTPRequestHandler):
 
     def do_GET(self) -> None:
         if self.path == "/health/liveliness":
-            self._json(HTTPStatus.OK, {"status": "ok", "mode": self.server.config.mode})
+            health = {"status": "ok", "mode": self.server.config.mode}
+            if self.server.hosted:
+                health["hosted"] = self.server.hosted.state()
+            self._json(HTTPStatus.OK, health)
+            return
+        if self.path == "/v1/hosted/status" and self.server.hosted:
+            status = self.server.hosted.refresh_status()
+            status["voice_installed"] = self.server.processes.voice_installed
+            status["local_fallback_installed"] = self.server.processes.local_chat_installed
+            self._json(HTTPStatus.OK, status)
+            return
+        if self.path == "/v1/model/info" and self.server.hosted:
+            local_api = f"http://127.0.0.1:{LOCAL_TRANSCRIBE_PORT}"
+            self._json(HTTPStatus.OK, {"data": [
+                {
+                    "model_name": HOSTED_MODEL,
+                    "litellm_params": {"model": HOSTED_MODEL, "api_base": self.server.hosted.endpoint},
+                    "model_info": {"mode": "chat", "litellm_provider": "anthropic",
+                                   "display_name": "Claude Haiku 4.5 (RTS AI hosted)", "supports_vision": True},
+                },
+                {
+                    "model_name": "local-whisper",
+                    "litellm_params": {"model": "local-whisper", "api_base": local_api},
+                    "model_info": {"mode": "audio_transcription", "litellm_provider": "local", "supports_vision": False},
+                },
+                {
+                    "model_name": "local-kokoro",
+                    "litellm_params": {"model": "local-kokoro", "api_base": local_api},
+                    "model_info": {"mode": "audio_speech", "litellm_provider": "local", "supports_vision": False},
+                },
+            ]})
             return
         if self.path == "/v1/model/info":
             local = self.server.config.mode == "local"
@@ -339,6 +516,14 @@ class GatewayHandler(BaseHTTPRequestHandler):
         try:
             if self.server.config.mode == "external":
                 self._proxy(self._external_url(self.path), body, self.headers.get("Content-Type", "application/json"))
+            elif self.path == "/v1/chat/completions" and self.server.hosted:
+                self._hosted_chat(body)
+            elif (self.path in {"/v1/audio/transcriptions", "/v1/audio/speech"} and self.server.hosted
+                  and not self.server.processes.voice_installed):
+                self._json(HTTPStatus.SERVICE_UNAVAILABLE, {
+                    "error": "voice_pack_missing",
+                    "detail": "Install the voice pack (about 270 MB) to talk to the co-commander.",
+                })
             elif self.path == "/v1/chat/completions":
                 request = json.loads(body)
                 has_images = any(isinstance(message.get("content"), list) and
@@ -360,8 +545,45 @@ class GatewayHandler(BaseHTTPRequestHandler):
                 self._write(HTTPStatus.OK, audio, "audio/wav")
             else:
                 self._json(HTTPStatus.NOT_FOUND, {"error": "not_found"})
+        except FileNotFoundError as exc:
+            self._json(HTTPStatus.SERVICE_UNAVAILABLE, {"error": "voice_pack_missing", "detail": str(exc)[:500]})
         except (OSError, ValueError, json.JSONDecodeError, urllib.error.URLError) as exc:
             self._json(HTTPStatus.BAD_GATEWAY, {"error": "local_ai_runtime", "detail": str(exc)[:500]})
+
+    def _hosted_chat(self, body: bytes) -> None:
+        """Hosted brain with graceful degradation: the local model if installed, else a clear error.
+
+        The companion turns an error into deterministic alert lines and reads
+        X-RTSAI-AI-State / X-RTSAI-AI-Route to tell the player what happened.
+        """
+        hosted = self.server.hosted
+        assert hosted is not None
+        try:
+            hosted_body = prepare_hosted_body(body)
+        except (ValueError, AttributeError):
+            self._json(HTTPStatus.BAD_REQUEST, {"error": {"code": "invalid_json", "message": "Request body is not JSON"}})
+            return
+        reply = hosted.chat(hosted_body)
+        if reply.state in FALLBACK_STATES:
+            if self.server.local_fallback():
+                hosted.set_route("local-fallback")
+                try:
+                    self._proxy(
+                        f"http://127.0.0.1:{LOCAL_CHAT_PORT}/v1/chat/completions",
+                        prepare_local_body(body, vision=self.server.processes.local_vision),
+                        "application/json",
+                        {"X-RTSAI-AI-Route": "local-fallback", "X-RTSAI-AI-State": reply.state},
+                    )
+                    return
+                except (OSError, urllib.error.URLError):
+                    pass
+            hosted.set_route("none")
+            self._write(reply.status, reply.payload, reply.content_type,
+                        {"X-RTSAI-AI-Route": "none", "X-RTSAI-AI-State": reply.state, **reply.headers})
+            return
+        hosted.set_route("hosted")
+        self._write(reply.status, reply.payload, reply.content_type,
+                    {"X-RTSAI-AI-Route": "hosted", "X-RTSAI-AI-State": reply.state, **reply.headers})
 
     def _external_url(self, path: str) -> str:
         base = self.server.config.endpoint.rstrip("/")
@@ -369,7 +591,7 @@ class GatewayHandler(BaseHTTPRequestHandler):
             return base + path[len("/v1"):]
         return base + path
 
-    def _proxy(self, url: str, body: bytes, content_type: str) -> None:
+    def _proxy(self, url: str, body: bytes, content_type: str, extra_headers: dict[str, str] | None = None) -> None:
         headers = {"Content-Type": content_type, "Accept": self.headers.get("Accept", "application/json")}
         if self.server.config.mode == "external" and self.server.config.api_key:
             headers["Authorization"] = "Bearer " + self.server.config.api_key
@@ -377,9 +599,9 @@ class GatewayHandler(BaseHTTPRequestHandler):
         try:
             with urllib.request.urlopen(request, timeout=120) as response:
                 payload = response.read()
-                self._write(response.status, payload, response.headers.get("Content-Type", "application/json"))
+                self._write(response.status, payload, response.headers.get("Content-Type", "application/json"), extra_headers)
         except urllib.error.HTTPError as exc:
-            self._write(exc.code, exc.read(), exc.headers.get("Content-Type", "application/json"))
+            self._write(exc.code, exc.read(), exc.headers.get("Content-Type", "application/json"), extra_headers)
 
 
 def configure(args: argparse.Namespace) -> int:
@@ -398,8 +620,9 @@ def configure(args: argparse.Namespace) -> int:
         key = key_path.read_text(encoding="utf-8").strip()
         key_path.unlink(missing_ok=True)
     mode = values.get("mode")
-    if mode not in {"local", "external"}:
-        raise ValueError("Choose local or external AI mode")
+    if mode not in AI_MODES:
+        raise ValueError("Choose local, external, or hosted AI mode")
+    previous = RuntimeConfig.load() if RuntimeConfig.exists() else RuntimeConfig()
     config = RuntimeConfig(
         mode=mode,
         endpoint=values.get("endpoint") or "https://api.openai.com/v1",
@@ -409,6 +632,9 @@ def configure(args: argparse.Namespace) -> int:
         transcribe_model=values.get("transcribe_model") or "whisper-1",
         speech_model=values.get("speech_model") or "gpt-4o-mini-tts",
         speech_voice=values.get("speech_voice") or "alloy",
+        hosted_endpoint=values.get("hosted_endpoint") or previous.hosted_endpoint,
+        # Re-running setup keeps this install's identity and allowance.
+        protected_install_token=previous.protected_install_token,
     ).validated()
     config.save()
     _merge_companion_settings(config)
@@ -416,15 +642,29 @@ def configure(args: argparse.Namespace) -> int:
     return 0
 
 
+def runtime_config_for(mode: str | None, path: Path | None = None) -> RuntimeConfig:
+    """The saved provider configuration with --mode applied.
+
+    Earlier builds replaced the whole configuration with RuntimeConfig(mode=...),
+    which dropped the External endpoint and key the installer had saved.
+    """
+    config = RuntimeConfig.load(path)
+    return replace(config, mode=mode).validated() if mode else config
+
+
 def serve_runtime(args: argparse.Namespace) -> int:
     install_root = Path(args.root).resolve()
-    config = RuntimeConfig(mode=args.mode) if args.mode else RuntimeConfig.load()
+    config = runtime_config_for(args.mode)
     runtime_root = Path(args.runtime_root).resolve() if args.runtime_root else None
     profile = json.loads(getattr(args, "model_profile", "{}"))
     processes = RuntimeProcesses(install_root, config, runtime_root, profile)
     processes.start()
     atexit.register(processes.stop)
-    server = GatewayServer((args.host, args.port), install_root, config, profile)
+    server = GatewayServer((args.host, args.port), install_root, config, profile, processes)
+    if server.hosted:
+        # Register (zero-click) and read the allowance in the background so the
+        # first question does not wait for the install round trip.
+        threading.Thread(target=server.hosted.refresh_status, name="rtsai-hosted-register", daemon=True).start()
 
     if args.parent_pid:
         def watch_parent() -> None:
@@ -451,13 +691,14 @@ def parser() -> argparse.ArgumentParser:
     serve = commands.add_parser("serve")
     serve.add_argument("--root", required=True)
     serve.add_argument("--runtime-root")
-    serve.add_argument("--mode", choices=("local", "external"))
+    serve.add_argument("--mode", choices=AI_MODES)
     serve.add_argument("--host", default="127.0.0.1")
     serve.add_argument("--port", type=int, default=DEFAULT_PORT)
     serve.add_argument("--parent-pid", type=int, default=0)
     serve.add_argument("--model-profile", default="{}")
     config = commands.add_parser("configure")
-    config.add_argument("--mode", choices=("local", "external"))
+    config.add_argument("--mode", choices=AI_MODES)
+    config.add_argument("--hosted-endpoint", default="")
     config.add_argument("--input-ini")
     config.add_argument("--endpoint", default="https://api.openai.com/v1")
     config.add_argument("--key-file")

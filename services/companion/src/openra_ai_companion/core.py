@@ -49,6 +49,7 @@ from .strategy_contracts import (
 )
 from . import nl_orders
 from .tactical_vision import tactical_overview_png
+from .vision_budget import fit_images
 from .threats import assess_threat
 
 SYSTEM_PROMPT = """You are a calm battlefield companion inside OpenRA, a classic RTS.
@@ -228,6 +229,35 @@ def _storage_needs_silo(snapshot: GameSnapshot) -> bool:
     )
 
 
+# HUD wording for the hosted brain's degraded states (see hosted_gateway.py).
+HOSTED_REASONS = {
+    "allowance": "DAILY HOSTED ALLOWANCE USED, RESETS 00:00 UTC",
+    "offline": "HOSTED AI UNREACHABLE",
+    "gateway_unreachable": "AI GATEWAY NOT RUNNING",
+    "paused": "HOSTED AI PAUSED",
+    "budget": "HOSTED AI AT CAPACITY TODAY",
+    "rate_limited": "HOSTED AI BUSY, RETRYING SHORTLY",
+    "unauthorized": "RECONNECTING TO RTS AI",
+    "unavailable": "HOSTED AI UNAVAILABLE",
+    "upstream": "HOSTED AI UNAVAILABLE",
+}
+HOSTED_SPOKEN = {
+    "allowance": "Today's free hosted AI allowance is used up; it resets at midnight UTC. Critical alerts continue.",
+    "offline": "I can't reach the RTS AI service right now. Critical alerts continue.",
+    "gateway_unreachable": "The local AI gateway isn't running. Critical alerts continue.",
+    "paused": "Hosted AI is paused right now. Critical alerts continue.",
+    "budget": "Hosted AI is at capacity for today. Critical alerts continue.",
+    "rate_limited": "That's a lot of questions in one minute. Give me a moment and ask again.",
+    "unauthorized": "I'm reconnecting to RTS AI. Critical alerts continue.",
+    "unavailable": "Hosted AI is briefly unavailable. Critical alerts continue.",
+    "upstream": "Hosted AI is briefly unavailable. Critical alerts continue.",
+}
+
+
+def _unavailable_text(exc: RouterError, default: str) -> str:
+    return HOSTED_SPOKEN.get(getattr(exc, "state", ""), default)
+
+
 class Companion:
     def __init__(
         self,
@@ -395,7 +425,43 @@ class Companion:
             return f"auto-active:{self.native_profile}", f"AUTO ASSISTANT ON  •  {name}  •  {profile} NATIVE BRAIN"
         if self.muted:
             return "muted", "AI VOICE OFF  •  TEXT INSIGHTS STAY ON"
+        service = self.ai_service_status()
+        if service["degraded"]:
+            # The state code stays ready:<profile> so OpenRA keeps AUTO semantics; only the line changes.
+            return f"ready:{self.native_profile}", service["hud"]
         return f"ready:{self.native_profile}", "AI READY  •  HOLD ASK KEY TO SPEAK OR SET STRATEGY"
+
+    def ai_service_status(self) -> dict:
+        """Where the co-commander's thinking currently runs, for the HUD and /v1/state."""
+        reader = getattr(self.router, "service_state", None)
+        service = reader() if callable(reader) else {}
+        route = str(service.get("route") or "")
+        state = str(service.get("state") or "")
+        provider = str(getattr(getattr(self.router, "settings", None), "model_provider", ""))
+        hosted = provider == "hosted"
+        degraded = hosted and (route in {"local-fallback", "none"} or state == "gateway_unreachable")
+        reason = HOSTED_REASONS.get(state, "HOSTED AI UNAVAILABLE")
+        if not degraded:
+            hud = ""
+        elif route == "local-fallback":
+            hud = f"AI READY  •  LOCAL MODEL STANDING IN: {reason}"
+        else:
+            hud = f"AI ALERTS ONLY  •  {reason}"
+        return {
+            "provider": provider,
+            "route": route or ("hosted" if hosted else "direct"),
+            "state": state or "unknown",
+            "degraded": degraded,
+            "hud": hud,
+            "detail": service.get("detail", ""),
+            "remaining_usd": service.get("remaining_usd"),
+            "llm_auto_planner": self.llm_auto_planner_allowed,
+        }
+
+    @property
+    def llm_auto_planner_allowed(self) -> bool:
+        """AUTO's periodic MCP planning loop is too costly for the shared hosted allowance."""
+        return getattr(getattr(self.router, "settings", None), "model_provider", "") != "hosted"
 
     def update_snapshot(self, snapshot: GameSnapshot) -> ThreatAssessment:
         previous = self.latest_snapshot
@@ -488,7 +554,8 @@ class Companion:
                 "height": snapshot.map_height,
                 "scope": "full-map-tactical-overview-fog-respecting",
             })
-        return images, views
+        # Two images, about 300 KB in total: bounded cost and latency on every route.
+        return fit_images(images, views)
 
     def _render_insight(
         self,
@@ -660,7 +727,13 @@ class Companion:
                 text = nl_orders.status_line(snapshot)
             response = CompanionResponse(text, "ai-layer", utterance_id=generation, latency_ms=result.latency_ms, metadata=metadata)
         except RouterError as exc:
-            response = CompanionResponse("The AI router is unavailable; I can still watch for critical deterministic alerts.", "deterministic-fallback", utterance_id=generation, latency_ms=round((time.perf_counter() - started) * 1000), metadata={"degraded": True, "reason": str(exc)})
+            response = CompanionResponse(
+                _unavailable_text(exc, "The AI router is unavailable; I can still watch for critical deterministic alerts."),
+                "deterministic-fallback",
+                utterance_id=generation,
+                latency_ms=round((time.perf_counter() - started) * 1000),
+                metadata={"degraded": True, "reason": str(exc), "ai_state": getattr(exc, "state", "")},
+            )
         if self._interrupted(generation):
             response.text = ""
             response.interrupted = True
@@ -1383,7 +1456,7 @@ class Companion:
                         self._pending_action = proposal
                     else:
                         return None
-            elif self.pending_action() is None:
+            elif self.pending_action() is None and self.llm_auto_planner_allowed:
                 instruction = AUTO_ACTION_INSTRUCTION
                 if event_context:
                     instruction += (
@@ -1396,6 +1469,10 @@ class Companion:
                     # AUTO reevaluates frequently. A stale or temporarily impossible model plan is
                     # not useful player-facing advice and must not pollute the tactical feed.
                     return None
+            elif self.pending_action() is None:
+                # Hosted mode: deterministic tactical and scripted-mission steps
+                # above still run, but the periodic LLM/MCP planner never does.
+                return None
         receipt = self.confirm_action()
         receipt.metadata["auto_act"] = True
         if receipt.metadata.get("action", {}).get("state") == "executed":
@@ -1914,7 +1991,7 @@ class Companion:
             result = request()
         except RouterError as exc:
             return CompanionResponse(
-                "The AI router is unavailable, so I couldn't interpret that order; nothing was created.",
+                _unavailable_text(exc, "The AI router is unavailable, so I couldn't interpret that order; nothing was created."),
                 "deterministic-fallback",
                 latency_ms=round((time.perf_counter() - started) * 1000),
                 metadata={"degraded": True, "reason": str(exc), "action": {"state": "not_created"}},
@@ -2187,7 +2264,7 @@ class Companion:
             except RouterError as exc:
                 reason = planner_error or str(exc)
                 return CompanionResponse(
-                    "The AI router is unavailable; no action was created.",
+                    _unavailable_text(exc, "The AI router is unavailable; no action was created."),
                     "deterministic-fallback",
                     utterance_id=generation,
                     latency_ms=round((time.perf_counter() - started) * 1000),
@@ -2567,5 +2644,6 @@ class Companion:
                 "last_frame_error": self._last_vision_error,
             },
             "router": self.router.health(),
+            "ai_service": self.ai_service_status(),
             "usage": self.router.usage_summary(),
         }

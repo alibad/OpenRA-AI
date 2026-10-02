@@ -13,11 +13,19 @@ import uuid
 import wave
 from dataclasses import dataclass, replace
 
-from .settings import Settings
+from .settings import HOSTED_MODEL, Settings
+
+# The hosted proxy accepts two inline images per call (viewport + tactical overview).
+MAX_IMAGES = 2
 
 
 class RouterError(RuntimeError):
-    pass
+    def __init__(self, message: str, *, status: int = 0, state: str = "", route: str = ""):
+        super().__init__(message)
+        self.status = status
+        # Hosted-gateway classification (ok, allowance, offline, paused, budget, ...).
+        self.state = state
+        self.route = route
 
 
 @dataclass(frozen=True)
@@ -42,6 +50,22 @@ class AIRouter:
         self._output_tokens = 0
         self._speech_characters = 0
         self._transcription_seconds = 0.0
+        self._service_lock = threading.Lock()
+        self._service: dict[str, object] = {"route": "", "state": "", "detail": "", "remaining_usd": None, "updated_at": 0.0}
+
+    def service_state(self) -> dict[str, object]:
+        """Where the brain was served last time: hosted, local-fallback, or none (alerts only)."""
+        with self._service_lock:
+            return dict(self._service)
+
+    def _record_service(self, route: str, state: str, detail: str = "", remaining: str | None = None) -> None:
+        with self._service_lock:
+            self._service.update({"route": route, "state": state, "detail": detail[:200], "updated_at": time.time()})
+            if remaining:
+                try:
+                    self._service["remaining_usd"] = float(remaining)
+                except ValueError:
+                    pass
 
     def configure(self, values: dict, *, persist: bool = True) -> dict[str, str | float | bool]:
         self.settings = self.settings.with_updates(values)
@@ -60,15 +84,33 @@ class AIRouter:
             headers={"Content-Type": content_type, "Accept": "application/json, audio/wav"},
             method="POST",
         )
+        brain = path == "/v1/chat/completions"
         try:
             with urllib.request.urlopen(request, timeout=self.settings.timeout_seconds) as response:
                 payload = response.read()
                 response_type = response.headers.get("Content-Type", "")
+                if brain:
+                    self._record_service(
+                        response.headers.get("X-RTSAI-AI-Route", "") or "direct",
+                        response.headers.get("X-RTSAI-AI-State", "") or "ok",
+                        remaining=response.headers.get("x-rtsai-remaining-usd"),
+                    )
         except urllib.error.HTTPError as exc:
             detail = exc.read().decode("utf-8", errors="replace")[:500]
-            raise RouterError(f"AI router returned HTTP {exc.code}: {detail}") from exc
+            state = (exc.headers.get("X-RTSAI-AI-State", "") if exc.headers else "") or "error"
+            route = (exc.headers.get("X-RTSAI-AI-Route", "") if exc.headers else "") or "none"
+            if brain:
+                try:
+                    message = str(json.loads(detail).get("error", {}).get("message", ""))
+                except (ValueError, AttributeError):
+                    message = ""
+                self._record_service(route, state, message)
+            raise RouterError(f"AI router returned HTTP {exc.code}: {detail}", status=exc.code, state=state, route=route) from exc
         except (OSError, TimeoutError, urllib.error.URLError) as exc:
-            raise RouterError(f"AI router is unavailable at {self.settings.router_url}: {exc}") from exc
+            if brain:
+                self._record_service("none", "gateway_unreachable", str(exc))
+            raise RouterError(f"AI router is unavailable at {self.settings.router_url}: {exc}",
+                              state="gateway_unreachable", route="none") from exc
         return payload, round((time.perf_counter() - started) * 1000), response_type
 
     def _get_json(self, path: str) -> dict:
@@ -309,7 +351,7 @@ class AIRouter:
                 {"role": "user", "content": prompt},
             ], schema, name=name, max_tokens=max_tokens)
         content: list[dict[str, object]] = [{"type": "text", "text": prompt}]
-        for image, media_type in images[:3]:
+        for image, media_type in images[:MAX_IMAGES]:
             encoded = base64.b64encode(image).decode("ascii")
             content.append({"type": "image_url", "image_url": {"url": f"data:{media_type};base64,{encoded}", "detail": "high"}})
         try:
@@ -356,7 +398,7 @@ class AIRouter:
         if not images or any(not image for image, _ in images):
             raise ValueError("at least one non-empty image is required")
         content: list[dict[str, object]] = [{"type": "text", "text": prompt}]
-        for image, media_type in images[:3]:
+        for image, media_type in images[:MAX_IMAGES]:
             encoded = base64.b64encode(image).decode("ascii")
             content.append({
                 "type": "image_url",
@@ -422,6 +464,7 @@ class AIRouter:
             return 0.0, 0.0, "Local router model: $0 provider cost"
         prices = {
             "gpt-5.5": (5.0, 30.0, "GPT-5.5 public token rates"),
+            HOSTED_MODEL: (1.0, 5.0, "Claude Haiku 4.5 list price ($1 / $5 per 1M tokens) via the RTS AI proxy"),
         }
         return prices.get(model.lower(), (0.0, 0.0, f"No public price mapping for {model}"))
 
