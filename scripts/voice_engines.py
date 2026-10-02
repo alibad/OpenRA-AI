@@ -62,8 +62,9 @@ ENGINES: dict[str, dict[str, object]] = {
         "checkpoint": "kokoro-v1_0.pth",
         "license": "Apache-2.0",
         "license_evidence": "https://huggingface.co/hexgrad/Kokoro-82M (model card: license apache-2.0; "
-                            "voicepacks ship in the same repository under the same license; trained only on "
-                            "permissive/non-copyrighted audio per the card)",
+                            "voicepacks ship in the same repository under the same license; the card lists its "
+                            "training data as permissive/non-copyrighted audio, including synthetic audio from "
+                            "closed TTS providers)",
     },
     "chatterbox": {
         "engine": "Chatterbox Multilingual V2 (0.5B)",
@@ -139,7 +140,7 @@ SPEAKERS: dict[str, Speaker] = {
     "redsea-control": Speaker(("am_michael", "bm_fable")),
     # Faction announcers (EVA), English only so alerts stay intelligible.
     "china-eva": Speaker(("af_bella",)),
-    "iran-eva": Speaker(("bf_emma",), "b"),
+    "iran-eva": Speaker(("af_sarah",)),
     "turkey-eva": Speaker(("af_heart",)),
     "saudi-eva": Speaker(("af_kore",)),
     "yemen-eva": Speaker(("af_aoede",)),
@@ -170,8 +171,24 @@ def _seed_everything(seed: int) -> None:
         torch.cuda.manual_seed_all(seed)
 
 
-def normalize_for_cer(text: str) -> str:
+_ONES = "zero one two three four five six seven eight nine ten eleven twelve thirteen fourteen fifteen sixteen " \
+         "seventeen eighteen nineteen".split()
+_TENS = "_ _ twenty thirty forty fifty sixty seventy eighty ninety".split()
+
+
+def _english_number(match: re.Match) -> str:
+    value = int(match.group())
+    if value < 20:
+        return _ONES[value]
+    if value < 100:
+        return _TENS[value // 10] + ("" if value % 10 == 0 else " " + _ONES[value % 10])
+    return match.group()
+
+
+def normalize_for_cer(text: str, language: str = "") -> str:
     text = unicodedata.normalize("NFKC", text)
+    if language == "en":  # Whisper writes "20 minutes" and British spellings for the scripted words
+        text = re.sub(r"\d+", _english_number, text.lower()).replace("cancelled", "canceled")
     text = re.sub("[ً-ْٰـ]", "", text)  # Arabic harakat and tatweel
     for source, target in (("أ", "ا"), ("إ", "ا"), ("آ", "ا"), ("ى", "ی"),
                            ("ي", "ی"), ("ة", "ه"), ("ك", "ک"), ("‌", "")):
@@ -427,7 +444,7 @@ class Synthesizer:
             end = min(len(audio), int((words[-1][1] + 0.25) * rate))
             if end - start > rate * 0.2:
                 audio = trim_silence(audio[start:end], rate)
-        cer = character_error_rate(normalize_for_cer(text), normalize_for_cer(transcript))
+        cer = character_error_rate(normalize_for_cer(text, language), normalize_for_cer(transcript, language))
         return Take(fade(audio, rate), rate, seed, transcript, cer)
 
     # Public API ---------------------------------------------------------

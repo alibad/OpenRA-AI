@@ -41,7 +41,7 @@ EVA_TEXT = {
     "007": "Chronosphere detected.",
     "008": "Chronosphere activated.",
     "009": "Chronosphere ready.",
-    "010": "Weather control device detected.",
+    "010": "Weather-control device detected.",
     "011": "Lightning storm created.",
     "012": "Lightning storm ready.",
     "013": "Mission accomplished.",
@@ -86,7 +86,7 @@ EVA_TEXT = {
     "053": "Low power.",
     "054": "Our base is under attack.",
     "055": "Primary building selected.",
-    "056": "On hold.",
+    "056": "Production on hold.",
     "057": "Repairing.",
     "058": "Structure sold.",
     "059": "Base defenses offline.",
@@ -142,7 +142,7 @@ EVA_TEXT = {
     "109": "Chrono miner offline.",
     "120": "Battle control online.",
     "121": "Reinforcements ready.",
-    "122": "Weather control device offline.",
+    "122": "Weather-control device offline.",
 }
 
 # Kokoro reads some game terms better with an explicit pronunciation (misaki markdown).

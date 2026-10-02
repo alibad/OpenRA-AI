@@ -127,6 +127,7 @@ def main() -> int:
     parser.add_argument("--skip-eva", action="store_true")
     parser.add_argument("--eva-only", action="store_true")
     parser.add_argument("--eva-clips", help="comma-separated EVA clip ids (default: all)")
+    parser.add_argument("--eva-factions", help="comma-separated factions (default: all)")
     args = parser.parse_args()
 
     mod = args.mod.resolve()
@@ -162,7 +163,8 @@ def main() -> int:
             if not args.skip_eva and not selected:
                 eva = load_eva()
                 clips = args.eva_clips.split(",") if args.eva_clips else eva.mod_speech_clips(mod)
-                for record in eva.generate(audio / "eva", None, list(eva.FACTIONS), clips, synth):
+                factions = args.eva_factions.split(",") if args.eva_factions else list(eva.FACTIONS)
+                for record in eva.generate(audio / "eva", None, factions, clips, synth):
                     eva_records[record["filename"]] = record
             sfx = [check_sfx(name, audio / f"{name}.wav", synth) for name in sorted(n for n in referenced if n in SFX)]
     finally:
