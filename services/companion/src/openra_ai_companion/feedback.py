@@ -21,6 +21,9 @@ def default_feedback_dir() -> Path:
     configured = os.environ.get("OPENRA_AI_FEEDBACK_DIR", "").strip()
     if configured:
         return Path(configured).expanduser().resolve()
+    data_dir = os.environ.get("OPENRA_AI_DATA_DIR", "").strip()
+    if data_dir:
+        return Path(data_dir).expanduser().resolve() / "Feedback"
     if os.name == "nt":
         return Path(os.environ.get("APPDATA", Path.home() / "AppData" / "Roaming")) / "OpenRA-AI" / "Feedback"
     if sys.platform == "darwin":

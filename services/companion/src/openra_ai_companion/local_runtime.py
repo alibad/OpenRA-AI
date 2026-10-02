@@ -39,6 +39,10 @@ DEFAULT_PORT = 4000
 
 
 def app_data_root() -> Path:
+    configured = os.environ.get("OPENRA_AI_DATA_DIR", "").strip()
+    if configured:
+        # The RTS AI mod keeps provider.json (and the hosted install token) in its support directory.
+        return Path(configured).expanduser()
     return Path(os.environ.get("APPDATA") or Path.home()) / "OpenRA-AI"
 
 

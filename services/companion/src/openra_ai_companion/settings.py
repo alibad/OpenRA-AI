@@ -25,10 +25,23 @@ def _load_project_env() -> dict[str, str]:
     return values
 
 
-def user_settings_path() -> Path:
+def data_root() -> Path:
+    """Where the companion keeps its settings, provider configuration and install token.
+
+    The RTS AI mod points OPENRA_AI_DATA_DIR at a folder in its OpenRA support
+    directory, so a mod install never writes to %APPDATA%/OpenRA-AI. Standalone
+    launches keep the original location.
+    """
+    configured = os.environ.get("OPENRA_AI_DATA_DIR", "").strip()
+    if configured:
+        return Path(configured).expanduser()
     app_data = os.environ.get("APPDATA")
     root = Path(app_data) if app_data else Path.home()
-    return root / "OpenRA-AI" / "settings.json"
+    return root / "OpenRA-AI"
+
+
+def user_settings_path() -> Path:
+    return data_root() / "settings.json"
 
 
 def _load_user_settings() -> dict[str, str | float | bool]:
