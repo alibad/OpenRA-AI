@@ -1,13 +1,14 @@
 """Generate disclosed generic Persian/English radio voices.
 
-Microsoft neural voices are used as generic synthetic performers.  No line is
-written to resemble a real person and Shadow One is explicitly fictional.
+Speech comes from local, redistributable engines (voice_engines.py): Kokoro-82M
+for English and MOSS-TTS-Nano (Persian fine-tune) for Persian, cloned from a
+Kokoro-spoken reference. No line is written to resemble a real person and
+Shadow One is explicitly fictional.
 """
 
 from __future__ import annotations
 
 import argparse
-import asyncio
 from dataclasses import asdict, dataclass
 import json
 import math
@@ -19,7 +20,7 @@ import subprocess
 import tempfile
 import wave
 
-import edge_tts
+from voice_engines import ENGINES, QA, Synthesizer
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -31,21 +32,21 @@ PROVENANCE = ROOT / "assets" / "iran-faction" / "voice-provenance.json"
 class Line:
     filename: str
     language: str
-    voice: str
+    voice: str  # speaker id from voice_engines.SPEAKERS
     text: str
     role: str
 
 
-def bilingual(prefix: str, role: str, phrases: dict[str, tuple[str, str]]) -> list[Line]:
+def bilingual(prefix: str, role: str, phrases: dict[str, tuple[str, str]], speaker: str = "iran-crew") -> list[Line]:
     lines: list[Line] = []
     for action, (persian, english) in phrases.items():
-        lines.append(Line(f"{prefix}-{action}-fa.wav", "fa-IR", "fa-IR-FaridNeural", persian, role))
-        lines.append(Line(f"{prefix}-{action}-en.wav", "en-US", "en-US-GuyNeural", english, role))
+        lines.append(Line(f"{prefix}-{action}-fa.wav", "fa-IR", speaker, persian, role))
+        lines.append(Line(f"{prefix}-{action}-en.wav", "en-US", speaker, english, role))
     return lines
 
 
 LINES = tuple(
-    bilingual("iran-inf", "generic infantry", {
+    bilingual("iran-inf", "generic infantry", speaker="iran-infantry", phrases={
         "select": ("آماده‌ایم.", "Section ready."),
         "move": ("در حال حرکت.", "Moving now."),
         "action": ("دستور دریافت شد.", "Order received."),
@@ -75,7 +76,7 @@ LINES = tuple(
         "action": ("فرمان دریافت شد.", "Command received."),
         "attack": ("ردیابی تثبیت شد.", "Track is steady."),
     })
-    + bilingual("shadow", "fictional Shadow One performer", {
+    + bilingual("shadow", "fictional Shadow One performer", speaker="iran-infantry", phrases={
         "select": ("سایه در شبکه است.", "Shadow is on the net."),
         "move": ("بی‌صدا حرکت می‌کنم.", "Moving quietly."),
         "action": ("نقطه ورود مشخص شد.", "Entry point marked."),
@@ -111,43 +112,68 @@ def radio_finish(path: Path) -> None:
         target.writeframes(encoded)
 
 
-async def render(line: Line, temporary: Path, ffmpeg: str, semaphore: asyncio.Semaphore, only_missing: bool) -> None:
-    destination = OUTPUT / line.filename
-    if only_missing and destination.exists():
-        print(f"keep {line.filename}")
-        return
-    async with semaphore:
-        mp3 = temporary / f"{Path(line.filename).stem}.mp3"
-        await edge_tts.Communicate(line.text, line.voice).save(str(mp3))
-        subprocess.run(
-            [ffmpeg, "-y", "-loglevel", "error", "-i", str(mp3), "-ac", "1", "-ar", "44100", "-c:a", "pcm_s16le", str(destination)],
-            check=True,
-        )
-        radio_finish(destination)
-        print(line.filename)
+def synthesize(line: Line, ffmpeg: str, temporary: Path, synth: Synthesizer,
+               output: Path = OUTPUT) -> dict[str, object]:
+    destination = output / line.filename
+    raw = temporary / f"{Path(line.filename).stem}.raw.wav"
+    record = synth.render(line.text, line.language, line.voice, raw, expressive=line.role.startswith("fictional"))
+    subprocess.run(
+        [ffmpeg, "-y", "-loglevel", "error", "-i", str(raw), "-ac", "1", "-ar", "44100", "-c:a", "pcm_s16le", str(destination)],
+        check=True,
+    )
+    radio_finish(destination)
+    with wave.open(str(destination), "rb") as check:
+        return {
+            **asdict(line),
+            **record,
+            "processing": "ffmpeg 44.1 kHz mono; radio beep, noise and fades",
+            "sample_rate": check.getframerate(),
+            "channels": check.getnchannels(),
+            "sample_width_bits": check.getsampwidth() * 8,
+            "duration_seconds": round(check.getnframes() / check.getframerate(), 3),
+            "synthetic_voice_disclosed": True,
+            "real_person_imitation": False,
+        }
 
 
-async def generate(only_missing: bool) -> None:
+def generate(only_missing: bool, output: Path = OUTPUT, provenance: Path = PROVENANCE,
+             selected: set[str] | None = None) -> None:
     ffmpeg = shutil.which("ffmpeg")
     if not ffmpeg:
         raise RuntimeError("ffmpeg is required to normalize neural voice output")
-    OUTPUT.mkdir(parents=True, exist_ok=True)
-    with tempfile.TemporaryDirectory(prefix="iran-voices-") as directory:
-        semaphore = asyncio.Semaphore(4)
-        await asyncio.gather(*(render(line, Path(directory), ffmpeg, semaphore, only_missing) for line in LINES))
-    PROVENANCE.parent.mkdir(parents=True, exist_ok=True)
-    PROVENANCE.write_text(json.dumps({
-        "generated": "2026-08-12",
-        "disclosure": "Generic Microsoft neural voices; no real-person imitation.",
-        "lines": [asdict(line) for line in LINES],
+    output.mkdir(parents=True, exist_ok=True)
+    records = []
+    synth = Synthesizer()
+    try:
+        with tempfile.TemporaryDirectory(prefix="iran-voices-") as directory:
+            for line in LINES:
+                if selected and line.filename not in selected:
+                    continue
+                if only_missing and (output / line.filename).exists():
+                    print(f"keep {line.filename}")
+                    continue
+                records.append(synthesize(line, ffmpeg, Path(directory), synth, output))
+                print(line.filename)
+    finally:
+        synth.close()
+    provenance.parent.mkdir(parents=True, exist_ok=True)
+    provenance.write_text(json.dumps({
+        "generator": "voice_engines.py + ffmpeg",
+        "engines": ENGINES,
+        "qa": QA,
+        "disclosure": "Generic synthetic voices; no real-person imitation.",
+        "lines": records,
     }, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 
 def main() -> int:
     parser = argparse.ArgumentParser()
+    parser.add_argument("filenames", nargs="*")
     parser.add_argument("--only-missing", action="store_true")
+    parser.add_argument("--output", type=Path, default=OUTPUT)
+    parser.add_argument("--provenance", type=Path, default=PROVENANCE)
     args = parser.parse_args()
-    asyncio.run(generate(args.only_missing))
+    generate(args.only_missing, args.output.resolve(), args.provenance.resolve(), set(args.filenames) or None)
     return 0
 
 

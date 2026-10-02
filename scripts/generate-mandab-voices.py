@@ -1,13 +1,14 @@
 """Generate disclosed synthetic radio for Bab al-Mandab Passage.
 
 This mission-specific pipeline is intentionally separate from the shared Red
-Sea and air-session voice list. Generic Microsoft neural voices are used; no
-real person is imitated. FFmpeg produces OpenRA-ready 44.1 kHz mono PCM WAVs.
+Sea and air-session voice list. Speech comes from local, redistributable engines
+(voice_engines.py: Kokoro-82M for English, Chatterbox Multilingual for Arabic);
+no real person is imitated. FFmpeg produces OpenRA-ready 44.1 kHz mono PCM WAVs.
 """
 
 from __future__ import annotations
 
-import asyncio
+import argparse
 import json
 import math
 import random
@@ -19,7 +20,7 @@ import wave
 from dataclasses import asdict, dataclass
 from pathlib import Path
 
-import edge_tts
+from voice_engines import ENGINES, QA, Synthesizer
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -37,16 +38,16 @@ class VoiceLine:
 
 
 LINES = (
-    VoiceLine("redsea-mandab-opening-ar.wav", "ar-SA", "ar-SA-HamedNeural", "هنا قيادة الممر. ابنوا مركز التقنية واستعدوا للعبور.", "Mandab passage control"),
-    VoiceLine("redsea-mandab-readiness-en.wav", "en-US", "en-US-GuyNeural", "Tech online. Sweep the three coastal sectors.", "Saudi maritime command"),
-    VoiceLine("redsea-mandab-recon-ar.wav", "ar-SA", "ar-SA-HamedNeural", "اكتمل المسح. منصات متحركة تهدد الممر. حيّدوها.", "Saudi maritime command"),
-    VoiceLine("redsea-mandab-shipping-en.wav", "en-US", "en-US-GuyNeural", "Civilian transit has begun. Hold both Mayyun lanes.", "Civilian shipping control"),
-    VoiceLine("redsea-mandab-recovery-ar.wav", "ar-SA", "ar-SA-HamedNeural", "سفينة متأخرة. قاطرة المرافقة تعيدها إلى المسار.", "Civilian shipping control"),
-    VoiceLine("redsea-mandab-loss-en.wav", "en-US", "en-US-GuyNeural", "Civilian ship lost. Protect the remaining convoy.", "Civilian shipping control"),
-    VoiceLine("redsea-mandab-final-ar.wav", "ar-SA", "ar-SA-HamedNeural", "بدأ الهجوم الأخير. أبقوا الممر مفتوحاً حتى اكتمال العبور.", "Saudi maritime command"),
-    VoiceLine("redsea-mandab-beacon-lost-en.wav", "en-US", "en-US-GuyNeural", "Navigation beacon lost. Optional objective failed.", "Mandab passage control"),
-    VoiceLine("redsea-mandab-victory-ar.wav", "ar-SA", "ar-SA-HamedNeural", "اكتمل العبور. الممر آمن.", "Mandab passage control"),
-    VoiceLine("redsea-mandab-failure-en.wav", "en-US", "en-US-GuyNeural", "Passage Control lost. Civilian transit suspended.", "Mandab passage control"),
+    VoiceLine("redsea-mandab-opening-ar.wav", "ar-SA", "redsea-control", "هنا قيادة الممر. ابنوا مركز التقنية واستعدوا للعبور.", "Mandab passage control"),
+    VoiceLine("redsea-mandab-readiness-en.wav", "en-US", "redsea-control", "Tech online. Sweep the three coastal sectors.", "Saudi maritime command"),
+    VoiceLine("redsea-mandab-recon-ar.wav", "ar-SA", "redsea-control", "اكتمل المسح. منصات متحركة تهدد الممر. حيّدوها.", "Saudi maritime command"),
+    VoiceLine("redsea-mandab-shipping-en.wav", "en-US", "redsea-control", "Civilian transit has begun. Hold both Mayyun lanes.", "Civilian shipping control"),
+    VoiceLine("redsea-mandab-recovery-ar.wav", "ar-SA", "redsea-control", "سفينة متأخرة. قاطرة المرافقة تعيدها إلى المسار.", "Civilian shipping control"),
+    VoiceLine("redsea-mandab-loss-en.wav", "en-US", "redsea-control", "Civilian ship lost. Protect the remaining convoy.", "Civilian shipping control"),
+    VoiceLine("redsea-mandab-final-ar.wav", "ar-SA", "redsea-control", "بدأ الهجوم الأخير. أبقوا الممر مفتوحاً حتى اكتمال العبور.", "Saudi maritime command"),
+    VoiceLine("redsea-mandab-beacon-lost-en.wav", "en-US", "redsea-control", "Navigation beacon lost. Optional objective failed.", "Mandab passage control"),
+    VoiceLine("redsea-mandab-victory-ar.wav", "ar-SA", "redsea-control", "اكتمل العبور. الممر آمن.", "Mandab passage control"),
+    VoiceLine("redsea-mandab-failure-en.wav", "en-US", "redsea-control", "Passage Control lost. Civilian transit suspended.", "Mandab passage control"),
 )
 
 
@@ -74,16 +75,18 @@ def radio_finish(path: Path) -> None:
         target.writeframes(encoded)
 
 
-async def synthesize(line: VoiceLine, ffmpeg: str, temporary: Path) -> dict[str, object]:
-    mp3 = temporary / f"{Path(line.filename).stem}.mp3"
-    wav = OUTPUT / line.filename
-    await edge_tts.Communicate(line.text, line.voice, rate="-6%", pitch="-2Hz").save(str(mp3))
+def synthesize(line: VoiceLine, ffmpeg: str, temporary: Path, synth: Synthesizer,
+               output: Path = OUTPUT) -> dict[str, object]:
+    raw = temporary / f"{Path(line.filename).stem}.raw.wav"
+    wav = output / line.filename
+    # Tempo 0.94 stands in for the old edge-tts rate of -6%. `voice` is a voice_engines speaker id.
+    record = synth.render(line.text, line.language, line.voice, raw, rate=0.94)
     filters = (
         "highpass=f=220,lowpass=f=5400,acompressor=threshold=-20dB:ratio=2.7:attack=6:release=90,"
         "loudnorm=I=-18:TP=-2:LRA=7"
     )
     subprocess.run(
-        [ffmpeg, "-hide_banner", "-loglevel", "error", "-y", "-i", str(mp3), "-af", filters,
+        [ffmpeg, "-hide_banner", "-loglevel", "error", "-y", "-i", str(raw), "-af", filters,
          "-ar", "44100", "-ac", "1", "-c:a", "pcm_s16le", str(wav)],
         check=True,
     )
@@ -91,6 +94,8 @@ async def synthesize(line: VoiceLine, ffmpeg: str, temporary: Path) -> dict[str,
     with wave.open(str(wav), "rb") as check:
         return {
             **asdict(line),
+            **record,
+            "processing": "ffmpeg " + filters + "; radio beep, noise and fades",
             "sample_rate": check.getframerate(),
             "channels": check.getnchannels(),
             "sample_width_bits": check.getsampwidth() * 8,
@@ -100,22 +105,30 @@ async def synthesize(line: VoiceLine, ffmpeg: str, temporary: Path) -> dict[str,
         }
 
 
-async def run() -> None:
+def run(output: Path = OUTPUT, provenance: Path = PROVENANCE, selected: set[str] | None = None) -> None:
     ffmpeg = shutil.which("ffmpeg")
     if not ffmpeg:
         raise RuntimeError("ffmpeg is required to master the generated voices")
-    OUTPUT.mkdir(parents=True, exist_ok=True)
-    PROVENANCE.parent.mkdir(parents=True, exist_ok=True)
-    with tempfile.TemporaryDirectory(prefix="openra-mandab-voice-") as directory:
-        records = []
-        for line in LINES:
-            print(f"Synthesizing {line.filename} ({line.voice})")
-            records.append(await synthesize(line, ffmpeg, Path(directory)))
-    PROVENANCE.write_text(
+    output.mkdir(parents=True, exist_ok=True)
+    provenance.parent.mkdir(parents=True, exist_ok=True)
+    synth = Synthesizer()
+    try:
+        with tempfile.TemporaryDirectory(prefix="openra-mandab-voice-") as directory:
+            records = []
+            for line in LINES:
+                if selected and line.filename not in selected:
+                    continue
+                print(f"Synthesizing {line.filename} ({line.voice})")
+                records.append(synthesize(line, ffmpeg, Path(directory), synth, output))
+    finally:
+        synth.close()
+    provenance.write_text(
         json.dumps(
             {
-                "generator": "edge-tts + ffmpeg",
-                "disclosure": "Generic synthetic Microsoft neural voices; no real person is imitated.",
+                "generator": "voice_engines.py + ffmpeg",
+                "engines": ENGINES,
+                "qa": QA,
+                "disclosure": "Generic synthetic voices; no real person is imitated.",
                 "mission": "bab-al-mandab-passage-2026",
                 "lines": records,
             },
@@ -127,7 +140,12 @@ async def run() -> None:
 
 
 def main() -> int:
-    asyncio.run(run())
+    parser = argparse.ArgumentParser()
+    parser.add_argument("filenames", nargs="*")
+    parser.add_argument("--output", type=Path, default=OUTPUT)
+    parser.add_argument("--provenance", type=Path, default=PROVENANCE)
+    args = parser.parse_args()
+    run(args.output.resolve(), args.provenance.resolve(), set(args.filenames) or None)
     return 0
 
 
