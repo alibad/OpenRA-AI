@@ -324,7 +324,11 @@ player call per minute, a session costs about $0.06–0.15 an hour.
 ## Known gaps
 
 - No real Anthropic call was made; the Firestore store was tested against a
-  fake of its REST API, not Google.
+  fake of its REST API, not Google. Two behaviours rest on documentation
+  rather than a live call: Haiku 4.5 accepting `output_config.format` together
+  with tools (the MCP planner's structured final answer), and the sanitised
+  json_schema subset. If either is rejected, the proxy returns 400 naming
+  `response_format`, and nl-orders already retries with `json_object`.
 - `docs/natural-language-orders.md`, referenced from `docs/models.md` by the
   merged `codex/nl-orders`, exists only as an uncommitted file in that branch's
   worktree.

@@ -111,7 +111,8 @@ class HostedClient:
         self._save_token = save_token
         self.timeout = timeout
         self.version = version or os.environ.get("OPENRA_AI_VERSION", "development")
-        self._lock = threading.Lock()
+        self._lock = threading.Lock()  # state only; never held across network I/O
+        self._token_lock = threading.Lock()  # serialises registration
         self._token: str | None = None
         self._state = {
             "state": "ok",
@@ -152,7 +153,7 @@ class HostedClient:
         return token
 
     def token(self, *, refresh: bool = False) -> str:
-        with self._lock:
+        with self._token_lock:
             if refresh:
                 self._token = None
                 self._save_token("")
