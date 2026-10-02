@@ -85,6 +85,8 @@ class CompanionHandler(BaseHTTPRequestHandler):
             "config": self.companion.router.settings.as_dict(),
             "usage": self.companion.router.usage_summary(),
             "router": self.companion.router.health(),
+            # Where the thinking runs now (hosted, local fallback, or alerts only).
+            "ai_service": self.companion.ai_service_status(),
         }
         manager = getattr(self.server, "local_ai_manager", None)
         if manager:

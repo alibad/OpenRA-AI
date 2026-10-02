@@ -9,7 +9,7 @@ the game/OS, caps the model budget at 8 GiB, and limits inference to four CPU
 threads and one request slot. Selection happens once at companion launch.
 Changing the preference applies on the next launch, not during a match.
 
-The initial catalogue has two profiles using the same pinned Qwen3-VL 2B model:
+The catalogue has two local profiles using the same pinned Qwen3-VL 2B model:
 
 - Balanced: approximately 1.82 GB, including the image projector.
 - Lightweight: approximately 1.38 GB, skipping image processing and relying on
@@ -17,6 +17,8 @@ The initial catalogue has two profiles using the same pinned Qwen3-VL 2B model:
   machines. Unknown hardware also gets this conservative default.
 
 Both include Whisper base.en (English transcription) and Kokoro spoken replies.
+A third profile, **voice-only** (268.5 MB: Whisper and Kokoro only), is used by
+hosted mode and is never chosen as a local brain.
 Voice is not assumed to be supported by a detected chat model. The game shows
 download/model readiness separately from microphone permission and on-demand
 speech loading. Legacy `local-small` is not offered as an installed model.
@@ -39,11 +41,15 @@ disallowed command responses; it is not part of the downloadable catalogue.
 
 ## Current routes
 
-OpenRA AI talks to the bundled loopback gateway at `http://127.0.0.1:4000`.
-The gateway has two explicit modes. **Local** starts the models and CPU
-inference runtimes from the installed target AI pack. **External** forwards the
-same OpenAI-compatible contracts to the endpoint chosen during setup. The game
-itself receives route names and the loopback URL, never the provider key.
+OpenRA AI talks to the bundled loopback gateway (the launcher picks its port,
+`http://127.0.0.1:4000` by default). The gateway has three explicit modes.
+**Hosted**, the default when no provider has been chosen, sends text and vision
+to the RTS AI proxy on rtsai.net (Claude Haiku 4.5) and keeps Whisper and
+Kokoro local; see [hosted-ai.md](hosted-ai.md). **Local** starts the models and
+CPU inference runtimes from the installed target AI pack. **External** forwards
+the same OpenAI-compatible contracts to the endpoint chosen during setup. The
+game itself receives route names and the loopback URL, never the provider key
+or the hosted install token.
 
 Local mode maps capabilities to these bundled routes:
 
@@ -61,7 +67,9 @@ instruction. Deterministic code—not the model—decides whether an observation
 is salient enough to speak. Persistent economy, power, production, and damage
 alerts are also worded locally and emit only when the condition begins. If a
 route is unavailable, critical events retain a deterministic fallback line and
-player questions report degraded status.
+player questions report degraded status. In hosted mode the gateway first tries
+the installed `local-coder` (started on demand) when the proxy is offline,
+paused or over the daily allowance, and the HUD names the reason.
 
 ## Player orders
 
