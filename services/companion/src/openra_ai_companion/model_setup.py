@@ -112,6 +112,12 @@ class LocalAIManager:
                 self._detail = "External AI endpoint configured."
             if auto_start:
                 self._start_worker(self._start_runtime_safely)
+            if (auto_start and self.mode == "hosted" and self.supported and not self.installed
+                    and os.environ.get("OPENRA_AI_AUTO_INSTALL_VOICE", "").strip() == "1"):
+                # The RTS AI mod's default is "hosted AI + local voice". When the installer
+                # could not fetch the voice pack (offline, portable zip), fetch it now in the
+                # background; the game shows the progress on its HUD.
+                threading.Thread(target=self._auto_install_voice, name="OpenRA-AI-voice-pack", daemon=True).start()
         elif not self.supported and self._state != "unsupported":
             self._state = "unsupported"
             self._detail = (
@@ -348,6 +354,17 @@ class LocalAIManager:
                 return self.status()
         return self.install()
 
+    def _auto_install_voice(self) -> None:
+        """Wait for the gateway worker, then download the voice pack (install() refuses while a worker runs)."""
+        worker = self._worker
+        if worker is not None and worker is not threading.current_thread():
+            worker.join(timeout=200)
+        try:
+            if not self.installed:
+                self.install()
+        except LocalAISetupError:
+            pass
+
     def _start_worker(self, target) -> None:
         self._worker = threading.Thread(target=target, name="OpenRA-AI-local-setup", daemon=True)
         self._worker.start()
@@ -490,15 +507,22 @@ class LocalAIManager:
                 self._state = "starting"
                 self._detail = "Local models are loading…" if self.mode == "local" else "Starting the AI gateway…"
             assert self.install_root and self.runtime_executable
-            log_directory = self.install_root / "logs"
+            # The RTS AI mod sends every log to its support directory (OPENRA_AI_LOG_DIR).
+            configured_logs = os.environ.get("OPENRA_AI_LOG_DIR", "").strip()
+            log_directory = Path(configured_logs) if configured_logs else self.install_root / "logs"
+            log_prefix = "ai-runtime" if configured_logs else "runtime"
             log_directory.mkdir(parents=True, exist_ok=True)
-            output = (log_directory / "runtime.out.log").open("ab")
-            error = (log_directory / "runtime.err.log").open("ab")
+            output = (log_directory / f"{log_prefix}.out.log").open("ab")
+            error = (log_directory / f"{log_prefix}.err.log").open("ab")
             self._log_handles.extend((output, error))
+            # A single frozen executable can host both the companion and the gateway
+            # (`rtsai-companion.exe runtime serve ...`); OPENRA_AI_RUNTIME_SUBCOMMAND names it.
+            subcommand = os.environ.get("OPENRA_AI_RUNTIME_SUBCOMMAND", "").strip()
             self._process = subprocess.Popen(
                 [
                     str(self.runtime_executable),
                     *(["-m", "openra_ai_companion.local_runtime"] if os.environ.get("OPENRA_AI_RUNTIME_PYTHON") == "1" else []),
+                    *([subcommand] if subcommand else []),
                     "serve",
                     "--port", LOCAL_ROUTER_URL.rsplit(":", 1)[-1],
                     "--root",

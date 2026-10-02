@@ -33,3 +33,14 @@ engine, the companion executable, and a sample generated map. Red Alert content
 is downloaded from OpenRA's mirror list on first launch and is not bundled in
 the release. Official Windows installers require verified Authenticode signatures;
 the macOS wrapper and DMG require Developer ID signing and notarization.
+
+## RTS AI mod sidecar
+
+The RTS AI mod (alibad/RTSAI-Mod) starts the companion itself; no PowerShell launcher is involved.
+`scripts/package-rtsai-companion.ps1` freezes one `--onedir` bundle, `companion\rtsai-companion.exe`,
+that serves every role: `watch` (the co-commander), `runtime serve` (the loopback gateway, named by
+`OPENRA_AI_RUNTIME_SUBCOMMAND=runtime`), `pack install` (checksum-verified AI pack install with progress
+lines, run by the mod's installer) and `game-mcp`. The mod sets `OPENRA_AI_DATA_DIR` (settings,
+`provider.json`, install token, feedback, journal) and `OPENRA_AI_LOG_DIR` to its OpenRA support folder,
+so it never writes `%APPDATA%\OpenRA-AI`, and `OPENRA_AI_AUTO_INSTALL_VOICE=1` in hosted mode so a
+missing voice pack is fetched on first launch. See `RTSAI-Mod/docs/first-launch.md`.

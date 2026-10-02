@@ -21,7 +21,12 @@ def workspace_root() -> Path:
 
 def default_learning_dir() -> Path:
     configured = os.environ.get("OPENRA_AI_LEARNING_DIR", "").strip()
-    return Path(configured).expanduser().resolve() if configured else workspace_root() / ".artifacts" / "autoplay" / "learning"
+    if configured:
+        return Path(configured).expanduser().resolve()
+    data_dir = os.environ.get("OPENRA_AI_DATA_DIR", "").strip()
+    if data_dir:
+        return Path(data_dir).expanduser().resolve() / "learning"
+    return workspace_root() / ".artifacts" / "autoplay" / "learning"
 
 
 def _json_lines(path: Path) -> list[dict[str, Any]]:

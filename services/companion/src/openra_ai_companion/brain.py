@@ -59,6 +59,10 @@ def default_blackboard_path() -> Path:
     configured = os.getenv("OPENRA_AI_BRAIN_STATE", "").strip()
     if configured:
         return Path(configured).expanduser().resolve()
+    data_dir = os.getenv("OPENRA_AI_DATA_DIR", "").strip()
+    if data_dir:
+        # Installed RTS AI mod: keep the journal with the player's other AI data, never beside the program.
+        return Path(data_dir).expanduser().resolve() / "runtime" / "brain-blackboard.jsonl"
     return Path(__file__).resolve().parents[4] / ".artifacts" / "runtime" / "brain-blackboard.jsonl"
 
 
