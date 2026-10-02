@@ -29,6 +29,12 @@ LAMP = (233, 207, 120)
 DECK = (82, 91, 88)
 SEA_DARK = (47, 57, 60)
 
+# Ownership materials for the classic sprites: the primary paint becomes the
+# player-remap ramp; running gear, weapons, glass, decks and trims keep their
+# material colors so the player color never erases equipment.
+TEAM_GROUND = frozenset({GREEN, GREEN_LIGHT})
+TEAM_SLATE = frozenset({SLATE, SLATE_LIGHT})
+
 
 def _tracked_base(length: float, width: float, wheels: int, *, low: bool = False) -> Mesh:
     mesh = Mesh()
@@ -322,21 +328,20 @@ def _defense_top(kind: str) -> Mesh:
 
 def render_ground(name: str, frame_size: int) -> list[Image.Image]:
     angles = _angles(32, classic=True)
-    if name == "cnqilin":
-        body, turret, span = _qilin_hull(), _qilin_turret(), 6.2
-        return [_render(body, a, frame_size, shadow=True, model_span=span) for a in angles] + [_render(turret, a, frame_size, shadow=False, model_span=span) for a in angles]
-    if name == "cnlynx":
-        body, turret, span = _lynx_hull(), _lynx_turret(), 3.7
-        return [_render(body, a, frame_size, shadow=True, model_span=span) for a in angles] + [_render(turret, a, frame_size, shadow=False, model_span=span) for a in angles]
-    if name == "cnmantis":
-        body, turret, span = _mantis_hull(), _mantis_turret(), 5.0
-        return [_render(body, a, frame_size, shadow=True, model_span=span) for a in angles] + [_render(turret, a, frame_size, shadow=False, model_span=span) for a in angles]
-    if name == "cnzbd":
-        body, turret, span = _zbd_hull(), _zbd_turret(), 5.6
-        return [_render(body, a, frame_size, shadow=True, model_span=span) for a in angles] + [_render(turret, a, frame_size, shadow=False, model_span=span) for a in angles]
+    team = TEAM_GROUND
     if name == "cnphl":
-        return [_render(_phl(loaded=True), a, frame_size, shadow=True, model_span=5.7) for a in angles] + [_render(_phl(loaded=False), a, frame_size, shadow=True, model_span=5.7) for a in angles]
-    raise ValueError(name)
+        return [_render(_phl(loaded=True), a, frame_size, shadow=True, model_span=5.7, team_colors=team) for a in angles] +             [_render(_phl(loaded=False), a, frame_size, shadow=True, model_span=5.7, team_colors=team) for a in angles]
+    models = {
+        "cnqilin": (_qilin_hull, _qilin_turret, 6.2),
+        "cnlynx": (_lynx_hull, _lynx_turret, 3.7),
+        "cnmantis": (_mantis_hull, _mantis_turret, 5.0),
+        "cnzbd": (_zbd_hull, _zbd_turret, 5.6),
+    }
+    if name not in models:
+        raise ValueError(name)
+    hull, turret, span = models[name]
+    body_mesh, turret_mesh = hull(), turret()
+    return [_render(body_mesh, a, frame_size, shadow=True, model_span=span, team_colors=team) for a in angles] +         [_render(turret_mesh, a, frame_size, shadow=False, model_span=span, team_colors=team) for a in angles]
 
 
 def render_air(name: str, frame_size: int) -> list[Image.Image]:
@@ -344,14 +349,14 @@ def render_air(name: str, frame_size: int) -> list[Image.Image]:
     facings = 32 if classic else 16
     angles = _angles(facings, classic=classic)
     if name == "cnskyspear":
-        mesh, span = _plane_mesh(drone=False), 6.5
+        mesh, span, team = _plane_mesh(drone=False), 6.5, frozenset({SLATE})
     elif name == "cncloud":
-        mesh, span = _plane_mesh(drone=True), 5.5
+        mesh, span, team = _plane_mesh(drone=True), 5.5, frozenset({SLATE})
     elif name == "cncrane":
-        mesh, span = _crane(), 6.7
+        mesh, span, team = _crane(), 6.7, TEAM_GROUND
     else:
         raise ValueError(name)
-    return [_render(mesh, a, frame_size, shadow=False, model_span=span, center_y_factor=0.59) for a in angles]
+    return [_render(mesh, a, frame_size, shadow=False, model_span=span, center_y_factor=0.59, team_colors=team) for a in angles]
 
 
 def render_ship(name: str, body_size: int, turret_size: int) -> tuple[list[Image.Image], list[Image.Image]]:
@@ -359,16 +364,16 @@ def render_ship(name: str, body_size: int, turret_size: int) -> tuple[list[Image
     turret_angles = _angles(32, classic=False)
     spans = {"cnhaiwang": 8.0, "cnluyang": 6.6, "cnhaiying": 5.3, "cnkunlun": 8.6, "cnjiaolong": 7.0}
     span = spans[name]
-    body = [_render(_ship_hull(name), a, body_size, shadow=False, model_span=span, center_y_factor=0.57) for a in body_angles]
-    turret = [] if name == "cnjiaolong" else [_render(_ship_turret(name), a, turret_size, shadow=False, model_span=span, center_y_factor=0.57) for a in turret_angles]
+    body = [_render(_ship_hull(name), a, body_size, shadow=False, model_span=span, center_y_factor=0.57, team_colors=TEAM_SLATE) for a in body_angles]
+    turret = [] if name == "cnjiaolong" else [_render(_ship_turret(name), a, turret_size, shadow=False, model_span=span, center_y_factor=0.57, team_colors=TEAM_SLATE) for a in turret_angles]
     return body, turret
 
 
 def render_defense(name: str, frame_size: int) -> tuple[Image.Image, list[Image.Image]]:
     span = 4.0 if name != "cnspectrum" else 4.5
-    base = _render(_defense_base(name), 315, frame_size, shadow=True, model_span=span, center_y_factor=0.61)
+    base = _render(_defense_base(name), 315, frame_size, shadow=True, model_span=span, center_y_factor=0.61, team_colors=TEAM_GROUND)
     facings = 16 if name == "cnspectrum" else 32
-    top = [_render(_defense_top(name), a, frame_size, shadow=False, model_span=span, center_y_factor=0.61)
+    top = [_render(_defense_top(name), a, frame_size, shadow=False, model_span=span, center_y_factor=0.61, team_colors=TEAM_GROUND)
            for a in _angles(facings, classic=name != "cnspectrum")]
     return base, top
 

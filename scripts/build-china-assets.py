@@ -17,6 +17,7 @@ from pathlib import Path
 from PIL import Image, ImageChops, ImageDraw, ImageEnhance, ImageFilter, ImageFont
 
 from china_directional_assets import render_air, render_defense, render_ground, render_rotor, render_ship
+from faction_palette import neutralize_team_markers, quantize_sprite
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -92,13 +93,15 @@ def quantize(image: Image.Image, palette: Image.Image, *, opaque: bool = False) 
     return paletted
 
 
-def output_frames(name: str, images: list[Image.Image], palette: Image.Image) -> None:
+def output_frames(name: str, images: list[Image.Image], palette: Image.Image, *, shadow: bool = True) -> None:
     output = FRAME_ROOT / name
     output.mkdir(parents=True, exist_ok=True)
     for stale in output.glob(f"{name}-[0-9][0-9][0-9][0-9].png"):
         stale.unlink()
     for index, image in enumerate(images):
-        quantize(image, palette).save(output / f"{name}-{index:04d}.png", transparency=0)
+        # Exact quantization: team materials -> remap ramp, contact shadow ->
+        # index 4, never the animated water/light indices.
+        quantize_sprite(image, palette, shadow=shadow).save(output / f"{name}-{index:04d}.png", transparency=0)
     columns = 8
     sheet = Image.new("RGBA", (columns * images[0].width, math.ceil(len(images) / columns) * images[0].height), (25, 34, 35, 255))
     for index, image in enumerate(images):
@@ -264,7 +267,7 @@ def wreck(images: list[Image.Image], facings: int, *, turret: bool) -> list[Imag
     count = facings * (2 if turret else 1)
     result: list[Image.Image] = []
     for index, source in enumerate(images[:count]):
-        damaged = ImageEnhance.Color(source.convert("RGBA")).enhance(0.18)
+        damaged = ImageEnhance.Color(neutralize_team_markers(source)).enhance(0.18)
         damaged = ImageEnhance.Brightness(damaged).enhance(0.55)
         burn = Image.new("RGBA", damaged.size, (0, 0, 0, 0))
         draw = ImageDraw.Draw(burn)
@@ -279,7 +282,7 @@ def sinking(body: list[Image.Image]) -> list[Image.Image]:
     result: list[Image.Image] = []
     for facing, source in enumerate(body):
         for phase in range(4):
-            dark = ImageEnhance.Brightness(ImageEnhance.Color(source).enhance(0.55)).enhance(1 - phase * 0.14)
+            dark = ImageEnhance.Brightness(ImageEnhance.Color(neutralize_team_markers(source)).enhance(0.55)).enhance(1 - phase * 0.14)
             frame = Image.new("RGBA", source.size, (0, 0, 0, 0))
             offset = phase * 3
             frame.alpha_composite(dark, (0, offset))
@@ -295,7 +298,7 @@ def sinking(body: list[Image.Image]) -> list[Image.Image]:
 
 def structure_package(base: Image.Image) -> list[Image.Image]:
     """Native-style idle, damaged, then ten authored construction stages."""
-    damaged = ImageEnhance.Brightness(ImageEnhance.Color(base).enhance(0.22)).enhance(0.62)
+    damaged = ImageEnhance.Brightness(ImageEnhance.Color(neutralize_team_markers(base)).enhance(0.22)).enhance(0.62)
     construction: list[Image.Image] = []
     for phase in range(10):
         progress = (phase + 1) / 10
@@ -310,20 +313,42 @@ def structure_package(base: Image.Image) -> list[Image.Image]:
 
 
 def landing_animation(body: list[Image.Image]) -> list[Image.Image]:
-    """Four facing-major stern-ramp stages followed by their closing reverse."""
+    """Four facing-major stern-ramp stages followed by their closing reverse.
+
+    The ramp is hinged on the modelled stern well (mesh y = +2.95, the bow is
+    -y) and projected with the same yaw, scale and camera as the hull, so it
+    lowers from the stern at every facing.  The earlier version started at the
+    hull centre and swept clockwise, drawing the ramp over the bow for
+    east/west headings.
+    """
+
+    frame_size, span, center_y_factor = 76, 8.6, 0.57
+    scale = frame_size / span
+    center_x, center_y = frame_size / 2, frame_size * center_y_factor
+
+    def project(point: tuple[float, float, float], yaw: float) -> tuple[float, float]:
+        x, y, z = point
+        radians = math.radians(yaw)
+        rx = x * math.cos(radians) - y * math.sin(radians)
+        ry = x * math.sin(radians) + y * math.cos(radians)
+        return (center_x + rx * scale, center_y + (ry * 0.57 - z * 0.82) * scale)
+
     opening: list[Image.Image] = []
     for facing, source in enumerate(body):
-        angle = math.radians(facing * 22.5 + 90)
+        yaw = -360 * facing / 16  # red_sea_directional_vehicle._angles(16, classic=False)
         for phase in range(4):
             frame = source.copy()
             draw = ImageDraw.Draw(frame)
-            reach = 4 + phase * 3
-            cx, cy = frame.width / 2, frame.height * 0.62
-            dx, dy = math.cos(angle) * reach, math.sin(angle) * reach * 0.48
-            px, py = -math.sin(angle) * 4.2, math.cos(angle) * 2.0
-            draw.polygon(((cx + px, cy + py), (cx - px, cy - py),
-                          (cx + dx - px, cy + dy - py), (cx + dx + px, cy + dy + py)),
-                         fill=(69, 77, 72, 255), outline=(31, 37, 36, 255))
+            reach = 0.45 + phase * 0.38
+            drop = 0.55 - phase * 0.14
+            hinge_y, x0, x1 = 2.95, 0.18, 0.84
+            quad = (
+                project((x0, hinge_y, 0.56), yaw),
+                project((x1, hinge_y, 0.56), yaw),
+                project((x1, hinge_y + reach, drop), yaw),
+                project((x0, hinge_y + reach, drop), yaw),
+            )
+            draw.polygon(quad, fill=(69, 77, 72, 255), outline=(31, 37, 36, 255))
             opening.append(frame)
     closing: list[Image.Image] = []
     for facing in range(16):
@@ -335,7 +360,8 @@ def landing_animation(body: list[Image.Image]) -> list[Image.Image]:
 def projectile_frames(kind: str, size: int = 32) -> list[Image.Image]:
     images: list[Image.Image] = []
     for facing in range(16):
-        angle = math.radians(facing * 22.5 - 90)
+        # OpenRA facings advance counter-clockwise on screen (north, then west).
+        angle = math.radians(-90 - facing * 22.5)
         canvas = Image.new("RGBA", (size, size), (0, 0, 0, 0))
         draw = ImageDraw.Draw(canvas)
         cx, cy = size / 2, size / 2
@@ -376,7 +402,8 @@ def effect_frames(kind: str, frames: int, size: int = 64) -> list[Image.Image]:
 def muzzle_frames(size: int, heavy: bool) -> list[Image.Image]:
     result: list[Image.Image] = []
     for facing in range(8):
-        angle = math.radians(facing * 45 - 90)
+        # OpenRA facings advance counter-clockwise on screen (north, then west).
+        angle = math.radians(-90 - facing * 45)
         for phase in range(6):
             canvas = Image.new("RGBA", (size, size), (0, 0, 0, 0))
             draw = ImageDraw.Draw(canvas)
@@ -392,15 +419,15 @@ def muzzle_frames(size: int, heavy: bool) -> list[Image.Image]:
 
 
 def rotor_and_misc(palette: Image.Image) -> None:
-    output_frames("cncranerotor", render_rotor(56), palette)
-    output_frames("china-heavy-muzzle", muzzle_frames(48, True), palette)
-    output_frames("china-light-muzzle", muzzle_frames(40, False), palette)
-    output_frames("china-missile", projectile_frames("missile"), palette)
-    output_frames("china-drone-projectile", projectile_frames("drone"), palette)
-    output_frames("china-network-pulse", effect_frames("network", 8, 48), palette)
-    output_frames("china-network-impact", effect_frames("network", 10), palette)
-    output_frames("china-precision-impact", effect_frames("precision", 10), palette)
-    output_frames("china-naval-impact", effect_frames("naval", 10), palette)
+    output_frames("cncranerotor", render_rotor(56), palette, shadow=False)
+    output_frames("china-heavy-muzzle", muzzle_frames(48, True), palette, shadow=False)
+    output_frames("china-light-muzzle", muzzle_frames(40, False), palette, shadow=False)
+    output_frames("china-missile", projectile_frames("missile"), palette, shadow=False)
+    output_frames("china-drone-projectile", projectile_frames("drone"), palette, shadow=False)
+    output_frames("china-network-pulse", effect_frames("network", 8, 48), palette, shadow=False)
+    output_frames("china-network-impact", effect_frames("network", 10), palette, shadow=False)
+    output_frames("china-precision-impact", effect_frames("precision", 10), palette, shadow=False)
+    output_frames("china-naval-impact", effect_frames("naval", 10), palette, shadow=False)
     wakes: list[Image.Image] = []
     for phase in range(8):
         canvas = Image.new("RGBA", (48, 32), (0, 0, 0, 0))
@@ -410,7 +437,7 @@ def rotor_and_misc(palette: Image.Image) -> None:
         draw.arc((3, 8 - phase // 2, 45, 25 + phase // 2), 15 + spread, 165 - spread, fill=(184, 214, 221, alpha), width=2)
         draw.arc((3, 8 - phase // 2, 45, 25 + phase // 2), 195 + spread, 345 - spread, fill=(184, 214, 221, alpha), width=2)
         wakes.append(canvas)
-    output_frames("china-wake", wakes, palette)
+    output_frames("china-wake", wakes, palette, shadow=False)
 
 
 def icon_frames(palette: Image.Image) -> None:
@@ -470,8 +497,9 @@ def main() -> int:
         output_frames(f"{name}husk", wreck(live, 32, turret=name != "cnphl"), palette)
     for name, size in AIR.items():
         live = render_air(name, size)
-        output_frames(name, live, palette)
-        output_frames(f"{name}husk", wreck(live, 32 if name == "cncrane" else 16, turret=False), palette)
+        # Aircraft get their shadow from the WithShadow trait, never baked in.
+        output_frames(name, live, palette, shadow=False)
+        output_frames(f"{name}husk", wreck(live, 32 if name == "cncrane" else 16, turret=False), palette, shadow=False)
     for name, (body_size, turret_size) in SHIPS.items():
         body, turret = render_ship(name, body_size, turret_size)
         output_frames(name, body + (landing_animation(body) if name == "cnkunlun" else []), palette)
