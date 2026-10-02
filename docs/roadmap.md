@@ -49,7 +49,15 @@ These stay in git but leave the product story, the website navigation and the re
 
 ## Phase 2 — Five complete factions (parallel with Phase 3)
 
-**Status, 2 October 2026:** all five nations are playable in `alibad/RTSAI-Mod`, with doctrine bots and zero lint warnings. The catalog's RA2 variants now validate against the mod. Still open: painted cameos, a faction EVA announcer, per-faction squad sizes, balance evidence and RA2 missions.
+**Status, 3 October 2026:** all five nations are playable in `alibad/RTSAI-Mod`. Done:
+
+- Doctrine bots with per-faction squad sizes.
+- Licensed voices and a per-faction announcer (`docs/audio-provenance.md` in the mod).
+- 87 painted, traceable cameos (`docs/art-provenance.md`).
+- Zero lint warnings.
+- A balance harness with evidence (`docs/balance.md`). The modern nations sit at 33–57% among themselves.
+
+Still open: China, Türkiye and Iran trail America and Russia in bot play; RA2 missions; a native-speaker review of the non-English lines.
 
 - Saudi Arabia and Yemen in RA2: review and merge `codex/ra2-red-sea`, add per-country validators, and flip the catalog entries.
 - What "complete" means for each faction:
@@ -63,7 +71,11 @@ These stay in git but leave the product story, the website navigation and the re
 
 ## Phase 3 — AI that works out of the box
 
-**Status, 2 October 2026:** the hosted Claude Haiku 4.5 proxy (RTSAI-Web), the game's hosted gateway mode with local voice and fallback, the External-mode fix, screenshot downscaling and single-call voice orders are merged. It is verified against a mocked Anthropic API only. Still to do: owner provisioning (see `docs/hosted-ai.md`), real smoke calls, and making hosted the first-launch default in the mod's companion host and installer.
+**Status, 3 October 2026:** built. The installer defaults to hosted AI with local voice, and the mod starts the companion.
+
+- Built: the hosted Claude Haiku 4.5 proxy, privacy-policy coverage and spend alerts. All verified against a mocked API.
+- Multiplayer: the AI co-commander is a lobby option that every player sees, off by default with 2+ humans.
+- Waiting on the owner: Vercel environment variables, Firestore setup and the Anthropic workspace limit (`RTSAI-Web/docs/launch-checklist.md`). Then real smoke calls.
 
 - Hosted proxy on rtsai.net:
   - The key stays server-side.
