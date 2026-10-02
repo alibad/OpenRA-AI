@@ -218,6 +218,109 @@ class AIRouter:
     def chat(self, messages: list[dict[str, object]], temperature: float | None = None) -> RouterResult:
         return self._chat(messages, self.settings.text_model)
 
+    def _structured(
+        self,
+        messages: list[dict[str, object]],
+        model: str,
+        schema: dict,
+        *,
+        name: str,
+        max_tokens: int,
+    ) -> RouterResult:
+        """Request schema-constrained JSON, degrading for providers without json_schema support.
+
+        llama.cpp turns ``json_schema`` into a GBNF grammar, so the local model
+        cannot emit malformed or out-of-schema output.  Hosted OpenAI-compatible
+        services use the same standard field.  Endpoints that reject it are
+        retried with ``json_object`` and finally with prompt-only JSON; callers
+        still validate the result strictly.
+        """
+        formats: list[dict | None] = [
+            {"type": "json_schema", "json_schema": {"name": name, "schema": schema, "strict": True}},
+            {"type": "json_object"},
+            None,
+        ]
+        last_error: RouterError | None = None
+        for response_format in formats:
+            body: dict[str, object] = {
+                "model": model,
+                "messages": messages,
+                "max_tokens": max_tokens,
+                "temperature": 0,
+            }
+            if response_format is not None:
+                body["response_format"] = response_format
+            started = time.perf_counter()
+            try:
+                payload, _, _ = self._request("/v1/chat/completions", json.dumps(body).encode("utf-8"), "application/json")
+            except RouterError as exc:
+                detail = str(exc).lower()
+                unsupported = "http 400" in detail or "http 422" in detail
+                if response_format is not None and unsupported and any(
+                    marker in detail for marker in ("response_format", "json_schema", "json_object", "schema", "grammar", "unsupported", "not supported")
+                ):
+                    last_error = exc
+                    continue
+                raise
+            latency = round((time.perf_counter() - started) * 1000)
+            try:
+                response = json.loads(payload)
+                content = response["choices"][0]["message"]["content"]
+                if isinstance(content, list):
+                    content = " ".join(str(part.get("text", "")) for part in content if isinstance(part, dict))
+                text = str(content or "").strip()
+                usage = response.get("usage") or {}
+                input_tokens = int(usage.get("prompt_tokens") or usage.get("input_tokens") or 0)
+                output_tokens = int(usage.get("completion_tokens") or usage.get("output_tokens") or 0)
+            except (KeyError, IndexError, TypeError, json.JSONDecodeError) as exc:
+                raise RouterError("AI router returned an invalid chat completion") from exc
+            if not text:
+                raise RouterError("AI router returned an empty chat completion")
+            with self._usage_lock:
+                self._chat_calls += 1
+                self._input_tokens += input_tokens or max(1, sum(len(str(m.get("content", ""))) for m in messages) // 4)
+                self._output_tokens += output_tokens or max(1, len(text) // 4)
+            return RouterResult(text, latency, model, input_tokens, output_tokens)
+        raise last_error or RouterError("AI router rejected every structured-output format")
+
+    def chat_structured(
+        self,
+        messages: list[dict[str, object]],
+        schema: dict,
+        *,
+        name: str = "structured_reply",
+        max_tokens: int = 320,
+    ) -> RouterResult:
+        return self._structured(messages, self.settings.text_model, schema, name=name, max_tokens=max_tokens)
+
+    def vision_structured(
+        self,
+        prompt: str,
+        images: list[tuple[bytes, str]],
+        schema: dict,
+        *,
+        name: str = "structured_reply",
+        max_tokens: int = 320,
+    ) -> RouterResult:
+        """Schema-constrained multimodal request; text-only profiles use the structured state alone."""
+        if self.settings.vision_model == "local-no-vision" or not images:
+            return self.chat_structured([
+                {"role": "system", "content": "Use only the structured game state below. No images are available; do not invent visual details."},
+                {"role": "user", "content": prompt},
+            ], schema, name=name, max_tokens=max_tokens)
+        content: list[dict[str, object]] = [{"type": "text", "text": prompt}]
+        for image, media_type in images[:3]:
+            encoded = base64.b64encode(image).decode("ascii")
+            content.append({"type": "image_url", "image_url": {"url": f"data:{media_type};base64,{encoded}", "detail": "high"}})
+        try:
+            result = self._structured([{"role": "user", "content": content}], self.settings.vision_model, schema,
+                                      name=name, max_tokens=max_tokens)
+        except RouterError as exc:
+            if "not a multimodal model" not in str(exc).lower():
+                raise
+            return self.chat_structured([{"role": "user", "content": prompt}], schema, name=name, max_tokens=max_tokens)
+        return replace(result, vision_used=True)
+
     def vision(self, prompt: str, image: bytes, media_type: str = "image/png") -> RouterResult:
         if self.settings.vision_model == "local-no-vision":
             raise RouterError("The lightweight AI profile uses game state, not map images. Choose Balanced for image analysis.")

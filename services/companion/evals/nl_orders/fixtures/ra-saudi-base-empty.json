@@ -1,0 +1,90 @@
+{
+ "captured": {
+  "at": "2026-09-27T21:46:31+00:00",
+  "enemy_faction": "russia",
+  "engine_commit": "5ddc34cb91e52953d4844c169075a0dbbd79e139",
+  "map": "ore-lord.oramap",
+  "mod": "ra",
+  "note": "Construction Yard deployed; nothing queued yet.",
+  "player_faction": "saudi",
+  "product_commit": "cc6e80a1c67cb2a8979ec4dc779dbb00d4c55576",
+  "scenario": "base-empty",
+  "source": "live headless OpenRA multi-session match (Game.Platform=Null)",
+  "spatial_map": "omitted to keep fixtures reviewable; not used by order interpretation"
+ },
+ "fixture": "ra-saudi-base-empty",
+ "observation": {
+  "actor_names": {
+   "brik": "Concrete Wall",
+   "fact": "Construction Yard",
+   "powr": "Power Plant",
+   "sbag": "Sandbag Wall"
+  },
+  "available_production": [
+   "powr",
+   "sbag",
+   "brik"
+  ],
+  "buildings": [
+   {
+    "actor_id": 147,
+    "armor_type": "Wood",
+    "cell_x": 46,
+    "cell_y": 46,
+    "cost": 2000,
+    "hp_percent": 1.0,
+    "is_powered": true,
+    "last_seen_tick": 80,
+    "owner": "Multi0",
+    "pos_x": 47616,
+    "pos_y": 47616,
+    "rally_x": -1,
+    "rally_y": -1,
+    "sell_value": 1000,
+    "target_types": [
+     "GroundActor",
+     "C4",
+     "DetonateAttack",
+     "Structure"
+    ],
+    "type": "fact"
+   }
+  ],
+  "economy": {
+   "cash": 5000
+  },
+  "episode_id": "414a1445fafe",
+  "explored_percent": 3.149414,
+  "map_info": {
+   "bounds_height": 61,
+   "bounds_width": 61,
+   "bounds_x": 1,
+   "bounds_y": 1,
+   "height": 64,
+   "map_name": "Ore Lord",
+   "width": 64
+  },
+  "military": {
+   "assets_value": 2000
+  },
+  "mod_id": "ra",
+  "objectives": [
+   {
+    "description": "Destroy all opposition!",
+    "required": true,
+    "state": "incomplete",
+    "type": "Primary"
+   }
+  ],
+  "spatial_channels": 0,
+  "tick": 80
+ },
+ "state": {
+  "enemy_faction": "russia",
+  "episode_id": "414a1445fafe",
+  "phase": "playing",
+  "player_count": 5,
+  "player_faction": "saudi",
+  "tick": 80
+ }
+}

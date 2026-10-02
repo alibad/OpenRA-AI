@@ -1,0 +1,245 @@
+{
+ "captured": {
+  "at": "2026-09-27T22:17:22+00:00",
+  "enemy_faction": "ukraine",
+  "engine_commit": "5ddc34cb91e52953d4844c169075a0dbbd79e139",
+  "map": "singles.oramap",
+  "mod": "ra",
+  "note": "Base with a placed Radar Dome, two power plants and a refinery.",
+  "player_faction": "germany",
+  "product_commit": "cc6e80a1c67cb2a8979ec4dc779dbb00d4c55576",
+  "scenario": "radar",
+  "source": "live headless OpenRA multi-session match (Game.Platform=Null)",
+  "spatial_map": "omitted to keep fixtures reviewable; not used by order interpretation"
+ },
+ "fixture": "ra-germany-radar",
+ "observation": {
+  "actor_names": {
+   "agun": "AA Gun",
+   "apwr": "Advanced Power Plant",
+   "brik": "Concrete Wall",
+   "dome": "Radar Dome",
+   "fact": "Construction Yard",
+   "harv": "Ore Truck",
+   "hpad": "Helipad",
+   "powr": "Power Plant",
+   "proc": "Ore Refinery",
+   "sbag": "Sandbag Wall",
+   "silo": "Silo",
+   "syrd": "Naval Yard",
+   "tent": "Allied Barracks",
+   "weap": "War Factory"
+  },
+  "available_production": [
+   "syrd",
+   "dome",
+   "weap",
+   "proc",
+   "hpad",
+   "powr",
+   "apwr",
+   "tent",
+   "agun",
+   "silo",
+   "sbag",
+   "brik"
+  ],
+  "buildings": [
+   {
+    "actor_id": 122,
+    "armor_type": "Wood",
+    "cell_x": 95,
+    "cell_y": 11,
+    "cost": 2000,
+    "hp_percent": 1.0,
+    "is_powered": true,
+    "last_seen_tick": 2428,
+    "owner": "Multi0",
+    "pos_x": 97792,
+    "pos_y": 11776,
+    "rally_x": -1,
+    "rally_y": -1,
+    "sell_value": 1000,
+    "target_types": [
+     "GroundActor",
+     "C4",
+     "DetonateAttack",
+     "Structure"
+    ],
+    "type": "fact"
+   },
+   {
+    "actor_id": 124,
+    "armor_type": "Wood",
+    "cell_x": 92,
+    "cell_y": 10,
+    "cost": 300,
+    "hp_percent": 1.0,
+    "is_powered": true,
+    "last_seen_tick": 2428,
+    "owner": "Multi0",
+    "pos_x": 94208,
+    "pos_y": 10240,
+    "power_amount": 100,
+    "rally_x": -1,
+    "rally_y": -1,
+    "sell_value": 150,
+    "target_types": [
+     "GroundActor",
+     "C4",
+     "DetonateAttack",
+     "Structure",
+     "SpyInfiltrate"
+    ],
+    "type": "powr"
+   },
+   {
+    "actor_id": 127,
+    "armor_type": "Wood",
+    "cell_x": 99,
+    "cell_y": 11,
+    "cost": 1400,
+    "hp_percent": 1.0,
+    "is_powered": true,
+    "last_seen_tick": 2428,
+    "owner": "Multi0",
+    "pos_x": 101888,
+    "pos_y": 11776,
+    "power_amount": -30,
+    "rally_x": -1,
+    "rally_y": -1,
+    "sell_value": 700,
+    "target_types": [
+     "GroundActor",
+     "C4",
+     "DetonateAttack",
+     "Structure",
+     "SpyInfiltrate",
+     "ThiefInfiltrate"
+    ],
+    "type": "proc"
+   },
+   {
+    "actor_id": 129,
+    "armor_type": "Wood",
+    "cell_x": 95,
+    "cell_y": 7,
+    "cost": 300,
+    "hp_percent": 1.0,
+    "is_powered": true,
+    "last_seen_tick": 2428,
+    "owner": "Multi0",
+    "pos_x": 97280,
+    "pos_y": 7168,
+    "power_amount": 100,
+    "rally_x": -1,
+    "rally_y": -1,
+    "sell_value": 150,
+    "target_types": [
+     "GroundActor",
+     "C4",
+     "DetonateAttack",
+     "Structure",
+     "SpyInfiltrate"
+    ],
+    "type": "powr"
+   },
+   {
+    "actor_id": 134,
+    "armor_type": "Wood",
+    "cell_x": 92,
+    "cell_y": 14,
+    "cost": 1500,
+    "hp_percent": 1.0,
+    "is_powered": true,
+    "last_seen_tick": 2428,
+    "owner": "Multi0",
+    "pos_x": 94208,
+    "pos_y": 14336,
+    "power_amount": -40,
+    "rally_x": -1,
+    "rally_y": -1,
+    "sell_value": 750,
+    "target_types": [
+     "GroundActor",
+     "C4",
+     "DetonateAttack",
+     "Structure",
+     "SpyInfiltrate"
+    ],
+    "type": "dome"
+   }
+  ],
+  "economy": {
+   "cash": 2533,
+   "harvester_count": 1,
+   "ore": 467,
+   "power_drained": 70,
+   "power_provided": 200,
+   "resource_capacity": 2000
+  },
+  "episode_id": "623a6df33242",
+  "explored_percent": 8.184524,
+  "map_info": {
+   "bounds_height": 50,
+   "bounds_width": 108,
+   "bounds_x": 2,
+   "bounds_y": 2,
+   "height": 54,
+   "map_name": "Singles",
+   "width": 112
+  },
+  "military": {
+   "active_unit_count": 1,
+   "army_value": 1100,
+   "assets_value": 6600,
+   "order_count": 8
+  },
+  "mod_id": "ra",
+  "objectives": [
+   {
+    "description": "Destroy all opposition!",
+    "required": true,
+    "state": "incomplete",
+    "type": "Primary"
+   }
+  ],
+  "spatial_channels": 0,
+  "tick": 2428,
+  "units": [
+   {
+    "actor_id": 128,
+    "ammo": -1,
+    "armor_type": "Heavy",
+    "cell_x": 100,
+    "cell_y": 17,
+    "cost": 1100,
+    "current_activity": "FindAndDeliverResources",
+    "facing": 512,
+    "hp_percent": 1.0,
+    "last_seen_tick": 2428,
+    "move_target_x": 100,
+    "move_target_y": 18,
+    "owner": "Multi0",
+    "passenger_count": -1,
+    "pos_x": 102912,
+    "pos_y": 18320,
+    "speed": 72,
+    "target_types": [
+     "GroundActor",
+     "Vehicle",
+     "MindControl"
+    ],
+    "type": "harv"
+   }
+  ]
+ },
+ "state": {
+  "enemy_faction": "ukraine",
+  "episode_id": "623a6df33242",
+  "phase": "playing",
+  "player_count": 5,
+  "player_faction": "germany",
+  "tick": 2428
+ }
+}

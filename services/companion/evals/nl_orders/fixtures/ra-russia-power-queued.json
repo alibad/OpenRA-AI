@@ -1,0 +1,100 @@
+{
+ "captured": {
+  "at": "2026-09-27T21:52:29+00:00",
+  "enemy_faction": "england",
+  "engine_commit": "5ddc34cb91e52953d4844c169075a0dbbd79e139",
+  "map": "desert-rats",
+  "mod": "ra",
+  "note": "A power plant is part-way through construction and not ready to place.",
+  "player_faction": "russia",
+  "product_commit": "cc6e80a1c67cb2a8979ec4dc779dbb00d4c55576",
+  "scenario": "power-queued",
+  "source": "live headless OpenRA multi-session match (Game.Platform=Null)",
+  "spatial_map": "omitted to keep fixtures reviewable; not used by order interpretation"
+ },
+ "fixture": "ra-russia-power-queued",
+ "observation": {
+  "actor_names": {
+   "brik": "Concrete Wall",
+   "fact": "Construction Yard",
+   "fenc": "Wire Fence",
+   "powr": "Power Plant"
+  },
+  "available_production": [
+   "powr",
+   "fenc",
+   "brik"
+  ],
+  "buildings": [
+   {
+    "actor_id": 166,
+    "armor_type": "Wood",
+    "cell_x": 49,
+    "cell_y": 55,
+    "cost": 2000,
+    "hp_percent": 1.0,
+    "is_powered": true,
+    "last_seen_tick": 124,
+    "owner": "Multi0",
+    "pos_x": 50688,
+    "pos_y": 56832,
+    "rally_x": -1,
+    "rally_y": -1,
+    "sell_value": 1000,
+    "target_types": [
+     "Structure",
+     "GroundActor",
+     "C4",
+     "DetonateAttack"
+    ],
+    "type": "fact"
+   }
+  ],
+  "economy": {
+   "cash": 4935
+  },
+  "episode_id": "11b499743cce",
+  "explored_percent": 2.488426,
+  "map_info": {
+   "bounds_height": 70,
+   "bounds_width": 70,
+   "bounds_x": 1,
+   "bounds_y": 1,
+   "height": 72,
+   "map_name": "Desert Rats",
+   "width": 72
+  },
+  "military": {
+   "assets_value": 2000,
+   "order_count": 1
+  },
+  "mod_id": "ra",
+  "objectives": [
+   {
+    "description": "Destroy all opposition!",
+    "required": true,
+    "state": "incomplete",
+    "type": "Primary"
+   }
+  ],
+  "production": [
+   {
+    "item": "powr",
+    "progress": 0.22222221,
+    "queue_type": "Building",
+    "remaining_cost": 235,
+    "remaining_ticks": 140
+   }
+  ],
+  "spatial_channels": 0,
+  "tick": 124
+ },
+ "state": {
+  "enemy_faction": "england",
+  "episode_id": "11b499743cce",
+  "phase": "playing",
+  "player_count": 5,
+  "player_faction": "russia",
+  "tick": 124
+ }
+}

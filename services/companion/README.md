@@ -16,6 +16,17 @@ confirmed request again on the game thread and returns a structured receipt.
 Actions are single-player only and never use the RL bridge's pause or
 fast-forward behavior.
 
+Player orders are interpreted by `nl_orders.py`: explicit phrasing is parsed
+deterministically, and everything else becomes one schema-constrained typed
+intent (verb plus free-text unit, item and target references). Python grounds
+the intent in the fog-respecting snapshot, so a model can choose *what* the
+player meant but never invents ids, coordinates or production items. Building
+requests queue production first and propose placement only when the structure
+is finished. Surrender, match-lifecycle controls, support powers, cheats and
+hidden targets are refused before any model call. Run the graded benchmark with
+`python services/companion/evals/nl_orders/run_eval.py --start-local-ai`; see
+`docs/natural-language-orders.md`.
+
 The in-game `AUTO` toggle is a separate, explicit authority mode. While it is
 on, the local human slot is delegated to OpenRA's complete native `ModularBot`
 stack. Native economy, production, placement, harvesting, expansion, repair,

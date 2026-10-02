@@ -47,6 +47,7 @@ from .strategy_contracts import (
     strategy_contract,
     strategy_state,
 )
+from . import nl_orders
 from .tactical_vision import tactical_overview_png
 from .threats import assess_threat
 
@@ -117,10 +118,20 @@ def _normalized_action_intent(text: str) -> str:
     return " ".join(re.sub(r"[^a-z0-9]+", " ", text.lower()).split())
 
 
+_PROPOSAL_OBJECTS = frozenset({
+    "", "that", "it", "this", "order", "orders", "proposal", "proposals", "command", "commands", "everything", "all",
+    "please", "now", "thanks", "thank", "plan", "action", "actions", "request", "last", "those", "them", "the",
+})
+
+
 def _is_cancel_intent(text: str) -> bool:
     normalized = _normalized_action_intent(text)
     if normalized in CANCEL_WORDS or normalized in {"no", "nope", "don t", "do not"}:
         return True
+    cancelled = re.search(r"\b(?:cancel|abort)\s+(?:the\s+|my\s+|our\s+|that\s+)?(\w*)", normalized)
+    if cancelled and cancelled.group(1) not in _PROPOSAL_OBJECTS:
+        # "cancel the radar dome" cancels production, not the pending proposal.
+        return False
     return any(phrase in f" {normalized} " for phrase in (
         " cancel ",
         " never mind ",
@@ -642,7 +653,12 @@ class Companion:
                     "views": views,
                     "fallback": None if result.vision_used else "structured-context",
                 }
-            response = CompanionResponse(snapshot.humanize_text(result.text), "ai-layer", utterance_id=generation, latency_ms=result.latency_ms, metadata=metadata)
+            text = snapshot.humanize_text(result.text)
+            if nl_orders.answer_is_malformed(text):
+                # Small local models occasionally loop or emit raw JSON; never show that.
+                metadata["sanitized"] = True
+                text = nl_orders.status_line(snapshot)
+            response = CompanionResponse(text, "ai-layer", utterance_id=generation, latency_ms=result.latency_ms, metadata=metadata)
         except RouterError as exc:
             response = CompanionResponse("The AI router is unavailable; I can still watch for critical deterministic alerts.", "deterministic-fallback", utterance_id=generation, latency_ms=round((time.perf_counter() - started) * 1000), metadata={"degraded": True, "reason": str(exc)})
         if self._interrupted(generation):
@@ -723,7 +739,20 @@ class Companion:
         return decoded if isinstance(decoded, dict) else None
 
     @staticmethod
-    def _validate_action_commands(snapshot: GameSnapshot, values: object) -> tuple[ActionCommand, ...]:
+    def _validate_action_commands(
+        snapshot: GameSnapshot,
+        values: object,
+        *,
+        player_request: bool = False,
+    ) -> tuple[ActionCommand, ...]:
+        """Validate proposed commands against the latest fog-respecting snapshot.
+
+        ``player_request`` marks an explicit spoken/typed player order.  Those
+        keep every ownership, visibility, availability and map check, and can
+        never use support powers, but they are not trimmed by AUTO's economy
+        heuristics (rolling unit caps, harvester targets and silo thresholds):
+        the player chose that spend and still confirms it separately.
+        """
         if not isinstance(values, list) or not 1 <= len(values) <= 12:
             raise ValueError("an action proposal must contain 1 to 12 commands")
 
@@ -751,6 +780,8 @@ class Companion:
             if not isinstance(raw, dict):
                 raise ValueError("every command must be an object")
             command = ActionCommand.from_dict(raw)
+            if player_request and command.action == "use_support_power":
+                raise ValueError("support powers are not available as player voice or text orders")
             if command.action in ACTOR_ACTIONS and command.actor_id not in owned_actors:
                 raise ValueError(f"actor {command.actor_id} is not owned by the player")
             if command.action in {
@@ -785,9 +816,16 @@ class Companion:
             if command.action == "enter_transport":
                 transport = owned_units.get(command.target_actor_id)
                 transport_kind = transport.kind.lower().split("@", 1)[0].split(".", 1)[0] if transport else ""
+                transport_name = snapshot.actor_name(transport.kind).lower() if transport else ""
                 if transport is None or (
                     transport.passenger_count < 0
                     and transport_kind not in {"tran", "lst", "apc", "hind"}
+                    # Empty transports report no passenger count; modern and RA2
+                    # carriers are recognised by their role name. OpenRA still
+                    # checks cargo type and capacity on the game thread.
+                    and not any(word in transport_name for word in (
+                        "personnel carrier", "infantry carrier", "transport", "infantry fighting vehicle", "flak track",
+                    ))
                 ):
                     raise ValueError(f"target {command.target_actor_id} is not an owned transport")
             if command.action == "disguise" and command.target_actor_id not in owned_units[command.actor_id].valid_disguise_targets:
@@ -813,7 +851,7 @@ class Companion:
                 raise ValueError("a production item is missing")
             if command.action in {"build", "train"} and command.item_type not in available:
                 raise ValueError(f"'{command.item_type}' is not currently available for production")
-            if command.action == "build" and command.item_type.split(".", 1)[0] == "silo":
+            if command.action == "build" and command.item_type.split(".", 1)[0] == "silo" and not player_request:
                 silo_count = sum(
                     building.kind.lower().split(".", 1)[0] == "silo"
                     for building in snapshot.buildings
@@ -826,7 +864,9 @@ class Companion:
                     and snapshot.ore * 100 <= snapshot.resource_capacity * 80
                 ):
                     raise ValueError("a silo is only needed above 80% storage")
-            if command.action == "train" and command.item_type.split(".", 1)[0] == "harv":
+            if player_request and command.action == "train":
+                pass
+            elif command.action == "train" and command.item_type.split(".", 1)[0] == "harv":
                 target = desired_harvester_count(snapshot)
                 if snapshot.harvester_count + queued_harvesters + planned_harvesters >= target:
                     raise ValueError(f"the map-scaled harvester target of {target} is already covered")
@@ -846,6 +886,14 @@ class Companion:
                 planned_units[command.item_type] = planned_count + 1
             if command.action == "place_building" and command.item_type not in in_production:
                 raise ValueError(f"'{command.item_type}' is not in a production queue")
+            if command.action == "place_building" and not any(
+                str(item.get("item", "")).lower() == command.item_type
+                and (float(item.get("progress", 0)) >= 0.999 or int(item.get("remaining_ticks", 1)) <= 0)
+                for item in snapshot.production
+            ):
+                # OpenRA only places finished structures; a premature proposal would
+                # always be rejected on the game thread after the player confirmed it.
+                raise ValueError(f"'{command.item_type}' has not finished production yet")
             if command.action == "cancel_production" and command.item_type not in in_production:
                 raise ValueError(f"'{command.item_type}' is not in a production queue")
             if command.action == "use_support_power":
@@ -1796,6 +1844,181 @@ class Companion:
             metadata=metadata,
         )
 
+    def _interpret_player_order(
+        self,
+        instruction: str,
+        snapshot: GameSnapshot,
+        generation: int,
+    ) -> CompanionResponse | tuple[RouterResult, list[dict], dict] | None:
+        """Route one player utterance through the typed natural-language order pipeline.
+
+        Returns a finished response, a legacy-format model result for the
+        existing decoder (older providers and scripted test routers), or None
+        when the utterance asks for advice and belongs to the planner path.
+        """
+        category = nl_orders.classify(instruction)
+        if category == "advice":
+            return None
+        if category == "question":
+            return self.ask(instruction)
+        started = time.perf_counter()
+        result = nl_orders.interpret_deterministic(instruction, snapshot)
+        model_metadata: dict = {}
+        if result is None:
+            outcome = self._model_order(instruction, snapshot)
+            if isinstance(outcome, CompanionResponse):
+                outcome.utterance_id = generation
+                return outcome
+            if len(outcome) == 3:
+                # Legacy direct-command format: the unchanged strict decoder handles it.
+                return outcome
+            result, model_metadata = outcome
+            if result.kind == "question":
+                return self.ask(instruction)
+        latency_ms = round((time.perf_counter() - started) * 1000)
+        return self._order_response(result, instruction, snapshot, generation, latency_ms, model_metadata)
+
+    def _model_order(
+        self,
+        instruction: str,
+        snapshot: GameSnapshot,
+    ) -> tuple[nl_orders.OrderResult, dict] | tuple[RouterResult, list[dict], dict] | CompanionResponse:
+        """Ask the routed model for a typed intent under a JSON schema, then ground it."""
+        messages = nl_orders.intent_messages(instruction, snapshot)
+        deictic = bool(nl_orders.VISUAL_REFERENCE.search(nl_orders.normalize(instruction)))
+        images: list[tuple[bytes, str]] = []
+        views: list[dict] = []
+        if deictic and self.router.settings.vision_model != "local-no-vision":
+            # "Move that tank" can depend on what the player is looking at.
+            images, views = self._vision_inputs(snapshot)
+        structured_chat = getattr(self.router, "chat_structured", None)
+        structured_vision = getattr(self.router, "vision_structured", None)
+        attempts: list[dict] = []
+        started = time.perf_counter()
+
+        def request(extra: list[dict] | None = None) -> RouterResult:
+            conversation = [*messages, *(extra or [])]
+            if images:
+                prompt = (
+                    nl_orders.INTENT_PROMPT + "\n" + FULL_VISION_PROMPT + "\n\n"
+                    + "\n".join(str(message["content"]) for message in conversation[1:])
+                )
+                if structured_vision is not None:
+                    return structured_vision(prompt, images, nl_orders.ORDER_SCHEMA, name="player_order", max_tokens=320)
+                return self.router.vision_many(prompt, images)
+            if structured_chat is not None:
+                return structured_chat(conversation, nl_orders.ORDER_SCHEMA, name="player_order", max_tokens=320)
+            return self.router.chat(conversation)
+
+        try:
+            result = request()
+        except RouterError as exc:
+            return CompanionResponse(
+                "The AI router is unavailable, so I couldn't interpret that order; nothing was created.",
+                "deterministic-fallback",
+                latency_ms=round((time.perf_counter() - started) * 1000),
+                metadata={"degraded": True, "reason": str(exc), "action": {"state": "not_created"}},
+            )
+        attempts.append({"latency_ms": result.latency_ms, "chars": len(result.text)})
+        for attempt in range(2):
+            decoded = nl_orders.parse_intent_json(result.text)
+            if decoded is not None and "intent" in decoded:
+                order = nl_orders.interpret_model_intent(instruction, snapshot, decoded)
+                if order is not None:
+                    return order, {
+                        "model": result.model,
+                        "model_latency_ms": round((time.perf_counter() - started) * 1000),
+                        "attempts": attempts,
+                        "vision_used": result.vision_used,
+                        "intent": decoded,
+                    }
+            elif decoded is not None and "mode" in decoded:
+                # Providers that answer in the previous direct-command format still pass
+                # through the unchanged strict command validator.
+                return result, views, {"path": "legacy-format", "attempts": attempts}
+            if attempt == 1:
+                break
+            # One repair attempt; malformed text never reaches the player.
+            try:
+                result = request([
+                    {"role": "assistant", "content": result.text[:600]},
+                    {"role": "user", "content": "That reply was not a valid JSON object for the required schema. Reply again with only the JSON object."},
+                ])
+            except RouterError:
+                break
+            attempts.append({"latency_ms": result.latency_ms, "chars": len(result.text), "repair": True})
+        return nl_orders.OrderResult(
+            "clarify",
+            "I didn't catch a clear order. Which units should do what, and where?",
+            path="model-unparsed",
+        ), {"model": result.model, "attempts": attempts, "malformed_model_output": True}
+
+    def _order_response(
+        self,
+        result: nl_orders.OrderResult,
+        instruction: str,
+        snapshot: GameSnapshot,
+        generation: int,
+        latency_ms: int,
+        model_metadata: dict,
+    ) -> CompanionResponse:
+        metadata: dict = {"nl": {**result.as_metadata(), **({"model": model_metadata} if model_metadata else {})}}
+        if model_metadata.get("model"):
+            metadata["model"] = model_metadata["model"]
+        created: ActionProposal | None = None
+        if result.kind == "proposal":
+            try:
+                commands = self._validate_action_commands(snapshot, result.commands, player_request=True)
+            except ValueError as exc:
+                response = CompanionResponse(
+                    "That order didn't pass live safety validation, so nothing was prepared.",
+                    "action-rejected",
+                    utterance_id=generation,
+                    latency_ms=latency_ms,
+                    metadata={**metadata, "action": {"state": "rejected", "reason": str(exc)}},
+                )
+            else:
+                summary = snapshot.humanize_text(result.summary.strip().rstrip(".")) or "Proposed order"
+                created = ActionProposal(
+                    proposal_id=str(uuid.uuid4()),
+                    instruction=instruction,
+                    summary=summary[:180],
+                    expected_tick=snapshot.tick,
+                    commands=commands,
+                    created_at=time.monotonic(),
+                    player_request=True,
+                )
+                with self._action_lock:
+                    self._pending_action = created
+                count = len(commands)
+                lead = f"{summary}. " + (f"{result.message} " if result.message else "")
+                response = CompanionResponse(
+                    f"{lead}I prepared {count} validated {'order' if count == 1 else 'orders'}. "
+                    "Say confirm to execute, or cancel.",
+                    "action-proposal",
+                    utterance_id=generation,
+                    latency_ms=latency_ms,
+                    metadata={**metadata, "action": {"state": "pending", **created.as_dict()}},
+                )
+        else:
+            state = "rejected" if result.kind == "refuse" else "not_created"
+            text = result.message or "Which units should do what, and where?"
+            response = CompanionResponse(
+                snapshot.humanize_text(text),
+                {"refuse": "order-refused", "clarify": "order-clarification"}.get(result.kind, "order-explanation"),
+                utterance_id=generation,
+                latency_ms=latency_ms,
+                metadata={**metadata, "action": {"state": state, "reason": result.kind}},
+            )
+        if self._interrupted(generation):
+            if created is not None:
+                with self._action_lock:
+                    if self._pending_action == created:
+                        self._pending_action = None
+            response.text = ""
+            response.interrupted = True
+        return response
+
     def handle_player_input(self, text: str) -> CompanionResponse:
         """Answer a question or create a proposal that still requires confirmation."""
         instruction = text.strip()
@@ -1807,6 +2030,11 @@ class Companion:
             return self.confirm_action()
 
         strategy_intent, requested_strategy = detect_strategy_intent(instruction)
+        background = instruction.lower().startswith(nl_orders.AUTO_INSTRUCTION_PREFIX)
+        if strategy_intent == "set" and not background and not nl_orders.is_strategy_command(instruction):
+            # "set the tanks to defensive stance" or "go build a medium tank" are unit orders,
+            # not doctrine switches.
+            strategy_intent, requested_strategy = "", None
         if strategy_intent == "query":
             generation = self._begin()
             metadata_strategy = strategy_contract(requested_strategy or self.native_strategy)
@@ -1876,20 +2104,30 @@ class Companion:
         failure_followup = _is_action_failure_followup(instruction)
         scout_request = _is_scout_request(instruction)
 
+        started = time.perf_counter()
+        views: list[dict] = []
+        result: RouterResult | None = None
+        nl_metadata: dict = {}
+        if not background and not (progress_request or failure_followup or scout_request):
+            # Player orders: deterministic fast path, then a schema-constrained typed
+            # intent. Both are grounded in Python; advice keeps the planner path.
+            outcome = self._interpret_player_order(instruction, snapshot, generation)
+            if isinstance(outcome, CompanionResponse):
+                return outcome
+            if outcome is not None:
+                result, views, nl_metadata = outcome
+
         # General explanations need one grounded answer, not a multi-tool action plan.
         # Preserve the planner's existing compound-order and live-briefing behavior.
-        if (not (progress_request or failure_followup or scout_request)
+        if (result is None and not (progress_request or failure_followup or scout_request)
                 and instruction.lower().startswith(("explain ", "why ", "what is ", "what are ", "how does ", "how do "))):
             return self.ask(instruction)
 
-        started = time.perf_counter()
         with self._action_lock:
             planner = self._action_planner
         planner_metadata: dict = {}
         planner_error = ""
-        views: list[dict] = []
-        result: RouterResult | None = None
-        if planner is not None:
+        if result is None and planner is not None:
             try:
                 planned = planner(instruction)
                 values = planned.get("commands", []) if isinstance(planned, dict) else []
@@ -1963,6 +2201,8 @@ class Companion:
 
         created_proposal: ActionProposal | None = None
         result_metadata = {"model": result.model}
+        if nl_metadata:
+            result_metadata["nl"] = nl_metadata
         if planner_metadata:
             result_metadata["mcp"] = planner_metadata
         elif planner_error:
@@ -1995,7 +2235,9 @@ class Companion:
             )
         else:
             try:
-                commands = self._validate_action_commands(snapshot, decoded.get("commands"))
+                commands = self._validate_action_commands(
+                    snapshot, decoded.get("commands"), player_request=not background
+                )
                 summary = snapshot.humanize_text(str(decoded.get("summary", "")).strip().rstrip("."))
                 if not summary or len(summary) > 180:
                     raise ValueError("the proposal summary is missing or too long")
@@ -2006,6 +2248,7 @@ class Companion:
                     expected_tick=snapshot.tick,
                     commands=commands,
                     created_at=time.monotonic(),
+                    player_request=not background,
                 )
                 with self._action_lock:
                     self._pending_action = proposal
@@ -2092,7 +2335,11 @@ class Companion:
             )
 
         try:
-            commands = self._validate_action_commands(snapshot, [command.as_dict() for command in proposal.commands])
+            commands = self._validate_action_commands(
+                snapshot,
+                [command.as_dict() for command in proposal.commands],
+                player_request=proposal.player_request,
+            )
         except ValueError as exc:
             with self._action_lock:
                 if self._pending_action == proposal:
