@@ -88,7 +88,11 @@ class LocalAIManagerTests(unittest.TestCase):
             suffix = ".exe" if os.name == "nt" else ""
             (runtime_root / "llama" / ("llama-server" + suffix)).write_text("llama", encoding="utf-8")
             (runtime_root / "whisper" / ("whisper-server" + suffix)).write_text("whisper", encoding="utf-8")
-            companion = Companion()
+            from openra_ai_companion.router import AIRouter
+            from openra_ai_companion.settings import Settings
+
+            # An explicit local choice (first launch with no settings now defaults to hosted).
+            companion = Companion(router=AIRouter(Settings()))
             manager = _TestManager(
                 companion,
                 lock_path=lock,

@@ -10,6 +10,9 @@ from openai import AsyncOpenAI
 
 
 LOCAL_PROVIDER = "local"
+# Providers served by the loopback gateway. Their credentials (the hosted
+# install token or an External key) live in the gateway, never in this process.
+GATEWAY_PROVIDERS = frozenset({"local", "hosted", "custom"})
 LOCAL_MODEL = "local-coder"
 LOCAL_ROUTER_URL = "http://127.0.0.1:4000"
 HOSTED_MODEL = "gpt-5.5"
@@ -27,6 +30,10 @@ class AgentModelRuntime:
     @property
     def local(self) -> bool:
         return self.provider == LOCAL_PROVIDER
+
+    @property
+    def gateway(self) -> bool:
+        return self.provider in GATEWAY_PROVIDERS
 
     async def close(self) -> None:
         if self.client is not None:
@@ -56,15 +63,17 @@ def create_agent_model(
     model = model.strip()
     if not model:
         raise ValueError("model must not be empty")
-    if provider != LOCAL_PROVIDER:
+    if provider not in GATEWAY_PROVIDERS:
+        # Research tooling only (autoplay/learn with provider "openai"): the
+        # Agents SDK default client reads OPENAI_API_KEY from this process.
         return AgentModelRuntime(provider, model, model, None, RunConfig())
 
-    # A local run must never fall back to the OpenAI default provider or export
-    # traces there. The BeTenshi router owns the local-coder -> vLLM mapping.
+    # Gateway runs must never fall back to the OpenAI default provider or export
+    # traces there. The gateway owns local-coder, hosted and External routing.
     set_tracing_disabled(True)
     os.environ["OPENAI_AGENTS_DISABLE_TRACING"] = "1"
     client = AsyncOpenAI(
-        api_key="local-router",
+        api_key="loopback-gateway",
         base_url=f"{router_url.rstrip('/')}/v1",
         timeout=120.0,
         max_retries=0,
@@ -89,7 +98,18 @@ def agent_model_settings(
     max_tokens: int,
     reasoning_effort: str,
     tool_choice: str | None = None,
+    gateway: bool = False,
 ) -> ModelSettings:
+    if gateway and not local:
+        # Hosted (Claude Haiku 4.5 behind the RTS AI proxy) and External
+        # endpoints: the standard chat/tool surface only. The proxy clamps
+        # max_tokens and has no reasoning-effort knob for this model.
+        return ModelSettings(
+            temperature=0.2,
+            tool_choice=tool_choice,
+            parallel_tool_calls=False,
+            max_tokens=max_tokens,
+        )
     if local:
         # vLLM accepts the standard chat/tool surface but not OpenAI-only
         # reasoning or verbosity fields.

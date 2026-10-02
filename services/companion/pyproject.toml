@@ -11,6 +11,7 @@ dependencies = [
   "grpcio>=1.67,<2",
   "mcp>=1.21,<2",
   "openai-agents>=0.18,<0.19",
+  "Pillow>=11,<13",
   "protobuf>=5.29,<7"
 ]
 

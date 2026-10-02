@@ -279,7 +279,8 @@ def main(argv: list[str] | None = None) -> int:
     with OpenRABridge(args.bridge) as bridge:
         from .interactive_agent import InteractiveMCPPlanner
 
-        planner = InteractiveMCPPlanner(args.bridge)
+        # The planner follows the companion's live route (local, hosted or custom) through the gateway.
+        planner = InteractiveMCPPlanner(args.bridge, router=companion.router)
         companion.set_action_planner(planner.plan)
         companion.set_action_executor(bridge.execute_actions)
         companion.set_snapshot_provider(bridge.observe)
@@ -331,6 +332,7 @@ def main(argv: list[str] | None = None) -> int:
         capabilities_announced = False
         insight_expires_at = 0.0
         last_threat_signature: tuple[int, str, str] | None = None
+        last_service_signature: tuple[str, str, bool] | None = None
         last_auto_act_enabled = companion.auto_act_enabled
         auto_routine_due_at = 0.0
         auto_planner_due_at = 0.0
@@ -483,7 +485,8 @@ def main(argv: list[str] | None = None) -> int:
                             if auto_planner_due_at <= 0:
                                 auto_planner_due_at = now + 12.0
                     if auto_response is None and now >= auto_planner_due_at:
-                        publish_status("thinking", "AUTO COMMANDER  •  PLANNING WITH 26 GAME TOOLS")
+                        if companion.llm_auto_planner_allowed:
+                            publish_status("thinking", "AUTO COMMANDER  •  PLANNING WITH 26 GAME TOOLS")
                         auto_response = companion.auto_act_once(event_context)
                         auto_planner_due_at = now + _auto_planner_interval(threat.level)
                     if event_context:
@@ -510,6 +513,19 @@ def main(argv: list[str] | None = None) -> int:
                         ):
                             response = auto_response
                             last_auto_message_at = now
+                service = companion.ai_service_status()
+                service_signature = (str(service["route"]), str(service["state"]), bool(service["degraded"]))
+                if service_signature != last_service_signature and response is None and not user_priority:
+                    if service["degraded"]:
+                        # One orange SYSTEM // DEGRADED line when the brain moves to the
+                        # local fallback or to alerts only; the idle line then keeps it visible.
+                        print(f"[ai-service] {service['hud']}")
+                        publish_status("error", "AI  •  " + str(service["hud"]).split("  •  ", 1)[-1])
+                        insight_expires_at = time.monotonic() + 8.0
+                    elif last_service_signature is not None and last_service_signature[2]:
+                        print("[ai-service] hosted AI restored")
+                        publish_status(*companion.idle_status())
+                    last_service_signature = service_signature
                 # Recheck at publication time: a question may have started while an
                 # event model call was finishing in this loop iteration.
                 if companion.user_turn_active or bool(hotkeys and hotkeys.active.is_set()):

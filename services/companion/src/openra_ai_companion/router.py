@@ -13,11 +13,19 @@ import uuid
 import wave
 from dataclasses import dataclass, replace
 
-from .settings import Settings
+from .settings import HOSTED_MODEL, Settings
+
+# The hosted proxy accepts two inline images per call (viewport + tactical overview).
+MAX_IMAGES = 2
 
 
 class RouterError(RuntimeError):
-    pass
+    def __init__(self, message: str, *, status: int = 0, state: str = "", route: str = ""):
+        super().__init__(message)
+        self.status = status
+        # Hosted-gateway classification (ok, allowance, offline, paused, budget, ...).
+        self.state = state
+        self.route = route
 
 
 @dataclass(frozen=True)
@@ -42,6 +50,22 @@ class AIRouter:
         self._output_tokens = 0
         self._speech_characters = 0
         self._transcription_seconds = 0.0
+        self._service_lock = threading.Lock()
+        self._service: dict[str, object] = {"route": "", "state": "", "detail": "", "remaining_usd": None, "updated_at": 0.0}
+
+    def service_state(self) -> dict[str, object]:
+        """Where the brain was served last time: hosted, local-fallback, or none (alerts only)."""
+        with self._service_lock:
+            return dict(self._service)
+
+    def _record_service(self, route: str, state: str, detail: str = "", remaining: str | None = None) -> None:
+        with self._service_lock:
+            self._service.update({"route": route, "state": state, "detail": detail[:200], "updated_at": time.time()})
+            if remaining:
+                try:
+                    self._service["remaining_usd"] = float(remaining)
+                except ValueError:
+                    pass
 
     def configure(self, values: dict, *, persist: bool = True) -> dict[str, str | float | bool]:
         self.settings = self.settings.with_updates(values)
@@ -60,15 +84,37 @@ class AIRouter:
             headers={"Content-Type": content_type, "Accept": "application/json, audio/wav"},
             method="POST",
         )
+        brain = path == "/v1/chat/completions"
         try:
             with urllib.request.urlopen(request, timeout=self.settings.timeout_seconds) as response:
                 payload = response.read()
                 response_type = response.headers.get("Content-Type", "")
+                if brain:
+                    self._record_service(
+                        response.headers.get("X-RTSAI-AI-Route", "") or "direct",
+                        response.headers.get("X-RTSAI-AI-State", "") or "ok",
+                        remaining=response.headers.get("x-rtsai-remaining-usd"),
+                    )
         except urllib.error.HTTPError as exc:
             detail = exc.read().decode("utf-8", errors="replace")[:500]
-            raise RouterError(f"AI router returned HTTP {exc.code}: {detail}") from exc
+            state = (exc.headers.get("X-RTSAI-AI-State", "") if exc.headers else "") or "error"
+            route = (exc.headers.get("X-RTSAI-AI-Route", "") if exc.headers else "") or "none"
+            if brain:
+                try:
+                    message = str(json.loads(detail).get("error", {}).get("message", ""))
+                except (ValueError, AttributeError):
+                    message = ""
+                self._record_service(route, state, message)
+            raise RouterError(f"AI router returned HTTP {exc.code}: {detail}", status=exc.code, state=state, route=route) from exc
         except (OSError, TimeoutError, urllib.error.URLError) as exc:
-            raise RouterError(f"AI router is unavailable at {self.settings.router_url}: {exc}") from exc
+            # urllib wraps connection failures (refused, or a connect timeout) in
+            # URLError: the gateway is not running. A bare timeout while waiting
+            # for the response means it is up but the model behind it is slow.
+            state = "upstream" if isinstance(exc, TimeoutError) else "gateway_unreachable"
+            if brain:
+                self._record_service("none", state, str(exc))
+            raise RouterError(f"AI router is unavailable at {self.settings.router_url}: {exc}",
+                              state=state, route="none") from exc
         return payload, round((time.perf_counter() - started) * 1000), response_type
 
     def _get_json(self, path: str) -> dict:
@@ -218,6 +264,109 @@ class AIRouter:
     def chat(self, messages: list[dict[str, object]], temperature: float | None = None) -> RouterResult:
         return self._chat(messages, self.settings.text_model)
 
+    def _structured(
+        self,
+        messages: list[dict[str, object]],
+        model: str,
+        schema: dict,
+        *,
+        name: str,
+        max_tokens: int,
+    ) -> RouterResult:
+        """Request schema-constrained JSON, degrading for providers without json_schema support.
+
+        llama.cpp turns ``json_schema`` into a GBNF grammar, so the local model
+        cannot emit malformed or out-of-schema output.  Hosted OpenAI-compatible
+        services use the same standard field.  Endpoints that reject it are
+        retried with ``json_object`` and finally with prompt-only JSON; callers
+        still validate the result strictly.
+        """
+        formats: list[dict | None] = [
+            {"type": "json_schema", "json_schema": {"name": name, "schema": schema, "strict": True}},
+            {"type": "json_object"},
+            None,
+        ]
+        last_error: RouterError | None = None
+        for response_format in formats:
+            body: dict[str, object] = {
+                "model": model,
+                "messages": messages,
+                "max_tokens": max_tokens,
+                "temperature": 0,
+            }
+            if response_format is not None:
+                body["response_format"] = response_format
+            started = time.perf_counter()
+            try:
+                payload, _, _ = self._request("/v1/chat/completions", json.dumps(body).encode("utf-8"), "application/json")
+            except RouterError as exc:
+                detail = str(exc).lower()
+                unsupported = "http 400" in detail or "http 422" in detail
+                if response_format is not None and unsupported and any(
+                    marker in detail for marker in ("response_format", "json_schema", "json_object", "schema", "grammar", "unsupported", "not supported")
+                ):
+                    last_error = exc
+                    continue
+                raise
+            latency = round((time.perf_counter() - started) * 1000)
+            try:
+                response = json.loads(payload)
+                content = response["choices"][0]["message"]["content"]
+                if isinstance(content, list):
+                    content = " ".join(str(part.get("text", "")) for part in content if isinstance(part, dict))
+                text = str(content or "").strip()
+                usage = response.get("usage") or {}
+                input_tokens = int(usage.get("prompt_tokens") or usage.get("input_tokens") or 0)
+                output_tokens = int(usage.get("completion_tokens") or usage.get("output_tokens") or 0)
+            except (KeyError, IndexError, TypeError, json.JSONDecodeError) as exc:
+                raise RouterError("AI router returned an invalid chat completion") from exc
+            if not text:
+                raise RouterError("AI router returned an empty chat completion")
+            with self._usage_lock:
+                self._chat_calls += 1
+                self._input_tokens += input_tokens or max(1, sum(len(str(m.get("content", ""))) for m in messages) // 4)
+                self._output_tokens += output_tokens or max(1, len(text) // 4)
+            return RouterResult(text, latency, model, input_tokens, output_tokens)
+        raise last_error or RouterError("AI router rejected every structured-output format")
+
+    def chat_structured(
+        self,
+        messages: list[dict[str, object]],
+        schema: dict,
+        *,
+        name: str = "structured_reply",
+        max_tokens: int = 320,
+    ) -> RouterResult:
+        return self._structured(messages, self.settings.text_model, schema, name=name, max_tokens=max_tokens)
+
+    def vision_structured(
+        self,
+        prompt: str,
+        images: list[tuple[bytes, str]],
+        schema: dict,
+        *,
+        name: str = "structured_reply",
+        max_tokens: int = 320,
+    ) -> RouterResult:
+        """Schema-constrained multimodal request; text-only profiles use the structured state alone."""
+        if self.settings.vision_model == "local-no-vision" or not images:
+            return self.chat_structured([
+                {"role": "system", "content": "Use only the structured game state below. No images are available; do not invent visual details."},
+                {"role": "user", "content": prompt},
+            ], schema, name=name, max_tokens=max_tokens)
+        content: list[dict[str, object]] = [{"type": "text", "text": prompt}]
+        for image, media_type in images[:MAX_IMAGES]:
+            encoded = base64.b64encode(image).decode("ascii")
+            content.append({"type": "image_url", "image_url": {"url": f"data:{media_type};base64,{encoded}", "detail": "high"}})
+        try:
+            result = self._structured([{"role": "user", "content": content}], self.settings.vision_model, schema,
+                                      name=name, max_tokens=max_tokens)
+        except RouterError as exc:
+            if "not a multimodal model" not in str(exc).lower():
+                raise
+            return self.chat_structured([{"role": "user", "content": prompt}], schema, name=name, max_tokens=max_tokens)
+        return replace(result, vision_used=True)
+
     def vision(self, prompt: str, image: bytes, media_type: str = "image/png") -> RouterResult:
         if self.settings.vision_model == "local-no-vision":
             raise RouterError("The lightweight AI profile uses game state, not map images. Choose Balanced for image analysis.")
@@ -253,7 +402,7 @@ class AIRouter:
         if not images or any(not image for image, _ in images):
             raise ValueError("at least one non-empty image is required")
         content: list[dict[str, object]] = [{"type": "text", "text": prompt}]
-        for image, media_type in images[:3]:
+        for image, media_type in images[:MAX_IMAGES]:
             encoded = base64.b64encode(image).decode("ascii")
             content.append({
                 "type": "image_url",
@@ -319,6 +468,7 @@ class AIRouter:
             return 0.0, 0.0, "Local router model: $0 provider cost"
         prices = {
             "gpt-5.5": (5.0, 30.0, "GPT-5.5 public token rates"),
+            HOSTED_MODEL: (1.0, 5.0, "Claude Haiku 4.5 list price ($1 / $5 per 1M tokens) via the RTS AI proxy"),
         }
         return prices.get(model.lower(), (0.0, 0.0, f"No public price mapping for {model}"))
 

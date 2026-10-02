@@ -3,7 +3,7 @@
   "pack_version": "2026.08.1",
   "name": "OpenRA AI Local AI Pack",
   "description": "Checksum-pinned model payload used by the platform-specific local OpenRA AI runtime.",
-  "catalogue_version": "2026.09.03",
+  "catalogue_version": "2026.10.02",
   "model_profiles": [
     {
       "id": "recommended",
@@ -30,6 +30,20 @@
       "model": "models/llm/Qwen3VL-2B-Instruct-Q4_K_M.gguf",
       "projector": null,
       "components": ["qwen3-vl-2b-q4", "whisper-base-en", "kokoro-82m-int8", "kokoro-voices-v1"]
+    },
+    {
+      "id": "voice-only",
+      "label": "Hosted co-commander with local voice",
+      "model_name": "Claude Haiku 4.5 on rtsai.net; Whisper and Kokoro on this PC",
+      "brain": "hosted",
+      "validated": true,
+      "priority": 0,
+      "memory_bytes": 1073741824,
+      "prefers_acceleration": false,
+      "context_length": null,
+      "model": null,
+      "projector": null,
+      "components": ["whisper-base-en", "kokoro-82m-int8", "kokoro-voices-v1"]
     }
   ],
   "hardware_requirements": {

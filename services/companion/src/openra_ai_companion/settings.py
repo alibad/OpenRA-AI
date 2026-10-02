@@ -42,6 +42,30 @@ def _load_user_settings() -> dict[str, str | float | bool]:
     return value if isinstance(value, dict) else {}
 
 
+HOSTED_MODEL = "claude-haiku-4-5"
+# First launch with no saved provider: thinking goes to the RTS AI hosted proxy
+# through the loopback gateway, while speech stays on this machine.
+HOSTED_DEFAULTS = {
+    "model_provider": "hosted",
+    "text_model": HOSTED_MODEL,
+    "vision_model": HOSTED_MODEL,
+    "transcribe_model": "local-whisper",
+    "speech_model": "local-kokoro",
+}
+
+
+def explicit_model_provider() -> str | None:
+    """The provider the player or installer chose, or None on a first launch."""
+    configured = os.environ.get("OPENRA_AI_MODEL_PROVIDER", "").strip()
+    if configured:
+        return configured
+    value = _load_user_settings().get("model_provider")
+    if isinstance(value, str) and value.strip():
+        return value.strip()
+    value = _load_project_env().get("OPENRA_AI_MODEL_PROVIDER", "").strip()
+    return value or None
+
+
 @dataclass(frozen=True)
 class Settings:
     router_url: str = "http://127.0.0.1:4000"
@@ -65,6 +89,10 @@ class Settings:
     def from_env(cls) -> "Settings":
         file_values = _load_project_env()
         user_values = _load_user_settings()
+        if explicit_model_provider() is None:
+            # Out of the box: hosted thinking plus local voice. Explicit values
+            # (environment, saved settings or the installer) always win.
+            user_values = {**HOSTED_DEFAULTS, **user_values}
 
         def get(name: str, default: str) -> str:
             field_name = {
@@ -116,8 +144,8 @@ class Settings:
         parsed = urlparse(self.router_url)
         if parsed.scheme not in {"http", "https"} or not parsed.netloc:
             raise ValueError("AI Layer URL must be an absolute http or https URL")
-        if self.model_provider not in {"openai", "anthropic", "gemini", "local", "custom"}:
-            raise ValueError("model_provider must be openai, anthropic, gemini, local, or custom")
+        if self.model_provider not in {"openai", "anthropic", "gemini", "local", "custom", "hosted"}:
+            raise ValueError("model_provider must be openai, anthropic, gemini, local, custom, or hosted")
         if self.model_selection not in {"auto", "recommended", "lightweight", "manual"}:
             raise ValueError("model_selection must be auto, recommended, lightweight, or manual")
         for name in ("text_model", "vision_model", "transcribe_model", "speech_model", "speech_voice"):

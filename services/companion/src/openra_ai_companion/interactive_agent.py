@@ -15,6 +15,7 @@ from agents.mcp import MCPServerStdio
 from pydantic import BaseModel, Field
 
 from .agent_models import (
+    GATEWAY_PROVIDERS,
     agent_model_settings,
     create_agent_model,
     default_agent_model,
@@ -196,20 +197,35 @@ class InteractiveMCPPlanner:
         model: str | None = None,
         provider: str | None = None,
         router_url: str | None = None,
+        router: Any | None = None,
     ) -> None:
         self.bridge = bridge
+        self._router = router
         self.provider = (provider or default_agent_provider()).strip().lower()
         self.model = model or default_agent_model(self.provider)
         self.router_url = (router_url or default_agent_router_url()).rstrip("/")
         self._dialogue: deque[tuple[str, str]] = deque(maxlen=6)
         self._dialogue_lock = threading.Lock()
 
+    def _sync_route(self) -> None:
+        """Follow the companion's live route: hosted and External go through the gateway too."""
+        if self._router is None:
+            return
+        settings = self._router.settings
+        provider = str(settings.model_provider).strip().lower()
+        if provider in GATEWAY_PROVIDERS:
+            self.provider = provider
+            self.model = str(settings.text_model)
+            self.router_url = str(settings.router_url).rstrip("/")
+
     async def _plan(
         self,
         instruction: str,
         dialogue: tuple[tuple[str, str], ...] = (),
     ) -> dict[str, Any]:
-        if self.provider != "local":
+        self._sync_route()
+        if self.provider not in GATEWAY_PROVIDERS:
+            # Only the explicit "openai" research provider may read OPENAI_API_KEY.
             _reuse_project_key()
             os.environ.setdefault("OPENAI_AGENTS_DONT_LOG_MODEL_DATA", "1")
             os.environ.setdefault("OPENAI_AGENTS_DONT_LOG_TOOL_DATA", "1")
@@ -247,9 +263,10 @@ class InteractiveMCPPlanner:
                     output_type=InteractiveDecision,
                     model_settings=agent_model_settings(
                         local=model_runtime.local,
-                        max_tokens=900 if model_runtime.local else 1200,
+                        max_tokens=900 if model_runtime.local else 1000,
                         reasoning_effort="low",
                         tool_choice="auto",
+                        gateway=model_runtime.gateway,
                     ),
                 )
                 history = "\n".join(
@@ -293,9 +310,10 @@ class InteractiveMCPPlanner:
                     })
                     retry_agent = agent.clone(model_settings=agent_model_settings(
                         local=model_runtime.local,
-                        max_tokens=900 if model_runtime.local else 1200,
+                        max_tokens=900 if model_runtime.local else 1000,
                         reasoning_effort="low",
                         tool_choice=proposed_action if proposed_action in _ACTION_TOOL_NAMES else "required",
+                        gateway=model_runtime.gateway,
                     ))
                     result = await Runner.run(
                         retry_agent,

@@ -45,6 +45,8 @@ class LocalRuntimeTests(unittest.TestCase):
         manifest = json.loads((root / "packaging/ai-pack.lock.json").read_text())
         self.assertTrue(manifest["model_profiles"])
         for profile in manifest["model_profiles"]:
+            if profile.get("brain") == "hosted":
+                continue  # voice-only: the hosted proxy does the thinking
             self.assertGreaterEqual(profile["context_length"], 8192)
 
     def test_lightweight_runtime_skips_images_and_caps_cpu(self) -> None:

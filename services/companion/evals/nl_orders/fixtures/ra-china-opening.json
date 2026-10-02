@@ -1,0 +1,86 @@
+{
+ "captured": {
+  "at": "2026-09-27T21:46:10+00:00",
+  "enemy_faction": "russia",
+  "engine_commit": "5ddc34cb91e52953d4844c169075a0dbbd79e139",
+  "map": "desert-rats",
+  "mod": "ra",
+  "note": "Start of match: the Mobile Construction Vehicle is not deployed yet.",
+  "player_faction": "china",
+  "product_commit": "cc6e80a1c67cb2a8979ec4dc779dbb00d4c55576",
+  "scenario": "opening",
+  "source": "live headless OpenRA multi-session match (Game.Platform=Null)",
+  "spatial_map": "omitted to keep fixtures reviewable; not used by order interpretation"
+ },
+ "fixture": "ra-china-opening",
+ "observation": {
+  "actor_names": {
+   "mcv": "Mobile Construction Vehicle"
+  },
+  "economy": {
+   "cash": 5000
+  },
+  "episode_id": "272e504ca490",
+  "explored_percent": 0.94521606,
+  "map_info": {
+   "bounds_height": 70,
+   "bounds_width": 70,
+   "bounds_x": 1,
+   "bounds_y": 1,
+   "height": 72,
+   "map_name": "Desert Rats",
+   "width": 72
+  },
+  "military": {
+   "active_unit_count": 1,
+   "army_value": 2000,
+   "assets_value": 2000
+  },
+  "mod_id": "ra",
+  "objectives": [
+   {
+    "description": "Destroy all opposition!",
+    "required": true,
+    "state": "incomplete",
+    "type": "Primary"
+   }
+  ],
+  "spatial_channels": 0,
+  "tick": 28,
+  "units": [
+   {
+    "actor_id": 163,
+    "ammo": -1,
+    "armor_type": "Light",
+    "cell_x": 49,
+    "cell_y": 55,
+    "cost": 2000,
+    "facing": 512,
+    "hp_percent": 1.0,
+    "is_idle": true,
+    "last_seen_tick": 28,
+    "move_target_x": 49,
+    "move_target_y": 55,
+    "owner": "Multi0",
+    "passenger_count": -1,
+    "pos_x": 50688,
+    "pos_y": 56832,
+    "speed": 60,
+    "target_types": [
+     "GroundActor",
+     "Vehicle",
+     "MindControl"
+    ],
+    "type": "mcv"
+   }
+  ]
+ },
+ "state": {
+  "enemy_faction": "russia",
+  "episode_id": "272e504ca490",
+  "phase": "playing",
+  "player_count": 5,
+  "player_faction": "china",
+  "tick": 28
+ }
+}

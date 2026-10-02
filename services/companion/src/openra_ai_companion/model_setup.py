@@ -15,13 +15,26 @@ import urllib.request
 from pathlib import Path, PurePosixPath
 from typing import TYPE_CHECKING
 
-from .model_selection import Hardware, choose_profile, selected_components, selection_status, validate_profiles
+from .model_selection import (
+    Hardware,
+    choose_profile,
+    selected_components,
+    selection_status,
+    validate_profiles,
+    voice_only_profile,
+)
+from .settings import HOSTED_MODEL
 
 if TYPE_CHECKING:
     from .core import Companion
 
 
 LOCAL_ROUTER_URL = os.environ.get("OPENRA_AI_LOCAL_ROUTER_URL", "http://127.0.0.1:4000")
+
+
+def gateway_mode(model_provider: str) -> str:
+    """Map the companion's provider setting to the loopback gateway mode it needs."""
+    return {"local": "local", "hosted": "hosted", "custom": "external"}.get(model_provider, "unmanaged")
 
 
 class LocalAISetupError(RuntimeError):
@@ -75,10 +88,31 @@ class LocalAIManager:
         self._profile: dict = {}
         self._hardware = Hardware.detect()
         self._preference = companion.router.settings.model_selection
+        # Gateway routing chosen once per launch: local models, an external
+        # OpenAI-compatible endpoint, or the hosted RTS AI proxy with local voice.
+        self.mode = gateway_mode(companion.router.settings.model_provider)
+        self._gateway_state = "stopped"
         self._load_manifest()
         atexit.register(self.stop)
 
-        if not self.supported and self._state != "unsupported":
+        if self.mode in {"hosted", "external"} and self.gateway_supported:
+            # The hosted brain and External endpoints need only the loopback
+            # gateway, never the model pack. In hosted mode the pack state below
+            # describes the optional ~270 MB voice pack.
+            if self.mode == "hosted" and self.supported and self.installed:
+                self._state = "ready"
+                self._detail = "Voice pack installed."
+            elif self.mode == "hosted" and self.supported:
+                self._detail = "Hosted AI needs no download. Install the voice pack (about 270 MB) to talk to the co-commander."
+            elif self.mode == "hosted":
+                self._state = "unsupported"
+                self._detail = "Hosted AI is available; local voice is not included in this build."
+            elif self.mode == "external":
+                self._state = "ready"
+                self._detail = "External AI endpoint configured."
+            if auto_start:
+                self._start_worker(self._start_runtime_safely)
+        elif not self.supported and self._state != "unsupported":
             self._state = "unsupported"
             self._detail = (
                 "Local AI requires macOS 13.3 or newer."
@@ -92,6 +126,16 @@ class LocalAIManager:
                                self.companion.router.settings.transcribe_model == "local-whisper" or
                                self.companion.router.settings.speech_model == "local-kokoro"):
                 self._start_worker(self._start_runtime_safely)
+
+    @property
+    def gateway_supported(self) -> bool:
+        """The loopback gateway can run without any model files (hosted and External modes)."""
+        return bool(
+            self._platform_supported()
+            and self.install_root
+            and self.runtime_executable
+            and self.runtime_executable.is_file()
+        )
 
     @staticmethod
     def _environment_path(name: str) -> Path | None:
@@ -120,7 +164,10 @@ class LocalAIManager:
                 ):
                     raise ValueError(f"invalid component {component.get('id', 'unknown')}")
             validate_profiles(value)
-            self._profile = choose_profile(value, self._hardware, self._preference)
+            if self.mode == "hosted":
+                self._profile = self._hosted_profile(value)
+            else:
+                self._profile = choose_profile(value, self._hardware, self._preference)
             components = selected_components(value, self._profile)
             value = {**value, "components": components}
             self._manifest = value
@@ -128,6 +175,19 @@ class LocalAIManager:
         except (OSError, ValueError, TypeError, KeyError, json.JSONDecodeError) as exc:
             self._state = "unsupported"
             self._detail = f"The bundled Local AI Pack manifest is invalid: {exc}"
+
+    def _hosted_profile(self, manifest: dict) -> dict:
+        """Voice-only download, unless a full local model is already installed to serve as the fallback brain."""
+        try:
+            local = choose_profile(manifest, self._hardware, self._preference)
+        except ValueError:
+            local = {}
+        if local and self.install_root and local.get("model"):
+            pack_root = self.install_root / "ai"
+            paths = [local["model"], *([local["projector"]] if local.get("projector") else [])]
+            if all((pack_root / Path(*PurePosixPath(path).parts)).is_file() for path in paths):
+                return local
+        return voice_only_profile(manifest) or local
 
     @property
     def supported(self) -> bool:
@@ -196,10 +256,15 @@ class LocalAIManager:
                 detail = "Local models are loading…"
                 self._state = state
                 self._detail = detail
+            gateway = self._gateway_state
+            if process and process.poll() is not None and gateway in {"starting", "running"}:
+                gateway = self._gateway_state = "error"
             downloaded = self._downloaded_bytes
             total = self._total_bytes
             progress = round(downloaded / total * 100) if total else 0
             requirements = dict((self._manifest or {}).get("hardware_requirements") or {})
+            if self.mode in {"hosted", "external"}:
+                return self._gateway_status(state, detail, gateway, downloaded, total, progress, requirements)
             return {
                 "supported": self.supported,
                 "installed": self.installed,
@@ -223,6 +288,44 @@ class LocalAIManager:
                 },
             }
 
+    def _gateway_status(self, state: str, detail: str, gateway: str, downloaded: int, total: int,
+                        progress: int, requirements: dict) -> dict[str, object]:
+        """Status for hosted/External modes: brain readiness from the gateway, voice from the pack."""
+        hosted: dict = {}
+        if gateway == "running":
+            try:
+                with urllib.request.urlopen(f"{LOCAL_ROUTER_URL}/health/liveliness", timeout=0.5) as response:
+                    hosted = dict(json.loads(response.read()).get("hosted") or {})
+            except (OSError, TimeoutError, ValueError, urllib.error.URLError):
+                gateway = "starting"
+        brain = gateway if gateway != "running" else ("hosted" if self.mode == "hosted" else "external")
+        voice = state if self.mode == "hosted" else "external"
+        return {
+            "mode": self.mode,
+            "supported": self.supported,
+            "installed": self.installed,
+            "state": state,
+            "detail": detail,
+            "gateway": {"state": gateway, "url": LOCAL_ROUTER_URL},
+            "hosted": hosted,
+            "pack_version": str((self._manifest or {}).get("pack_version", "")),
+            "downloaded_bytes": downloaded,
+            "total_bytes": total,
+            "progress_percent": max(0, min(100, progress)),
+            "active_component": self._active_component,
+            "hardware_requirements": requirements,
+            "selection": selection_status(self._profile, self._hardware, self._preference),
+            "catalogue_version": str((self._manifest or {}).get("catalogue_version", "")),
+            "pending_restart": False,
+            "capabilities": {
+                "assistant": brain,
+                "map_images": brain,
+                "voice_input": "ready" if voice == "running" else voice,
+                "spoken_replies": "available_on_demand" if voice == "running" else voice,
+                "voice_language": "English",
+            },
+        }
+
     def install(self) -> dict[str, object]:
         if not self.supported:
             raise LocalAISetupError("Local AI installation is unavailable in this build.")
@@ -237,7 +340,7 @@ class LocalAIManager:
             return self.status()
 
     def retry(self) -> dict[str, object]:
-        if self.installed:
+        if self.installed or (self.mode in {"hosted", "external"} and self._gateway_state == "error"):
             with self._lock:
                 if self._worker and self._worker.is_alive():
                     return self.status()
@@ -294,6 +397,9 @@ class LocalAIManager:
                 self._active_component = ""
                 self._state = "ready"
                 self._detail = "Local AI Pack installed. Starting the model service…"
+            if self.mode == "hosted":
+                # The running gateway started without speech; restart it with the new voice models.
+                self.stop()
             self._start_runtime()
         except Exception as exc:
             with self._lock:
@@ -353,20 +459,37 @@ class LocalAIManager:
             raise LocalAISetupError(f"Security check failed for {component['id']}: SHA-256 does not match.")
         os.replace(partial, destination)
 
+    def _ready_detail(self, voice_ready: bool) -> str:
+        if self.mode == "hosted":
+            return ("Hosted AI is ready. Voice stays on this device." if voice_ready else
+                    "Hosted AI is ready. Install the voice pack (about 270 MB) to talk to the co-commander.")
+        if self.mode == "external":
+            return "Your external AI endpoint is connected through the local gateway."
+        return "Local AI is installed and ready. Voice stays on this device."
+
     def _start_runtime(self) -> None:
-        if not self.supported or not self.installed:
+        if self.mode in {"hosted", "external"}:
+            if not self.gateway_supported:
+                return
+        elif not self.supported or not self.installed:
             return
+        # In hosted mode the pack state tracks the optional voice pack only.
+        voice_ready = self.mode != "hosted" or (self.supported and self.installed)
         with self._lock:
             if _reachable(f"{LOCAL_ROUTER_URL}/health/liveliness"):
-                self._configure_local_route()
-                self._state = "running"
-                self._detail = "Local AI is installed and ready. Voice stays on this device."
+                self._gateway_state = "running"
+                self._configure_route()
+                if voice_ready:
+                    self._state = "running"
+                self._detail = self._ready_detail(voice_ready)
                 return
             if self._process and self._process.poll() is None:
                 return
-            self._state = "starting"
-            self._detail = "Local models are loading…"
-            assert self.install_root and self.runtime_executable and self.runtime_root
+            self._gateway_state = "starting"
+            if voice_ready:
+                self._state = "starting"
+                self._detail = "Local models are loading…" if self.mode == "local" else "Starting the AI gateway…"
+            assert self.install_root and self.runtime_executable
             log_directory = self.install_root / "logs"
             log_directory.mkdir(parents=True, exist_ok=True)
             output = (log_directory / "runtime.out.log").open("ab")
@@ -380,10 +503,9 @@ class LocalAIManager:
                     "--port", LOCAL_ROUTER_URL.rsplit(":", 1)[-1],
                     "--root",
                     str(self.install_root),
-                    "--runtime-root",
-                    str(self.runtime_root),
+                    *(["--runtime-root", str(self.runtime_root)] if self.runtime_root else []),
                     "--mode",
-                    "local",
+                    self.mode,
                     "--parent-pid",
                     str(os.getpid()),
                     "--model-profile", json.dumps(self._profile),
@@ -397,17 +519,46 @@ class LocalAIManager:
         deadline = time.monotonic() + 180
         while time.monotonic() < deadline:
             if self._process and self._process.poll() is not None:
+                with self._lock:
+                    self._gateway_state = "error"
                 raise LocalAISetupError(
                     "The local model service could not start. Select Retry; details are in runtime.err.log."
                 )
             if _reachable(f"{LOCAL_ROUTER_URL}/health/liveliness"):
-                self._configure_local_route()
+                self._configure_route()
                 with self._lock:
-                    self._state = "running"
-                    self._detail = "Local AI is installed and ready. Voice stays on this device."
+                    self._gateway_state = "running"
+                    if voice_ready:
+                        self._state = "running"
+                    self._detail = self._ready_detail(voice_ready)
                 return
             time.sleep(0.5)
+        with self._lock:
+            self._gateway_state = "error"
         raise LocalAISetupError("Local models did not finish loading within three minutes. Select Retry.")
+
+    def _configure_route(self) -> None:
+        """Point the companion at the gateway this launch started (its port is chosen by the launcher)."""
+        provider = self.companion.router.settings.model_provider
+        if self.mode == "local":
+            self._configure_local_route()
+            return
+        if self.mode == "hosted" and provider == "hosted":
+            self.companion.router.configure({
+                "router_url": LOCAL_ROUTER_URL,
+                "model_provider": "hosted",
+                "text_model": HOSTED_MODEL,
+                "vision_model": HOSTED_MODEL,
+                "transcribe_model": "local-whisper",
+                "speech_model": "local-kokoro",
+            })
+        elif self.mode == "external" and provider == "custom":
+            # External mode never started this gateway before, and the launcher
+            # picks its port per launch, so the saved :4000 URL was unreachable.
+            self.companion.router.configure({"router_url": LOCAL_ROUTER_URL})
+        else:
+            return
+        self.companion.apply_settings()
 
     def _configure_local_route(self) -> None:
         if self.companion.router.settings.model_provider != "local":
