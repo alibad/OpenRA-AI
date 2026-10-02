@@ -33,10 +33,13 @@ Mission-specific synthetic voices use their own generator and provenance file:
 .\.venv\Scripts\python.exe scripts\generate-mandab-voices.py
 ```
 
-The voices are generic Microsoft neural voices generated through `edge-tts`,
-then radio-mastered with FFmpeg. They do not imitate a real person. See
-`assets/red-sea-2026/mandab-voice-provenance.json` for every line, voice,
-language, duration, and disclosure flag.
+The generator now speaks through the local, redistributable engines in
+`scripts/voice_engines.py` (Kokoro-82M for English, Chatterbox Multilingual for
+Arabic), then radio-masters with FFmpeg. The Classic WAVs already in the engine
+bits predate that change and were made with `edge-tts`, whose output has no
+redistribution grant; regenerate them before any Classic release. No voice
+imitates a real person. See `assets/red-sea-2026/mandab-voice-provenance.json`
+for every line, voice, language, duration, and disclosure flag.
 
 ## Mission flow
 
