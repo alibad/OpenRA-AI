@@ -81,6 +81,21 @@ These stay in git but leave the product story, the website navigation and the re
 - Site relaunch with a 60-second trailer cut from real gameplay. The download page states the RA2 ownership requirement up front.
 - Then macOS, RA2 missions (starting with the Red Sea theatre) and a mod-directory listing.
 
+## Open branches (inventory, 2 October 2026)
+
+None of these branches has been pushed; their commits exist only in the local worktrees. No worktree is both fully merged and clean, so none has been removed.
+
+| Branch (repo) | State | Decision |
+|---|---|---|
+| `codex/ra2-red-sea` (product) | 4 commits + uncommitted roster/voice edits and `validate-ra2-red-sea.py` | Phase 2: finish, validate, merge |
+| `codex/in-game-catalog` (engine 5, product 6) | Clean | Phase 2: port into `OpenRA.Mods.RTSAI` after the Phase 1 decision |
+| `codex/nl-orders` (product) | 6 commits + 1 untracked doc | Phase 3: single-call voice orders |
+| `codex/harness` (product) | 4 commits + uncommitted docs | Phase 2 balance tooling (internal only) |
+| `codex/upstream-sync` (engine) | 182 commits, clean | Phase 1 input for the slim engine branch |
+| `codex/integrator-fixes` (engine 1, product 1) | Clean; Classic mission fixes | Parked with Classic |
+| `codex/usa-concept` (engine 2, product 2) | Clean; a sixth nation | Parked: not in the five-nation scope |
+| `codex/art-audit` (engine, product) + detached baseline | No commits; ~190 uncommitted Classic sprite/script changes | Parked with Classic. The owner decides whether to commit it as WIP or discard it |
+
 ## Guardrails
 
 - Commercial Red Alert 2 data is never bundled. A source path is not a redistribution license.
