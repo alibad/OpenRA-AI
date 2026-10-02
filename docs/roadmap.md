@@ -63,6 +63,8 @@ These stay in git but leave the product story, the website navigation and the re
 
 ## Phase 3 — AI that works out of the box
 
+**Status, 2 October 2026:** the hosted Claude Haiku 4.5 proxy (RTSAI-Web), the game's hosted gateway mode with local voice and fallback, the External-mode fix, screenshot downscaling and single-call voice orders are merged. It is verified against a mocked Anthropic API only. Still to do: owner provisioning (see `docs/hosted-ai.md`), real smoke calls, and making hosted the first-launch default in the mod's companion host and installer.
+
 - Hosted proxy on rtsai.net:
   - The key stays server-side.
   - A per-account daily allowance, a model allowlist, a `max_tokens` clamp and an image-size limit.
