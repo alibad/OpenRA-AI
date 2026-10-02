@@ -10,11 +10,14 @@ import shutil
 
 PRODUCT = Path(__file__).resolve().parents[1]
 CATALOG = PRODUCT / "catalog" / "factions.json"
+MOD = PRODUCT.parent / "RTSAI-Mod"
 # Where each mode's faction rules and player-facing Fluent strings live. RA2 is the
-# product mode, so its in-game names are canonical; Classic is recorded as shipped.
+# product mode (the RTS AI mod), so its in-game names are canonical; Classic is
+# recorded as shipped in the parked public alpha.
 MODE_SOURCES = {
     "ra": {"repository": "engine", "rules": ("mods/ra/rules", "mods/ra/experiences"), "fluent": ("mods/ra/fluent",)},
-    "ra2": {"repository": "product", "rules": ("apps/installer/ra2/modern-factions",), "fluent": ("apps/installer/ra2/modern-factions",)},
+    "ra2": {"repository": "mod", "rules": ("mods/rtsai/modern-factions", "mods/rtsai/rules"),
+            "fluent": ("mods/rtsai/modern-factions", "mods/rtsai/languages", "mods/rtsai/languages/rules")},
 }
 PRIMARY_MODES = ("ra2", "ra")
 
@@ -74,7 +77,7 @@ def faction_name_key(rules_dirs: list[Path], internal_name: str) -> str | None:
     return None
 
 
-def validate(catalog: dict, engine: Path, product: Path = PRODUCT) -> None:
+def validate(catalog: dict, engine: Path, product: Path = PRODUCT, mod: Path = MOD) -> None:
     if catalog.get("schemaVersion") != 1:
         raise ValueError("Unsupported catalog schema")
 
@@ -88,7 +91,7 @@ def validate(catalog: dict, engine: Path, product: Path = PRODUCT) -> None:
     modes, profiles, factions, units = (indexed(key) for key in ("modes", "profiles", "factions", "units"))
     if set(modes) != {"ra", "ra2"}:
         raise ValueError("Catalog must distinguish ra and ra2")
-    roots = {"engine": engine.resolve(), "product": product.resolve()}
+    roots = {"engine": engine.resolve(), "product": product.resolve(), "mod": mod.resolve()}
 
     def mode_dirs(mode: str, kind: str) -> list[Path]:
         source = MODE_SOURCES[mode]
@@ -162,9 +165,10 @@ def validate(catalog: dict, engine: Path, product: Path = PRODUCT) -> None:
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--engine", type=Path, default=PRODUCT / "engine" / "openra")
+    parser.add_argument("--mod", type=Path, default=MOD, help="RTS AI mod checkout (alibad/RTSAI-Mod)")
     parser.add_argument("--stage", type=Path, help="Package root; copies catalog to catalog/factions.json")
     args = parser.parse_args()
-    validate(json.loads(CATALOG.read_text(encoding="utf-8")), args.engine)
+    validate(json.loads(CATALOG.read_text(encoding="utf-8")), args.engine, mod=args.mod)
     if args.stage:
         destination = args.stage / "catalog" / "factions.json"
         destination.parent.mkdir(parents=True, exist_ok=True)

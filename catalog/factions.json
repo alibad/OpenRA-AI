@@ -1,11 +1,12 @@
 {
   "schemaVersion": 1,
   "id": "modern-factions",
-  "revision": "2026-10-02.1",
+  "revision": "2026-10-02.2",
   "scope": "Curated faction guide and signature units; not the complete build roster or a balance database.",
   "sources": {
     "engineCommit": "5ddc34cb91e52953d4844c169075a0dbbd79e139",
-    "productCommit": "8fc59f71ab71a5e4834f8476506a65c01d734a05"
+    "productCommit": "8fc59f71ab71a5e4834f8476506a65c01d734a05",
+    "modCommit": "01adb19"
   },
   "modes": [
     {
@@ -39,7 +40,9 @@
       "factionIds": [
         "china",
         "iran",
-        "turkey"
+        "turkey",
+        "saudi-arabia",
+        "yemen"
       ]
     }
   ],
@@ -182,9 +185,11 @@
           "name": "Saudi Arabia"
         },
         "ra2": {
-          "status": "unavailable",
-          "profileId": null,
-          "description": "No RA2 implementation in the current modern-faction overlay. Explore this faction in Classic."
+          "status": "implemented",
+          "profileId": "ra2-modern",
+          "description": "RA2-specific actors and balance on an isometric battlefield. Shares the faction identity, not identical statistics or every mechanic.",
+          "engineFactionId": "saudi",
+          "name": "Saudi Arabia"
         }
       }
     },
@@ -212,9 +217,11 @@
           "name": "Yemen"
         },
         "ra2": {
-          "status": "unavailable",
-          "profileId": null,
-          "description": "No RA2 implementation in the current modern-faction overlay. Explore this faction in Classic."
+          "status": "implemented",
+          "profileId": "ra2-modern",
+          "description": "RA2-specific actors and balance on an isometric battlefield. Shares the faction identity, not identical statistics or every mechanic.",
+          "engineFactionId": "yemen",
+          "name": "Yemen"
         }
       }
     }
@@ -242,8 +249,8 @@
         },
         "ra2": {
           "actorId": "r2cnrifle",
-          "repository": "product",
-          "rulesPath": "apps/installer/ra2/modern-factions/china-roster.yaml",
+          "repository": "mod",
+          "rulesPath": "mods/rtsai/modern-factions/china-roster.yaml",
           "name": "Combined-Arms Rifleman",
           "role": "Line infantry"
         }
@@ -271,8 +278,8 @@
         },
         "ra2": {
           "actorId": "r2qilin",
-          "repository": "product",
-          "rulesPath": "apps/installer/ra2/modern-factions/china.yaml",
+          "repository": "mod",
+          "rulesPath": "mods/rtsai/modern-factions/china.yaml",
           "name": "Qilin Battle Tank",
           "role": "Precision armor"
         }
@@ -300,8 +307,8 @@
         },
         "ra2": {
           "actorId": "r2cloud",
-          "repository": "product",
-          "rulesPath": "apps/installer/ra2/modern-factions/china.yaml",
+          "repository": "mod",
+          "rulesPath": "mods/rtsai/modern-factions/china.yaml",
           "name": "Cloud Recon Drone",
           "role": "Reconnaissance with light strike"
         }
@@ -329,8 +336,8 @@
         },
         "ra2": {
           "actorId": "r2haiwang",
-          "repository": "product",
-          "rulesPath": "apps/installer/ra2/modern-factions/china-roster.yaml",
+          "repository": "mod",
+          "rulesPath": "mods/rtsai/modern-factions/china-roster.yaml",
           "name": "Haiwang Drone Carrier",
           "role": "Drone carrier"
         }
@@ -358,8 +365,8 @@
         },
         "ra2": {
           "actorId": "r2karrar",
-          "repository": "product",
-          "rulesPath": "apps/installer/ra2/modern-factions/iran.yaml",
+          "repository": "mod",
+          "rulesPath": "mods/rtsai/modern-factions/iran.yaml",
           "name": "Karrar Battle Tank",
           "role": "Main battle tank"
         }
@@ -387,8 +394,8 @@
         },
         "ra2": {
           "actorId": "r2raad",
-          "repository": "product",
-          "rulesPath": "apps/installer/ra2/modern-factions/iran.yaml",
+          "repository": "mod",
+          "rulesPath": "mods/rtsai/modern-factions/iran.yaml",
           "name": "Raad Air Defense",
           "role": "Mobile air defense"
         }
@@ -416,8 +423,8 @@
         },
         "ra2": {
           "actorId": "r2bozkir",
-          "repository": "product",
-          "rulesPath": "apps/installer/ra2/modern-factions/turkey.yaml",
+          "repository": "mod",
+          "rulesPath": "mods/rtsai/modern-factions/turkey.yaml",
           "name": "Bozkir Battle Tank",
           "role": "Armored spearhead"
         }
@@ -445,8 +452,8 @@
         },
         "ra2": {
           "actorId": "r2kuzgun",
-          "repository": "product",
-          "rulesPath": "apps/installer/ra2/modern-factions/turkey.yaml",
+          "repository": "mod",
+          "rulesPath": "mods/rtsai/modern-factions/turkey.yaml",
           "name": "Kuzgun Recon Drone",
           "role": "Reconnaissance with light strike"
         }
@@ -455,7 +462,7 @@
     {
       "id": "m1a2s",
       "factionId": "saudi-arabia",
-      "name": "M1A2S",
+      "name": "M1A2S Battle Tank",
       "role": "Heavy armor",
       "story": "Heavy armor anchors Saudi formations in the Red Sea theatre.",
       "strengths": "Hold contested ground with infantry support.",
@@ -470,6 +477,13 @@
           "repository": "engine",
           "rulesPath": "mods/ra/rules/red-sea.yaml",
           "name": "M1A2S",
+          "role": "Heavy armor"
+        },
+        "ra2": {
+          "actorId": "r2m1a2s",
+          "repository": "mod",
+          "rulesPath": "mods/rtsai/modern-factions/saudi.yaml",
+          "name": "M1A2S Battle Tank",
           "role": "Heavy armor"
         }
       }
@@ -491,6 +505,13 @@
           "actorId": "SANG",
           "repository": "engine",
           "rulesPath": "mods/ra/rules/red-sea.yaml",
+          "name": "Saudi National Guard",
+          "role": "Line infantry"
+        },
+        "ra2": {
+          "actorId": "r2sang",
+          "repository": "mod",
+          "rulesPath": "mods/rtsai/modern-factions/saudi-roster.yaml",
           "name": "Saudi National Guard",
           "role": "Line infantry"
         }
@@ -515,6 +536,13 @@
           "rulesPath": "mods/ra/rules/red-sea.yaml",
           "name": "Armed Technical",
           "role": "Mobile harassment"
+        },
+        "ra2": {
+          "actorId": "r2technical",
+          "repository": "mod",
+          "rulesPath": "mods/rtsai/modern-factions/yemen.yaml",
+          "name": "Armed Technical",
+          "role": "Mobile harassment"
         }
       }
     },
@@ -535,6 +563,13 @@
           "actorId": "SAMAD",
           "repository": "engine",
           "rulesPath": "mods/ra/rules/red-sea.yaml",
+          "name": "Samad Drone",
+          "role": "Terminal strike drone"
+        },
+        "ra2": {
+          "actorId": "r2samad",
+          "repository": "mod",
+          "rulesPath": "mods/rtsai/modern-factions/yemen-roster.yaml",
           "name": "Samad Drone",
           "role": "Terminal strike drone"
         }

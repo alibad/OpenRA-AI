@@ -49,6 +49,8 @@ These stay in git but leave the product story, the website navigation and the re
 
 ## Phase 2 — Five complete factions (parallel with Phase 3)
 
+**Status, 2 October 2026:** all five nations are playable in `alibad/RTSAI-Mod`, with doctrine bots and zero lint warnings. The catalog's RA2 variants now validate against the mod. Still open: painted cameos, a faction EVA announcer, per-faction squad sizes, balance evidence and RA2 missions.
+
 - Saudi Arabia and Yemen in RA2: review and merge `codex/ra2-red-sea`, add per-country validators, and flip the catalog entries.
 - What "complete" means for each faction:
   - The full roster in the catalog, including structures and defenses.
