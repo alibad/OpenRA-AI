@@ -1,39 +1,89 @@
-# OpenRA AI roadmap
+# RTS AI roadmap
 
-Updated 12 September 2026. This is the handoff roadmap for the next build cycle.
+Updated 2 October 2026. Approved by the owner. This replaces the 12 September dual-mode roadmap.
 
-## Current position
+## The product
 
-- Native OpenRA `main` supports the Classic (`ra`) and integrated Red Alert 2 (`ra2`) launch paths.
-- Windows packaging includes the self-contained engine, companion, local AI option, and owned-RA2 import path.
-- The web app now has a shared, validated faction catalog and player flow: faction → signature unit → mode → install guidance.
-- Classic contains the five modern faction identities; the current RA2 overlay contains China, Iran and Türkiye.
-- Public alpha.13 remains the only release advertised by the website. The newer dual-mode Windows build is local and unpromoted.
+**RTS AI is a Red Alert 2 mod for OpenRA: five modern nations, commanded with an AI co-commander that works from the first launch.**
 
-## Next milestone — first public dual-mode release
+- The player owns Red Alert 2 (Steam, EA app/Origin or disc), and the mod imports it. Commercial RA2 data is never bundled.
+- The five nations are China, Iran, Türkiye, Saudi Arabia and Yemen. One catalog (`catalog/factions.json`) is the source for the game, the companion and rtsai.net.
+- The AI default is a hosted model for the thinking and local voice: Whisper for speech-in and Kokoro for speech-out. It falls back gracefully when offline or over the daily allowance.
+- Windows ships first. macOS follows the first public mod release.
 
-1. Finish the catalog integration: add full roster coverage incrementally, expose the catalog in the installed companion/game surfaces, and keep engine rules authoritative for balance and mechanics.
-2. Complete the faction experience: add accurate RA2 captures, improve portraits and story art, verify licensing/provenance, and add missions, counterplay and AI behavior per faction.
-3. Finish installer acceptance: clean-machine install without Python/.NET, Classic first run, owned RA2 import, missing-content/retry flows, secondary Steam library, offline local AI, explicit external provider, upgrade, uninstall, saves and settings preservation.
-4. Produce release evidence: exact product/engine commits, artifact sizes and SHA-256 digests, Windows Authenticode result, and independent macOS signing/notarization/stapling evidence.
-5. Promote only after all evidence checks pass. Update per-platform release coverage separately; never infer Mac or RA2 availability from another platform or from a local build.
-6. Publish the game release and update the committed web manifest only with explicit approval. Deploy the web app only after the public links and clean-install walkthrough are verified.
+Judge every change by one question: does it make the RA2 mod, its factions or the out-of-box AI better? Anything else waits.
 
-## Later milestones
+## Parked
 
-- Add Saudi Arabia and Yemen to the RA2 overlay when their rules, art, AI and balance are actually complete.
-- Render the shared faction/unit catalog inside the native game and companion, with mode-aware details and deep links back to the web.
-- Add replay-backed faction balance tests, headless AI match evaluation, and deterministic mission acceptance.
-- Establish a polished media pipeline for original concept art, UI portraits, sprites, live captures, audio and accessibility review.
-- Add release update, rollback, repair and uninstall diagnostics for installed users.
+These stay in git but leave the product story, the website navigation and the release scope:
+
+- Classic (`ra`) mode and its faction packs. The shipped alpha.13 remains downloadable as is.
+- Earth-to-battlefield studio.
+- Capability Atlas, build archive and platform-plan pages.
+- Autonomous agent research (RL, headless commander). It is kept only as internal tooling for balance testing.
+- Faction cursor effects.
+- macOS releases, until Windows ships.
+- The full local LLM as the default. It becomes an optional download.
+
+## Phase 0 — Cut and align
+
+- Website shrinks to Home, Factions and Download.
+- The catalog is the single naming source:
+  - Per-mode `name` and `role` for every unit, and `engineFactionId` and `name` for every faction mode.
+  - `scripts/content_catalog.py` fails when a catalog name differs from the in-game Fluent string.
+  - RA2 names are canonical.
+- The web snapshot sync check runs in the web test suite.
+- Consolidate the open `codex/*` worktrees: merge what is validated and in scope, and archive the rest.
+
+## Phase 1 — Become an OpenRA mod
+
+- Start with a technical test build in `../RTSAI-Mod`, a Mod SDK structure that pins an `alibad/OpenRA` engine commit. Decide go or no-go before migrating.
+- Target layout:
+  - `mods/rtsai`: the RA2 rules, chrome and maps.
+  - `mods/rtsai-content`: a content installer for Steam, Origin/EA and disc, modelled on Romanov's Vengeance.
+  - `OpenRA.Mods.RA2`: the net10 port.
+  - `OpenRA.Mods.RTSAI`: the companion bridge, faction logic and widgets.
+  - The Python companion as a bundled sidecar.
+- Slim pinned engine branch: Arabic/right-to-left text, plus the screenshot and push-to-talk hooks if they cannot live in the mod. With RA2 as the only mode, the Experience file-selection system is not needed. The RL/headless engine work moves to its own branch.
+- Done when the mod installs, imports owned RA2, plays a skirmish and the companion speaks.
+
+## Phase 2 — Five complete factions (parallel with Phase 3)
+
+- Saudi Arabia and Yemen in RA2: review and merge `codex/ra2-red-sea`, add per-country validators, and flip the catalog entries.
+- What "complete" means for each faction:
+  - The full roster in the catalog, including structures and defenses.
+  - Painted cameos, replacing the model-render placeholders.
+  - RA2 voice lines with variety, plus a faction announcer (EVA).
+  - Its own bot doctrine.
+  - Real RA2 captures for the website.
+- The catalog is rendered in-game (`codex/in-game-catalog`). The companion knows each faction's doctrine and units.
+- Balance through automated AI-vs-AI matches; clear the RA2 rules lint warnings.
+
+## Phase 3 — AI that works out of the box
+
+- Hosted proxy on rtsai.net:
+  - The key stays server-side.
+  - A per-account daily allowance, a model allowlist, a `max_tokens` clamp and an image-size limit.
+  - A global spend cap and a kill switch.
+  - Zero-click anonymous allowance on first launch; linking an account raises it.
+- Gateway "hosted" mode: the thinking goes to the proxy and voice stays local. It falls back to fixed alert lines when offline or over the allowance.
+- Installer default is "Hosted + local voice (~280 MB)" instead of the 1.76 GB pack.
+- Fix External mode never starting the gateway in installed builds.
+- Cost guardrails:
+  - Downscale screenshots.
+  - Single-call voice orders (`codex/nl-orders`).
+  - No AUTO mission planner on the hosted model.
+- Target first run: install, launch, RA2 detected, play, companion speaks.
+
+## Phase 4 — Ship
+
+- Clean-machine Windows acceptance and a signed release.
+- Site relaunch with a 60-second trailer cut from real gameplay. The download page states the RA2 ownership requirement up front.
+- Then macOS, RA2 missions (starting with the Red Sea theatre) and a mod-directory listing.
 
 ## Guardrails
 
-Commercial Red Alert 2 data is never bundled. A source path is not a redistribution
-license. “Implemented,” “verified in development,” and “in the public release” are
-separate states. No hosted CI workflow is required, and pushing web `main` deploys
-Vercel, so release and deployment remain deliberate actions.
-
-See [faction-install-milestone.md](faction-install-milestone.md) for the detailed
-acceptance checklist and [upstream-reuse/roadmap.json](upstream-reuse/roadmap.json)
-for the component-level reuse inventory.
+- Commercial Red Alert 2 data is never bundled. A source path is not a redistribution license.
+- "Implemented", "verified in development" and "in the public release" are separate states.
+- No hosted CI workflows.
+- Pushing web `main` deploys Vercel, so releases and deployments remain deliberate actions.

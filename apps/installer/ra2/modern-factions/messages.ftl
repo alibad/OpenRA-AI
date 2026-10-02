@@ -1,5 +1,5 @@
 # Original project faction names and descriptions.
-ra2-modern-turkey-name = Turkey
+ra2-modern-turkey-name = Türkiye
 ra2-modern-turkey-description = Combined arms: 16 Turkish units and three defenses. Mechanized
     infantry, drones and naval escorts; keep support vehicles
     close.

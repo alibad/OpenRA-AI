@@ -30,6 +30,15 @@ class ContentCatalogTests(unittest.TestCase):
             lambda c: c["units"][0]["variants"]["ra"].update(rulesPath="../../outside"),
             lambda c: c["units"].append(copy.deepcopy(c["units"][0])),
             lambda c: c["factions"][0]["variants"]["ra2"].update(status="unavailable"),
+            # Names and roles must match what each game mode shows, with RA2 canonical.
+            lambda c: c["units"][0]["variants"]["ra2"].update(name="Renamed In Catalog Only"),
+            lambda c: c["units"][0]["variants"]["ra"].update(name="Renamed In Catalog Only"),
+            lambda c: c["units"][0].update(name=c["units"][0]["variants"]["ra"]["name"]),
+            lambda c: c["units"][0].update(role="Different role"),
+            lambda c: c["units"][0]["variants"]["ra2"].pop("role"),
+            lambda c: c["factions"][2]["variants"]["ra2"].update(name="Turkey"),
+            lambda c: c["factions"][2]["variants"]["ra2"].update(engineFactionId="missing"),
+            lambda c: c["factions"][2].update(name="Turkey"),
         ):
             candidate = copy.deepcopy(self.catalog)
             mutation(candidate)

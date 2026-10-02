@@ -1,10 +1,10 @@
 {
   "schemaVersion": 1,
   "id": "modern-factions",
-  "revision": "2026-09-12.1",
+  "revision": "2026-10-02.1",
   "scope": "Curated faction guide and signature units; not the complete build roster or a balance database.",
   "sources": {
-    "engineCommit": "dde7f13cb1d432a98aa121a5fd8826ff3842bcf0",
+    "engineCommit": "5ddc34cb91e52953d4844c169075a0dbbd79e139",
     "productCommit": "8fc59f71ab71a5e4834f8476506a65c01d734a05"
   },
   "modes": [
@@ -63,9 +63,9 @@
     {
       "id": "china",
       "name": "China",
-      "title": "Haitian Network",
+      "title": "Haitan Network",
       "tagline": "Coordination is your strongest weapon.",
-      "story": "A scattered force can hold ground. A connected force can choose where the battle happens. China’s fictional Haitian Network brings reconnaissance, precision armor and maritime reach into one coordinated offensive.",
+      "story": "A scattered force can hold ground. A connected force can choose where the battle happens. China’s fictional Haitan Network brings reconnaissance, precision armor and maritime reach into one coordinated offensive.",
       "playstyle": "Keep specialists and escorts close to your main force. Use reconnaissance to commit your armor where it matters.",
       "strengths": "Coordinated armor, specialist support and sea-to-land pressure.",
       "counterplay": "Disrupt the supporting units and attack separated formations.",
@@ -81,12 +81,16 @@
         "ra": {
           "status": "implemented",
           "profileId": "world-war-iii",
-          "description": "Classic sprite-based battlefield with this modern faction’s native rules and roster."
+          "description": "Classic sprite-based battlefield with this modern faction’s native rules and roster.",
+          "engineFactionId": "china",
+          "name": "China"
         },
         "ra2": {
           "status": "implemented",
           "profileId": "ra2-modern",
-          "description": "RA2-specific actors and balance on an isometric battlefield. Shares the faction identity, not identical statistics or every mechanic."
+          "description": "RA2-specific actors and balance on an isometric battlefield. Shares the faction identity, not identical statistics or every mechanic.",
+          "engineFactionId": "china",
+          "name": "China"
         }
       }
     },
@@ -109,12 +113,16 @@
         "ra": {
           "status": "implemented",
           "profileId": "world-war-iii",
-          "description": "Classic sprite-based battlefield with this modern faction’s native rules and roster."
+          "description": "Classic sprite-based battlefield with this modern faction’s native rules and roster.",
+          "engineFactionId": "iran",
+          "name": "Iran"
         },
         "ra2": {
           "status": "implemented",
           "profileId": "ra2-modern",
-          "description": "RA2-specific actors and balance on an isometric battlefield. Shares the faction identity, not identical statistics or every mechanic."
+          "description": "RA2-specific actors and balance on an isometric battlefield. Shares the faction identity, not identical statistics or every mechanic.",
+          "engineFactionId": "iran",
+          "name": "Iran"
         }
       }
     },
@@ -137,12 +145,16 @@
         "ra": {
           "status": "implemented",
           "profileId": "world-war-iii",
-          "description": "Classic sprite-based battlefield with this modern faction’s native rules and roster."
+          "description": "Classic sprite-based battlefield with this modern faction’s native rules and roster.",
+          "engineFactionId": "turkey",
+          "name": "Turkey"
         },
         "ra2": {
           "status": "implemented",
           "profileId": "ra2-modern",
-          "description": "RA2-specific actors and balance on an isometric battlefield. Shares the faction identity, not identical statistics or every mechanic."
+          "description": "RA2-specific actors and balance on an isometric battlefield. Shares the faction identity, not identical statistics or every mechanic.",
+          "engineFactionId": "turkey",
+          "name": "Türkiye"
         }
       }
     },
@@ -165,7 +177,9 @@
         "ra": {
           "status": "implemented",
           "profileId": "world-war-iii",
-          "description": "Classic sprite-based battlefield with this modern faction’s native rules and roster."
+          "description": "Classic sprite-based battlefield with this modern faction’s native rules and roster.",
+          "engineFactionId": "saudi",
+          "name": "Saudi Arabia"
         },
         "ra2": {
           "status": "unavailable",
@@ -193,7 +207,9 @@
         "ra": {
           "status": "implemented",
           "profileId": "world-war-iii",
-          "description": "Classic sprite-based battlefield with this modern faction’s native rules and roster."
+          "description": "Classic sprite-based battlefield with this modern faction’s native rules and roster.",
+          "engineFactionId": "yemen",
+          "name": "Yemen"
         },
         "ra2": {
           "status": "unavailable",
@@ -220,19 +236,23 @@
         "ra": {
           "actorId": "CNRIFLE",
           "repository": "engine",
-          "rulesPath": "mods/ra/rules/china.yaml"
+          "rulesPath": "mods/ra/rules/china.yaml",
+          "name": "PLA Combined-Arms Rifleman",
+          "role": "Line infantry"
         },
         "ra2": {
           "actorId": "r2cnrifle",
           "repository": "product",
-          "rulesPath": "apps/installer/ra2/modern-factions/china-roster.yaml"
+          "rulesPath": "apps/installer/ra2/modern-factions/china-roster.yaml",
+          "name": "Combined-Arms Rifleman",
+          "role": "Line infantry"
         }
       }
     },
     {
       "id": "cnqilin",
       "factionId": "china",
-      "name": "Qilin Main Battle Tank",
+      "name": "Qilin Battle Tank",
       "role": "Precision armor",
       "story": "A durable armored anchor with a precision cannon.",
       "strengths": "Lead supported attacks against vehicles.",
@@ -245,22 +265,26 @@
         "ra": {
           "actorId": "CNQILIN",
           "repository": "engine",
-          "rulesPath": "mods/ra/rules/china.yaml"
+          "rulesPath": "mods/ra/rules/china.yaml",
+          "name": "Qilin Main Battle Tank",
+          "role": "Precision armor"
         },
         "ra2": {
           "actorId": "r2qilin",
           "repository": "product",
-          "rulesPath": "apps/installer/ra2/modern-factions/china.yaml"
+          "rulesPath": "apps/installer/ra2/modern-factions/china.yaml",
+          "name": "Qilin Battle Tank",
+          "role": "Precision armor"
         }
       }
     },
     {
       "id": "cncloud",
       "factionId": "china",
-      "name": "Cloud Shadow UAV",
-      "role": "Reconnaissance and strike",
-      "story": "A separate reconnaissance and precision-strike aircraft—not the carrier-launched drone.",
-      "strengths": "Scout routes and strike exposed targets.",
+      "name": "Cloud Recon Drone",
+      "role": "Reconnaissance with light strike",
+      "story": "A long-range reconnaissance drone with light ground attack, separate from the carrier-launched drone wing.",
+      "strengths": "Scout routes early and finish exposed light targets.",
       "counterplay": "Respect air defense and rearming windows.",
       "assetIds": [
         "china-cncloudicon-review",
@@ -270,21 +294,25 @@
         "ra": {
           "actorId": "CNCLOUD",
           "repository": "engine",
-          "rulesPath": "mods/ra/rules/china.yaml"
+          "rulesPath": "mods/ra/rules/china.yaml",
+          "name": "Cloud Shadow UAV",
+          "role": "Reconnaissance and precision strike"
         },
         "ra2": {
           "actorId": "r2cloud",
           "repository": "product",
-          "rulesPath": "apps/installer/ra2/modern-factions/china.yaml"
+          "rulesPath": "apps/installer/ra2/modern-factions/china.yaml",
+          "name": "Cloud Recon Drone",
+          "role": "Reconnaissance with light strike"
         }
       }
     },
     {
       "id": "cnhaiwang",
       "factionId": "china",
-      "name": "Haiwang Drone Assault Ship",
-      "role": "Carrier and maritime command",
-      "story": "A high-value command ship that projects force through its drone wing.",
+      "name": "Haiwang Drone Carrier",
+      "role": "Drone carrier",
+      "story": "A high-value carrier that projects force through a replenishing drone wing.",
       "strengths": "Operate behind an escort screen.",
       "counterplay": "Protect the carrier from concentrated naval attacks.",
       "assetIds": [
@@ -295,19 +323,23 @@
         "ra": {
           "actorId": "CNHAIWANG",
           "repository": "engine",
-          "rulesPath": "mods/ra/rules/china.yaml"
+          "rulesPath": "mods/ra/rules/china.yaml",
+          "name": "Haiwang Drone Assault Ship",
+          "role": "Amphibious command ship with drone strikes"
         },
         "ra2": {
           "actorId": "r2haiwang",
           "repository": "product",
-          "rulesPath": "apps/installer/ra2/modern-factions/china-roster.yaml"
+          "rulesPath": "apps/installer/ra2/modern-factions/china-roster.yaml",
+          "name": "Haiwang Drone Carrier",
+          "role": "Drone carrier"
         }
       }
     },
     {
       "id": "irkarr",
       "factionId": "iran",
-      "name": "Karrar Tank",
+      "name": "Karrar Battle Tank",
       "role": "Main battle tank",
       "story": "The armored element of a dispersed combined-arms defense.",
       "strengths": "Operate within supporting reconnaissance and air-defense coverage.",
@@ -320,12 +352,16 @@
         "ra": {
           "actorId": "IRKARR",
           "repository": "engine",
-          "rulesPath": "mods/ra/rules/iran.yaml"
+          "rulesPath": "mods/ra/rules/iran.yaml",
+          "name": "Karrar Main Battle Tank",
+          "role": "Main battle tank"
         },
         "ra2": {
           "actorId": "r2karrar",
           "repository": "product",
-          "rulesPath": "apps/installer/ra2/modern-factions/iran.yaml"
+          "rulesPath": "apps/installer/ra2/modern-factions/iran.yaml",
+          "name": "Karrar Battle Tank",
+          "role": "Main battle tank"
         }
       }
     },
@@ -345,19 +381,23 @@
         "ra": {
           "actorId": "IRRAAD",
           "repository": "engine",
-          "rulesPath": "mods/ra/rules/iran.yaml"
+          "rulesPath": "mods/ra/rules/iran.yaml",
+          "name": "Raad Mobile Air Defense",
+          "role": "Mobile air defense"
         },
         "ra2": {
           "actorId": "r2raad",
           "repository": "product",
-          "rulesPath": "apps/installer/ra2/modern-factions/iran.yaml"
+          "rulesPath": "apps/installer/ra2/modern-factions/iran.yaml",
+          "name": "Raad Air Defense",
+          "role": "Mobile air defense"
         }
       }
     },
     {
       "id": "bozkir",
       "factionId": "turkey",
-      "name": "Bozkir Tank",
+      "name": "Bozkir Battle Tank",
       "role": "Armored spearhead",
       "story": "A main battle tank at the center of the Anatolian Guard’s mechanized force.",
       "strengths": "Advance with infantry and drone reconnaissance.",
@@ -370,23 +410,27 @@
         "ra": {
           "actorId": "BOZKIR",
           "repository": "engine",
-          "rulesPath": "mods/ra/rules/turkey.yaml"
+          "rulesPath": "mods/ra/rules/turkey.yaml",
+          "name": "Bozkir Main Battle Tank",
+          "role": "Armored spearhead"
         },
         "ra2": {
           "actorId": "r2bozkir",
           "repository": "product",
-          "rulesPath": "apps/installer/ra2/modern-factions/turkey.yaml"
+          "rulesPath": "apps/installer/ra2/modern-factions/turkey.yaml",
+          "name": "Bozkir Battle Tank",
+          "role": "Armored spearhead"
         }
       }
     },
     {
       "id": "kuzgunm",
       "factionId": "turkey",
-      "name": "Kuzgun-M UCAV",
-      "role": "Uncrewed strike aircraft",
-      "story": "An aerial strike platform supporting maneuver on the ground.",
-      "strengths": "Find exposed targets before committing the flight.",
-      "counterplay": "Plan around air defense and time away from the front to rearm.",
+      "name": "Kuzgun Recon Drone",
+      "role": "Reconnaissance with light strike",
+      "story": "A reconnaissance drone that finds the next opening for the armored spearhead.",
+      "strengths": "Spot targets before committing armor; adds light strike support.",
+      "counterplay": "Shoot it down before it spots your formation; plan around air defense.",
       "assetIds": [
         "turkey-kuzgunmicon-review",
         "turkey-kuzgunm-contact-sheet"
@@ -395,19 +439,23 @@
         "ra": {
           "actorId": "KUZGUNM",
           "repository": "engine",
-          "rulesPath": "mods/ra/rules/turkey.yaml"
+          "rulesPath": "mods/ra/rules/turkey.yaml",
+          "name": "Kuzgun-M Tactical Drone",
+          "role": "Reconnaissance and designation"
         },
         "ra2": {
           "actorId": "r2kuzgun",
           "repository": "product",
-          "rulesPath": "apps/installer/ra2/modern-factions/turkey.yaml"
+          "rulesPath": "apps/installer/ra2/modern-factions/turkey.yaml",
+          "name": "Kuzgun Recon Drone",
+          "role": "Reconnaissance with light strike"
         }
       }
     },
     {
       "id": "m1a2s",
       "factionId": "saudi-arabia",
-      "name": "M1A2S Tank",
+      "name": "M1A2S",
       "role": "Heavy armor",
       "story": "Heavy armor anchors Saudi formations in the Red Sea theatre.",
       "strengths": "Hold contested ground with infantry support.",
@@ -420,7 +468,9 @@
         "ra": {
           "actorId": "M1A2S",
           "repository": "engine",
-          "rulesPath": "mods/ra/rules/red-sea.yaml"
+          "rulesPath": "mods/ra/rules/red-sea.yaml",
+          "name": "M1A2S",
+          "role": "Heavy armor"
         }
       }
     },
@@ -440,7 +490,9 @@
         "ra": {
           "actorId": "SANG",
           "repository": "engine",
-          "rulesPath": "mods/ra/rules/red-sea.yaml"
+          "rulesPath": "mods/ra/rules/red-sea.yaml",
+          "name": "Saudi National Guard",
+          "role": "Line infantry"
         }
       }
     },
@@ -460,7 +512,9 @@
         "ra": {
           "actorId": "TECH",
           "repository": "engine",
-          "rulesPath": "mods/ra/rules/red-sea.yaml"
+          "rulesPath": "mods/ra/rules/red-sea.yaml",
+          "name": "Armed Technical",
+          "role": "Mobile harassment"
         }
       }
     },
@@ -480,7 +534,9 @@
         "ra": {
           "actorId": "SAMAD",
           "repository": "engine",
-          "rulesPath": "mods/ra/rules/red-sea.yaml"
+          "rulesPath": "mods/ra/rules/red-sea.yaml",
+          "name": "Samad Drone",
+          "role": "Terminal strike drone"
         }
       }
     }

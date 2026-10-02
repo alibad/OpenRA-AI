@@ -1,4 +1,4 @@
-ra2-r2cnrifle-name = Combined Arms Rifleman
+ra2-r2cnrifle-name = Combined-Arms Rifleman
 ra2-r2cnrifle-description = Affordable line infantry.
     Network support improves sustained fire.
     Strong vs infantry; vulnerable to armor and splash damage.
