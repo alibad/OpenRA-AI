@@ -107,10 +107,14 @@ class AIRouter:
                 self._record_service(route, state, message)
             raise RouterError(f"AI router returned HTTP {exc.code}: {detail}", status=exc.code, state=state, route=route) from exc
         except (OSError, TimeoutError, urllib.error.URLError) as exc:
+            # urllib wraps connection failures (refused, or a connect timeout) in
+            # URLError: the gateway is not running. A bare timeout while waiting
+            # for the response means it is up but the model behind it is slow.
+            state = "upstream" if isinstance(exc, TimeoutError) else "gateway_unreachable"
             if brain:
-                self._record_service("none", "gateway_unreachable", str(exc))
+                self._record_service("none", state, str(exc))
             raise RouterError(f"AI router is unavailable at {self.settings.router_url}: {exc}",
-                              state="gateway_unreachable", route="none") from exc
+                              state=state, route="none") from exc
         return payload, round((time.perf_counter() - started) * 1000), response_type
 
     def _get_json(self, path: str) -> dict:

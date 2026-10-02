@@ -217,6 +217,39 @@ class HostedGatewayTests(unittest.TestCase):
         self.assertEqual(models["local-kokoro"]["mode"], "audio_speech")
 
 
+class _SlowGateway(BaseHTTPRequestHandler):
+    def log_message(self, *_args) -> None:
+        pass
+
+    def do_POST(self) -> None:
+        import time
+
+        time.sleep(1.5)
+        self.send_response(200)
+        self.end_headers()
+
+
+class RouterServiceStateTests(unittest.TestCase):
+    def test_a_slow_gateway_is_not_reported_as_missing(self) -> None:
+        server, url = _serve(_SlowGateway)
+        try:
+            router = AIRouter(Settings(router_url=url, model_provider="hosted", text_model=HOSTED_MODEL,
+                                       vision_model=HOSTED_MODEL, timeout_seconds=1))
+            with self.assertRaises(RouterError) as caught:
+                router.chat([{"role": "user", "content": "status?"}])
+            self.assertEqual(caught.exception.state, "upstream")
+        finally:
+            server.shutdown()
+            server.server_close()
+
+        router = AIRouter(Settings(router_url="http://127.0.0.1:9", model_provider="hosted", text_model=HOSTED_MODEL,
+                                   vision_model=HOSTED_MODEL, timeout_seconds=2))
+        with self.assertRaises(RouterError) as caught:
+            router.chat([{"role": "user", "content": "status?"}])
+        self.assertEqual(caught.exception.state, "gateway_unreachable")
+        self.assertEqual(Companion(router=router).idle_status()[1], "AI ALERTS ONLY  •  AI GATEWAY NOT RUNNING")
+
+
 class HostedSetupTests(unittest.TestCase):
     def setUp(self) -> None:
         self.directory = tempfile.TemporaryDirectory()

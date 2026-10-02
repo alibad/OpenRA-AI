@@ -103,7 +103,7 @@ class HostedClient:
         load_token: Callable[[], str],
         save_token: Callable[[str], None],
         *,
-        timeout: float = 25.0,
+        timeout: float = 18.0,
         version: str = "",
     ):
         self.endpoint = endpoint.rstrip("/")
