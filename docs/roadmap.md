@@ -120,6 +120,8 @@ None of these branches has been pushed; their commits exist only in the local wo
 
 ## Guardrails
 
+**Owner-requested local tooling, 4 October 2026:** Workshop now includes a Campaign Studio for both catalogs, with editable chapters, cast, storyboards, objective playtests, branching consequences and custom map attachments. The starter is explicitly fictional civilian storytelling. Intro export produces original silent animated briefings and captions in the browser. This does not deliver native campaign scripts or paid AI cinema; those remain separate work. Details: `../RTSAI-Web/docs/campaign-studio.md`.
+
 - Commercial Red Alert 2 data is never bundled. A source path is not a redistribution license.
 - "Implemented", "verified in development" and "in the public release" are separate states.
 - No hosted CI workflows.
