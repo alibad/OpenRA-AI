@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
   "id": "modern-factions",
-  "revision": "2026-10-02.2",
+  "revision": "2026-10-04.1",
   "scope": "Curated faction guide and signature units; not the complete build roster or a balance database.",
   "sources": {
-    "engineCommit": "5ddc34cb91e52953d4844c169075a0dbbd79e139",
+    "engineCommit": "cd9bcba176db0cb4265739a08fa41bb3c125d195",
     "productCommit": "8fc59f71ab71a5e4834f8476506a65c01d734a05",
-    "modCommit": "01adb19"
+    "modCommit": "fce87fdd10ee44f3baf7f5023324d5cac50721c1"
   },
   "modes": [
     {
@@ -31,7 +31,9 @@
         "iran",
         "turkey",
         "saudi-arabia",
-        "yemen"
+        "yemen",
+        "israel",
+        "hezbollah"
       ]
     },
     {
@@ -42,7 +44,9 @@
         "iran",
         "turkey",
         "saudi-arabia",
-        "yemen"
+        "yemen",
+        "israel",
+        "hezbollah"
       ]
     }
   ],
@@ -222,6 +226,101 @@
           "description": "RA2-specific actors and balance on an isometric battlefield. Shares the faction identity, not identical statistics or every mechanic.",
           "engineFactionId": "yemen",
           "name": "Yemen"
+        }
+      }
+    },
+    {
+      "id": "israel",
+      "name": "Israel",
+      "title": "Precision support",
+      "tagline": "Protect the formation. Coordinate the strike.",
+      "story": "A fictional strategy-game roster built around protected armor, forward observation and vulnerable support nodes. Its statistics and abilities are game abstractions.",
+      "playstyle": "Keep armor, carriers and observers together. Use powered relays to improve firing cycles and service stations to preserve damaged vehicles.",
+      "strengths": "Durable armor, infantry transport, finite-ammunition aviation, guided fires and local support.",
+      "counterplay": "Attack support nodes, cut power and surround expensive units with anti-armor or air threats.",
+      "heroAssetId": "israel-roster",
+      "accent": "#80b8ff",
+      "unitIds": [
+        "ilrifle",
+        "ilat",
+        "ilobserver",
+        "ilrecon",
+        "merkava",
+        "ilshield",
+        "ilhowitzer",
+        "namer",
+        "ilfalcon",
+        "ilgunship",
+        "ilpatrol",
+        "ilfrigate",
+        "iltender",
+        "ilsentry",
+        "ilbattery",
+        "ilatpost",
+        "ilrelay",
+        "ilworkshop"
+      ],
+      "variants": {
+        "ra": {
+          "status": "implemented",
+          "profileId": "world-war-iii",
+          "description": "Local development roster. Native rules and authored art are present; final art approval, broad balance validation and release confirmation remain pending.",
+          "engineFactionId": "israel",
+          "name": "Israel"
+        },
+        "ra2": {
+          "status": "implemented",
+          "profileId": "ra2-modern",
+          "description": "Local development roster. Native rules and authored art are present; final art approval, broad balance validation and release confirmation remain pending.",
+          "engineFactionId": "israel",
+          "name": "Israel"
+        }
+      }
+    },
+    {
+      "id": "hezbollah",
+      "name": "Hezbollah",
+      "title": "Concealed defense",
+      "tagline": "Hold the ground. Move before the counterattack.",
+      "story": "A fictional strategy-game roster built around light forces, concealed positions and vulnerable support nodes. It depicts gameplay roles, not real-world capability or operational doctrine.",
+      "playstyle": "Scout, spread out and control approaches with concealed positions. Guide missiles through spotters and signal posts, then relocate before close attackers or artillery arrive.",
+      "strengths": "Low-cost forces, stationary concealment, guided rocket pressure and agile coastal craft.",
+      "counterplay": "Detect concealed units, destroy signal posts and close the artillery minimum-range gap. Light armor loses concentrated fights.",
+      "heroAssetId": "hezbollah-roster",
+      "accent": "#b3b881",
+      "unitIds": [
+        "hzrifle",
+        "hzat",
+        "hzspotter",
+        "hzscout",
+        "hztechnical",
+        "hzrecoilless",
+        "hzescort",
+        "hzrockets",
+        "hzdrone",
+        "hzmissileboat",
+        "hzskiff",
+        "hzsurvey",
+        "hzbunker",
+        "hzaanest",
+        "hzcoastal",
+        "hzrelay",
+        "hzworkshop"
+      ],
+      "variants": {
+        "ra": {
+          "status": "implemented",
+          "profileId": "world-war-iii",
+          "description": "Local development roster. Native rules and authored art are present; final art approval, broad balance validation and release confirmation remain pending.",
+          "engineFactionId": "hezbollah",
+          "name": "Hezbollah"
+        },
+        "ra2": {
+          "status": "implemented",
+          "profileId": "ra2-modern",
+          "description": "Local development roster. Native rules and authored art are present; final art approval, broad balance validation and release confirmation remain pending.",
+          "engineFactionId": "hezbollah",
+          "name": "Hezbollah"
         }
       }
     }
@@ -572,6 +671,1083 @@
           "rulesPath": "mods/rtsai/modern-factions/yemen-roster.yaml",
           "name": "Samad Drone",
           "role": "Terminal strike drone"
+        }
+      }
+    },
+    {
+      "id": "ilrifle",
+      "factionId": "israel",
+      "name": "Rifle Team",
+      "role": "Line infantry",
+      "story": "Three-round burst infantry. Deploy to brace: +18% range, 20% faster fire and 28% less incoming damage. Moving ends the brace. Weak against armor and aircraft.",
+      "strengths": "Use the role and support relationships shown in the current mode’s rule-derived roster.",
+      "counterplay": "Respect detection, range, armor and support dependencies; the local evaluation tools expose these tradeoffs.",
+      "assetIds": [
+        "israel-ilrifle-source",
+        "israel-ilrifle-cameo"
+      ],
+      "variants": {
+        "ra": {
+          "description": "Three-round burst infantry. Deploy to brace: +18% range, 20% faster fire and 28% less incoming damage. Moving ends the brace. Weak against armor and aircraft.",
+          "actorId": "ILRIFLE",
+          "repository": "engine",
+          "rulesPath": "mods/ra/rules/israel.yaml",
+          "name": "Rifle Team",
+          "role": "Line infantry"
+        },
+        "ra2": {
+          "description": "Three-round burst infantry. Deploy to brace: +18% range, 20% faster fire and 28% less incoming damage. Moving ends the brace. Weak against armor and aircraft.",
+          "actorId": "r2ilrifle",
+          "repository": "mod",
+          "rulesPath": "mods/rtsai/modern-factions/israel-roster.yaml",
+          "name": "Rifle Team",
+          "role": "Line infantry"
+        }
+      }
+    },
+    {
+      "id": "ilat",
+      "factionId": "israel",
+      "name": "Anti-Armor Team",
+      "role": "Anti armor",
+      "story": "Guided anti-armor missiles with a two-cell minimum range. Marked targets take extra damage. Screen against infantry and close rushes.",
+      "strengths": "Use the role and support relationships shown in the current mode’s rule-derived roster.",
+      "counterplay": "Respect detection, range, armor and support dependencies; the local evaluation tools expose these tradeoffs.",
+      "assetIds": [
+        "israel-ilat-source",
+        "israel-ilat-cameo"
+      ],
+      "variants": {
+        "ra": {
+          "description": "Guided anti-armor infantry. Marks from a forward observer improve guided fire. Screen against infantry and close attacks.",
+          "actorId": "ILAT",
+          "repository": "engine",
+          "rulesPath": "mods/ra/rules/israel.yaml",
+          "name": "Anti-Armor Team",
+          "role": "Anti armor"
+        },
+        "ra2": {
+          "description": "Guided anti-armor missiles with a two-cell minimum range. Marked targets take extra damage. Screen against infantry and close rushes.",
+          "actorId": "r2ilat",
+          "repository": "mod",
+          "rulesPath": "mods/rtsai/modern-factions/israel-roster.yaml",
+          "name": "Anti-Armor Team",
+          "role": "Anti armor"
+        }
+      }
+    },
+    {
+      "id": "ilobserver",
+      "factionId": "israel",
+      "name": "Forward Observer",
+      "role": "Support",
+      "story": "Marks ground and naval targets for eight seconds. Only this faction's guided weapons gain bonus damage. Detects cloaked units; no direct damage.",
+      "strengths": "Use the role and support relationships shown in the current mode’s rule-derived roster.",
+      "counterplay": "Respect detection, range, armor and support dependencies; the local evaluation tools expose these tradeoffs.",
+      "assetIds": [
+        "israel-ilobserver-source",
+        "israel-ilobserver-cameo"
+      ],
+      "variants": {
+        "ra": {
+          "description": "Observer with a light defensive weapon, target marking and cloak detection. Supports guided anti-armor weapons; vulnerable alone.",
+          "actorId": "ILOBSERVER",
+          "repository": "engine",
+          "rulesPath": "mods/ra/rules/israel.yaml",
+          "name": "Forward Observer",
+          "role": "Support"
+        },
+        "ra2": {
+          "description": "Marks ground and naval targets for eight seconds. Only this faction's guided weapons gain bonus damage. Detects cloaked units; no direct damage.",
+          "actorId": "r2ilobserver",
+          "repository": "mod",
+          "rulesPath": "mods/rtsai/modern-factions/israel-roster.yaml",
+          "name": "Forward Observer",
+          "role": "Support"
+        }
+      }
+    },
+    {
+      "id": "ilrecon",
+      "factionId": "israel",
+      "name": "Recon Specialist",
+      "role": "Line infantry",
+      "story": "One elite reconnaissance specialist with a precision double-tap, demolition ability and a timed precision air strike. Fragile against concentrated fire.",
+      "strengths": "Use the role and support relationships shown in the current mode’s rule-derived roster.",
+      "counterplay": "Respect detection, range, armor and support dependencies; the local evaluation tools expose these tradeoffs.",
+      "assetIds": [
+        "israel-ilrecon-source",
+        "israel-ilrecon-cameo"
+      ],
+      "variants": {
+        "ra": {
+          "description": "One elite reconnaissance specialist with a precision double-tap, demolition ability and a timed precision air strike. Fragile against concentrated fire.",
+          "actorId": "ILRECON",
+          "repository": "engine",
+          "rulesPath": "mods/ra/rules/israel.yaml",
+          "name": "Recon Specialist",
+          "role": "Line infantry"
+        },
+        "ra2": {
+          "description": "One elite reconnaissance specialist with a precision double-tap, demolition ability and a timed precision air strike. Fragile against concentrated fire.",
+          "actorId": "r2ilrecon",
+          "repository": "mod",
+          "rulesPath": "mods/rtsai/modern-factions/israel-roster.yaml",
+          "name": "Recon Specialist",
+          "role": "Line infantry"
+        }
+      }
+    },
+    {
+      "id": "merkava",
+      "factionId": "israel",
+      "name": "Merkava Battle Tank",
+      "role": "Main battle tank",
+      "story": "Durable armored anchor with a 120 mm cannon. Benefits from a powered coordination relay. Expensive and slow; vulnerable to air attacks and flanking anti-armor teams.",
+      "strengths": "Use the role and support relationships shown in the current mode’s rule-derived roster.",
+      "counterplay": "Respect detection, range, armor and support dependencies; the local evaluation tools expose these tradeoffs.",
+      "assetIds": [
+        "israel-merkava-source",
+        "israel-merkava-cameo"
+      ],
+      "variants": {
+        "ra": {
+          "description": "Durable armored anchor with a 120 mm cannon. Benefits from a powered coordination relay. Expensive and slow; vulnerable to air attacks and flanking anti-armor teams.",
+          "actorId": "MERKAVA",
+          "repository": "engine",
+          "rulesPath": "mods/ra/rules/israel.yaml",
+          "name": "Merkava Battle Tank",
+          "role": "Main battle tank"
+        },
+        "ra2": {
+          "description": "Durable armored anchor with a 120 mm cannon. Benefits from a powered coordination relay. Expensive and slow; vulnerable to air attacks and flanking anti-armor teams.",
+          "actorId": "r2merkava",
+          "repository": "mod",
+          "rulesPath": "mods/rtsai/modern-factions/israel.yaml",
+          "name": "Merkava Battle Tank",
+          "role": "Main battle tank"
+        }
+      }
+    },
+    {
+      "id": "ilshield",
+      "factionId": "israel",
+      "name": "Mobile Air Shield",
+      "role": "Anti air",
+      "story": "Long-range radar-guided anti-air missiles. Cannot engage ground targets. Protect with infantry and armor.",
+      "strengths": "Use the role and support relationships shown in the current mode’s rule-derived roster.",
+      "counterplay": "Respect detection, range, armor and support dependencies; the local evaluation tools expose these tradeoffs.",
+      "assetIds": [
+        "israel-ilshield-source",
+        "israel-ilshield-cameo"
+      ],
+      "variants": {
+        "ra": {
+          "description": "Long-range radar-guided anti-air missiles. Cannot engage ground targets. Protect with infantry and armor.",
+          "actorId": "ILSHIELD",
+          "repository": "engine",
+          "rulesPath": "mods/ra/rules/israel.yaml",
+          "name": "Mobile Air Shield",
+          "role": "Anti air"
+        },
+        "ra2": {
+          "description": "Long-range radar-guided anti-air missiles. Cannot engage ground targets. Protect with infantry and armor.",
+          "actorId": "r2ilshield",
+          "repository": "mod",
+          "rulesPath": "mods/rtsai/modern-factions/israel.yaml",
+          "name": "Mobile Air Shield",
+          "role": "Anti air"
+        }
+      }
+    },
+    {
+      "id": "ilhowitzer",
+      "factionId": "israel",
+      "name": "Siege Howitzer",
+      "role": "Artillery",
+      "story": "Tracked artillery with a four-cell minimum range. Guided shells hit marked targets harder. Requires an escort and room to withdraw.",
+      "strengths": "Use the role and support relationships shown in the current mode’s rule-derived roster.",
+      "counterplay": "Respect detection, range, armor and support dependencies; the local evaluation tools expose these tradeoffs.",
+      "assetIds": [
+        "israel-ilhowitzer-source",
+        "israel-ilhowitzer-cameo"
+      ],
+      "variants": {
+        "ra": {
+          "description": "Tracked long-range artillery. Requires an escort and space to withdraw; aircraft and close attacks counter it.",
+          "actorId": "ILHOWITZER",
+          "repository": "engine",
+          "rulesPath": "mods/ra/rules/israel.yaml",
+          "name": "Siege Howitzer",
+          "role": "Artillery"
+        },
+        "ra2": {
+          "description": "Tracked artillery with a four-cell minimum range. Guided shells hit marked targets harder. Requires an escort and room to withdraw.",
+          "actorId": "r2ilhowitzer",
+          "repository": "mod",
+          "rulesPath": "mods/rtsai/modern-factions/israel.yaml",
+          "name": "Siege Howitzer",
+          "role": "Artillery"
+        }
+      }
+    },
+    {
+      "id": "namer",
+      "factionId": "israel",
+      "name": "Namer Support Carrier",
+      "role": "Transport",
+      "story": "Protected carrier for five infantry, with a cannon and a slow-reloading anti-armor missile. Durable but expensive. Unload infantry before an ambush.",
+      "strengths": "Use the role and support relationships shown in the current mode’s rule-derived roster.",
+      "counterplay": "Respect detection, range, armor and support dependencies; the local evaluation tools expose these tradeoffs.",
+      "assetIds": [
+        "israel-namer-source",
+        "israel-namer-cameo"
+      ],
+      "variants": {
+        "ra": {
+          "description": "Protected carrier for five infantry, with a cannon and a slow-reloading anti-armor missile. Durable but expensive. Unload infantry before an ambush.",
+          "actorId": "NAMER",
+          "repository": "engine",
+          "rulesPath": "mods/ra/rules/israel.yaml",
+          "name": "Namer Support Carrier",
+          "role": "Transport"
+        },
+        "ra2": {
+          "description": "Protected carrier for five infantry, with a cannon and a slow-reloading anti-armor missile. Durable but expensive. Unload infantry before an ambush.",
+          "actorId": "r2namer",
+          "repository": "mod",
+          "rulesPath": "mods/rtsai/modern-factions/israel.yaml",
+          "name": "Namer Support Carrier",
+          "role": "Transport"
+        }
+      }
+    },
+    {
+      "id": "ilfalcon",
+      "factionId": "israel",
+      "name": "Falcon Multirole Jet",
+      "role": "Interceptor",
+      "story": "Multirole aircraft with separate air and ground missile magazines. Returns to its air service building to rearm. Requires advanced technology.",
+      "strengths": "Use the role and support relationships shown in the current mode’s rule-derived roster.",
+      "counterplay": "Respect detection, range, armor and support dependencies; the local evaluation tools expose these tradeoffs.",
+      "assetIds": [
+        "israel-ilfalcon-source",
+        "israel-ilfalcon-cameo"
+      ],
+      "variants": {
+        "ra": {
+          "description": "Multirole aircraft with separate air and ground missile magazines. Returns to its air service building to rearm. Requires advanced technology.",
+          "actorId": "ILFALCON",
+          "repository": "engine",
+          "rulesPath": "mods/ra/rules/israel.yaml",
+          "name": "Falcon Multirole Jet",
+          "role": "Interceptor"
+        },
+        "ra2": {
+          "description": "Multirole aircraft with separate air and ground missile magazines. Returns to its air service building to rearm. Requires advanced technology.",
+          "actorId": "r2ilfalcon",
+          "repository": "mod",
+          "rulesPath": "mods/rtsai/modern-factions/israel-roster.yaml",
+          "name": "Falcon Multirole Jet",
+          "role": "Interceptor"
+        }
+      }
+    },
+    {
+      "id": "ilgunship",
+      "factionId": "israel",
+      "name": "Escort Gunship",
+      "role": "Strike aircraft",
+      "story": "Attack helicopter with a chain gun and guided anti-armor rockets. Marked targets take extra rocket damage. Keep clear of anti-air coverage.",
+      "strengths": "Use the role and support relationships shown in the current mode’s rule-derived roster.",
+      "counterplay": "Respect detection, range, armor and support dependencies; the local evaluation tools expose these tradeoffs.",
+      "assetIds": [
+        "israel-ilgunship-source",
+        "israel-ilgunship-cameo"
+      ],
+      "variants": {
+        "ra": {
+          "description": "Attack helicopter with a chain gun and guided anti-armor rockets. Marked targets take extra rocket damage. Keep clear of anti-air coverage.",
+          "actorId": "ILGUNSHIP",
+          "repository": "engine",
+          "rulesPath": "mods/ra/rules/israel.yaml",
+          "name": "Escort Gunship",
+          "role": "Strike aircraft"
+        },
+        "ra2": {
+          "description": "Attack helicopter with a chain gun and guided anti-armor rockets. Marked targets take extra rocket damage. Keep clear of anti-air coverage.",
+          "actorId": "r2ilgunship",
+          "repository": "mod",
+          "rulesPath": "mods/rtsai/modern-factions/israel-roster.yaml",
+          "name": "Escort Gunship",
+          "role": "Strike aircraft"
+        }
+      }
+    },
+    {
+      "id": "ilpatrol",
+      "factionId": "israel",
+      "name": "Coastal Patrol Craft",
+      "role": "Naval screen",
+      "story": "Fast cannon patrol craft. Sonar reveals submarines. Screens light boats but loses to heavy ships.",
+      "strengths": "Use the role and support relationships shown in the current mode’s rule-derived roster.",
+      "counterplay": "Respect detection, range, armor and support dependencies; the local evaluation tools expose these tradeoffs.",
+      "assetIds": [
+        "israel-ilpatrol-source",
+        "israel-ilpatrol-cameo"
+      ],
+      "variants": {
+        "ra": {
+          "description": "Fast cannon patrol craft. Sonar reveals submarines. Screens light boats but loses to heavy ships.",
+          "actorId": "ILPATROL",
+          "repository": "engine",
+          "rulesPath": "mods/ra/rules/israel.yaml",
+          "name": "Coastal Patrol Craft",
+          "role": "Naval screen"
+        },
+        "ra2": {
+          "description": "Fast cannon patrol craft. Sonar reveals submarines. Screens light boats but loses to heavy ships.",
+          "actorId": "r2ilpatrol",
+          "repository": "mod",
+          "rulesPath": "mods/rtsai/modern-factions/israel-roster.yaml",
+          "name": "Coastal Patrol Craft",
+          "role": "Naval screen"
+        }
+      }
+    },
+    {
+      "id": "ilfrigate",
+      "factionId": "israel",
+      "name": "Shield Frigate",
+      "role": "Anti submarine",
+      "story": "Naval gun, anti-air and depth charges. Limited interceptor magazine deflects missiles. Active radar increases coverage but reveals the ship.",
+      "strengths": "Use the role and support relationships shown in the current mode’s rule-derived roster.",
+      "counterplay": "Respect detection, range, armor and support dependencies; the local evaluation tools expose these tradeoffs.",
+      "assetIds": [
+        "israel-ilfrigate-source",
+        "israel-ilfrigate-cameo"
+      ],
+      "variants": {
+        "ra": {
+          "description": "Naval cannon, anti-air missiles and depth charges. Limited interceptor ammunition and active radar provide fleet protection. Sensor mode reveals the ship.",
+          "actorId": "ILFRIGATE",
+          "repository": "engine",
+          "rulesPath": "mods/ra/rules/israel.yaml",
+          "name": "Shield Frigate",
+          "role": "Anti submarine"
+        },
+        "ra2": {
+          "description": "Naval gun, anti-air and depth charges. Limited interceptor magazine deflects missiles. Active radar increases coverage but reveals the ship.",
+          "actorId": "r2ilfrigate",
+          "repository": "mod",
+          "rulesPath": "mods/rtsai/modern-factions/israel-roster.yaml",
+          "name": "Shield Frigate",
+          "role": "Anti submarine"
+        }
+      }
+    },
+    {
+      "id": "iltender",
+      "factionId": "israel",
+      "name": "Fleet Support Tender",
+      "role": "Support",
+      "story": "Unarmed fleet support. Nearby eligible ships repair and frigate interceptors reload faster. Escort this vulnerable ship.",
+      "strengths": "Use the role and support relationships shown in the current mode’s rule-derived roster.",
+      "counterplay": "Respect detection, range, armor and support dependencies; the local evaluation tools expose these tradeoffs.",
+      "assetIds": [
+        "israel-iltender-source",
+        "israel-iltender-cameo"
+      ],
+      "variants": {
+        "ra": {
+          "description": "Unarmed fleet support. Repairs eligible nearby ships and supplies fleet guidance. Escort this vulnerable ship.",
+          "actorId": "ILTENDER",
+          "repository": "engine",
+          "rulesPath": "mods/ra/rules/israel.yaml",
+          "name": "Fleet Support Tender",
+          "role": "Support"
+        },
+        "ra2": {
+          "description": "Unarmed fleet support. Nearby eligible ships repair and frigate interceptors reload faster. Escort this vulnerable ship.",
+          "actorId": "r2iltender",
+          "repository": "mod",
+          "rulesPath": "mods/rtsai/modern-factions/israel-roster.yaml",
+          "name": "Fleet Support Tender",
+          "role": "Support"
+        }
+      }
+    },
+    {
+      "id": "ilsentry",
+      "factionId": "israel",
+      "name": "Sentry Emplacement",
+      "role": "Line infantry",
+      "story": "Powered anti-infantry defense. Weak against armor, artillery and aircraft.",
+      "strengths": "Use the role and support relationships shown in the current mode’s rule-derived roster.",
+      "counterplay": "Respect detection, range, armor and support dependencies; the local evaluation tools expose these tradeoffs.",
+      "assetIds": [
+        "israel-ilsentry-source",
+        "israel-ilsentry-cameo"
+      ],
+      "variants": {
+        "ra": {
+          "description": "Powered anti-infantry defense. Weak against armor, artillery and aircraft.",
+          "actorId": "ILSENTRY",
+          "repository": "engine",
+          "rulesPath": "mods/ra/rules/israel.yaml",
+          "name": "Sentry Emplacement",
+          "role": "Line infantry"
+        },
+        "ra2": {
+          "description": "Powered anti-infantry defense. Weak against armor, artillery and aircraft.",
+          "actorId": "r2ilsentry",
+          "repository": "mod",
+          "rulesPath": "mods/rtsai/modern-factions/israel-roster.yaml",
+          "name": "Sentry Emplacement",
+          "role": "Line infantry"
+        }
+      }
+    },
+    {
+      "id": "ilbattery",
+      "factionId": "israel",
+      "name": "Interceptor Battery",
+      "role": "Anti air",
+      "story": "Powered long-range anti-air defense with a two-cell minimum range. Cannot fire at ground targets. This is an aircraft defense, not a universal missile shield.",
+      "strengths": "Use the role and support relationships shown in the current mode’s rule-derived roster.",
+      "counterplay": "Respect detection, range, armor and support dependencies; the local evaluation tools expose these tradeoffs.",
+      "assetIds": [
+        "israel-ilbattery-source",
+        "israel-ilbattery-cameo"
+      ],
+      "variants": {
+        "ra": {
+          "description": "Powered anti-air missile defense. Protects the base against aircraft; cannot fire at ground units.",
+          "actorId": "ILBATTERY",
+          "repository": "engine",
+          "rulesPath": "mods/ra/rules/israel.yaml",
+          "name": "Interceptor Battery",
+          "role": "Anti air"
+        },
+        "ra2": {
+          "description": "Powered long-range anti-air defense with a two-cell minimum range. Cannot fire at ground targets. This is an aircraft defense, not a universal missile shield.",
+          "actorId": "r2ilbattery",
+          "repository": "mod",
+          "rulesPath": "mods/rtsai/modern-factions/israel-roster.yaml",
+          "name": "Interceptor Battery",
+          "role": "Anti air"
+        }
+      }
+    },
+    {
+      "id": "ilatpost",
+      "factionId": "israel",
+      "name": "Anti-Armor Emplacement",
+      "role": "Anti armor",
+      "story": "Powered guided anti-armor missiles with a two-cell minimum range. Marked ground and naval targets take extra damage. Close infantry and artillery counter it.",
+      "strengths": "Use the role and support relationships shown in the current mode’s rule-derived roster.",
+      "counterplay": "Respect detection, range, armor and support dependencies; the local evaluation tools expose these tradeoffs.",
+      "assetIds": [
+        "israel-ilatpost-source",
+        "israel-ilatpost-cameo"
+      ],
+      "variants": {
+        "ra": {
+          "description": "Powered guided anti-armor missiles with a two-cell minimum range. Marked ground and naval targets take extra damage. Close infantry and artillery counter it.",
+          "actorId": "ILATPOST",
+          "repository": "engine",
+          "rulesPath": "mods/ra/rules/israel.yaml",
+          "name": "Anti-Armor Emplacement",
+          "role": "Anti armor"
+        },
+        "ra2": {
+          "description": "Powered guided anti-armor missiles with a two-cell minimum range. Marked ground and naval targets take extra damage. Close infantry and artillery counter it.",
+          "actorId": "r2ilatpost",
+          "repository": "mod",
+          "rulesPath": "mods/rtsai/modern-factions/israel-roster.yaml",
+          "name": "Anti-Armor Emplacement",
+          "role": "Anti armor"
+        }
+      }
+    },
+    {
+      "id": "ilrelay",
+      "factionId": "israel",
+      "name": "Coordination Relay",
+      "role": "Support structure",
+      "story": "A powered, unarmed support building. Local benefits end when it is destroyed or loses power.",
+      "strengths": "Supports eligible friendly units inside its visible range. Multiple sources do not multiply the bonus.",
+      "counterplay": "Cut power, destroy the exposed node or fight outside its range.",
+      "assetIds": [
+        "israel-ilrelay-source",
+        "israel-ilrelay-cameo"
+      ],
+      "variants": {
+        "ra": {
+          "actorId": "ILRELAY",
+          "repository": "engine",
+          "rulesPath": "mods/ra/rules/israel.yaml",
+          "name": "Coordination Relay",
+          "role": "Support structure"
+        },
+        "ra2": {
+          "actorId": "r2ilrelay",
+          "repository": "mod",
+          "rulesPath": "mods/rtsai/modern-factions/israel-roster.yaml",
+          "name": "Coordination Relay",
+          "role": "Support structure"
+        }
+      }
+    },
+    {
+      "id": "ilworkshop",
+      "factionId": "israel",
+      "name": "Field Service Station",
+      "role": "Support structure",
+      "story": "A powered, unarmed support building. Local benefits end when it is destroyed or loses power.",
+      "strengths": "Supports eligible friendly units inside its visible range. Multiple sources do not multiply the bonus.",
+      "counterplay": "Cut power, destroy the exposed node or fight outside its range.",
+      "assetIds": [
+        "israel-ilworkshop-source",
+        "israel-ilworkshop-cameo"
+      ],
+      "variants": {
+        "ra": {
+          "actorId": "ILWORKSHOP",
+          "repository": "engine",
+          "rulesPath": "mods/ra/rules/israel.yaml",
+          "name": "Field Service Station",
+          "role": "Support structure"
+        },
+        "ra2": {
+          "actorId": "r2ilworkshop",
+          "repository": "mod",
+          "rulesPath": "mods/rtsai/modern-factions/israel-roster.yaml",
+          "name": "Field Service Station",
+          "role": "Support structure"
+        }
+      }
+    },
+    {
+      "id": "hzrifle",
+      "factionId": "hezbollah",
+      "name": "Line Fighter",
+      "role": "Line infantry",
+      "story": "Inexpensive rifle infantry. Conceals while stationary; moving, firing or taking damage reveals it. Detectors and artillery defeat isolated positions.",
+      "strengths": "Use the role and support relationships shown in the current mode’s rule-derived roster.",
+      "counterplay": "Respect detection, range, armor and support dependencies; the local evaluation tools expose these tradeoffs.",
+      "assetIds": [
+        "hezbollah-hzrifle-source",
+        "hezbollah-hzrifle-cameo"
+      ],
+      "variants": {
+        "ra": {
+          "description": "Inexpensive rifle infantry. Conceals while stationary; moving, firing or taking damage reveals it. Detectors and artillery defeat isolated positions.",
+          "actorId": "HZRIFLE",
+          "repository": "engine",
+          "rulesPath": "mods/ra/rules/hezbollah.yaml",
+          "name": "Line Fighter",
+          "role": "Line infantry"
+        },
+        "ra2": {
+          "description": "Inexpensive rifle infantry. Conceals while stationary; moving, firing or taking damage reveals it. Detectors and artillery defeat isolated positions.",
+          "actorId": "r2hzrifle",
+          "repository": "mod",
+          "rulesPath": "mods/rtsai/modern-factions/hezbollah-roster.yaml",
+          "name": "Line Fighter",
+          "role": "Line infantry"
+        }
+      }
+    },
+    {
+      "id": "hzat",
+      "factionId": "hezbollah",
+      "name": "Ridge Missile Team",
+      "role": "Anti armor",
+      "story": "Light anti-armor missile infantry. A signal post or scout improves range and reload. Vulnerable to infantry, detectors and air attacks.",
+      "strengths": "Use the role and support relationships shown in the current mode’s rule-derived roster.",
+      "counterplay": "Respect detection, range, armor and support dependencies; the local evaluation tools expose these tradeoffs.",
+      "assetIds": [
+        "hezbollah-hzat-source",
+        "hezbollah-hzat-cameo"
+      ],
+      "variants": {
+        "ra": {
+          "description": "Light anti-armor missile infantry. A signal post or scout improves range and reload. Vulnerable to infantry, detectors and air attacks.",
+          "actorId": "HZAT",
+          "repository": "engine",
+          "rulesPath": "mods/ra/rules/hezbollah.yaml",
+          "name": "Ridge Missile Team",
+          "role": "Anti armor"
+        },
+        "ra2": {
+          "description": "Light anti-armor missile infantry. A signal post or scout improves range and reload. Vulnerable to infantry, detectors and air attacks.",
+          "actorId": "r2hzat",
+          "repository": "mod",
+          "rulesPath": "mods/rtsai/modern-factions/hezbollah-roster.yaml",
+          "name": "Ridge Missile Team",
+          "role": "Anti armor"
+        }
+      }
+    },
+    {
+      "id": "hzspotter",
+      "factionId": "hezbollah",
+      "name": "Field Spotter",
+      "role": "Support",
+      "story": "Reconnaissance specialist who detects cloaked units and guides nearby eligible missile teams and vehicles. A weak weapon makes escorts essential.",
+      "strengths": "Use the role and support relationships shown in the current mode’s rule-derived roster.",
+      "counterplay": "Respect detection, range, armor and support dependencies; the local evaluation tools expose these tradeoffs.",
+      "assetIds": [
+        "hezbollah-hzspotter-source",
+        "hezbollah-hzspotter-cameo"
+      ],
+      "variants": {
+        "ra": {
+          "description": "Reconnaissance specialist who detects cloaked units and guides nearby eligible missile teams and vehicles. A weak weapon makes escorts essential.",
+          "actorId": "HZSPOTTER",
+          "repository": "engine",
+          "rulesPath": "mods/ra/rules/hezbollah.yaml",
+          "name": "Field Spotter",
+          "role": "Support"
+        },
+        "ra2": {
+          "description": "Reconnaissance specialist who detects cloaked units and guides nearby eligible missile teams and vehicles. A weak weapon makes escorts essential.",
+          "actorId": "r2hzspotter",
+          "repository": "mod",
+          "rulesPath": "mods/rtsai/modern-factions/hezbollah-roster.yaml",
+          "name": "Field Spotter",
+          "role": "Support"
+        }
+      }
+    },
+    {
+      "id": "hzscout",
+      "factionId": "hezbollah",
+      "name": "Cedar Scout",
+      "role": "Line infantry",
+      "story": "One concealed scout with a suppressed carbine and demolition ability. Stationary concealment breaks when firing, moving or damaged. Vulnerable once detected.",
+      "strengths": "Use the role and support relationships shown in the current mode’s rule-derived roster.",
+      "counterplay": "Respect detection, range, armor and support dependencies; the local evaluation tools expose these tradeoffs.",
+      "assetIds": [
+        "hezbollah-hzscout-source",
+        "hezbollah-hzscout-cameo"
+      ],
+      "variants": {
+        "ra": {
+          "description": "One concealed scout with a suppressed carbine and demolition ability. Stationary concealment breaks when firing, moving or damaged. Vulnerable once detected.",
+          "actorId": "HZSCOUT",
+          "repository": "engine",
+          "rulesPath": "mods/ra/rules/hezbollah.yaml",
+          "name": "Cedar Scout",
+          "role": "Line infantry"
+        },
+        "ra2": {
+          "description": "One concealed scout with a suppressed carbine and demolition ability. Stationary concealment breaks when firing, moving or damaged. Vulnerable once detected.",
+          "actorId": "r2hzscout",
+          "repository": "mod",
+          "rulesPath": "mods/rtsai/modern-factions/hezbollah-roster.yaml",
+          "name": "Cedar Scout",
+          "role": "Line infantry"
+        }
+      }
+    },
+    {
+      "id": "hztechnical",
+      "factionId": "hezbollah",
+      "name": "Cedar Technical",
+      "role": "Line infantry",
+      "story": "Fast and inexpensive machine-gun vehicle. Strong against exposed infantry, weak against armor and air attacks.",
+      "strengths": "Use the role and support relationships shown in the current mode’s rule-derived roster.",
+      "counterplay": "Respect detection, range, armor and support dependencies; the local evaluation tools expose these tradeoffs.",
+      "assetIds": [
+        "hezbollah-hztechnical-source",
+        "hezbollah-hztechnical-cameo"
+      ],
+      "variants": {
+        "ra": {
+          "description": "Fast and inexpensive machine-gun vehicle. Strong against exposed infantry, weak against armor and air attacks.",
+          "actorId": "HZTECHNICAL",
+          "repository": "engine",
+          "rulesPath": "mods/ra/rules/hezbollah.yaml",
+          "name": "Cedar Technical",
+          "role": "Line infantry"
+        },
+        "ra2": {
+          "description": "Fast and inexpensive machine-gun vehicle. Strong against exposed infantry, weak against armor and air attacks.",
+          "actorId": "r2hztechnical",
+          "repository": "mod",
+          "rulesPath": "mods/rtsai/modern-factions/hezbollah.yaml",
+          "name": "Cedar Technical",
+          "role": "Line infantry"
+        }
+      }
+    },
+    {
+      "id": "hzrecoilless",
+      "factionId": "hezbollah",
+      "name": "Recoilless Technical",
+      "role": "Anti armor",
+      "story": "Mobile anti-armor fire on a fragile chassis. Signal coverage improves range and reload. Infantry and aircraft punish exposed vehicles.",
+      "strengths": "Use the role and support relationships shown in the current mode’s rule-derived roster.",
+      "counterplay": "Respect detection, range, armor and support dependencies; the local evaluation tools expose these tradeoffs.",
+      "assetIds": [
+        "hezbollah-hzrecoilless-source",
+        "hezbollah-hzrecoilless-cameo"
+      ],
+      "variants": {
+        "ra": {
+          "description": "Mobile anti-armor fire on a fragile chassis. Signal coverage improves range and reload. Infantry and aircraft punish exposed vehicles.",
+          "actorId": "HZRECOILLESS",
+          "repository": "engine",
+          "rulesPath": "mods/ra/rules/hezbollah.yaml",
+          "name": "Recoilless Technical",
+          "role": "Anti armor"
+        },
+        "ra2": {
+          "description": "Mobile anti-armor fire on a fragile chassis. Signal coverage improves range and reload. Infantry and aircraft punish exposed vehicles.",
+          "actorId": "r2hzrecoilless",
+          "repository": "mod",
+          "rulesPath": "mods/rtsai/modern-factions/hezbollah.yaml",
+          "name": "Recoilless Technical",
+          "role": "Anti armor"
+        }
+      }
+    },
+    {
+      "id": "hzescort",
+      "factionId": "hezbollah",
+      "name": "Escort Gun Truck",
+      "role": "Anti air",
+      "story": "Fragile mobile anti-air escort. Its ground fire discourages infantry; tanks and artillery counter it.",
+      "strengths": "Use the role and support relationships shown in the current mode’s rule-derived roster.",
+      "counterplay": "Respect detection, range, armor and support dependencies; the local evaluation tools expose these tradeoffs.",
+      "assetIds": [
+        "hezbollah-hzescort-source",
+        "hezbollah-hzescort-cameo"
+      ],
+      "variants": {
+        "ra": {
+          "description": "Fragile mobile anti-air escort. Its ground fire discourages infantry; tanks and artillery counter it.",
+          "actorId": "HZESCORT",
+          "repository": "engine",
+          "rulesPath": "mods/ra/rules/hezbollah.yaml",
+          "name": "Escort Gun Truck",
+          "role": "Anti air"
+        },
+        "ra2": {
+          "description": "Fragile mobile anti-air escort. Its ground fire discourages infantry; tanks and artillery counter it.",
+          "actorId": "r2hzescort",
+          "repository": "mod",
+          "rulesPath": "mods/rtsai/modern-factions/hezbollah.yaml",
+          "name": "Escort Gun Truck",
+          "role": "Anti air"
+        }
+      }
+    },
+    {
+      "id": "hzrockets",
+      "factionId": "hezbollah",
+      "name": "Mobile Rocket Battery",
+      "role": "Artillery",
+      "story": "Long-range rocket artillery with a minimum range and a slow reload. Must stop to set up its stabilized firing cycle. Scouts or signal posts improve guided fire; close attacks force withdrawal.",
+      "strengths": "Use the role and support relationships shown in the current mode’s rule-derived roster.",
+      "counterplay": "Respect detection, range, armor and support dependencies; the local evaluation tools expose these tradeoffs.",
+      "assetIds": [
+        "hezbollah-hzrockets-source",
+        "hezbollah-hzrockets-cameo"
+      ],
+      "variants": {
+        "ra": {
+          "description": "Long-range rocket artillery on a fragile mobile chassis. Spotter guidance improves coordinated fire; vulnerable when approached closely.",
+          "actorId": "HZROCKETS",
+          "repository": "engine",
+          "rulesPath": "mods/ra/rules/hezbollah.yaml",
+          "name": "Mobile Rocket Battery",
+          "role": "Artillery"
+        },
+        "ra2": {
+          "description": "Long-range rocket artillery with a minimum range and a slow reload. Must stop to set up its stabilized firing cycle. Scouts or signal posts improve guided fire; close attacks force withdrawal.",
+          "actorId": "r2hzrockets",
+          "repository": "mod",
+          "rulesPath": "mods/rtsai/modern-factions/hezbollah.yaml",
+          "name": "Mobile Rocket Battery",
+          "role": "Artillery"
+        }
+      }
+    },
+    {
+      "id": "hzdrone",
+      "factionId": "hezbollah",
+      "name": "Loiter Drone",
+      "role": "Strike aircraft",
+      "story": "One-way airborne attack that consumes the drone. Scout the target first. Anti-air fire destroys it before impact.",
+      "strengths": "Use the role and support relationships shown in the current mode’s rule-derived roster.",
+      "counterplay": "Respect detection, range, armor and support dependencies; the local evaluation tools expose these tradeoffs.",
+      "assetIds": [
+        "hezbollah-hzdrone-source",
+        "hezbollah-hzdrone-cameo"
+      ],
+      "variants": {
+        "ra": {
+          "description": "One-way airborne attack that consumes the drone. Scout the target first. Anti-air fire destroys it before impact.",
+          "actorId": "HZDRONE",
+          "repository": "engine",
+          "rulesPath": "mods/ra/rules/hezbollah.yaml",
+          "name": "Loiter Drone",
+          "role": "Strike aircraft"
+        },
+        "ra2": {
+          "description": "One-way airborne attack that consumes the drone. Scout the target first. Anti-air fire destroys it before impact.",
+          "actorId": "r2hzdrone",
+          "repository": "mod",
+          "rulesPath": "mods/rtsai/modern-factions/hezbollah-roster.yaml",
+          "name": "Loiter Drone",
+          "role": "Strike aircraft"
+        }
+      }
+    },
+    {
+      "id": "hzmissileboat",
+      "factionId": "hezbollah",
+      "name": "Coastal Missile Boat",
+      "role": "Naval screen",
+      "story": "Light guided-missile craft. Coverage from a scout boat supports coordinated fire; poor armor demands spacing and an escort.",
+      "strengths": "Use the role and support relationships shown in the current mode’s rule-derived roster.",
+      "counterplay": "Respect detection, range, armor and support dependencies; the local evaluation tools expose these tradeoffs.",
+      "assetIds": [
+        "hezbollah-hzmissileboat-source",
+        "hezbollah-hzmissileboat-cameo"
+      ],
+      "variants": {
+        "ra": {
+          "description": "Light guided-missile craft. Coverage from a scout boat supports coordinated fire; poor armor demands spacing and an escort.",
+          "actorId": "HZMISSILEBOAT",
+          "repository": "engine",
+          "rulesPath": "mods/ra/rules/hezbollah.yaml",
+          "name": "Coastal Missile Boat",
+          "role": "Naval screen"
+        },
+        "ra2": {
+          "description": "Light guided-missile craft. Coverage from a scout boat supports coordinated fire; poor armor demands spacing and an escort.",
+          "actorId": "r2hzmissileboat",
+          "repository": "mod",
+          "rulesPath": "mods/rtsai/modern-factions/hezbollah-roster.yaml",
+          "name": "Coastal Missile Boat",
+          "role": "Naval screen"
+        }
+      }
+    },
+    {
+      "id": "hzskiff",
+      "factionId": "hezbollah",
+      "name": "Attack Skiff",
+      "role": "Naval screen",
+      "story": "Inexpensive one-way attack boat. Requires a reachable water target and is consumed on impact. Patrol screens and concentrated fire counter it.",
+      "strengths": "Use the role and support relationships shown in the current mode’s rule-derived roster.",
+      "counterplay": "Respect detection, range, armor and support dependencies; the local evaluation tools expose these tradeoffs.",
+      "assetIds": [
+        "hezbollah-hzskiff-source",
+        "hezbollah-hzskiff-cameo"
+      ],
+      "variants": {
+        "ra": {
+          "description": "Inexpensive one-way attack boat. Requires a reachable water target and is consumed on impact. Patrol screens and concentrated fire counter it.",
+          "actorId": "HZSKIFF",
+          "repository": "engine",
+          "rulesPath": "mods/ra/rules/hezbollah.yaml",
+          "name": "Attack Skiff",
+          "role": "Naval screen"
+        },
+        "ra2": {
+          "description": "Inexpensive one-way attack boat. Requires a reachable water target and is consumed on impact. Patrol screens and concentrated fire counter it.",
+          "actorId": "r2hzskiff",
+          "repository": "mod",
+          "rulesPath": "mods/rtsai/modern-factions/hezbollah-roster.yaml",
+          "name": "Attack Skiff",
+          "role": "Naval screen"
+        }
+      }
+    },
+    {
+      "id": "hzsurvey",
+      "factionId": "hezbollah",
+      "name": "Coastal Survey Boat",
+      "role": "Support",
+      "story": "Light patrol and reconnaissance craft with sonar and fleet guidance. Prioritize its sensors; heavy warships outgun it.",
+      "strengths": "Use the role and support relationships shown in the current mode’s rule-derived roster.",
+      "counterplay": "Respect detection, range, armor and support dependencies; the local evaluation tools expose these tradeoffs.",
+      "assetIds": [
+        "hezbollah-hzsurvey-source",
+        "hezbollah-hzsurvey-cameo"
+      ],
+      "variants": {
+        "ra": {
+          "description": "Light patrol and reconnaissance craft with sonar and fleet guidance. Prioritize its sensors; heavy warships outgun it.",
+          "actorId": "HZSURVEY",
+          "repository": "engine",
+          "rulesPath": "mods/ra/rules/hezbollah.yaml",
+          "name": "Coastal Survey Boat",
+          "role": "Support"
+        },
+        "ra2": {
+          "description": "Light patrol and reconnaissance craft with sonar and fleet guidance. Prioritize its sensors; heavy warships outgun it.",
+          "actorId": "r2hzsurvey",
+          "repository": "mod",
+          "rulesPath": "mods/rtsai/modern-factions/hezbollah-roster.yaml",
+          "name": "Coastal Survey Boat",
+          "role": "Support"
+        }
+      }
+    },
+    {
+      "id": "hzbunker",
+      "factionId": "hezbollah",
+      "name": "Concealed Bunker",
+      "role": "Line infantry",
+      "story": "Stationary concealed machine-gun defense. Firing or taking damage reveals it. Detection and artillery counter the position.",
+      "strengths": "Use the role and support relationships shown in the current mode’s rule-derived roster.",
+      "counterplay": "Respect detection, range, armor and support dependencies; the local evaluation tools expose these tradeoffs.",
+      "assetIds": [
+        "hezbollah-hzbunker-source",
+        "hezbollah-hzbunker-cameo"
+      ],
+      "variants": {
+        "ra": {
+          "description": "Concealed defensive bunker with room for infantry. Attacking and damage reveal it. Detection and artillery counter it.",
+          "actorId": "HZBUNKER",
+          "repository": "engine",
+          "rulesPath": "mods/ra/rules/hezbollah.yaml",
+          "name": "Concealed Bunker",
+          "role": "Line infantry"
+        },
+        "ra2": {
+          "description": "Stationary concealed machine-gun defense. Firing or taking damage reveals it. Detection and artillery counter the position.",
+          "actorId": "r2hzbunker",
+          "repository": "mod",
+          "rulesPath": "mods/rtsai/modern-factions/hezbollah-roster.yaml",
+          "name": "Concealed Bunker",
+          "role": "Line infantry"
+        }
+      }
+    },
+    {
+      "id": "hzaanest",
+      "factionId": "hezbollah",
+      "name": "Short-Range AA Nest",
+      "role": "Anti air",
+      "story": "Low-cost anti-air emplacement. Cannot substitute for armor defense. Artillery attacks outside its range.",
+      "strengths": "Use the role and support relationships shown in the current mode’s rule-derived roster.",
+      "counterplay": "Respect detection, range, armor and support dependencies; the local evaluation tools expose these tradeoffs.",
+      "assetIds": [
+        "hezbollah-hzaanest-source",
+        "hezbollah-hzaanest-cameo"
+      ],
+      "variants": {
+        "ra": {
+          "description": "Low-cost anti-air emplacement. Cannot substitute for armor defense. Artillery attacks outside its range.",
+          "actorId": "HZAANEST",
+          "repository": "engine",
+          "rulesPath": "mods/ra/rules/hezbollah.yaml",
+          "name": "Short-Range AA Nest",
+          "role": "Anti air"
+        },
+        "ra2": {
+          "description": "Low-cost anti-air emplacement. Cannot substitute for armor defense. Artillery attacks outside its range.",
+          "actorId": "r2hzaanest",
+          "repository": "mod",
+          "rulesPath": "mods/rtsai/modern-factions/hezbollah-roster.yaml",
+          "name": "Short-Range AA Nest",
+          "role": "Anti air"
+        }
+      }
+    },
+    {
+      "id": "hzcoastal",
+      "factionId": "hezbollah",
+      "name": "Coastal Missile Emplacement",
+      "role": "Anti armor",
+      "story": "Concealed missile defense against ground vehicles and ships. Minimum range leaves a close-attack window. Detection and infantry counter it.",
+      "strengths": "Use the role and support relationships shown in the current mode’s rule-derived roster.",
+      "counterplay": "Respect detection, range, armor and support dependencies; the local evaluation tools expose these tradeoffs.",
+      "assetIds": [
+        "hezbollah-hzcoastal-source",
+        "hezbollah-hzcoastal-cameo"
+      ],
+      "variants": {
+        "ra": {
+          "description": "Concealed anti-armor missile emplacement able to engage vehicles and ships. Detection, infantry and artillery counter it.",
+          "actorId": "HZCOASTAL",
+          "repository": "engine",
+          "rulesPath": "mods/ra/rules/hezbollah.yaml",
+          "name": "Coastal Missile Emplacement",
+          "role": "Anti armor"
+        },
+        "ra2": {
+          "description": "Concealed missile defense against ground vehicles and ships. Minimum range leaves a close-attack window. Detection and infantry counter it.",
+          "actorId": "r2hzcoastal",
+          "repository": "mod",
+          "rulesPath": "mods/rtsai/modern-factions/hezbollah-roster.yaml",
+          "name": "Coastal Missile Emplacement",
+          "role": "Anti armor"
+        }
+      }
+    },
+    {
+      "id": "hzrelay",
+      "factionId": "hezbollah",
+      "name": "Signal Post",
+      "role": "Support structure",
+      "story": "A powered, unarmed support building. Local benefits end when it is destroyed or loses power.",
+      "strengths": "Supports eligible friendly units inside its visible range. Multiple sources do not multiply the bonus.",
+      "counterplay": "Cut power, destroy the exposed node or fight outside its range.",
+      "assetIds": [
+        "hezbollah-hzrelay-source",
+        "hezbollah-hzrelay-cameo"
+      ],
+      "variants": {
+        "ra": {
+          "actorId": "HZRELAY",
+          "repository": "engine",
+          "rulesPath": "mods/ra/rules/hezbollah.yaml",
+          "name": "Signal Post",
+          "role": "Support structure"
+        },
+        "ra2": {
+          "actorId": "r2hzrelay",
+          "repository": "mod",
+          "rulesPath": "mods/rtsai/modern-factions/hezbollah-roster.yaml",
+          "name": "Signal Post",
+          "role": "Support structure"
+        }
+      }
+    },
+    {
+      "id": "hzworkshop",
+      "factionId": "hezbollah",
+      "name": "Field Workshop",
+      "role": "Support structure",
+      "story": "A powered, unarmed support building. Local benefits end when it is destroyed or loses power.",
+      "strengths": "Supports eligible friendly units inside its visible range. Multiple sources do not multiply the bonus.",
+      "counterplay": "Cut power, destroy the exposed node or fight outside its range.",
+      "assetIds": [
+        "hezbollah-hzworkshop-source",
+        "hezbollah-hzworkshop-cameo"
+      ],
+      "variants": {
+        "ra": {
+          "actorId": "HZWORKSHOP",
+          "repository": "engine",
+          "rulesPath": "mods/ra/rules/hezbollah.yaml",
+          "name": "Field Workshop",
+          "role": "Support structure"
+        },
+        "ra2": {
+          "actorId": "r2hzworkshop",
+          "repository": "mod",
+          "rulesPath": "mods/rtsai/modern-factions/hezbollah-roster.yaml",
+          "name": "Field Workshop",
+          "role": "Support structure"
         }
       }
     }

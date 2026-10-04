@@ -2,12 +2,18 @@
 
 Updated 2 October 2026. Approved by the owner. This replaces the 12 September dual-mode roadmap.
 
+## Owner-requested local expansion — 4 October 2026
+
+The owner requested Israel and Hezbollah as complete faction packs in both modes. These are local development packs: original authored art, infantry, armor/support vehicles, aircraft, naval roles, three defenses and two support buildings per faction, integrated production and bot composition. They use fictional gameplay abstractions; no real-world effectiveness is claimed. RA2 remains the canonical product. Classic contains the new packs in the World War III experience; the existing public alpha is unchanged.
+
+The owner also requested full-roster website dossiers, a live map Workshop and browser/native behavior evaluations. Those local tools now cover both factions. Keep release coverage and production deployment separate: new faction art, broad balance and owner approval remain open gates. No publishing or paid generation is approved by this expansion request.
+
 ## The product
 
-**RTS AI is a Red Alert 2 mod for OpenRA: five modern nations, commanded with an AI co-commander that works from the first launch.**
+**RTS AI is a Red Alert 2 mod for OpenRA: modern factions, commanded with an AI co-commander that works from the first launch.**
 
 - The player owns Red Alert 2 (Steam, EA app/Origin or disc), and the mod imports it. Commercial RA2 data is never bundled.
-- The five nations are China, Iran, Türkiye, Saudi Arabia and Yemen. One catalog (`catalog/factions.json`) is the source for the game, the companion and rtsai.net.
+- The seven modern factions are China, Iran, Türkiye, Saudi Arabia, Yemen, Israel and Hezbollah. One catalog (`catalog/factions.json`) is the source for the game, the companion and rtsai.net.
 - The AI default is a hosted model for the thinking and local voice: Whisper for speech-in and Kokoro for speech-out. It falls back gracefully when offline or over the daily allowance.
 - Windows ships first. macOS follows the first public mod release.
 
