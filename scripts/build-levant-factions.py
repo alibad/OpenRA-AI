@@ -3,12 +3,21 @@
 
 No external services, game asset archives, models or credentials are opened.
 Game rules are generated separately for each engine; balance is provisional.
+
+A default run refreshes only what this script owns: the RA2 rules, messages, voice and announcer wiring, and the
+shared manifests and data. Outputs that later pipelines took over are bootstrap-only and are left alone:
+  --write-sequences  the RA2 roster sequences (israel- and hezbollah-roster-sequences.yaml; the art pipeline's)
+  --bootstrap        everything a brand-new faction needs: the roster sequences, placeholder art, voxels and icons
+                     copied from the source faction, and the Classic faction rules and sequences in ../OpenRA
 """
 from __future__ import annotations
-import argparse, json, re, shutil
+import argparse, json, re, shutil, sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]  # --root points the build at another tree (e.g. a scratch copy)
+WRITE_SEQUENCES = False  # --write-sequences (or --bootstrap)
+BOOTSTRAP = False  # --bootstrap
+SKIPPED = []  # bootstrap-only outputs left alone by this run
 MOD = ROOT / 'RTSAI-Mod/mods/rtsai'
 RA = ROOT / 'OpenRA/mods/ra'
 PACK = MOD / 'modern-factions'
@@ -74,6 +83,11 @@ VOICES_HEADER = ('# Israel (Hebrew/English) and Hezbollah (Lebanese Arabic/Engli
                  '# scripts/generate-levant-voices.py; provenance in audio/PROVENANCE.json and docs/audio-provenance.md.\n')
 
 def read(path): return path.read_text(encoding='utf-8')
+
+def bootstrap_only(path, allowed):
+ """True when this run may write a bootstrap-only output; otherwise records that it was left alone."""
+ if not allowed: SKIPPED.append(path)
+ return allowed
 
 def voice_set(faction, role, prefix, lang, infantry):
  audio='ra2|modern-factions/audio/'
@@ -240,6 +254,7 @@ def build_ra2(faction, source, units):
   if ext=='-roster.yaml':
    for _,actor,*_ in units:
     text=text.replace(f'Name: ra2-{actor}-name',f'Name: levant-{actor}-name')
+  if ext=='-roster-sequences.yaml' and not bootstrap_only(PACK/(faction+ext),WRITE_SEQUENCES): continue
   write(PACK/(faction+ext),text)
  # Each unit answers with its role's voice set from levant-voices.yaml (generate-levant-voices.py lines).
  voices='\n\n'.join(f'{actor}:\n\tVoiced:\n\t\tVoiceSet: R2{title}{VOICE_ROLES[actor]}Voice' for _,actor,*_ in units)
@@ -257,15 +272,17 @@ def build_ra2(faction, source, units):
   actor=('r2il' if faction=='israel' else 'r2hz')+suffix
   locale+=f'levant-{actor}-name = {label}\nlevant-{actor}-description = {desc}\n'
  write(PACK/f'{faction}-messages.ftl',locale)
- # Only project-authored packages are copied, never stock content or archives.
- owned=PACK/f'{source}-art'; out=PACK/f'{faction}-art'; out.mkdir(exist_ok=True)
- for path in owned.iterdir():
-  if path.suffix in ('.pal','.shp'): shutil.copy2(path,out/rewrite(path.name,mapping))
- for path in (PACK/'voxels').iterdir():
-  if path.suffix in ('.vxl','.hva') and any(path.stem.startswith(a) for a,_,*_ in units):
-   shutil.copy2(path,path.with_name(rewrite(path.name,mapping)))
- for a,b,*_ in units:
-  if (PACK/'icons'/f'{a}.png').exists(): shutil.copy2(PACK/'icons'/f'{a}.png',PACK/'icons'/f'{b}.png')
+ # Placeholder art for a new faction: the source faction's project-authored art (never stock content or archives).
+ # The art pipeline replaces it afterwards, so it is copied only when bootstrapping.
+ if bootstrap_only(PACK/f'{faction}-art (placeholder art, voxels, icons)',BOOTSTRAP):
+  owned=PACK/f'{source}-art'; out=PACK/f'{faction}-art'; out.mkdir(exist_ok=True)
+  for path in owned.iterdir():
+   if path.suffix in ('.pal','.shp'): shutil.copy2(path,out/rewrite(path.name,mapping))
+  for path in (PACK/'voxels').iterdir():
+   if path.suffix in ('.vxl','.hva') and any(path.stem.startswith(a) for a,_,*_ in units):
+    shutil.copy2(path,path.with_name(rewrite(path.name,mapping)))
+  for a,b,*_ in units:
+   if (PACK/'icons'/f'{a}.png').exists(): shutil.copy2(PACK/'icons'/f'{a}.png',PACK/'icons'/f'{b}.png')
  for ext,section in [('.yaml','Rules'),('-roster.yaml','Rules'),('-ai.yaml','Rules'),('-roles.yaml','Rules'),('-audio.yaml','Rules'),('-sequences.yaml','Sequences'),('-roster-sequences.yaml','Sequences'),('-voxels.yaml','VoxelSequences'),('-weapons.yaml','Weapons'),('-messages.ftl','FluentMessages')]:
   anchor=f'\tra2|modern-factions/{source}{ext}'
   add_manifest(MOD/'mod.yaml',anchor,f'\tra2|modern-factions/{faction}{ext}')
@@ -333,7 +350,8 @@ def classic(faction, source, units):
   lines+=f'\n{actor}:\n\tSpawnActorOnDeath:\n\t\tActor: {actor}.Husk\n\n{actor}.Husk:\n\tInherits: {base}.Husk\n\tTooltip:\n\t\tName: levant-{actor.lower()}-name\n\tRenderSprites:\n\t\tImage: {actor.lower()}\n\t\tPlayerPalette: {faction}player\n'
  if allied: lines+='\nILSTRIKE:\n\tInherits: F15SA.STRIKE\n\tRenderSprites:\n\t\tImage: ilfalcon\n'
  lines+='\n'+support_rules(faction,'classic')
- write(RA/f'rules/{faction}.yaml',normalized(lines))
+ # The Classic faction rules and sequences are maintained in OpenRA since the bootstrap (art passes, defenses).
+ if bootstrap_only(RA/f'rules/{faction}.yaml',BOOTSTRAP): write(RA/f'rules/{faction}.yaml',normalized(lines))
  locale=f'faction-{faction} =\n    .name = {title}\n    .description = Fictional RTS faction: {"protected armor, guided fire and powered coordination" if allied else "light forces, concealment and guided support"}.\n'
  for _,actor,_,name,_,desc in units: locale+=f'\nlevant-{actor[2:]}-name = {name}\nlevant-{actor[2:]}-description = {CLASSIC_DESCRIPTIONS.get(actor[2:],desc)}\n'
  for suffix,label,desc in [('relay','Coordination Relay' if allied else 'Signal Post','Powered six-cell support aura and five-cell cloak detection. Losing power disables the benefits. Bonuses do not stack.'),('workshop','Field Service Station' if allied else 'Field Workshop','Powered four-cell repair zone. Eligible vehicles repair 200 health per second below 70% health. Does not stack; unarmed and vulnerable.')]: locale+=f'\nlevant-{prefix.lower()+suffix}-name = {label}\nlevant-{prefix.lower()+suffix}-description = {desc}\n'
@@ -345,7 +363,7 @@ def classic(faction, source, units):
   seq+=f'{new}:\n\tInherits: {image}\n\n'
  # support structures use purpose-built owned art in the following asset pass.
  for suffix in ('relay','workshop'): seq+=f'{prefix.lower()+suffix}:\n\tInherits: pbox\n\n'
- write(RA/f'sequences/{faction}.yaml',seq)
+ if bootstrap_only(RA/f'sequences/{faction}.yaml',BOOTSTRAP): write(RA/f'sequences/{faction}.yaml',seq)
  path=RA/'experiences.yaml'; text=read(path)
  entry=f'''\t\t{faction}-faction:
 \t\t\tTitle: {title}
@@ -385,11 +403,19 @@ def classic(faction, source, units):
  add_manifest(RA/'mod.yaml','FluentMessages:',f'\tra|fluent/{faction}.ftl')
 
 def main():
- global ROOT, MOD, RA, PACK
- parser=argparse.ArgumentParser(description=__doc__)
+ global ROOT, MOD, RA, PACK, WRITE_SEQUENCES, BOOTSTRAP
+ parser=argparse.ArgumentParser(description=__doc__,formatter_class=argparse.RawDescriptionHelpFormatter)
  parser.add_argument('--root',type=Path,default=ROOT,help='folder holding RTSAI-Mod and OpenRA (default: the hq games folder)')
+ parser.add_argument('--write-sequences',action='store_true',
+                     help='also write the RA2 roster sequences (israel- and hezbollah-roster-sequences.yaml). By default '
+                          'they are never written, so the art pipeline\'s files are left alone.')
+ parser.add_argument('--bootstrap',action='store_true',
+                     help='build a new faction from scratch: implies --write-sequences and also copies placeholder art, '
+                          'voxels and icons from the source faction and writes the Classic faction rules and sequences. '
+                          'Overwrites art-pipeline and Classic edits; never use it to refresh existing packs.')
  args=parser.parse_args()
  ROOT=args.root.resolve(); MOD=ROOT/'RTSAI-Mod/mods/rtsai'; RA=ROOT/'OpenRA/mods/ra'; PACK=MOD/'modern-factions'
+ BOOTSTRAP=args.bootstrap; WRITE_SEQUENCES=args.write_sequences or args.bootstrap
  for faction,(source,_,_,_) in FACTIONS.items():
   build_ra2(faction,source,FACTIONS[faction][1]); classic(faction,source,FACTIONS[faction][1])
  common='''^LevantIsraelCoordination:
@@ -406,7 +432,8 @@ def main():
 '''
  common+='\nPlayer:\n'
  for faction in FACTIONS: common+=f'\tProvidesPrerequisite@{faction}:\n\t\tPrerequisite: faction.{faction}\n\t\tFactions: {faction}\n'
- write(PACK/'levant-common.yaml',common); write(RA/'rules/levant-common.yaml',common)
+ write(PACK/'levant-common.yaml',common)
+ if bootstrap_only(RA/'rules/levant-common.yaml',BOOTSTRAP): write(RA/'rules/levant-common.yaml',common)
  add_manifest(MOD/'mod.yaml','\tra2|modern-factions/common.yaml','\tra2|modern-factions/levant-common.yaml')
  world=read(MOD/'rules/world.yaml').replace('korea, china, turkey, saudi','korea, china, turkey, saudi, israel').replace('russia, iran, yemen','russia, iran, yemen, hezbollah');write(MOD/'rules/world.yaml',world)
  metrics=read(MOD/'metrics.yaml');
@@ -478,6 +505,7 @@ def main():
  # Normalize generated comma lists so repeated builds remain idempotent.
  for path in [MOD/'rules/world.yaml',PACK/'shared-replacements.yaml']:
   text=read(path);text=re.sub(r'^(\s*(?:RandomFactionMembers|Prerequisites): )(.*)$',lambda m:m[1]+', '.join(dict.fromkeys(x.strip() for x in m[2].split(','))),text,flags=re.M);write(path,text)
+ for path in SKIPPED: print(f'left alone (bootstrap-only, see --help): {path}',file=sys.stderr)
  print(json.dumps({'israelExclusiveActors':18,'hezbollahExclusiveActors':17,'modes':['ra','ra2'],'paidSpend':0}))
 
 if __name__=='__main__': main()
