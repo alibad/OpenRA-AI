@@ -11,6 +11,10 @@ import shutil
 PRODUCT = Path(__file__).resolve().parents[1]
 CATALOG = PRODUCT / "catalog" / "factions.json"
 MOD = PRODUCT.parent / "RTSAI-Mod"
+# Classic (ra) mode is checked against the canonical alibad/OpenRA main checkout beside this repository, as the
+# tests do. The engine/openra submodule pins an older engine without the Classic Israel and Hezbollah packs.
+# Packagers pass --engine with the engine they are packaging.
+ENGINE = PRODUCT.parent / "OpenRA"
 # Where each mode's faction rules and player-facing Fluent strings live. RA2 is the
 # product mode (the RTS AI mod), so its in-game names are canonical; Classic is
 # recorded as shipped in the parked public alpha.
@@ -164,7 +168,8 @@ def validate(catalog: dict, engine: Path, product: Path = PRODUCT, mod: Path = M
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--engine", type=Path, default=PRODUCT / "engine" / "openra")
+    parser.add_argument("--engine", type=Path, default=ENGINE,
+                        help="Classic engine checkout (default: ../OpenRA, the canonical alibad/OpenRA main)")
     parser.add_argument("--mod", type=Path, default=MOD, help="RTS AI mod checkout (alibad/RTSAI-Mod)")
     parser.add_argument("--stage", type=Path, help="Package root; copies catalog to catalog/factions.json")
     args = parser.parse_args()
