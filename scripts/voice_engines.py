@@ -96,12 +96,19 @@ QA = {
     "metric": "character error rate against the script after punctuation/diacritic normalization",
 }
 
-LANGUAGE_ENGINE = {"en": "kokoro", "zh": "chatterbox", "ar": "chatterbox", "tr": "chatterbox", "fa": "moss-fa"}
+LANGUAGE_ENGINE = {"en": "kokoro", "zh": "chatterbox", "ar": "chatterbox", "tr": "chatterbox", "he": "chatterbox",
+                   "fa": "moss-fa"}
 REFERENCE_TEXT = ("Command, this is the forward element. We hold the ridge line and the road is clear. "
                   "Awaiting your orders, ready to move on your signal.")
-# The same field-radio sentence in each Chatterbox language: the native reference clip.
+# The same field-radio sentence in each Chatterbox language: the native reference clip. A full language code
+# (ar-LB) selects a dialect reference, so the cloned lines inherit the dialect rather than Modern Standard Arabic.
 NATIVE_REFERENCE_TEXT = {
     "ar": "القيادة، هنا الوحدة الأمامية. نحن نسيطر على خط التلال والطريق آمن. ننتظر أوامركم وجاهزون للتحرك.",
+    "ar-LB": "القيادة، هون الوحدة الأمامية. نحنا ماسكين خط التلال والطريق مفتوحة. ناطرين أوامركن وجاهزين "
+             "نتحرك عإشارتكن.",
+    # Pointed: Chatterbox's Hebrew front end expects niqqud (its optional dicta_onnx diacritizer adds them).
+    "he": "פִּיקּוּד, כָּאן הַכּוֹחַ הַקִּדְמִי. אֲנַחְנוּ מַחֲזִיקִים אֶת קַו הָרֶכֶס וְהַדֶּרֶךְ פְּנוּיָה. "
+          "מַמְתִּינִים לַפְּקוּדּוֹת שֶׁלָּכֶם, מוּכָנִים לָזוּז בָּאוֹת שֶׁלָּכֶם.",
     "tr": "Komuta, burası ileri birlik. Sırt hattını tutuyoruz ve yol açık. Emirlerinizi bekliyoruz, "
           "işaretinizle harekete hazırız.",
     "zh": "指挥部，这里是前沿分队。我们控制着山脊线，道路畅通。等待你的命令，随时准备行动。",
@@ -134,6 +141,10 @@ SPEAKERS: dict[str, Speaker] = {
     "saudi-crew": Speaker(("bm_fable",), "b"),
     "yemen-infantry": Speaker(("am_fenrir", "bm_fable")),
     "yemen-crew": Speaker(("bm_lewis", "am_michael"), "b"),
+    "israel-infantry": Speaker(("am_puck", "bm_lewis")),
+    "israel-crew": Speaker(("am_michael", "am_adam")),
+    "hezbollah-infantry": Speaker(("am_fenrir", "am_michael")),
+    "hezbollah-crew": Speaker(("bm_george", "am_puck"), "b"),
     # Classic mission controllers (not shipped in the RA2 mod).
     "china-control": Speaker(("am_michael", "am_puck")),
     "turkey-control": Speaker(("bm_george", "am_fenrir"), "b"),
@@ -144,6 +155,8 @@ SPEAKERS: dict[str, Speaker] = {
     "turkey-eva": Speaker(("af_heart",)),
     "saudi-eva": Speaker(("af_kore",)),
     "yemen-eva": Speaker(("af_aoede",)),
+    "israel-eva": Speaker(("bf_emma", "af_heart")),  # bf_emma alone adds a tail ("Unit Laster") on 4 clips
+    "hezbollah-eva": Speaker(("bf_isabella",), "b"),
 }
 
 
@@ -190,6 +203,7 @@ def normalize_for_cer(text: str, language: str = "") -> str:
     if language == "en":  # Whisper writes "20 minutes" and British spellings for the scripted words
         text = re.sub(r"\d+", _english_number, text.lower()).replace("cancelled", "canceled")
     text = re.sub("[ً-ْٰـ]", "", text)  # Arabic harakat and tatweel
+    text = re.sub("[֑-ׇ]", "", text)  # Hebrew points and cantillation
     for source, target in (("أ", "ا"), ("إ", "ا"), ("آ", "ا"), ("ى", "ی"),
                            ("ي", "ی"), ("ة", "ه"), ("ك", "ک"), ("‌", "")):
         text = text.replace(source, target)
@@ -336,10 +350,11 @@ class Synthesizer:
         else:
             english = self.reference(speaker_id, "en").path
             text = NATIVE_REFERENCE_TEXT[language]
+            base = base_language(language)  # "ar-LB" -> Chatterbox and Whisper language "ar"
             takes = []
             for seed in range(1, REFERENCE_SEEDS + 1):
-                audio, rate = self.chatterbox(text, language, english, seed, cfg_weight=0.0)
-                takes.append(self._take(audio, rate, seed, text, language))
+                audio, rate = self.chatterbox(text, base, english, seed, cfg_weight=0.0)
+                takes.append(self._take(audio, rate, seed, text, base))
                 if takes[-1].cer <= self.accept_cer:
                     break
             best = min(takes, key=lambda take: (round(take.cer / 0.05), take.duration))
@@ -467,7 +482,8 @@ class Synthesizer:
             audio, sample_rate = self.kokoro(text, speaker, speed=rate)
             takes.append(self._take(audio, sample_rate, None, script, lang))
         else:
-            reference = self.reference(speaker_id, lang if engine == "chatterbox" else "en")
+            native = language if language in NATIVE_REFERENCE_TEXT else lang  # dialect reference when there is one
+            reference = self.reference(speaker_id, native if engine == "chatterbox" else "en")
             attempts = self.moss_seeds if engine == "moss-fa" else self.seeds
             for seed in range(1, attempts + 1):
                 try:

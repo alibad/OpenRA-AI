@@ -60,7 +60,7 @@ LINES = (
     VoiceLine("rcn-naval-select-en.wav", "en-US", CREW, "Maritime group, communications clear.", "generic naval crew"),
     VoiceLine("rcn-naval-action-zh.wav", "zh-CN", CREW, "航向确认，舰队前进。", "generic naval crew"),
     VoiceLine("rcn-naval-action-en.wav", "en-US", CREW, "Course confirmed. Fleet underway.", "generic naval crew"),
-    VoiceLine("rcn-redspear-select-zh.wav", "zh-CN", INF, "红矛接入指挥网络。", "fictional Red Spear operator"),
+    VoiceLine("rcn-redspear-select-zh.wav", "zh-CN", INF, "赤矛接入指挥网络。", "fictional Red Spear operator"),
     VoiceLine("rcn-redspear-select-en.wav", "en-US", INF, "Red Spear linked to the command network.", "fictional Red Spear operator"),
     VoiceLine("rcn-redspear-action-zh.wav", "zh-CN", INF, "精确坐标已接收。", "fictional Red Spear operator"),
     VoiceLine("rcn-redspear-action-en.wav", "en-US", INF, "Precision coordinates received.", "fictional Red Spear operator"),

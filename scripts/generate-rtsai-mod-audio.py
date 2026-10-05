@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import argparse
 import datetime as dt
+import hashlib
 import importlib.util
 import json
 import re
@@ -30,7 +31,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from voice_engines import ENGINES, QA, SPEAKERS, Synthesizer  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[1]
-GENERATORS = ("china", "iran", "turkey", "red-sea", "air-warfare")
+GENERATORS = ("china", "iran", "turkey", "red-sea", "air-warfare", "levant")
 # Shipped files that are procedural sound effects, with the script or source that made them.
 SFX = {
     "china-network-deploy": "OpenRA-AI scripts/generate-china-sfx.py (procedural)",
@@ -41,9 +42,14 @@ SFX = {
         "ah64-cannon", "ah64-rocket", "atgm-launch", "drone-impact", "drone-loiter", "drone-strike", "f15-missile",
         "guard-rifle", "interceptor", "m1-fire", "mobile-launch", "mountain-rifle", "remote-charge", "rpg-launch",
         "suppressed")},
-    **{f"naval-{name}": "alibad/OpenRA fork mods/ra/bits/naval (1d76c546f1, 'Add Saudi and Yemen naval systems')"
+    **{f"naval-{name}": (f"procedural: alibad/OpenRA packaging/naval/generate_naval_assets.py, synth(\"{name}\"), "
+                         "added with its output in 1d76c546f1 ('Add Saudi and Yemen naval systems'); sine/noise "
+                         "formulas and Python's random.Random seeded with the name, no recordings")
        for name in ("ciws-burst", "missile-launch", "naval-alarm", "radar-sweep")},
 }
+# Sound effects whose bytes are reproduced exactly by a script in RTSAI-Mod; their records carry the digest.
+SFX_REPRODUCE = {f"naval-{name}": "RTSAI-Mod: python tools/naval-sfx.py (byte-identical)"
+                 for name in ("ciws-burst", "missile-launch", "naval-alarm", "radar-sweep")}
 REJECTED = [
     {"candidate": "edge-tts (Microsoft Edge Read Aloud)", "reason": "Unofficial client of a Microsoft service; no "
      "license grants redistribution of its output. Removed from the mod."},
@@ -59,6 +65,22 @@ REJECTED = [
     {"candidate": "Coqui XTTS-v2", "reason": "Coqui Public Model License (non-commercial)."},
     {"candidate": "Kokoro zh voicepacks (zm_*/zf_*)", "reason": "License-compatible (Apache-2.0) but graded D by "
      "the model card; Chatterbox Multilingual (MIT) speaks Mandarin instead."},
+    # Engine check of 5 October 2026: the faction's 24 scripts, two seeds each, Whisper large-v3 transcript
+    # (mean best-take CER) and automatic language ID (mean probability of the target language over all takes).
+    {"candidate": "Kokoro-82M for Hebrew or Arabic", "reason": "Its G2P has no Hebrew or Arabic (language codes "
+     "a, b, e, f, h, i, j, p, z)."},
+    {"candidate": "MOSS-TTS-Nano base for Hebrew", "reason": "Hebrew is not among its 20 languages; Israel scripts: "
+     "CER 0.46, Hebrew ID 0.02."},
+    {"candidate": "Chatterbox Hebrew from unpointed text", "reason": "Its Hebrew front end expects niqqud (added by "
+     "the optional dicta_onnx diacritizer, not installed); unpointed: CER 0.21, 4/24 lines clean, Hebrew ID 0.51; "
+     "hand-pointed: CER 0.05, 18/24 clean, Hebrew ID 0.69. Chatterbox reads pointed text."},
+    {"candidate": "MOSS-TTS-Nano base for Lebanese Arabic", "reason": "Hezbollah scripts: CER 0.19, 4/24 clean, "
+     "Arabic ID 0.46, against CER 0.03, 18/24 clean, Arabic ID 0.90 for Chatterbox."},
+    {"candidate": "Persian alternatives to the MOSS fine-tune cloned from the English clip (CER 0.09, Persian ID "
+     "0.65)", "reason": "MOSS-TTS-Nano base: CER 0.19, ID 0.05. Fine-tune cloned from a synthetic Persian "
+     "reference: CER 0.13, ID 0.54. Other speakers: bm_george CER 0.14, ID 0.44; am_fenrir CER 0.03, ID 0.76 on "
+     "seeds 1-2 but CER 0.16, ID 0.71 on seeds 3-4; am_fenrir blends over four seeds: mean take CER 0.16 against "
+     "0.18 and ID 0.69 against 0.62. Not clearly better, so the Persian set was kept; Chatterbox has no Persian."},
 ]
 
 
@@ -116,8 +138,12 @@ def check_sfx(name: str, path: Path, synth: Synthesizer) -> dict[str, object]:
     speech = synth.detect_speech(data.mean(axis=1), rate)
     if speech:
         raise SystemExit(f"{name}.wav is listed as a sound effect but contains speech: {speech!r}")
-    return {"filename": f"{name}.wav", "source": SFX[name],
-            "speech_check": "no speech detected (Whisper large-v3 with voice-activity filter)"}
+    record = {"filename": f"{name}.wav", "source": SFX[name],
+              "speech_check": "no speech detected (Whisper large-v3 with voice-activity filter)"}
+    if name in SFX_REPRODUCE:
+        record["sha256"] = hashlib.sha256(path.read_bytes()).hexdigest()
+        record["reproduce"] = SFX_REPRODUCE[name]
+    return record
 
 
 def main() -> int:
@@ -184,6 +210,8 @@ def main() -> int:
         "speakers": {key: {"kokoro_voicepacks": list(value.voicepacks), "accent": value.accent}
                      for key, value in SPEAKERS.items()},
         "qa": QA,
+        # The native-speaker review record is written by RTSAI-Mod's tools/voice-review.py; keep it.
+        **({"voice_review": previous["voice_review"]} if "voice_review" in previous else {}),
         "rejected": REJECTED,
         "voice_lines": [records[key] for key in sorted(records)],
         "announcers": [eva_records[key] for key in sorted(eva_records)],
