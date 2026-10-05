@@ -208,10 +208,13 @@ def build_ra2(faction, source, units):
  write(PACK/f'{faction}-audio.yaml',voices)
  locale=f'ra2-modern-{faction}-name = {title}\nra2-modern-{faction}-description = Fictional RTS faction: {"precision armor, protected support and guided fire" if faction=="israel" else "light mobile forces, concealed defenses and guided rockets"}.\n    Includes economy, production, land, air, naval and support buildings.\n    New local development roster; balance and final art approval pending.\n\n'
  for _,actor,_,name,_,description in units: locale+=f'levant-{actor}-name = {name}\nlevant-{actor}-description = {description}\n\n'
- # Inherited support-power and aircraft proxy keys still need localized names.
- original=rewrite(read(PACK/f'{source}-messages.ftl'),mapping)
- original=re.sub(r'^ra2-modern-'+faction+r'-(?:name|description) =.*(?:\n    .*?)*\n', '', original, flags=re.M)
- locale+=original
+ # The only inherited key the rules still use is the Recon Specialist's air strike (AirstrikePower@falcon).
+ # The source faction's other messages are not copied: they carried Saudi and Yemeni names that no rule shows.
+ if faction=='israel':
+  locale+=('# The Recon Specialist\'s support power (AirstrikePower@falcon in israel-roster.yaml).\n'
+           'ra2-r2ilrecon-strike-name = Precision Air Strike\n'
+           'ra2-r2ilrecon-strike-description = A Falcon Multirole Jet drops a precision bomb on the target.\n'
+           '    Marked targets take heavy extra damage.\n\n')
  for suffix,label,desc in [('relay','Coordination Relay' if faction=='israel' else 'Signal Post','Powered six-cell support and five-cell cloak detection. '+('Eligible infantry and vehicles reload 15% faster; bonuses do not stack.' if faction=='israel' else 'Eligible guided units gain range and reload bonuses; bonuses do not stack.')),('workshop','Field Service Station' if faction=='israel' else 'Field Workshop','Powered four-cell repair zone for eligible vehicles. Repairs two health per second only below 70% health. Bonuses do not stack; protect this unarmed structure.')]:
   actor=('r2il' if faction=='israel' else 'r2hz')+suffix
   locale+=f'levant-{actor}-name = {label}\nlevant-{actor}-description = {desc}\n'
