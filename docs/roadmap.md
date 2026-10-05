@@ -2,6 +2,43 @@
 
 Updated 2 October 2026. Approved by the owner. This replaces the 12 September dual-mode roadmap.
 
+## Status, 5 October 2026
+
+**Art rebuild, verified locally, not yet approved.** All 122 new modern units have native game art in the preview copy of the mod (`RTSAI-Mod-wt-art-preview`, branch `rtsai/art-preview`):
+
+- 69 vehicles, ships and aircraft are voxels, with firing, damage and death effects.
+- 28 infantry are animated sprites rigged from their 3D models.
+- 25 buildings and defenses are sprites.
+- All 122 build-menu icons are re-rendered from the same models; 87 pass the stock-icon gate, against 0 for the old paintings.
+
+A local engine fix makes missiles fired over raised ground hit, up from 63 to 130 of 144 test sites (`rtsai/engine` `ae14ce6b01`). Missile infantry now fire from the shoulder. None of this is in `RTSAI-Mod` main or pushed yet.
+
+The owner reviews it in the local app at `http://127.0.0.1:3450`, which starts at login (`RTSAI-Web/scripts/local-app.ps1`). The app serves the Faction Studio review board, the website and the native battle runner from one origin. The owner's U/R decisions gate promoting the art into `RTSAI-Mod` main.
+
+**Owner gates, in order:**
+
+1. Decide the 122 units in the Studio.
+2. Approve publishing the engine fixes and the mod pin.
+3. Hosted AI setup: Vercel environment variables, the Firestore TTL and rules, and the Anthropic workspace limit.
+4. Approve the release and the single web deploy.
+5. Buy a code-signing certificate.
+
+**Remaining work after those gates:**
+
+- Promote the approved art into `RTSAI-Mod` main with provenance.
+- Merge `rtsai/integration` into web main.
+- Run the real Haiku smoke calls.
+- Clean-machine acceptance, the trailer and the release (Phase 4).
+
+**Known open items:**
+
+- 7 short-range missile shots on ramps still miss; this needs a ramp-aware look-ahead.
+- 35 icons miss the stock gate, mostly ships and aircraft.
+- China, Türkiye and Iran trail America and Russia in bot play.
+- Non-English voice lines need a native-speaker review.
+- Four naval sound effects lack provenance.
+- RA2 missions are not started.
+
 ## Owner-requested local expansion — 4 October 2026
 
 The owner requested Israel and Hezbollah as complete faction packs in both modes. These are local development packs: original authored art, infantry, armor/support vehicles, aircraft, naval roles, three defenses and two support buildings per faction, integrated production and bot composition. They use fictional gameplay abstractions; no real-world effectiveness is claimed. RA2 remains the canonical product. Classic contains the new packs in the World War III experience; the existing public alpha is unchanged.
@@ -102,6 +139,12 @@ Still open: China, Türkiye and Iran trail America and Russia in bot play; RA2 m
 - Clean-machine Windows acceptance and a signed release.
 - Site relaunch with a 60-second trailer cut from real gameplay. The download page states the RA2 ownership requirement up front.
 - Then macOS, RA2 missions (starting with the Red Sea theatre) and a mod-directory listing.
+
+## Phase 5 — Red Alert 4 on the web (later, owner direction 5 October 2026)
+
+The owner wants to eventually build a "Red Alert 4" in the browser with the best web graphics technology. It starts from the installable local app and reuses the factions catalog, the 122 authored 3D models, the rules facts and the hosted AI co-commander. This revises the 2 October "no web game" decision, but only for the period after the mod ships. Phases 2–4 come first.
+
+First step when it starts: a technology spike and a one-map, two-faction vertical slice. Choose the renderer, the simulation and the netcode from current evidence at that time, not from this note.
 
 ## Open branches (inventory, 2 October 2026)
 
