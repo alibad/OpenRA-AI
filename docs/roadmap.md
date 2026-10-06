@@ -2,42 +2,68 @@
 
 Updated 2 October 2026. Approved by the owner. This replaces the 12 September dual-mode roadmap.
 
-## Status, 5 October 2026
+## Status, 6 October 2026
 
-**Art rebuild, verified locally, not yet approved.** All 122 new modern units have native game art in the preview copy of the mod (`RTSAI-Mod-wt-art-preview`, branch `rtsai/art-preview`):
+**Every known issue from 5 October is fixed in the preview copy** (`RTSAI-Mod-wt-art-preview`, branch `rtsai/art-preview`). It is verified locally and awaits the owner's review. None of it is in `RTSAI-Mod` main, and nothing is pushed.
 
-- 69 vehicles, ships and aircraft are voxels, with firing, damage and death effects.
-- 28 infantry are animated sprites rigged from their 3D models.
-- 25 buildings and defenses are sprites.
-- All 122 build-menu icons are re-rendered from the same models; 87 pass the stock-icon gate, against 0 for the old paintings.
+Art:
 
-A local engine fix makes missiles fired over raised ground hit, up from 63 to 130 of 144 test sites (`rtsai/engine` `ae14ce6b01`). Missile infantry now fire from the shoulder. None of this is in `RTSAI-Mod` main or pushed yet.
+- **69 vehicles, ships and aircraft** are now prerendered sprites made straight from their 3D models. The voxel conversion flattened them, so the voxel route is kept only as a fallback.
+  - They pass the stock-family gate, with lit-RGB checks for sprites, and a fragment gate.
+  - Spinning radars, rotors and propellers, recoil, and the reload cue on the two rocket trucks all work.
+  - Muzzles sit within 0.24 px of the drawn barrel tip, down from about 9 px.
+- **28 infantry** wear faction uniforms with each faction's accent colour, at stock brightness, with a smaller team-colour share.
+- **25 buildings** carry a faction panel.
+- **All 122 cameos** match their units, carry stock-style name bars (CC0 pixel font) and pass the stock gate on the picture area, 122 of 122.
 
-The owner reviews it in the local app at `http://127.0.0.1:3450`, which starts at login (`RTSAI-Web/scripts/local-app.ps1`). The app serves the Faction Studio review board, the website and the native battle runner from one origin. The owner's U/R decisions gate promoting the art into `RTSAI-Mod` main.
+Engine, on `rtsai/engine` (local):
+
+- Missiles now track ramp surfaces and hit at 160 of 160 sites, with stock units unchanged.
+- A latent upstream divide-by-zero in `WRot.SLerp` that crashed games on adjacent ramps is fixed.
+
+Gameplay:
+
+- All 191 armament tests pass. The explosive boats can now reach ships.
+- **Balance round 4:** 15 of 16 targets are met. The miss, China against the modern factions at 33%, is within noise.
+- **Bot fixes for all factions:** no shipyard unless ships can reach the enemy, one airfield jet of each type at a time, and Israel's and Hezbollah's types are added to the bot lists.
+
+Audio:
+
+- The naval sound effects' provenance is proven.
+- Israel (Hebrew) and Hezbollah (Lebanese Arabic) have their own voices and announcers.
+- Call signs are fixed.
+- 74 non-English lines are machine-checked, with the wrong ones regenerated.
+
+Studio and app:
+
+- The local app at `http://127.0.0.1:3450` starts at login.
+- The Studio previews recoil and muzzle flashes, plays spins and draws the sprite vehicles.
+- Its renderer matches the engine to the pixel.
 
 **Owner gates, in order:**
 
 1. Decide the 122 units in the Studio.
-2. Approve publishing the engine fixes and the mod pin.
-3. Hosted AI setup: Vercel environment variables, the Firestore TTL and rules, and the Anthropic workspace limit.
-4. Approve the release and the single web deploy.
+2. Native-speaker sign-off of `docs/voice-review.csv`. It has 28 flagged lines, plus the hand-pointed Hebrew.
+3. Approve publishing:
+   - the engine fixes (`rtsai/engine`);
+   - the promotion of the preview into `RTSAI-Mod` main, with the engine pin;
+   - the release;
+   - one web deploy.
+4. Hosted AI setup: Vercel environment variables, the Firestore TTL and rules, and the Anthropic workspace limit.
 5. Buy a code-signing certificate.
+6. Doctrine call: China's army is about 38% tanks and rocket artillery at about 0.7 value per credit. A smaller tank share would lift it against the modern factions but change its identity.
 
 **Remaining work after those gates:**
 
-- Promote the approved art into `RTSAI-Mod` main with provenance.
-- Merge `rtsai/integration` into web main.
-- Run the real Haiku smoke calls.
+- Promote the approved preview into main.
+- Real Haiku smoke calls.
 - Clean-machine acceptance, the trailer and the release (Phase 4).
+- RA2 missions.
 
-**Known open items:**
+**Known structural limits** (recorded in `docs/balance.md`, not fixable with numbers):
 
-- 7 short-range missile shots on ramps still miss; this needs a ramp-aware look-ahead.
-- 35 icons miss the stock gate, mostly ships and aircraft.
-- China, Türkiye and Iran trail America and Russia in bot play.
-- Non-English voice lines need a native-speaker review.
-- Four naval sound effects lack provenance.
-- RA2 missions are not started.
+- Stock Cloning Vats and armed War Miners favour the Soviet side.
+- The naval map is reported, not tuned.
 
 ## Owner-requested local expansion — 4 October 2026
 
