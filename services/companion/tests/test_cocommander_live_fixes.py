@@ -145,6 +145,16 @@ class OfferPersistenceTests(unittest.TestCase):
         bot.update_snapshot(placed)
         self.assertIsNone(bot.pending_action())
 
+    def test_confirmed_placement_is_not_offered_again_while_the_observation_catches_up(self) -> None:
+        bot, _, executed = companion()
+        bot.observe(iran())
+        place = bot.pending_action()
+        bot.confirm_action(place["proposal_id"])
+        self.assertEqual(executed[-1][2][0].action, "place_building")
+        # The next observation can still list the structure as finished for a moment.
+        bot.observe(iran(tick=bot.latest_snapshot.tick + 2))
+        self.assertIsNone(bot.pending_action())
+
     def test_status_lists_every_waiting_offer(self) -> None:
         bot, _, _ = companion()
         bot.observe(iran())

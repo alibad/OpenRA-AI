@@ -125,6 +125,9 @@ CANCEL_WORDS = frozenset({"cancel", "never mind", "nevermind", "stop", "discard"
 ACTION_EXPIRY_SECONDS = 300.0
 # Offers the player can have open at once (cards in the panel); the oldest drops out first.
 MAX_PENDING_ACTIONS = 3
+# After a placement order, how long a structure may still show as "finished" before the
+# engine's next observation; within it the structure is not offered for placement again.
+PLACEMENT_SETTLE_SECONDS = 8.0
 
 
 def proposal_subjects(proposal: ActionProposal) -> frozenset[str]:
@@ -336,6 +339,9 @@ class Companion:
         self.goal_blackboard = GoalBlackboard(journal_path=default_blackboard_path())
         self.tactical_controller = TacticalController()
         self._goal_updates: list[dict] = []
+        # Structures just ordered placed: the observation can still list them as finished for a
+        # moment, so they are not offered again until the engine has had time to place them.
+        self._placement_sent: dict[str, float] = {}
 
     def _begin(self) -> int:
         with self._lock:
@@ -1072,6 +1078,7 @@ class Companion:
         """
         if not self.enabled or self.auto_act_enabled or snapshot.mission_mode or snapshot.done:
             return
+        now = time.monotonic()
         with self._action_lock:
             placing = {
                 command.item_type.lower()
@@ -1079,6 +1086,10 @@ class Companion:
                 for command in proposal.commands
                 if command.action == "place_building"
             }
+            self._placement_sent = {
+                item: sent for item, sent in self._placement_sent.items() if now - sent < PLACEMENT_SETTLE_SECONDS
+            }
+            placing.update(self._placement_sent)
         for entry in snapshot.production:
             item = str(entry.get("item", "")).strip().lower()
             if (
@@ -1634,6 +1645,14 @@ class Companion:
         if suggestion is None:
             return
         summary, message, values = suggestion
+        with self._action_lock:
+            settling = {
+                item for item, sent in self._placement_sent.items()
+                if time.monotonic() - sent < PLACEMENT_SETTLE_SECONDS
+            }
+        if any(value.get("action") == "place_building" and str(value.get("item_type", "")).lower() in settling
+               for value in values):
+            return  # Already ordered placed; the observation has not caught up yet.
         if not idle and not all(value.get("action") == "place_building" for value in values):
             # One volunteered suggestion at a time; placing a finished building is always offered,
             # whatever else is waiting, because nothing else in that queue can progress until then.
@@ -2710,6 +2729,11 @@ class Companion:
             )
 
         self.goal_blackboard.apply_receipt(receipt)
+        if receipt.accepted:
+            with self._action_lock:
+                for command in commands:
+                    if command.action == "place_building":
+                        self._placement_sent[command.item_type.lower()] = time.monotonic()
         state = "executed" if receipt.accepted else "rejected"
         if receipt.accepted and "infantry scout" in proposal.summary.lower():
             trained = [
