@@ -108,9 +108,20 @@ four problems; this is how each now works.
   repairs on the factory", "gis deploy", exact words beating sound-alikes). Orders keep the same
   command format, so replays are unaffected.
 
-Offline deterministic benchmark (`run_eval.py --offline`, 281 cases): overall 91.8 % -> 97.2 %,
-executable 92.7 % -> 99.5 %, unsafe accepts 0 -> 0. The remaining offline failures are vague
-orders that need the model to ask back ("move them", "go over there").
+Measured on 8 October (Qwen3-VL 2B on CUDA llama.cpp, Whisper large-v3, Kokoro; the same
+machine and stack for both sides, the old code run from 96171fb):
+
+| | Before | After |
+|---|---|---|
+| Live harness, talk key released to reply playing (2 runs, 24 turns): median / p95 / max | 0.94 / 6.3 / 12.5 s | 0.98 / 2.1 / 3.1 s |
+| "What should I build first?" / "What should I do next?" | 3.3 to 12.5 s | 0.6 to 1.1 s |
+| Spoken orders that became the right card (14) | 9 | 12 |
+| Native replay parity | identical | identical |
+| Order benchmark with the live model (281 cases): overall / executable / unsafe accepts | 95.0 % / 95.5 % / 1 | 98.6 % / 99.5 % / 0 |
+| Offline deterministic benchmark: overall / executable | 91.8 % / 92.7 % | 97.2 % / 99.5 % |
+
+The two remaining harness misses are "Build a power plant" right after the harness accepted the
+advice card from "What should I build first?": the reply is the correct "already 39% built".
 
 ## Evaluation
 
