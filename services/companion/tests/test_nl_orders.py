@@ -164,7 +164,9 @@ class DeterministicOrderTests(unittest.TestCase):
 
     def test_relative_directions_and_pronouns_defer_to_the_model(self) -> None:
         army = fixture("ra-england-army")
-        self.assertIsNone(nl_orders.interpret_deterministic("move the tanks north", army))
+        # Screen-relative directions need the model; compass directions ground deterministically.
+        self.assertIsNone(nl_orders.interpret_deterministic("move the tanks left", army))
+        self.assertIsNone(nl_orders.interpret_deterministic("move that tank north", army))
         self.assertIsNone(nl_orders.interpret_deterministic("move them", army))
         self.assertIsNone(nl_orders.interpret_deterministic("go over there", army))
 
@@ -238,7 +240,7 @@ class CompanionRoutingTests(unittest.TestCase):
         reply = intent(steps=[step("move", units="Light Tanks", target="north")])
         companion, router, _ = self.companion(reply)
         companion.update_snapshot(fixture("ra-england-army"))
-        response = companion.handle_player_input("move the tanks north")
+        response = companion.handle_player_input("move the tanks left")
         self.assertEqual(response.source, "action-proposal")
         self.assertEqual(len(router.calls), 1)
         self.assertEqual(response.metadata["nl"]["path"], "model")
@@ -247,7 +249,7 @@ class CompanionRoutingTests(unittest.TestCase):
     def test_malformed_model_output_is_repaired_once_then_clarified(self) -> None:
         companion, router, _ = self.companion("move move move", "still not json")
         companion.update_snapshot(fixture("ra-england-army"))
-        response = companion.handle_player_input("move the tanks north")
+        response = companion.handle_player_input("move the tanks left")
         self.assertEqual(len(router.calls), 2)
         self.assertEqual(response.source, "order-clarification")
         self.assertIsNone(companion.pending_action())
@@ -259,7 +261,7 @@ class CompanionRoutingTests(unittest.TestCase):
         ]})
         companion, _, _ = self.companion(legacy)
         companion.update_snapshot(fixture("ra-england-army"))
-        response = companion.handle_player_input("move the tanks north")
+        response = companion.handle_player_input("move the tanks left")
         self.assertIsNone(companion.pending_action())
         self.assertIn(response.metadata["action"]["state"], {"rejected", "not_created"})
 
@@ -421,7 +423,7 @@ class ExternalProviderPathTests(unittest.TestCase):
                 )
                 companion = Companion(router=AIRouter(settings))
                 companion.update_snapshot(fixture("ra-england-army"))
-                response = companion.handle_player_input("move the tanks north")
+                response = companion.handle_player_input("move the tanks left")
                 return response, list(provider.RequestHandlerClass.requests)
             finally:
                 gateway.shutdown()

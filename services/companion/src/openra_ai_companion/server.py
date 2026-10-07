@@ -79,6 +79,8 @@ class CompanionHandler(BaseHTTPRequestHandler):
             "voice_enabled": not self.companion.muted,
             "auto_act_enabled": self.companion.auto_act_enabled,
             "pending_action": self.companion.pending_action(),
+            # Every offer still waiting, newest first ("pending_action" is the newest one).
+            "pending_actions": self.companion.pending_actions(),
             "brain": self.companion.brain_state(),
             "snapshot": self.companion.latest_snapshot.compact() if self.companion.latest_snapshot else None,
             "threat": self.companion.threat_status(),

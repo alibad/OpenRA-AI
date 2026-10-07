@@ -169,6 +169,7 @@ PYINSTALLER_ARGUMENTS=(
   --paths "$REPOSITORY_ROOT/services/companion/src"
   --collect-all sounddevice
   --collect-data agents
+  --collect-data openra_ai_companion
   --distpath "$RESOURCES/bin"
   --workpath "$PACKAGE_ROOT/pyinstaller-work-$RELEASE_ARCH"
   --specpath "$PACKAGE_ROOT/pyinstaller-spec-$RELEASE_ARCH"

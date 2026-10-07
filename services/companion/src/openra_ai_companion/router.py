@@ -228,12 +228,12 @@ class AIRouter:
             ],
         }
 
-    def _chat(self, messages: list[dict[str, object]], model: str) -> RouterResult:
+    def _chat(self, messages: list[dict[str, object]], model: str, max_tokens: int = 800) -> RouterResult:
         body = json.dumps(
             {
                 "model": model,
                 "messages": messages,
-                "max_tokens": 800,
+                "max_tokens": max_tokens,
                 "reasoning_effort": "low",
             }
         ).encode("utf-8")
@@ -261,8 +261,14 @@ class AIRouter:
             self._output_tokens += output_tokens
         return RouterResult(text, latency, model, input_tokens, output_tokens)
 
-    def chat(self, messages: list[dict[str, object]], temperature: float | None = None) -> RouterResult:
-        return self._chat(messages, self.settings.text_model)
+    def chat(
+        self,
+        messages: list[dict[str, object]],
+        temperature: float | None = None,
+        max_tokens: int | None = None,
+    ) -> RouterResult:
+        """One chat completion; ``max_tokens`` caps short spoken answers (default 800)."""
+        return self._chat(messages, self.settings.text_model, max_tokens or 800)
 
     def _structured(
         self,

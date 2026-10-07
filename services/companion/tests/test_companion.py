@@ -549,20 +549,16 @@ class CompanionTests(unittest.TestCase):
         ):
             with self.subTest(prompt=prompt):
                 response = companion.handle_player_input(prompt)
-                self.assertEqual(response.source, "ai-layer")
+                # The live briefing is built from the game state: no planner and no model call.
+                self.assertEqual(response.source, "strategy-next-step")
                 self.assertIn("Allied Barracks", response.text)
-                self.assertIn("power is +80", response.text)
+                self.assertIn("power +80", response.text)
                 self.assertIn("3 harvesters", response.text)
-                self.assertTrue(response.metadata["mcp"]["battlefield_read"])
+                self.assertIn("AUTO is executing", response.text)
                 self.assertNotIn("assessing", response.text.lower())
                 self.assertNotIn("analyzing", response.text.lower())
 
-        self.assertEqual(planner_calls, [
-            "Why what is happening right now?",
-            "So what is the situation?",
-            "Is that all you have? Come on.",
-            "Tell me something useful, please.",
-        ])
+        self.assertEqual(planner_calls, [])
         self.assertEqual(router.calls, 0)
 
     def test_compound_barracks_scout_request_uses_ready_infantry_and_safe_routes(self) -> None:
@@ -1316,25 +1312,23 @@ class CompanionTests(unittest.TestCase):
         self.assertIsNone(companion.propose_routine_action())
         self.assertIsNone(companion.pending_action())
 
-    def test_interactive_mcp_plan_creates_confirmable_proposal(self) -> None:
+    def test_suggestion_request_is_a_deterministic_confirmable_proposal_without_the_planner(self) -> None:
+        # "What do you suggest?" used to run the multi-call MCP planner (9-24 s on the local
+        # model). The next step is decided from the game state with no model call at all.
         router = FakeRouter()
         companion = Companion(router=router)
         companion.latest_snapshot = self.action_snapshot()
-        companion.set_action_planner(lambda _instruction: {
-            "message": "Add one tank to the main force.",
-            "summary": "Train one tank",
-            "commands": [{"action": "train", "item_type": "1tnk", "queued": True}],
-            "model": "fake-mcp-agent",
-            "latency_ms": 12,
-            "mcp": {"connected": True, "tools": 22, "proposal_only": True},
-        })
+        planner = mock.Mock(side_effect=AssertionError("advice must not run the multi-call planner"))
+        companion.set_action_planner(planner)
 
         response = companion.handle_player_input("What action do you suggest?")
 
-        self.assertEqual(response.source, "action-proposal")
+        self.assertEqual(response.source, "strategy-next-step")
         self.assertEqual(response.metadata["action"]["state"], "pending")
-        self.assertEqual(response.metadata["mcp"]["tools"], 22)
-        self.assertTrue(response.metadata["mcp"]["proposal_only"])
+        self.assertEqual({command["item_type"] for command in response.metadata["action"]["commands"]}, {"1tnk"})
+        self.assertTrue(response.metadata["advice"]["deterministic"])
+        self.assertIn("Light Tank", response.text)
+        planner.assert_not_called()
         self.assertEqual(router.calls, 0)
 
     def test_mcp_proposal_mode_never_dispatches_commands(self) -> None:
@@ -1497,7 +1491,7 @@ class CompanionTests(unittest.TestCase):
             "commands": [{"action": "move", "actor_id": 999, "target_x": 30, "target_y": 30}],
         }))
         companion.latest_snapshot = self.action_snapshot()
-        response = companion.handle_player_input("Move the tank north")
+        response = companion.handle_player_input("Move the tank to the left")
         self.assertEqual(response.source, "action-rejected")
         self.assertIn("not owned", response.metadata["action"]["reason"])
         self.assertIsNone(companion.pending_action())

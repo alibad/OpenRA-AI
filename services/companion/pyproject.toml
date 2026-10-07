@@ -27,3 +27,6 @@ openra-ai-game-mcp = "openra_ai_companion.game_mcp:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.setuptools.package-data]
+openra_ai_companion = ["data/*.json"]

@@ -48,6 +48,7 @@ from .strategy_contracts import (
     strategy_state,
 )
 from . import nl_orders
+from .advisor import BUILD_FOCUS, Advice, Advisor, is_next_step_question, state_summary
 from .tactical_vision import tactical_overview_png
 from .vision_budget import fit_images
 from .threats import assess_threat
@@ -109,9 +110,36 @@ Build and train commands contain only action and item_type; do not add coordinat
 Requests to sell, cancel production, power down, or attack hidden enemies MUST use mode answer, with no commands.
 Explain that the requested action cannot be proposed; do not repeat it as advice."""
 
+# Progress questions about the state of play rather than the next step.
+STATUS_WORDS = re.compile(
+    r"\b(remaining|left|remains|situation|happening|going on|winning|doing|status|report|useful|all you have|where are we)\b"
+)
+
+ADVICE_PROMPT = """You are the player's co-commander in a real-time strategy game.
+Answer the player's question in one or two short sentences, under 35 words in total, using only the supplied state.
+If a suggested next step is supplied and it fits the question, recommend it in your own words.
+Never invent units, buildings, places or numbers. No internal ids, markdown, greetings or filler such as "I am assessing"."""
+
 CONFIRM_WORDS = frozenset({"confirm", "confirmed", "yes", "do it", "execute", "go ahead", "proceed"})
 CANCEL_WORDS = frozenset({"cancel", "never mind", "nevermind", "stop", "discard"})
 ACTION_EXPIRY_SECONDS = 300.0
+# Offers the player can have open at once (cards in the panel); the oldest drops out first.
+MAX_PENDING_ACTIONS = 3
+
+
+def proposal_subjects(proposal: ActionProposal) -> frozenset[str]:
+    """What an offer is about: the production items and the units it would order.
+
+    A newer offer replaces an older one only when they share a subject, so a
+    question, or an order for different units, leaves the older offer standing.
+    """
+    subjects: set[str] = set()
+    for command in proposal.commands:
+        if command.action in ITEM_ACTIONS and command.item_type:
+            subjects.add("item:" + command.item_type.lower().split("@", 1)[0].split(".", 1)[0])
+        if command.action in ACTOR_ACTIONS and command.actor_id:
+            subjects.add(f"actor:{command.actor_id}")
+    return frozenset(subjects)
 AUTO_ACTION_INSTRUCTION = """Autonomous commander mode is enabled. Inspect the battlefield with MCP tools and issue one immediately useful batch of legal orders toward winning. In scripted missions, follow mission_plan and the live objectives before skirmish economy logic; preserve required heroes, avoid dog detectors, and restrict disguise, infiltration, capture, and C4 to listed valid targets. Otherwise prioritize completed building placement, economy, production, scouting, defense, then concentrated attacks. Act instead of merely advising; return no commands only when no useful legal order exists."""
 
 
@@ -141,6 +169,11 @@ def _is_cancel_intent(text: str) -> bool:
         " do not execute ",
         " don t execute ",
     ))
+
+
+def _cancels_everything(text: str) -> bool:
+    words = set(_normalized_action_intent(text).split())
+    return bool(words & {"all", "everything", "every", "them", "those", "proposals", "offers", "orders"})
 
 
 def _is_confirm_intent(text: str) -> bool:
@@ -278,7 +311,9 @@ class Companion:
         self._generation = 0
         self._lock = threading.Lock()
         self._action_lock = threading.Lock()
-        self._pending_action: ActionProposal | None = None
+        # Offers waiting for the player, oldest first. An offer survives unrelated questions and
+        # orders; only a newer offer for the same thing (item or units) replaces it.
+        self._pending_actions: list[ActionProposal] = []
         self._action_executor = action_executor
         self._action_planner: Callable[[str], dict] | None = None
         self._strategy_controller: Callable[[str], bool] | None = None
@@ -357,7 +392,7 @@ class Companion:
             if not enabled:
                 self.interrupt()
                 with self._action_lock:
-                    self._pending_action = None
+                    self._pending_actions = []
         if muted is not None:
             self.muted = muted
             if muted:
@@ -478,6 +513,11 @@ class Companion:
             self._opening_scouts_committed = 0
             self.brain_arbiter = BrainArbiter()
         self.latest_snapshot = snapshot
+        if match_changed:
+            with self._action_lock:
+                self._pending_actions = []
+        else:
+            self._prune_pending(snapshot)
         updates = self.goal_blackboard.reconcile(snapshot)
         self._goal_updates = [goal.as_dict() for goal in updates]
         for goal in updates:
@@ -610,6 +650,7 @@ class Companion:
 
     def observe(self, snapshot: GameSnapshot) -> CompanionResponse | None:
         threat = self.update_snapshot(snapshot)
+        self._ensure_placement_offers(snapshot)
         insight = self.insights.select(snapshot, threat=threat)
         event_insight = self.insights.last_event
         event_context = self._event_context(snapshot, event_insight, threat) if event_insight else None
@@ -994,15 +1035,121 @@ class Companion:
 
         return tuple(commands)
 
-    def pending_action(self) -> dict | None:
+    def _live_pending(self) -> list[ActionProposal]:
+        """Drop expired offers; the caller holds ``_action_lock``."""
+        now = time.monotonic()
+        self._pending_actions = [
+            proposal for proposal in self._pending_actions
+            if now - proposal.created_at <= ACTION_EXPIRY_SECONDS
+        ]
+        return self._pending_actions
+
+    def _offer(self, proposal: ActionProposal, *, only_if_idle: bool = False, announce: bool = True) -> bool:
+        """Hold a proposal for confirmation; it replaces only offers for the same thing.
+
+        An announced offer becomes the newest, the one a bare "confirm" accepts. A silent
+        one (``announce=False``) waits behind the offers the player has already heard.
+        """
+        subjects = proposal_subjects(proposal)
         with self._action_lock:
-            proposal = self._pending_action
-            if proposal is not None and time.monotonic() - proposal.created_at > ACTION_EXPIRY_SECONDS:
-                self._pending_action = None
-                proposal = None
-        if proposal is None:
-            return None
-        return proposal.as_dict()
+            pending = self._live_pending()
+            if only_if_idle and pending:
+                return False
+            kept = [
+                existing for existing in pending
+                if existing.proposal_id != proposal.proposal_id and not (subjects & proposal_subjects(existing))
+            ]
+            self._pending_actions = [*kept, proposal] if announce else [proposal, *kept]
+            if len(self._pending_actions) > MAX_PENDING_ACTIONS:
+                del self._pending_actions[: len(self._pending_actions) - MAX_PENDING_ACTIONS]
+        return True
+
+    def _ensure_placement_offers(self, snapshot: GameSnapshot) -> None:
+        """Keep an offer to place every finished structure until it is placed or cancelled.
+
+        The "ready to place" alert is raised once; when it lands during a player's question
+        it is not spoken, so the offer is held silently instead of being lost.
+        """
+        if not self.enabled or self.auto_act_enabled or snapshot.mission_mode or snapshot.done:
+            return
+        with self._action_lock:
+            placing = {
+                command.item_type.lower()
+                for proposal in self._live_pending()
+                for command in proposal.commands
+                if command.action == "place_building"
+            }
+        for entry in snapshot.production:
+            item = str(entry.get("item", "")).strip().lower()
+            if (
+                not item
+                or item in placing
+                or str(entry.get("queue_type", "")).lower() not in {"building", "defense"}
+                or not (float(entry.get("progress", 0)) >= 0.999 or int(entry.get("remaining_ticks", 1)) <= 0)
+            ):
+                continue
+            try:
+                commands = self._validate_action_commands(snapshot, [{"action": "place_building", "item_type": item}])
+            except ValueError:
+                continue
+            self._offer(ActionProposal(
+                proposal_id=str(uuid.uuid4()),
+                instruction="contextual:placement",
+                summary=f"Place the completed {snapshot.actor_name(item)}",
+                expected_tick=snapshot.tick,
+                commands=commands,
+                created_at=time.monotonic(),
+            ), announce=False)
+
+    def _withdraw(self, proposal: ActionProposal) -> bool:
+        with self._action_lock:
+            before = len(self._pending_actions)
+            self._pending_actions = [
+                existing for existing in self._pending_actions if existing.proposal_id != proposal.proposal_id
+            ]
+            return len(self._pending_actions) != before
+
+    def _pending_proposal(self, proposal_id: str = "") -> ActionProposal | None:
+        """The offer with this id, or the newest one when no id is given."""
+        with self._action_lock:
+            pending = self._live_pending()
+            if proposal_id:
+                return next((proposal for proposal in pending if proposal.proposal_id == proposal_id), None)
+            return pending[-1] if pending else None
+
+    def _equivalent_pending(self, commands: tuple[ActionCommand, ...]) -> ActionProposal | None:
+        with self._action_lock:
+            return next((proposal for proposal in self._live_pending() if proposal.commands == commands), None)
+
+    def pending_action(self) -> dict | None:
+        """The newest offer (the one a bare "confirm" accepts)."""
+        proposal = self._pending_proposal()
+        return proposal.as_dict() if proposal is not None else None
+
+    def pending_actions(self) -> list[dict]:
+        """Every offer still waiting, newest first."""
+        with self._action_lock:
+            return [proposal.as_dict() for proposal in reversed(self._live_pending())]
+
+    def _prune_pending(self, snapshot: GameSnapshot) -> None:
+        """Forget offers the battlefield has made impossible (placed, destroyed, already built)."""
+        with self._action_lock:
+            pending = list(self._pending_actions)
+        stale = []
+        for proposal in pending:
+            try:
+                self._validate_action_commands(
+                    snapshot,
+                    [command.as_dict() for command in proposal.commands],
+                    player_request=proposal.player_request,
+                )
+            except (ValueError, KeyError):
+                stale.append(proposal.proposal_id)
+        if stale:
+            with self._action_lock:
+                self._pending_actions = [
+                    proposal for proposal in self._pending_actions if proposal.proposal_id not in stale
+                ]
 
     def _contextual_action(
         self,
@@ -1399,9 +1546,8 @@ class Companion:
                     created_at=time.monotonic(),
                 )
                 if self.goal_blackboard.bind_retry(retry.goal_id, proposal, self.latest_snapshot) is not None:
-                    with self._action_lock:
-                        self._pending_action = proposal
-                    retried = self.confirm_action()
+                    self._offer(proposal)
+                    retried = self.confirm_action(proposal.proposal_id)
                     retried.metadata["auto_act"] = True
                     if retried.metadata.get("action", {}).get("state") == "executed":
                         retried.text = f"Auto commander: {retried.text}"
@@ -1426,9 +1572,7 @@ class Companion:
                         commands=commands,
                         created_at=time.monotonic(),
                     )
-                    with self._action_lock:
-                        if self._pending_action is None:
-                            self._pending_action = proposal
+                    self._offer(proposal, only_if_idle=True)
             if self.pending_action() is None and self.latest_snapshot.mission_mode:
                 # Scripted mission micro is a deterministic, event-driven control
                 # loop. Do not wait for (or charge for) a general LLM/MCP planning
@@ -1451,11 +1595,8 @@ class Companion:
                     commands=commands,
                     created_at=time.monotonic(),
                 )
-                with self._action_lock:
-                    if self._pending_action is None:
-                        self._pending_action = proposal
-                    else:
-                        return None
+                if not self._offer(proposal, only_if_idle=True):
+                    return None
             elif self.pending_action() is None and self.llm_auto_planner_allowed:
                 instruction = AUTO_ACTION_INSTRUCTION
                 if event_context:
@@ -1488,19 +1629,20 @@ class Companion:
     ) -> None:
         if response.interrupted or not response.text:
             return
-        self.pending_action()
-        with self._action_lock:
-            if self._pending_action is not None:
-                return
+        idle = self.pending_action() is None
         suggestion = self._contextual_action(snapshot, insight, threat)
         if suggestion is None:
             return
         summary, message, values = suggestion
+        if not idle and not all(value.get("action") == "place_building" for value in values):
+            # One volunteered suggestion at a time; placing a finished building is always offered,
+            # whatever else is waiting, because nothing else in that queue can progress until then.
+            return
         try:
             commands = self._validate_action_commands(snapshot, values)
         except ValueError:
             return
-        proposal = ActionProposal(
+        proposal = self._equivalent_pending(commands) or ActionProposal(
             proposal_id=str(uuid.uuid4()),
             instruction=f"contextual:{insight.key}",
             summary=summary,
@@ -1508,10 +1650,8 @@ class Companion:
             commands=commands,
             created_at=time.monotonic(),
         )
-        with self._action_lock:
-            if self._pending_action is not None:
-                return
-            self._pending_action = proposal
+        # Announcing an offer (new or held silently until now) makes it the newest.
+        self._offer(proposal)
         response.text = message
         response.source = "contextual-action-suggestion"
         response.metadata["action"] = {"state": "pending", "contextual": True, **proposal.as_dict()}
@@ -1606,8 +1746,7 @@ class Companion:
                 commands=commands,
                 created_at=time.monotonic(),
             )
-            with self._action_lock:
-                self._pending_action = proposal
+            self._offer(proposal)
             barracks_note = (
                 "The Barracks is already ready; " if barracks_ready
                 else "You already have scout-capable infantry, so another Barracks is unnecessary; "
@@ -1635,8 +1774,7 @@ class Companion:
                     commands=commands,
                     created_at=time.monotonic(),
                 )
-                with self._action_lock:
-                    self._pending_action = proposal
+                self._offer(proposal)
                 return CompanionResponse(
                     "The Barracks is complete but not placed; I can place it now, then infantry production can begin. Say confirm.",
                     "action-proposal",
@@ -1684,8 +1822,7 @@ class Companion:
                     commands=commands,
                     created_at=time.monotonic(),
                 )
-                with self._action_lock:
-                    self._pending_action = proposal
+                self._offer(proposal)
                 return CompanionResponse(
                     f"The Barracks is ready; I can train {quota} infantry scouts now, then fan them out as they deploy. Say confirm.",
                     "action-proposal",
@@ -1704,8 +1841,7 @@ class Companion:
                 commands=commands,
                 created_at=time.monotonic(),
             )
-            with self._action_lock:
-                self._pending_action = proposal
+            self._offer(proposal)
             return CompanionResponse(
                 "I can queue the Barracks now; once it is placed, infantry scouts become the next legal step. Say confirm.",
                 "action-proposal",
@@ -1767,11 +1903,8 @@ class Companion:
                     commands=commands,
                     created_at=time.monotonic(),
                 )
-                with self._action_lock:
-                    if self._pending_action is None:
-                        self._pending_action = created_proposal
-                    else:
-                        created_proposal = None
+                if not self._offer(created_proposal, only_if_idle=True):
+                    created_proposal = None
 
         detector_count = len(plan.get("hazards", {}).get("disguise_detectors", []))
         warning = (
@@ -1814,39 +1947,40 @@ class Companion:
         pending = self.pending_action()
         created_proposal: ActionProposal | None = None
         suggestion: tuple[str, str, list[dict]] | None = None
-        if not self.auto_act_enabled and pending is None:
-            opening_mcv = any(
-                unit.kind.split(".", 1)[0] == "mcv" for unit in snapshot.units
-            ) and not snapshot.buildings
-            briefing_insight = Insight(
-                "opening_deploy" if opening_mcv else "situation_update",
-                80,
-                "Player requested the live strategic plan",
-                "Player requested the live strategic plan.",
-                snapshot.tick,
-            )
-            suggestion = self._contextual_action(snapshot, briefing_insight, threat)
+        if not self.auto_act_enabled:
+            advice = Advisor(snapshot, threat).next_step()
+            if advice is not None and advice.commands:
+                suggestion = (advice.summary, advice.text, advice.commands)
+            elif pending is None:
+                opening_mcv = any(
+                    unit.kind.split(".", 1)[0] == "mcv" for unit in snapshot.units
+                ) and not snapshot.buildings
+                briefing_insight = Insight(
+                    "opening_deploy" if opening_mcv else "situation_update",
+                    80,
+                    "Player requested the live strategic plan",
+                    "Player requested the live strategic plan.",
+                    snapshot.tick,
+                )
+                suggestion = self._contextual_action(snapshot, briefing_insight, threat)
             if suggestion is not None:
                 summary, _, values = suggestion
                 try:
-                    commands = self._validate_action_commands(snapshot, values)
+                    commands = self._validate_action_commands(snapshot, values, player_request=True)
                 except ValueError:
                     suggestion = None
                 else:
-                    created_proposal = ActionProposal(
+                    created_proposal = self._equivalent_pending(commands) or ActionProposal(
                         proposal_id=str(uuid.uuid4()),
                         instruction="strategy:next-step",
                         summary=summary,
                         expected_tick=snapshot.tick,
                         commands=commands,
                         created_at=time.monotonic(),
+                        player_request=True,
                     )
-                    with self._action_lock:
-                        if self._pending_action is None:
-                            self._pending_action = created_proposal
-                        else:
-                            created_proposal = None
-                    pending = created_proposal.as_dict() if created_proposal is not None else self.pending_action()
+                    self._offer(created_proposal)
+                    pending = created_proposal.as_dict()
 
         if suggestion is not None and created_proposal is not None:
             objective = suggestion[0].rstrip(".")
@@ -1920,6 +2054,105 @@ class Companion:
             utterance_id=generation,
             metadata=metadata,
         )
+
+    def _short_answer(self, messages: list[dict]) -> RouterResult:
+        try:
+            return self.router.chat(messages, max_tokens=120)
+        except TypeError:  # Routers without a token cap (older providers, test doubles).
+            return self.router.chat(messages)
+
+    def _advice_response(
+        self,
+        instruction: str,
+        snapshot: GameSnapshot,
+        generation: int,
+        *,
+        progress: bool = False,
+    ) -> CompanionResponse:
+        """Answer "what should I build first?", "what now?" or "how are we doing?" fast.
+
+        These used to go through the interactive MCP planner (several model calls,
+        9-24 s on the local 2B model). Now:
+
+        * a plain next-step question is decided from the game state (advisor.py) with
+          no model call, and the recommended order comes as a card;
+        * a status question ("what's happening?", "what's left?"), or any of these while
+          AUTO plays, gets the deterministic briefing, also without a model call;
+        * any other advice ("should I attack now?") gets one short model call over a
+          compact state summary, with the same deterministic suggestion as the card.
+        """
+        started = time.perf_counter()
+        if snapshot.mission_mode:
+            return self._mission_progress_response(snapshot, generation)
+        next_step = is_next_step_question(instruction)
+        status = bool(STATUS_WORDS.search(nl_orders.normalize(instruction)))
+        if self.auto_act_enabled or (progress and (status or not next_step)):
+            # Status, "what's left?" and anything while AUTO plays: the deterministic briefing
+            # (facts, the next step as a card, what remains), no model call.
+            return self._strategy_progress_response(snapshot, generation)
+        advice: Advice | None = Advisor(snapshot, self.current_threat).next_step(
+            build_focus=bool(BUILD_FOCUS.search(nl_orders.normalize(instruction)))
+        )
+        proposal: ActionProposal | None = None
+        if advice is not None and advice.commands:
+            try:
+                commands = self._validate_action_commands(snapshot, advice.commands, player_request=True)
+            except ValueError:
+                commands = ()
+            if commands:
+                proposal = self._equivalent_pending(commands) or ActionProposal(
+                    proposal_id=str(uuid.uuid4()),
+                    instruction=f"advice:{advice.key}",
+                    summary=advice.summary,
+                    expected_tick=snapshot.tick,
+                    commands=commands,
+                    created_at=time.monotonic(),
+                    player_request=True,
+                )
+        metadata: dict = {"advice": {"key": advice.key if advice else "", "deterministic": True}}
+        if advice is not None and next_step:
+            text = advice.text
+            source_metadata: dict = {"model": "none", "local": True}
+            latency_ms = round((time.perf_counter() - started) * 1000)
+        else:
+            context = state_summary(snapshot, self.current_threat)
+            if advice is not None:
+                context += f"\nSuggested next step{' (offered as a card)' if proposal else ''}: {advice.text}"
+            try:
+                result = self._short_answer([
+                    {"role": "system", "content": ADVICE_PROMPT},
+                    {"role": "user", "content": f"Player: {json.dumps(instruction)}\n\nState:\n{context}"},
+                ])
+            except RouterError as exc:
+                if advice is None:
+                    fallback = self._strategy_progress_response(snapshot, generation)
+                    fallback.metadata.update({"degraded": True, "reason": str(exc)})
+                    return fallback
+                text, latency_ms = advice.text, round((time.perf_counter() - started) * 1000)
+                source_metadata = {"degraded": True, "reason": str(exc), "ai_state": getattr(exc, "state", "")}
+            else:
+                text = snapshot.humanize_text(" ".join(result.text.split()))
+                latency_ms = result.latency_ms
+                source_metadata = {"model": result.model}
+                if nl_orders.answer_is_malformed(text) or _is_unhelpful_player_answer(text) or len(text) > 320:
+                    source_metadata["sanitized"] = True
+                    if advice is None:
+                        fallback = self._strategy_progress_response(snapshot, generation)
+                        fallback.metadata["sanitized"] = True
+                        return fallback
+                    text = advice.text
+        metadata.update(source_metadata)
+        metadata["advice"]["deterministic"] = source_metadata.get("model") == "none"
+        if proposal is not None:
+            self._offer(proposal)
+            metadata["action"] = {"state": "pending", "contextual": True, **proposal.as_dict()}
+        response = CompanionResponse(text, "strategy-next-step", utterance_id=generation, latency_ms=latency_ms, metadata=metadata)
+        if self._interrupted(generation):
+            if proposal is not None:
+                self._withdraw(proposal)
+            response.text = ""
+            response.interrupted = True
+        return response
 
     def _interpret_player_order(
         self,
@@ -2065,8 +2298,7 @@ class Companion:
                     created_at=time.monotonic(),
                     player_request=True,
                 )
-                with self._action_lock:
-                    self._pending_action = created
+                self._offer(created)
                 count = len(commands)
                 lead = f"{summary}. " + (f"{result.message} " if result.message else "")
                 response = CompanionResponse(
@@ -2089,9 +2321,7 @@ class Companion:
             )
         if self._interrupted(generation):
             if created is not None:
-                with self._action_lock:
-                    if self._pending_action == created:
-                        self._pending_action = None
+                self._withdraw(created)
             response.text = ""
             response.interrupted = True
         return response
@@ -2102,7 +2332,7 @@ class Companion:
         if not instruction:
             raise ValueError("question must not be empty")
         if _is_cancel_intent(instruction):
-            return self.cancel_action()
+            return self.cancel_action(everything=_cancels_everything(instruction))
         if _is_confirm_intent(instruction):
             return self.confirm_action()
 
@@ -2162,9 +2392,8 @@ class Companion:
                 metadata={"strategy": contract, "native_active": self.auto_act_enabled},
             )
 
-        # Any new instruction replaces an unconfirmed proposal.
-        with self._action_lock:
-            self._pending_action = None
+        # Unconfirmed offers stay: a question or an order for something else leaves them standing,
+        # and a newer offer replaces only one for the same item or units (see _offer).
 
         generation = self._begin()
         if not self.enabled:
@@ -2179,7 +2408,13 @@ class Companion:
             )
         progress_request = strategy_intent == "progress"
         failure_followup = _is_action_failure_followup(instruction)
-        scout_request = _is_scout_request(instruction)
+        scout_request = _is_scout_request(instruction) and not nl_orders.names_production_item(instruction, snapshot)
+        if not background and not (failure_followup or scout_request) and (
+            progress_request or nl_orders.classify(instruction) == "advice"
+        ):
+            # "What should I build first?", "what now?", "how are we doing?": decided from the game
+            # state, or one short model call; never the multi-call planner.
+            return self._advice_response(instruction, snapshot, generation, progress=progress_request)
 
         started = time.perf_counter()
         views: list[dict] = []
@@ -2327,8 +2562,7 @@ class Companion:
                     created_at=time.monotonic(),
                     player_request=not background,
                 )
-                with self._action_lock:
-                    self._pending_action = proposal
+                self._offer(proposal)
                 created_proposal = proposal
                 message = snapshot.humanize_text(str(decoded.get("message", "")).strip().rstrip("."))
                 lead = f"{message}. " if message else ""
@@ -2354,9 +2588,7 @@ class Companion:
 
         if self._interrupted(generation):
             if created_proposal is not None:
-                with self._action_lock:
-                    if self._pending_action == created_proposal:
-                        self._pending_action = None
+                self._withdraw(created_proposal)
             response.text = ""
             response.interrupted = True
         return response
@@ -2370,11 +2602,9 @@ class Companion:
                 utterance_id=generation,
                 metadata={"action": {"state": "disabled"}},
             )
+        proposal = self._pending_proposal(proposal_id)
         with self._action_lock:
-            proposal = self._pending_action
             executor = self._action_executor
-            if proposal is not None and proposal_id and proposal.proposal_id != proposal_id:
-                proposal = None
 
         if proposal is None:
             return CompanionResponse(
@@ -2393,9 +2623,7 @@ class Companion:
                 pass
         snapshot = self.latest_snapshot
         if time.monotonic() - proposal.created_at > ACTION_EXPIRY_SECONDS:
-            with self._action_lock:
-                if self._pending_action == proposal:
-                    self._pending_action = None
+            self._withdraw(proposal)
             return CompanionResponse(
                 "That proposal expired after five minutes. Please ask again.",
                 "action-confirmation",
@@ -2418,9 +2646,7 @@ class Companion:
                 player_request=proposal.player_request,
             )
         except ValueError as exc:
-            with self._action_lock:
-                if self._pending_action == proposal:
-                    self._pending_action = None
+            self._withdraw(proposal)
             return CompanionResponse(
                 "That order is no longer valid on the current battlefield. Nothing was sent.",
                 "action-rejected",
@@ -2458,9 +2684,7 @@ class Companion:
             reason=proposal.summary,
         ):
             self.goal_blackboard.fail(proposal.proposal_id, snapshot.tick, "a higher-priority brain owns this control scope")
-            with self._action_lock:
-                if self._pending_action == proposal:
-                    self._pending_action = None
+            self._withdraw(proposal)
             return CompanionResponse(
                 "A higher-priority command currently owns those units; nothing was sent.",
                 "action-rejected",
@@ -2469,9 +2693,7 @@ class Companion:
             )
 
         # Clear before the call: the proposal id remains the idempotency key if the response is lost.
-        with self._action_lock:
-            if self._pending_action == proposal:
-                self._pending_action = None
+        self._withdraw(proposal)
         self.goal_blackboard.mark_dispatched(proposal.proposal_id, snapshot.tick)
         try:
             receipt = executor(proposal.proposal_id, snapshot.tick, commands)
@@ -2511,30 +2733,33 @@ class Companion:
             metadata={"action": {"state": state, **proposal.as_dict(), "receipt": receipt.as_dict()}},
         )
 
-    def cancel_action(self, proposal_id: str = "") -> CompanionResponse:
+    def cancel_action(self, proposal_id: str = "", *, everything: bool = False) -> CompanionResponse:
+        """Cancel one offer (by id, else the newest) or, with ``everything``, all of them."""
         generation = self._begin()
-        with self._action_lock:
-            proposal = self._pending_action
-            if proposal is not None and proposal_id and proposal.proposal_id != proposal_id:
-                proposal = None
-            if proposal is not None:
-                self._pending_action = None
-        if proposal is not None:
-            self.goal_blackboard.cancel(
-                proposal.proposal_id,
-                self.latest_snapshot.tick if self.latest_snapshot is not None else 0,
-            )
-        if proposal is None:
+        if everything and not proposal_id:
+            with self._action_lock:
+                cancelled = list(self._live_pending())
+                self._pending_actions = []
+        else:
+            proposal = self._pending_proposal(proposal_id)
+            cancelled = [proposal] if proposal is not None and self._withdraw(proposal) else []
+        tick = self.latest_snapshot.tick if self.latest_snapshot is not None else 0
+        for proposal in cancelled:
+            self.goal_blackboard.cancel(proposal.proposal_id, tick)
+        if not cancelled:
             text = "There is no matching action waiting to be cancelled."
             state = "missing"
         else:
-            text = "Cancelled. No orders were sent."
+            text = "Cancelled. No orders were sent." if len(cancelled) == 1 else f"Cancelled {len(cancelled)} offers. No orders were sent."
             state = "cancelled"
+        metadata: dict = {"state": state}
+        if cancelled:
+            metadata["proposal_ids"] = [proposal.proposal_id for proposal in cancelled]
         return CompanionResponse(
             text,
             "action-confirmation",
             utterance_id=generation,
-            metadata={"action": {"state": state}},
+            metadata={"action": metadata},
         )
 
     def draft_mission(self, context: dict) -> CompanionResponse:
@@ -2637,6 +2862,7 @@ class Companion:
             ),
             "has_snapshot": self.latest_snapshot is not None,
             "pending_action": self.pending_action(),
+            "pending_actions": self.pending_actions(),
             "threat": self.threat_status(),
             "vision": {
                 "live_frame_provider": self._frame_provider is not None,

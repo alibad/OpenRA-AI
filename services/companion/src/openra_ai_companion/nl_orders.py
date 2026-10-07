@@ -29,6 +29,7 @@ from typing import Any, Iterable
 from .labels import actor_names as classic_actor_names
 from .models import GameSnapshot, Unit
 from .strategy import desired_harvester_count, maximum_queued_unit_count, maximum_silo_count
+from .techtree import TechTree, _article
 
 MAX_ORDERS = 12
 
@@ -187,6 +188,7 @@ VERB_WORDS = (
     "salvage", "rally", "guard", "protect", "escort", "defend", "cover", "load", "board", "enter", "mount", "embark",
     "unload", "dismount", "disembark", "capture", "seize", "infiltrate", "disguise", "demolish", "blow", "plant",
     "cancel", "abort", "dequeue", "power", "turn", "switch", "shut", "prioritize", "patrol", "scout", "use",
+    "steal", "start", "begin",
 )
 
 
@@ -419,6 +421,9 @@ ALIASES: dict[str, tuple[str, ...]] = {
     "htnk": ("rhino", "rhino tank"),
     "fv": ("ifv", "infantry fighting vehicle"),
     "htk": ("flak track",),
+    "gapill": ("pillbox", "pill box"),
+    "cnlynx": ("lynx", "lynx drone", "lynx ugv"),
+    "r2lynx": ("lynx", "lynx scout"),
 }
 
 SUPPORT_POWER_TERMS = (
@@ -480,32 +485,50 @@ class Vocabulary:
                       *snapshot.visible_enemy_buildings, *snapshot.remembered_enemy_buildings):
             items.setdefault(actor.kind.lower(), snapshot.actor_name(actor.kind))
         self.names = items
+        # The player's faction roster (RTS AI / RA2): every unit and building it can
+        # ever build, with catalog names and aliases, even before it is available.
+        self.tree = TechTree(snapshot)
         self.entries: dict[str, Entry] = {}
         for item, name in items.items():
             category = _name_category(item, name)
+            roster = self.tree.items.get(base_type(item))
             if queue_types.get(base_type(item)) in {"building", "defense"} or base_type(item) in own_building_types:
                 category = "building"
             elif queue_types.get(base_type(item)) in {"infantry", "vehicle", "aircraft", "ship", "plane", "helicopter"}:
                 category = "unit"
-            aliases = {alias_text(name), alias_text(re.sub(r"\s*\(.*?\)", "", name))}
-            aliases.update(alias_text(alias) for alias in ALIASES.get(base_type(item), ()))
-            self.entries[item] = Entry(item, name, tuple(sorted(alias for alias in aliases if alias)), category)
+            elif roster is not None:
+                category = roster["kind"]
+            self.entries[item] = Entry(item, name, self._aliases(item, name), category)
+        self.roster: dict[str, Entry] = {}
+        for item, roster in self.tree.items.items():
+            if item in self.entries:
+                continue
+            name = self.tree.name(item)
+            self.roster[item] = Entry(item, name, self._aliases(item, name), roster["kind"])
         # Known names that are not currently available (Classic RA catalog).
         self.catalog: dict[str, str] = {}
         if snapshot.mod_id == "ra":
             self.catalog = {key: value for key, value in classic_actor_names().items() if "husk" not in key}
 
+    def _aliases(self, item: str, name: str) -> tuple[str, ...]:
+        aliases = {alias_text(name), alias_text(re.sub(r"\s*\(.*?\)", "", name))}
+        aliases.update(alias_text(alias) for alias in ALIASES.get(base_type(item), ()))
+        aliases.update(alias_text(alias) for alias in self.tree.aliases(item))
+        return tuple(sorted(alias for alias in aliases if alias))
+
     def display(self, item: str) -> str:
-        return self.names.get(item.lower()) or self.snapshot.actor_name(item)
+        return self.names.get(item.lower()) or (self.tree.name(item) if self.tree.factions else self.snapshot.actor_name(item))
 
     @staticmethod
     def score(phrase: str, alias: str) -> float:
-        spoken = [_plural_stem(word) for word in phrase.split() if word not in {"the", "a", "an", "my", "our", "some", "of"}]
+        # "short-range" is spoken as two words, the way names are normalized ("Short-Range AA Nest").
+        spoken = [_plural_stem(word) for word in re.split(r"[\s\-]+", phrase.strip())
+                  if word and word not in {"the", "a", "an", "my", "our", "some", "of"}]
         name = [_plural_stem(word) for word in alias.split()]
         if not spoken or not name:
             return 0.0
-        if " ".join(spoken) == " ".join(name):
-            return 1.0
+        if " ".join(spoken) == " ".join(name) or "".join(spoken) == "".join(name):
+            return 1.0  # "pillbox" is "Pill Box"
         weights = [0.35 if word in GENERIC_NAME_WORDS else 1.0 for word in name]
         best = [max((_token_match(token, word) for token in spoken), default=0.0) for word in name]
         coverage = sum(weight * value for weight, value in zip(weights, best)) / sum(weights)
@@ -516,14 +539,16 @@ class Vocabulary:
         distinctive = any(value >= 0.85 and word not in GENERIC_NAME_WORDS for word, value in zip(name, best))
         if not unmatched and distinctive:
             # Every spoken word is part of the name ("rhino tank" for "Rhino Heavy Tank").
-            score = max(score, 0.9)
+            # An exact word beats a sound-alike ("basij" is Basij, not "bazooka").
+            exact = any(value >= 0.98 and word not in GENERIC_NAME_WORDS for word, value in zip(name, best))
+            score = max(score, 0.93 if exact else 0.9)
         return score
 
     def match_items(self, phrase: str, candidates: Iterable[str], threshold: float = 0.84) -> list[tuple[str, float]]:
         scored: list[tuple[str, float]] = []
         spoken_id = " ".join(_plural_stem(word) for word in phrase.split() if word not in {"the", "a", "an", "my", "our"})
         for item in candidates:
-            entry = self.entries.get(item.lower())
+            entry = self.entries.get(item.lower()) or self.roster.get(item.lower())
             aliases = entry.aliases if entry else (alias_text(self.display(item)),)
             best = max((self.score(phrase, alias) for alias in aliases), default=0.0)
             if spoken_id and spoken_id == base_type(item):
@@ -536,6 +561,36 @@ class Vocabulary:
             return []
         top = scored[0][1]
         return [pair for pair in scored if pair[1] >= top - 0.02]
+
+    def match_roster(self, phrase: str, *, want: str | None = None, threshold: float = 0.84) -> str | None:
+        """The faction item (available or not) a phrase names, in palette order on ties."""
+        pool = {**self.roster, **{item: entry for item, entry in self.entries.items() if base_type(item) in self.tree.items}}
+        scored: list[tuple[float, int, str]] = []
+        for item, entry in pool.items():
+            if want and entry.category != want:
+                continue
+            best = max((self.score(phrase, alias) for alias in entry.aliases), default=0.0)
+            if " ".join(_plural_stem(word) for word in phrase.split()) == base_type(item):
+                best = 1.0
+            if best >= threshold:
+                scored.append((best, self.tree.items.get(base_type(item), {}).get("order", 999), item))
+        if not scored:
+            return None
+        top = max(score for score, _, _ in scored)
+        return min((order, item) for score, order, item in scored if score >= top - 0.02)[1]
+
+    def match_foreign(self, phrase: str, threshold: float = 0.9) -> tuple[str, str] | None:
+        """(item, faction) when the phrase names another faction's unit or building."""
+        if not self.tree.confident:
+            return None
+        best: tuple[float, str, str] | None = None
+        for item, faction in self.tree.foreign_items():
+            aliases = {alias_text(alias) for alias in self.tree.aliases(item, faction)}
+            aliases.update(alias_text(alias) for alias in ALIASES.get(item, ()))
+            score = max((self.score(phrase, alias) for alias in aliases if alias), default=0.0)
+            if score >= threshold and (best is None or score > best[0]):
+                best = (score, item, faction)
+        return (best[1], best[2]) if best else None
 
     def match_catalog(self, phrase: str, threshold: float = 0.9) -> str | None:
         best: tuple[float, str] | None = None
@@ -646,6 +701,9 @@ DIRECTIONS: dict[str, tuple[int, int]] = {
 }
 
 
+RELATIVE_DIRECTIONS = tuple(words for words in DIRECTIONS if not re.search(r"north|south|east|west", words))
+
+
 def direction_target(snapshot: GameSnapshot, origin: tuple[int, int], vector: tuple[int, int]) -> tuple[int, int]:
     _, _, width, height = playable_bounds(snapshot)
     distance = max(8, round(min(width, height) / 3))
@@ -678,9 +736,14 @@ class OrderResult:
     path: str = "deterministic"
     notes: list[str] = field(default_factory=list)
     steps: list[dict[str, Any]] = field(default_factory=list)
+    # Items the player asked for that are not buildable yet; the proposal is their first prerequisite.
+    prerequisite_for: list[str] = field(default_factory=list)
 
     def as_metadata(self) -> dict[str, Any]:
-        return {"kind": self.kind, "path": self.path, "steps": self.steps, "notes": self.notes}
+        metadata: dict[str, Any] = {"kind": self.kind, "path": self.path, "steps": self.steps, "notes": self.notes}
+        if self.prerequisite_for:
+            metadata["prerequisite_for"] = self.prerequisite_for
+        return metadata
 
 
 class GroundingError(ValueError):
@@ -806,6 +869,7 @@ REFUSAL_TEXT = {
 # Deterministic parser
 # ---------------------------------------------------------------------------
 
+TRANSPORT_WORDS = r"\b(apc|apcs|transport|transports|carrier|ifv|personnel|chopper|helicopter|boat|lst|flak track)\b"
 _TARGET_PREPOSITIONS = r"(?:to|towards|toward|into|onto|at|over to|up to|near|by|next to|around|on|in|inside|in front of|behind)"
 _COORD = re.compile(r"\b(?:cell |position |coordinates? |x )?(\d{1,3})(?:,| |, | y | and )(\d{1,3})\b")
 # Pronouns and bare demonstratives depend on what the player is looking at;
@@ -967,9 +1031,16 @@ def _parse_clause(clause: str) -> Step | None:
         return Step("sell", item=found.group(1).strip(), source="parser")
 
     # Repair.
-    found = re.match(r"^(?:repair|fix|mend|patch up|patch)\s+(?:up\s+)?(.+)$", c)
+    found = re.match(r"^(?:repair|fix|mend|patch up|patch)\s+(?:up\s+)?(.+)$", c) or re.match(
+        r"^(?:start|begin|do)\s+(?:the\s+)?repair(?:s|ing)?\s+(?:on\s+|of\s+|to\s+)?(.+)$", c
+    )
     if found:
         return Step("repair", item=found.group(1).strip(), source="parser")
+
+    # Power down / up, object first ("turn the radar dome off").
+    found = re.match(r"^(?:turn|switch|shut|power)\s+(?:the\s+|my\s+|our\s+)?(.+?)\s+(?:off|down|on|back on|up)$", c)
+    if found and not re.search(r"\b(units?|tanks?|infantry|troops|army|everyone)\b", found.group(1)):
+        return Step("power_down", item=found.group(1).strip(), source="parser")
 
     # Deploy (MCV / deployable infantry).
     found = re.match(r"^(?:deploy|unpack|set up|setup|unfold|establish)\s+(?:the\s+|my\s+|our\s+|a\s+)?(.+)$", c)
@@ -977,13 +1048,23 @@ def _parse_clause(clause: str) -> Step | None:
         subject = found.group(1).strip()
         if re.fullmatch(r"(base|a base|the base|our base|camp|mcv|mcvs|construction yard|construction vehicle)", subject):
             subject = "mcv"
+        elif re.match(r"^(?:set up|setup|establish)\b", c) and _plural_stem(subject.split()[-1]) in BUILDING_WORDS:
+            # "set up a pillbox" builds one; deploying is for vehicles and infantry.
+            count, item = _strip_count(subject)
+            return Step("build", count=count, item=item, source="parser")
         return Step("deploy", units=subject, source="parser")
     if re.fullmatch(r"(?:build|make|set up|start) (?:a |the |our )?base(?: here)?", c):
         return Step("deploy", units="mcv", source="parser")
+    found = re.match(r"^(?:the\s+|my\s+|our\s+|all\s+)?(.+?)\s+(?:deploy|unpack|dig in|set up)(?:\s+(?:now|here|there))?$", c)
+    if found:
+        return Step("deploy", units=found.group(1).strip(), source="parser")
 
-    # Placement of finished structures.
+    # Placement of finished structures ("put four riflemen in the APC" boards a transport instead).
     found = re.match(r"^(?:place|put down|put|drop|plop|set down|position)\s+(?:the\s+|my\s+|our\s+|a\s+|that\s+)?(.+?)(?:\s+(?:down|somewhere|anywhere))?(?:\s+" + _TARGET_PREPOSITIONS + r"\s+(.+))?$", c)
-    if found and not re.search(r"\b(units?|tanks?|infantry|troops|army|harvesters?)\b", found.group(1)):
+    transport_target = bool(found and found.group(2) and re.search(TRANSPORT_WORDS, found.group(2)))
+    if found and not transport_target and not re.search(
+        r"\b(units?|tanks?|infantry|troops|army|harvesters?|riflem[ae]n|soldiers?|men|guys)\b", found.group(1)
+    ):
         return Step("place", item=found.group(1).strip(), target=(found.group(2) or "").strip(), source="parser")
 
     # Transport loading / unloading.
@@ -1013,6 +1094,11 @@ def _parse_clause(clause: str) -> Step | None:
         (r"demolish|blow up|plant c4 on|c4|plant explosives on|plant charges on|place c4 on|bomb", "demolish"),
     ):
         found = re.match(rf"^(?:(?:have|get|send|use|order)\s+(?:the\s+|my\s+|our\s+|an?\s+)?(.+?)\s+(?:to\s+)?)?(?:{verb})\s+(?:the\s+|that\s+|their\s+|an?\s+|enemy\s+)*(.+?)(?:\s+(?:with|using)\s+(?:the\s+|my\s+|our\s+|an?\s+)?(.+))?$", c)
+        if found is None:
+            # Subject first: "spy infiltrate the war factory", "engineers capture the derrick".
+            found = re.match(rf"^(?:the\s+|my\s+|our\s+|all\s+)?(.+?)\s+(?:{verb})\s+(?:the\s+|that\s+|their\s+|an?\s+|enemy\s+)*(.+?)()$", c)
+            if found is not None and IMPERATIVE_START.match(found.group(1)):
+                found = None
         if found:
             if action == "disguise":
                 target = re.sub(r"^(?:(?:as|like)\s+(?:an?\s+|the\s+|one of the\s+|enemy\s+)*)", "", found.group(2).strip())
@@ -1107,6 +1193,12 @@ def _parse_clause(clause: str) -> Step | None:
         subject = (found.group(2) or "").strip()
         action = "attack_move" if _is_place_reference(target) else "attack"
         return Step(action, units=subject, target=target, source="parser")
+    # Subject first: "light tanks focus the rifleman".
+    found = re.match(rf"^(?:all\s+)?(?:the\s+|my\s+|our\s+)?(.+?)\s+{ATTACK_VERBS}\s+(?:on\s+)?(?:the\s+|that\s+|those\s+|their\s+|enemy\s+)*(.+)$", c)
+    if found and not IMPERATIVE_START.match(found.group(1)):
+        target = found.group(2).strip()
+        action = "attack_move" if _is_place_reference(target) else "attack"
+        return Step(action, units=found.group(1).strip(), target=target, source="parser")
 
     # Movement.
     found = re.match(rf"^(?:{MOVE_VERBS})\s+(?:all\s+)?(?:the\s+|my\s+|our\s+)?(.+?)\s+{_TARGET_PREPOSITIONS}\s+(?:the\s+|our\s+|my\s+)?(.+)$", c)
@@ -1153,6 +1245,9 @@ class Grounder:
         self.planned_units: dict[str, int] = {}
         self.planned_harvesters = 0
         self.planned_buildings: set[str] = set()
+        # Explanations that lead the reply ("The Barracks needs a Power Plant first.").
+        self.leads: list[str] = []
+        self.prerequisites: list[str] = []
 
     # -- names ---------------------------------------------------------------
     def name(self, item: str) -> str:
@@ -1181,7 +1276,8 @@ class Grounder:
         units = self.mobile_units()
         text = normalize(phrase) if phrase else ""
         idle_only = bool(re.search(r"\bidle\b|\bunused\b|\bdoing nothing\b|\bsitting\b", text))
-        text = re.sub(r"\b(idle|unused|doing nothing|sitting around|sitting|the|my|our|all|every|each|of|your|available|remaining|spare|free|units? of)\b", " ", text)
+        # "the selected tanks": the observation carries no selection, so it means all of them.
+        text = re.sub(r"\b(idle|unused|doing nothing|sitting around|sitting|the|my|our|all|every|each|of|your|available|remaining|spare|free|units? of|selected|chosen|highlighted|current)\b", " ", text)
         text = _collapse(text)
         spoken_count, text = _strip_count(text)
         count = count or spoken_count
@@ -1338,7 +1434,7 @@ class Grounder:
         for words, vector in sorted(DIRECTIONS.items(), key=lambda item: -len(item[0])):
             if re.fullmatch(rf"(?:the\s+)?{words}(?:\s+(?:side|edge|part|of the map|end|flank))?(?:\s+of the map)?", text):
                 start = origin or own_base(snapshot) or (0, 0)
-                return direction_target(snapshot, start, vector), words
+                return direction_target(snapshot, start, vector), f"the {words}"
         if re.fullmatch(r"(center|centre|middle)(?: of the map)?", text):
             left, top, width, height = playable_bounds(snapshot)
             return (left + width // 2, top + height // 2), "the map center"
@@ -1406,22 +1502,9 @@ class Grounder:
             ordered = sorted(matches, key=lambda pair: available.index(pair[0]) if pair[0] in available else 999)
             item = ordered[0][0]
             return item, self.name(item)
-        words = text.split()
-        generic_only = all(word in {"more", "some", "new", "main", "basic", "battle", "regular", "standard", "few"} for word in words[:-1])
-        if words and generic_only and words[-1] in CLASS_WORDS and CLASS_WORDS[words[-1]] in {"tank", "infantry", "harvester"}:
-            wanted = CLASS_WORDS[words[-1]]
-            for item in pool:
-                entry = self.vocabulary.entries.get(item)
-                name = self.name(item).lower()
-                if entry and entry.category == "unit" and (
-                    (wanted == "tank" and "tank" in name)
-                    or (wanted == "harvester" and any(word in name for word in ("ore truck", "harvester", "miner")))
-                ):
-                    return item, self.name(item)
-            if wanted == "infantry":
-                for item in pool:
-                    if base_type(item) in {"e1", "e2", "cnrifle", "trrifle", "irbas", "sang", "ymr"}:
-                        return item, self.name(item)
+        generic = self._generic_item(text, pool)
+        if generic:
+            return generic, self.name(generic)
         known = self.vocabulary.match_items(text, self.vocabulary.names.keys())
         if known:
             return None, self.name(known[0][0])
@@ -1429,6 +1512,90 @@ class Grounder:
         if catalog:
             return None, catalog
         return None, ""
+
+    GENERIC_WORDS = frozenset({"more", "some", "new", "main", "basic", "battle", "regular", "standard", "few", "a", "an"})
+    NON_LINE_INFANTRY = ("engineer", "dog", "spy", "medic", "mechanic", "technician", "thief", "commando", "hero")
+
+    def _generic_item(self, text: str, pool: Iterable[str]) -> str | None:
+        """"tanks", "soldiers", "harvesters": the faction's standard item of that class, in palette order."""
+        words = text.split()
+        if not words or words[-1] not in CLASS_WORDS or not all(word in self.GENERIC_WORDS for word in words[:-1]):
+            return None
+        wanted = CLASS_WORDS[words[-1]]
+        if wanted not in {"tank", "infantry", "harvester"}:
+            return None
+        tree = self.vocabulary.tree
+        pool = list(pool)
+        if tree.known:
+            pool = sorted(pool, key=lambda item: (tree.items.get(base_type(item), {}).get("order", 999), pool.index(item)))
+        for item in pool:
+            entry = self.vocabulary.entries.get(item) or self.vocabulary.roster.get(item)
+            name = self.name(item).lower()
+            roster = tree.items.get(base_type(item), {})
+            if entry is None or entry.category != "unit":
+                continue
+            if wanted == "tank" and "tank" in name:
+                return item
+            if wanted == "harvester" and (any(word in name for word in ("ore truck", "harvester", "miner")) or base_type(item) in {"harv", "cmin"}):
+                return item
+            if wanted == "infantry" and (
+                base_type(item) in {"e1", "e2", "cnrifle", "trrifle", "irbas", "sang", "ymr"}
+                or (roster.get("queue") == "Infantry" and not any(word in name for word in self.NON_LINE_INFANTRY)
+                    and roster.get("cost", 0) <= 400)
+            ):
+                return item
+        return None
+
+    def roster_item(self, phrase: str, *, want: str | None = None) -> str | None:
+        """The faction item a phrase names even when it cannot be built yet."""
+        tree = self.vocabulary.tree
+        if not tree.known:
+            return None
+        text = normalize(phrase)
+        text = re.sub(r"^(?:the|a|an|my|our|some|more|new|another|extra)\s+", "", text)
+        if not text:
+            return None
+        item = self.vocabulary.match_roster(text, want=want)
+        if item is None:
+            item = self._generic_item(text, list(tree.items))
+        return base_type(item) if item else None
+
+    def prerequisite_step(self, item: str) -> tuple[list[dict], str]:
+        """Explain what an unavailable item needs, and offer the first step toward it."""
+        tree = self.vocabulary.tree
+        name = self.name(item)
+        requirement = tree.requirement(item)
+        if requirement.state == "met":
+            raise GroundingError(
+                f"You have everything the {name} needs, but it isn't in your build options right now"
+                + ("; its build limit may be reached." if tree.items.get(item, {}).get("limit") else "."),
+                "explain",
+            )
+        explanation = tree.explain(requirement)
+        blocker = requirement.blocker
+        blocker_name = self.name(blocker)
+        if requirement.state == "wait":
+            raise GroundingError(
+                f"{explanation} The {blocker_name} is {requirement.progress}% built; I'll offer to place it when it's ready.",
+                "explain",
+            )
+        if requirement.state == "unavailable":
+            raise GroundingError(explanation, "explain")
+        self.leads.append(explanation)
+        self.prerequisites.append(item)
+        if requirement.state == "place":
+            return [{"action": "place_building", "item_type": self._queued_item(blocker)}], f"Place the {blocker_name} for the {name}"
+        available = next(entry for entry in self.snapshot.available_production if base_type(entry) == blocker)
+        if blocker in self.planned_buildings:
+            return [], ""
+        self.planned_buildings.add(blocker)
+        return [{"action": "build", "item_type": available.lower()}], f"Build {_article(blocker_name)} for the {name}"
+
+    def _queued_item(self, item: str) -> str:
+        return next(
+            (str(entry.get("item", "")).lower() for entry in self.snapshot.production if base_type(str(entry.get("item", ""))) == item),
+            item,
+        )
 
     def production_command(self, step: Step) -> tuple[list[dict], str]:
         snapshot = self.snapshot
@@ -1441,6 +1608,12 @@ class Grounder:
                 self.notes.append(f"the {wanted} can be built once the Construction Yard is up")
                 return [{"action": "deploy", "actor_id": mcvs[0].actor_id}], "Deploy the Mobile Construction Vehicle first"
         if item is None:
+            roster = self.roster_item(step.item)
+            if roster is not None:
+                return self.prerequisite_step(roster)
+            foreign = self.vocabulary.match_foreign(normalize(step.item))
+            if foreign is not None:
+                raise GroundingError(self.vocabulary.tree.foreign_text(foreign[0]), "explain")
             if name:
                 raise GroundingError(
                     f"{name} isn't in your build options right now; it needs a production building or technology you don't have yet.",
@@ -1622,6 +1795,9 @@ class Grounder:
         if matches:
             item = matches[0][0]
         if item is None:
+            roster = self.roster_item(text, want="building")
+            if roster is not None:
+                return self.prerequisite_step(roster)
             if name:
                 raise GroundingError(f"{name} isn't available to build or place right now.", "explain")
             raise GroundingError(f"I don't recognize \"{step.item}\" as a building.")
@@ -1906,7 +2082,7 @@ def ground_steps(snapshot: GameSnapshot, steps: list[Step], *, path: str) -> Ord
     ]
     if commands:
         extra = [str(problem) for problem in problems]
-        message_parts = []
+        message_parts = list(dict.fromkeys(grounder.leads))
         if extra:
             message_parts.append(" ".join(extra))
         if grounder.notes:
@@ -1919,6 +2095,7 @@ def ground_steps(snapshot: GameSnapshot, steps: list[Step], *, path: str) -> Ord
             path=path,
             notes=list(dict.fromkeys(grounder.notes)),
             steps=described,
+            prerequisite_for=list(dict.fromkeys(grounder.prerequisites)),
         )
     if problems:
         first = problems[0]
@@ -1942,6 +2119,20 @@ def _bare_production(normalized: str, snapshot: GameSnapshot) -> OrderResult | N
     return ground_steps(snapshot, [Step("build", count=count, item=phrase, source="parser")], path="deterministic")
 
 
+def names_production_item(text: str, snapshot: GameSnapshot) -> bool:
+    """True when a production request names a real item ("train a Lynx Command Scout")."""
+    found = re.match(rf"^{PRODUCTION_VERBS}\s+(?:up\s+|out\s+|me\s+|us\s+|some\s+|more\s+)*(.+)$", normalize(text))
+    if not found:
+        return False
+    _, phrase = _strip_count(found.group(1))
+    if not phrase:
+        return False
+    vocabulary = Vocabulary(snapshot)
+    pool = [item.lower() for item in snapshot.available_production] + list(vocabulary.tree.items)
+    # Exact words only: a sound-alike ("scouts" ~ "squid") is not a named unit.
+    return bool(vocabulary.match_items(phrase, pool, threshold=0.93))
+
+
 def interpret_deterministic(text: str, snapshot: GameSnapshot) -> OrderResult | None:
     """Fast path: claim explicit commands whose every reference is concrete."""
     category = classify(text)
@@ -1960,9 +2151,14 @@ def interpret_deterministic(text: str, snapshot: GameSnapshot) -> OrderResult | 
         return _bare_production(normalized, snapshot)
     for step in steps:
         target = normalize(step.target)
+        if re.search(r"\b(that|this|those|these)\b", normalize(step.units)):
+            # "Move that tank east" names one unit on screen: the model sees the view.
+            return None
         if step.action in {"move", "attack_move", "rally"} and target:
-            bare_direction = any(re.fullmatch(rf"(?:the\s+)?{words}(?:\s+\w+)?", target) for words in DIRECTIONS)
-            if bare_direction and not re.search(r"\b(base|map)\b", target):
+            # Compass directions ground the same way whoever parses them ("send the tanks east"),
+            # so they no longer wait for a model call; screen-relative words still go to the model.
+            relative = any(re.fullmatch(rf"(?:the\s+)?{words}(?:\s+\w+)?", target) for words in RELATIVE_DIRECTIONS)
+            if relative and not re.search(r"\b(base|map)\b", target):
                 return None
         if step.action in {"move", "attack_move"} and not target:
             return None

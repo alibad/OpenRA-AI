@@ -87,6 +87,7 @@ $pyinstallerArguments = @(
     "--specpath", (Join-Path $WorkDirectory "spec"),
     "--collect-all", "sounddevice",
     "--collect-data", "agents",
+    "--collect-data", "openra_ai_companion",
     "--collect-all", "kokoro_onnx",
     "--collect-all", "espeakng_loader",
     "--collect-all", "phonemizer",
