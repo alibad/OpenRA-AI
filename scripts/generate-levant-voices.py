@@ -150,6 +150,12 @@ HEZBOLLAH = tuple(
         "attack": ("شايف الهدف.", "Eyes on target."),
         "action": ("الطريق مفتوح.", "Path is clear."),
     })
+    + lebanese("hz-fpv", "FPV drone team", "hezbollah-infantry", {
+        "select": ("فريق المسيرات جاهز.", "Drone team ready."),
+        "move": ("رايحين عالموقع الجديد.", "Moving to a new position."),
+        "attack": ("طلعنا المسيرات.", "Drones away."),
+        "action": ("الإشارة منيحة.", "Signal's good."),
+    })
     + lebanese("hz-veh", "generic vehicle crew", "hezbollah-crew", {
         "select": ("الطاقم جاهز.", "Crew ready."),
         "move": ("منتحرك هلق.", "Moving out."),

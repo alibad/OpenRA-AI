@@ -280,12 +280,12 @@
     {
       "id": "hezbollah",
       "name": "Hezbollah",
-      "title": "Concealed defense",
-      "tagline": "Hold the ground. Move before the counterattack.",
+      "title": "Salvo and swarm",
+      "tagline": "Few fighters. Many rockets. Small drones.",
       "story": "A fictional strategy-game roster built around light forces, concealed positions and vulnerable support nodes. It depicts gameplay roles, not real-world capability or operational doctrine.",
-      "playstyle": "Scout, spread out and control approaches with concealed positions. Guide missiles through spotters and signal posts, then relocate before close attackers or artillery arrive.",
-      "strengths": "Low-cost forces, stationary concealment, guided rocket pressure and agile coastal craft.",
-      "counterplay": "Detect concealed units, destroy signal posts and close the artillery minimum-range gap. Light armor loses concentrated fights.",
+      "playstyle": "Field a small core of veteran fighters, cover them with cheap rocket volleys and launch FPV drones from concealment. Fight from rough ground, keep drone teams inside their link and move launchers after each volley.",
+      "strengths": "Veteran infantry from the first minute, cheap rocket volume and regenerating micro-drones that cannons and artillery cannot hit.",
+      "counterplay": "Anti-air and small arms down FPV drones; kill the operator or leave the link. Close the rocket minimum range and use splash and detection against fewer, costlier fighters.",
       "heroAssetId": "hezbollah-roster",
       "accent": "#b3b881",
       "unitIds": [
@@ -293,10 +293,12 @@
         "hzat",
         "hzspotter",
         "hzscout",
+        "hzfpv",
         "hztechnical",
         "hzrecoilless",
         "hzescort",
         "hzrockets",
+        "hzrail",
         "hzdrone",
         "hzmissileboat",
         "hzskiff",
@@ -1233,7 +1235,7 @@
       "factionId": "hezbollah",
       "name": "Line Fighter",
       "role": "Line infantry",
-      "story": "Inexpensive rifle infantry. Conceals while stationary; moving, firing or taking damage reveals it. Detectors and artillery defeat isolated positions.",
+      "story": "Veteran rifle infantry, fewer and stronger: leaves the barracks Veteran, promotes quickly and takes less damage on rough ground. Conceals while stationary; moving, firing or taking damage reveals it. Detectors and splash defeat it.",
       "strengths": "Use the role and support relationships shown in the current mode’s rule-derived roster.",
       "counterplay": "Respect detection, range, armor and support dependencies; the local evaluation tools expose these tradeoffs.",
       "assetIds": [
@@ -1250,7 +1252,7 @@
           "role": "Line infantry"
         },
         "ra2": {
-          "description": "Inexpensive rifle infantry. Conceals while stationary; moving, firing or taking damage reveals it. Detectors and artillery defeat isolated positions.",
+          "description": "Veteran rifle infantry, fewer and stronger: leaves the barracks Veteran, promotes quickly and takes less damage on rough ground. Conceals while stationary; moving, firing or taking damage reveals it. Detectors and splash defeat it.",
           "actorId": "r2hzrifle",
           "repository": "mod",
           "rulesPath": "mods/rtsai/modern-factions/hezbollah-roster.yaml",
@@ -1264,7 +1266,7 @@
       "factionId": "hezbollah",
       "name": "Ridge Missile Team",
       "role": "Anti armor",
-      "story": "Light anti-armor missile infantry. A signal post or scout improves range and reload. Vulnerable to infantry, detectors and air attacks.",
+      "story": "Veteran ambush team with a basic shoulder-fired rocket. Conceals while stationary; a signal post or spotter improves range and reload. Vulnerable to infantry, detectors and air attacks.",
       "strengths": "Use the role and support relationships shown in the current mode’s rule-derived roster.",
       "counterplay": "Respect detection, range, armor and support dependencies; the local evaluation tools expose these tradeoffs.",
       "assetIds": [
@@ -1281,7 +1283,7 @@
           "role": "Anti armor"
         },
         "ra2": {
-          "description": "Light anti-armor missile infantry. A signal post or scout improves range and reload. Vulnerable to infantry, detectors and air attacks.",
+          "description": "Veteran ambush team with a basic shoulder-fired rocket. Conceals while stationary; a signal post or spotter improves range and reload. Vulnerable to infantry, detectors and air attacks.",
           "actorId": "r2hzat",
           "repository": "mod",
           "rulesPath": "mods/rtsai/modern-factions/hezbollah-roster.yaml",
@@ -1295,7 +1297,7 @@
       "factionId": "hezbollah",
       "name": "Field Spotter",
       "role": "Support",
-      "story": "Reconnaissance specialist who detects cloaked units and guides nearby eligible missile teams and vehicles. A weak weapon makes escorts essential.",
+      "story": "Veteran reconnaissance specialist who detects cloaked units, guides nearby missile teams, rocket vehicles and FPV teams, and relays the FPV drone link. A weak weapon makes escorts essential.",
       "strengths": "Use the role and support relationships shown in the current mode’s rule-derived roster.",
       "counterplay": "Respect detection, range, armor and support dependencies; the local evaluation tools expose these tradeoffs.",
       "assetIds": [
@@ -1312,7 +1314,7 @@
           "role": "Support"
         },
         "ra2": {
-          "description": "Reconnaissance specialist who detects cloaked units and guides nearby eligible missile teams and vehicles. A weak weapon makes escorts essential.",
+          "description": "Veteran reconnaissance specialist who detects cloaked units, guides nearby missile teams, rocket vehicles and FPV teams, and relays the FPV drone link. A weak weapon makes escorts essential.",
           "actorId": "r2hzspotter",
           "repository": "mod",
           "rulesPath": "mods/rtsai/modern-factions/hezbollah-roster.yaml",
@@ -1326,7 +1328,7 @@
       "factionId": "hezbollah",
       "name": "Cedar Scout",
       "role": "Line infantry",
-      "story": "One concealed scout with a suppressed carbine and demolition ability. Stationary concealment breaks when firing, moving or damaged. Vulnerable once detected.",
+      "story": "The faction's hero: one concealed scout who leaves the barracks Elite, with a suppressed carbine and demolition ability. Firing or damage breaks concealment. Vulnerable once detected.",
       "strengths": "Use the role and support relationships shown in the current mode’s rule-derived roster.",
       "counterplay": "Respect detection, range, armor and support dependencies; the local evaluation tools expose these tradeoffs.",
       "assetIds": [
@@ -1343,12 +1345,35 @@
           "role": "Line infantry"
         },
         "ra2": {
-          "description": "One concealed scout with a suppressed carbine and demolition ability. Stationary concealment breaks when firing, moving or damaged. Vulnerable once detected.",
+          "description": "The faction's hero: one concealed scout who leaves the barracks Elite, with a suppressed carbine and demolition ability. Firing or damage breaks concealment. Vulnerable once detected.",
           "actorId": "r2hzscout",
           "repository": "mod",
           "rulesPath": "mods/rtsai/modern-factions/hezbollah-roster.yaml",
           "name": "Cedar Scout",
           "role": "Line infantry"
+        }
+      }
+    },
+    {
+      "id": "hzfpv",
+      "factionId": "hezbollah",
+      "name": "FPV Team",
+      "role": "Drone swarm",
+      "story": "Veteran drone team that launches three one-way FPV micro-drones at targets in range and regrows one every few seconds. Strong against infantry and light vehicles. Drones crash outside the team's link; anti-air and small arms shoot them down, and killing the team downs them.",
+      "strengths": "Use the role and support relationships shown in the current mode’s rule-derived roster.",
+      "counterplay": "Respect detection, range, armor and support dependencies; the local evaluation tools expose these tradeoffs.",
+      "assetIds": [
+        "hezbollah-hzfpv-source",
+        "hezbollah-hzfpv-cameo"
+      ],
+      "variants": {
+        "ra2": {
+          "description": "Veteran drone team that launches three one-way FPV micro-drones at targets in range and regrows one every few seconds. Strong against infantry and light vehicles. Drones crash outside the team's link; anti-air and small arms shoot them down, and killing the team downs them.",
+          "actorId": "r2hzfpv",
+          "repository": "mod",
+          "rulesPath": "mods/rtsai/modern-factions/hezbollah-roster.yaml",
+          "name": "FPV Team",
+          "role": "Drone swarm"
         }
       }
     },
@@ -1388,7 +1413,7 @@
       "factionId": "hezbollah",
       "name": "Recoilless Technical",
       "role": "Anti armor",
-      "story": "Mobile anti-armor fire on a fragile chassis. Signal coverage improves range and reload. Infantry and aircraft punish exposed vehicles.",
+      "story": "Inexpensive mobile anti-armor fire on a fragile chassis. Signal coverage improves range and reload. Infantry and aircraft punish exposed vehicles.",
       "strengths": "Use the role and support relationships shown in the current mode’s rule-derived roster.",
       "counterplay": "Respect detection, range, armor and support dependencies; the local evaluation tools expose these tradeoffs.",
       "assetIds": [
@@ -1405,7 +1430,7 @@
           "role": "Anti armor"
         },
         "ra2": {
-          "description": "Mobile anti-armor fire on a fragile chassis. Signal coverage improves range and reload. Infantry and aircraft punish exposed vehicles.",
+          "description": "Inexpensive mobile anti-armor fire on a fragile chassis. Signal coverage improves range and reload. Infantry and aircraft punish exposed vehicles.",
           "actorId": "r2hzrecoilless",
           "repository": "mod",
           "rulesPath": "mods/rtsai/modern-factions/hezbollah.yaml",
@@ -1450,7 +1475,7 @@
       "factionId": "hezbollah",
       "name": "Mobile Rocket Battery",
       "role": "Artillery",
-      "story": "Long-range rocket artillery with a minimum range and a slow reload. Must stop to set up its stabilized firing cycle. Scouts or signal posts improve guided fire; close attacks force withdrawal.",
+      "story": "Rocket artillery: a volley of eight unguided rockets with wide scatter, a minimum range and a slow reload. Must stop to set up its stabilized firing cycle. Spotters or signal posts improve range and reload; close attacks force withdrawal.",
       "strengths": "Use the role and support relationships shown in the current mode’s rule-derived roster.",
       "counterplay": "Respect detection, range, armor and support dependencies; the local evaluation tools expose these tradeoffs.",
       "assetIds": [
@@ -1467,7 +1492,7 @@
           "role": "Artillery"
         },
         "ra2": {
-          "description": "Long-range rocket artillery with a minimum range and a slow reload. Must stop to set up its stabilized firing cycle. Scouts or signal posts improve guided fire; close attacks force withdrawal.",
+          "description": "Rocket artillery: a volley of eight unguided rockets with wide scatter, a minimum range and a slow reload. Must stop to set up its stabilized firing cycle. Spotters or signal posts improve range and reload; close attacks force withdrawal.",
           "actorId": "r2hzrockets",
           "repository": "mod",
           "rulesPath": "mods/rtsai/modern-factions/hezbollah.yaml",
@@ -1477,11 +1502,34 @@
       }
     },
     {
+      "id": "hzrail",
+      "factionId": "hezbollah",
+      "name": "Rail Technical",
+      "role": "Artillery",
+      "story": "Inexpensive rocket pickup: four unguided rockets with scatter, a minimum range and a slow reload; no radar needed. Spotters or signal posts improve range and reload. Fragile up close.",
+      "strengths": "Use the role and support relationships shown in the current mode’s rule-derived roster.",
+      "counterplay": "Respect detection, range, armor and support dependencies; the local evaluation tools expose these tradeoffs.",
+      "assetIds": [
+        "hezbollah-hzrail-source",
+        "hezbollah-hzrail-cameo"
+      ],
+      "variants": {
+        "ra2": {
+          "description": "Inexpensive rocket pickup: four unguided rockets with scatter, a minimum range and a slow reload; no radar needed. Spotters or signal posts improve range and reload. Fragile up close.",
+          "actorId": "r2hzrail",
+          "repository": "mod",
+          "rulesPath": "mods/rtsai/modern-factions/hezbollah.yaml",
+          "name": "Rail Technical",
+          "role": "Artillery"
+        }
+      }
+    },
+    {
       "id": "hzdrone",
       "factionId": "hezbollah",
       "name": "Loiter Drone",
       "role": "Strike aircraft",
-      "story": "One-way airborne attack that consumes the drone. Scout the target first. Anti-air fire destroys it before impact.",
+      "story": "Light one-way airborne attack that consumes the drone. Scout the target first. Anti-air fire destroys it before impact.",
       "strengths": "Use the role and support relationships shown in the current mode’s rule-derived roster.",
       "counterplay": "Respect detection, range, armor and support dependencies; the local evaluation tools expose these tradeoffs.",
       "assetIds": [
@@ -1498,7 +1546,7 @@
           "role": "Strike aircraft"
         },
         "ra2": {
-          "description": "One-way airborne attack that consumes the drone. Scout the target first. Anti-air fire destroys it before impact.",
+          "description": "Light one-way airborne attack that consumes the drone. Scout the target first. Anti-air fire destroys it before impact.",
           "actorId": "r2hzdrone",
           "repository": "mod",
           "rulesPath": "mods/rtsai/modern-factions/hezbollah-roster.yaml",
@@ -1512,7 +1560,7 @@
       "factionId": "hezbollah",
       "name": "Coastal Missile Boat",
       "role": "Naval screen",
-      "story": "Light guided-missile craft. Coverage from a scout boat supports coordinated fire; poor armor demands spacing and an escort.",
+      "story": "Light missile craft firing three-missile salvos. Coverage from a scout boat supports coordinated fire; poor armor demands spacing and an escort.",
       "strengths": "Use the role and support relationships shown in the current mode’s rule-derived roster.",
       "counterplay": "Respect detection, range, armor and support dependencies; the local evaluation tools expose these tradeoffs.",
       "assetIds": [
@@ -1529,7 +1577,7 @@
           "role": "Naval screen"
         },
         "ra2": {
-          "description": "Light guided-missile craft. Coverage from a scout boat supports coordinated fire; poor armor demands spacing and an escort.",
+          "description": "Light missile craft firing three-missile salvos. Coverage from a scout boat supports coordinated fire; poor armor demands spacing and an escort.",
           "actorId": "r2hzmissileboat",
           "repository": "mod",
           "rulesPath": "mods/rtsai/modern-factions/hezbollah-roster.yaml",
@@ -1667,7 +1715,7 @@
       "factionId": "hezbollah",
       "name": "Coastal Missile Emplacement",
       "role": "Anti armor",
-      "story": "Concealed missile defense against ground vehicles and ships. Minimum range leaves a close-attack window. Detection and infantry counter it.",
+      "story": "Concealed missile defense firing four-missile salvos at ground vehicles and ships. Minimum range leaves a close-attack window. Detection and infantry counter it.",
       "strengths": "Use the role and support relationships shown in the current mode’s rule-derived roster.",
       "counterplay": "Respect detection, range, armor and support dependencies; the local evaluation tools expose these tradeoffs.",
       "assetIds": [
@@ -1684,7 +1732,7 @@
           "role": "Anti armor"
         },
         "ra2": {
-          "description": "Concealed missile defense against ground vehicles and ships. Minimum range leaves a close-attack window. Detection and infantry counter it.",
+          "description": "Concealed missile defense firing four-missile salvos at ground vehicles and ships. Minimum range leaves a close-attack window. Detection and infantry counter it.",
           "actorId": "r2hzcoastal",
           "repository": "mod",
           "rulesPath": "mods/rtsai/modern-factions/hezbollah-roster.yaml",
@@ -1698,7 +1746,7 @@
       "factionId": "hezbollah",
       "name": "Signal Post",
       "role": "Support structure",
-      "story": "A powered, unarmed support building. Local benefits end when it is destroyed or loses power.",
+      "story": "Powered six-cell support, FPV drone link and five-cell cloak detection. Eligible guided units gain range and reload bonuses; bonuses do not stack.",
       "strengths": "Supports eligible friendly units inside its visible range. Multiple sources do not multiply the bonus.",
       "counterplay": "Cut power, destroy the exposed node or fight outside its range.",
       "assetIds": [
@@ -1718,7 +1766,8 @@
           "repository": "mod",
           "rulesPath": "mods/rtsai/modern-factions/hezbollah-roster.yaml",
           "name": "Signal Post",
-          "role": "Support structure"
+          "role": "Support structure",
+          "description": "Powered six-cell support, FPV drone link and five-cell cloak detection. Eligible guided units gain range and reload bonuses; bonuses do not stack."
         }
       }
     },
