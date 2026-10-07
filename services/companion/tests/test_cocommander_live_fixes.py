@@ -379,6 +379,18 @@ class OrderParsingTests(unittest.TestCase):
         basij = nl_orders.interpret_deterministic("train some basij", fixture("ra-iran-army"))
         self.assertEqual(basij.commands[0]["item_type"], "irbas")  # not the sound-alike "bazooka"
 
+    def test_bare_build_asks_instead_of_guessing_an_item(self) -> None:
+        # The live model used to invent "Build a War Factory" for a bare "build" (an unsafe accept).
+        result = nl_orders.interpret_deterministic("build", fixture("ra-england-army"))
+        self.assertEqual(result.kind, "clarify")
+        self.assertIn("?", result.message)
+
+    def test_disguise_without_a_target_asks_what_to_disguise_as(self) -> None:
+        step = nl_orders.Step("disguise", units="spy", target="yourself", source="model")
+        result = nl_orders.ground_steps(fixture("ra-mission-allies-05a-spy-infiltration"), [step], path="model")
+        self.assertEqual(result.kind, "clarify")
+        self.assertTrue(result.message.startswith("What should the spy disguise as?"))
+
     def test_named_scout_unit_is_trained_not_sent_scouting(self) -> None:
         bot, _, _ = companion()
         bot.update_snapshot(fixture("ra2-china-army"))

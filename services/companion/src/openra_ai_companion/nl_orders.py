@@ -2030,11 +2030,11 @@ class Grounder:
                 chosen = min((target for target in targets if target.kind.lower() in kinds),
                              key=lambda target: (target.cell_x - unit.cell_x) ** 2 + (target.cell_y - unit.cell_y) ** 2)
             else:
-                raise GroundingError(
-                    f"That isn't a valid {action} target right now. Valid targets: "
-                    + ", ".join(sorted({self.name(target.kind) for target in targets})[:5]) + ".",
-                    "clarify",
-                )
+                options = ", ".join(sorted({self.name(target.kind) for target in targets})[:5])
+                if action == "disguise":
+                    # "disguise yourself" names no target: ask, as for a bare "disguise".
+                    raise GroundingError(f"What should the spy disguise as? Options: {options}.", "clarify")
+                raise GroundingError(f"Which target do you mean? Valid {action} targets right now: {options}.", "clarify")
         elif targets:
             if len({target.kind.lower() for target in targets}) == 1 or action in {"demolish", "capture", "infiltrate"}:
                 chosen = min(targets, key=lambda target: (target.cell_x - unit.cell_x) ** 2 + (target.cell_y - unit.cell_y) ** 2)
@@ -2143,6 +2143,9 @@ def interpret_deterministic(text: str, snapshot: GameSnapshot) -> OrderResult | 
         return _bare_production(normalized, snapshot)
     if category != "command":
         return None
+    if re.fullmatch(rf"{PRODUCTION_VERBS}(?:\s+(?:something|stuff|anything|more|some|things?))?", normalized):
+        # A bare "build" names nothing to build; a model would only guess an item.
+        return OrderResult("clarify", "What should I build or train?", path="deterministic")
     # Deictic and relative references benefit from the model (and vision).
     if DEICTIC.search(normalized) and not re.search(r"\b(place|put) (it|that|them)\b|^(place|put) (it|that)", normalized):
         return None
