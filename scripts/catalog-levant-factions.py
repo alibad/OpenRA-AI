@@ -7,6 +7,8 @@ rules=runpy.run_path(str(Path(__file__).with_name('build-levant-factions.py')))
 ROOT=rules['ROOT'];path=ROOT/'OpenRA-AI/catalog/factions.json'
 catalog=json.loads(path.read_text(encoding='utf-8'))
 catalog['revision']='2026-10-04.1'
+# Identity, rival views and flavour are authored editorial text (validated by content_catalog.py), not rule facts: keep them.
+narrative={f['id']:{k:f[k] for k in ('identity','rivalViews','flavour') if k in f} for f in catalog['factions']}
 catalog['factions']=[f for f in catalog['factions'] if f['id'] not in rules['FACTIONS']]
 catalog['units']=[u for u in catalog['units'] if u['factionId'] not in rules['FACTIONS']]
 for f,(_,units,title,side) in rules['FACTIONS'].items():
@@ -18,6 +20,7 @@ for f,(_,units,title,side) in rules['FACTIONS'].items():
   'counterplay':'Attack support nodes, cut power and surround expensive units with anti-armor or air threats.' if allied else 'Detect concealed units, destroy signal posts and close the artillery minimum-range gap. Light armor loses concentrated fights.',
   'heroAssetId':f+'-roster','accent':'#80b8ff' if allied else '#b3b881','unitIds':[u[1][2:] for u in units]+[('il' if allied else 'hz')+s for s in ('relay','workshop')],
   'variants':{m:{'status':'implemented','profileId':'world-war-iii' if m=='ra' else 'ra2-modern','description':'Local development roster. Native rules and authored art are present; final art approval, broad balance validation and release confirmation remain pending.','engineFactionId':f,'name':f.capitalize()} for m in ('ra','ra2')}})
+ catalog['factions'][-1].update(narrative.get(f,{}))
  for _,actor,_,name,role,description in units:
   key=actor[2:]
   catalog['units'].append({'id':key,'factionId':f,'name':name,'role':role.replace('-',' ').capitalize(),'story':description,'strengths':'Use the role and support relationships shown in the current mode’s rule-derived roster.','counterplay':'Respect detection, range, armor and support dependencies; the local evaluation tools expose these tradeoffs.','assetIds':[f+'-'+key+'-source',f+'-'+key+'-cameo'],

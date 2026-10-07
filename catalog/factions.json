@@ -1,8 +1,11 @@
 {
   "schemaVersion": 1,
   "id": "modern-factions",
-  "revision": "2026-10-04.1",
+  "revision": "2026-10-07.1",
   "scope": "Curated faction guide and signature units; not the complete build roster or a balance database.",
+  "narrative": {
+    "framing": "In-world perspectives in a fictional game conflict. Each identity is a faction's own in-game self-image; each rival view is in-game propaganda or a grievance voiced by a named rival faction. None of it describes real people, faiths or events, or the real-world capability of any force."
+  },
   "sources": {
     "engineCommit": "cd9bcba176db0cb4265739a08fa41bb3c125d195",
     "productCommit": "8fc59f71ab71a5e4834f8476506a65c01d734a05",
@@ -99,6 +102,49 @@
           "engineFactionId": "china",
           "name": "China"
         }
+      },
+      "identity": {
+        "motto": "Many hands. One network.",
+        "story": "We remember an age when others drew the lines of our coast for us, and we promised it would never happen again. Our strength is not one hero but millions working as one: engineers, sailors, scouts and tank crews linked into a single network. We build ports, roads and ships, and we defend what we have built. Patience and discipline are our oldest virtues, so when the network moves, it moves together. We fight so that the sea brings trade to our shores, never invaders.",
+        "keywords": [
+          "Unity",
+          "Discipline",
+          "Renewal"
+        ]
+      },
+      "rivalViews": [
+        {
+          "rival": "turkey",
+          "kind": "propaganda",
+          "text": "Haitan engineers lay roads and ports across half the world and call it partnership. Every new pier seems long enough for a carrier, and every loan arrives with a network attached."
+        },
+        {
+          "rival": "saudi-arabia",
+          "kind": "grievance",
+          "text": "They enter our sea lanes as customers and stay as a navy. Their drone carriers patrol waters they never had to defend, and nobody outside the network ever gets a say."
+        },
+        {
+          "rival": "yemen",
+          "kind": "grievance",
+          "text": "Distant fleets sail into our waters and call it protecting trade. Whose trade, and whose waters? A network that watches everything still does not understand the people on the shore."
+        }
+      ],
+      "flavour": {
+        "loading": [
+          {
+            "perspective": "self",
+            "text": "The network is awake. What one unit sees, every unit sees."
+          },
+          {
+            "perspective": "rival",
+            "rival": "turkey",
+            "text": "Every Haitan pier is long enough for a carrier. Ask yourself why."
+          }
+        ],
+        "voiceIdeas": [
+          "Network linked. Choose the ground.",
+          "Many hands, one signal."
+        ]
       }
     },
     {
@@ -131,6 +177,49 @@
           "engineFactionId": "iran",
           "name": "Iran"
         }
+      },
+      "identity": {
+        "motto": "Every approach is ours to guard.",
+        "story": "We are heirs of a civilization older than most of the maps that tried to draw us smaller. Our poets taught us to love this land, and our faith taught us patience and the dignity of sacrifice. Long years of pressure did not break us; they taught us to build our own tanks, our own air defense and our own way of fighting. We do not need to reach far, only to make every mountain pass and every mile of coast cost an invader more than he can pay. Sovereignty is not given; it is guarded.",
+        "keywords": [
+          "Sovereignty",
+          "Patience",
+          "Heritage"
+        ]
+      },
+      "rivalViews": [
+        {
+          "rival": "israel",
+          "kind": "propaganda",
+          "text": "Iran's command calls it defense, yet its rockets and drones keep turning up on every front line except its own. A country that guards its own passes so carefully is remarkably generous with other people's wars."
+        },
+        {
+          "rival": "saudi-arabia",
+          "kind": "grievance",
+          "text": "They speak of brotherhood across the Gulf while their missile ranges grow every year. A neighbour that turns every coastline into a firing range cannot be trusted with straits the whole region depends on."
+        },
+        {
+          "rival": "turkey",
+          "kind": "propaganda",
+          "text": "An old rival wearing new slogans. They would rather ring a region with fortresses than trade with it openly, and their layered defenses are built to keep out change as much as enemies."
+        }
+      ],
+      "flavour": {
+        "loading": [
+          {
+            "perspective": "self",
+            "text": "Every pass guarded, every coast contested. Let the enemy choose a road."
+          },
+          {
+            "perspective": "rival",
+            "rival": "saudi-arabia",
+            "text": "Their talk is of brotherhood. Their missile ranges grow every year."
+          }
+        ],
+        "voiceIdeas": [
+          "Coverage holding. Let them come.",
+          "Patience. Wait for the gap."
+        ]
       }
     },
     {
@@ -163,6 +252,49 @@
           "engineFactionId": "turkey",
           "name": "Türkiye"
         }
+      },
+      "identity": {
+        "motto": "The homeland first. The initiative always.",
+        "story": "Anatolia has been a crossroads and a shield for thousands of years, and we are its guardians. We call every soldier Mehmetçik, and the whole nation stands behind that name. We build our own drones, our own armor and our own future, so no distant capital can switch them off. We are a bridge between continents, and a bridge must be guarded from both sides. Independence, honour and hospitality are not slogans to us; they are the oath we keep.",
+        "keywords": [
+          "Homeland",
+          "Independence",
+          "Initiative"
+        ]
+      },
+      "rivalViews": [
+        {
+          "rival": "iran",
+          "kind": "propaganda",
+          "text": "They keep one foot in a distant alliance and the other on their neighbours' borders. Their drones are sold to every side of every quarrel, and they call that independence."
+        },
+        {
+          "rival": "china",
+          "kind": "grievance",
+          "text": "Ankara dreams of trade corridors that bypass everyone else's and calls its ambition a bridge. A guard who decides who may cross is no longer a bridge; he is a tollgate."
+        },
+        {
+          "rival": "hezbollah",
+          "kind": "grievance",
+          "text": "They speak for the region in every forum, then send armor across their neighbours' borders and call it security. The Anatolian Guard moves fast, and it rarely asks permission."
+        }
+      ],
+      "flavour": {
+        "loading": [
+          {
+            "perspective": "self",
+            "text": "A bridge between continents must be guarded from both sides."
+          },
+          {
+            "perspective": "rival",
+            "rival": "iran",
+            "text": "One foot in a distant alliance, the other on our border."
+          }
+        ],
+        "voiceIdeas": [
+          "Mehmetçik, forward!",
+          "Drone eyes up. Keep moving."
+        ]
       }
     },
     {
@@ -195,6 +327,49 @@
           "engineFactionId": "saudi",
           "name": "Saudi Arabia"
         }
+      },
+      "identity": {
+        "motto": "Guard the lifeline. Keep your word.",
+        "story": "We are children of the desert and the sea, from families who kept their word when the land gave them little else. Our faith teaches generosity to the guest and steadfastness in hardship, and we hold to both. Today we are building cities, industries and a future our grandparents could only imagine. The Red Sea corridor carries that future and the livelihoods of millions on both shores, so we hold it open. Our National Guard stands where the line must not break.",
+        "keywords": [
+          "Faith",
+          "Honour",
+          "Ambition"
+        ]
+      },
+      "rivalViews": [
+        {
+          "rival": "yemen",
+          "kind": "grievance",
+          "text": "They answered our quarrels with air power and blockades, and called it stability. Their wealth can buy the heaviest armor in the world, but it cannot buy our consent."
+        },
+        {
+          "rival": "iran",
+          "kind": "propaganda",
+          "text": "They own the newest tanks money can buy and still invite distant powers to guard their skies. A fortress rented from strangers is only as loyal as the next payment."
+        },
+        {
+          "rival": "hezbollah",
+          "kind": "grievance",
+          "text": "Their money moves faster than their armies, and it always seems to arrive on the far side of our fight. They lecture the region about stability while choosing partners by what they can sell."
+        }
+      ],
+      "flavour": {
+        "loading": [
+          {
+            "perspective": "self",
+            "text": "The corridor carries a nation's future. Hold it."
+          },
+          {
+            "perspective": "rival",
+            "rival": "yemen",
+            "text": "Wealth buys armor. It cannot buy consent."
+          }
+        ],
+        "voiceIdeas": [
+          "The line holds.",
+          "Guard rolling. Corridor secure."
+        ]
       }
     },
     {
@@ -227,6 +402,49 @@
           "engineFactionId": "yemen",
           "name": "Yemen"
         }
+      },
+      "identity": {
+        "motto": "Steadfast as the mountains.",
+        "story": "Ours is the ancient land of Saba, of terraced mountains, coffee and caravan roads older than empires. We are mountain people and sea people, bound by tribe, faith and an unbending sense of dignity. Others have tried to command these mountains, and the mountains outlasted them. We have little steel, so we fight with speed, patience and ingenuity: a pickup truck, a drone and a crew that knows every road. We would rather be poor and free than rich and told where to stand.",
+        "keywords": [
+          "Steadfastness",
+          "Dignity",
+          "Ingenuity"
+        ]
+      },
+      "rivalViews": [
+        {
+          "rival": "saudi-arabia",
+          "kind": "grievance",
+          "text": "They turn a sea lane that feeds two continents into a gamble. Their drones are cheap, but every merchant crew they endanger belongs to someone who never chose a side."
+        },
+        {
+          "rival": "israel",
+          "kind": "propaganda",
+          "text": "Their command fires at targets far beyond its own borders to win applause at home. A leadership that needs a distant enemy to stay united is fighting for slogans, not for the people it claims to protect."
+        },
+        {
+          "rival": "china",
+          "kind": "propaganda",
+          "text": "Harassing a shipping lane does not make anyone a navy. Every container they delay raises the price of bread in ports that have nothing to do with their war."
+        }
+      ],
+      "flavour": {
+        "loading": [
+          {
+            "perspective": "self",
+            "text": "We have little steel, so we bring patience. And speed."
+          },
+          {
+            "perspective": "rival",
+            "rival": "china",
+            "text": "Every container they delay raises the price of bread somewhere far away."
+          }
+        ],
+        "voiceIdeas": [
+          "Hit hard, then gone.",
+          "The mountains are with us."
+        ]
       }
     },
     {
@@ -275,6 +493,49 @@
           "engineFactionId": "israel",
           "name": "Israel"
         }
+      },
+      "identity": {
+        "motto": "Every soldier covered. Every home defended.",
+        "story": "Our country is small enough to cross in an afternoon, so every border is a front door. Most of us are reservists: teachers, engineers and farmers who leave the family table when the call comes. We carry a long memory, and it taught us to trust our own hands, our own ingenuity and one another. In our formations nobody moves alone: the observer, the tank and the shield cover each other. We do not fight to be feared; we fight so that our children can sleep.",
+        "keywords": [
+          "Protection",
+          "Ingenuity",
+          "Memory"
+        ]
+      },
+      "rivalViews": [
+        {
+          "rival": "hezbollah",
+          "kind": "grievance",
+          "text": "They fly over our hills as if the sky belonged to them. Behind all that precision is a command that has never learned to leave other people's ground."
+        },
+        {
+          "rival": "iran",
+          "kind": "propaganda",
+          "text": "They call their walls and interceptors defense, yet their reach always seems to end in someone else's country. Precision without restraint is still a very long arm."
+        },
+        {
+          "rival": "yemen",
+          "kind": "grievance",
+          "text": "They trust machines more than neighbours, and every wall they build makes the region smaller. Their formations are protected so carefully that they forget who is standing outside them."
+        }
+      ],
+      "flavour": {
+        "loading": [
+          {
+            "perspective": "self",
+            "text": "Nobody moves alone. The observer, the tank and the shield cover each other."
+          },
+          {
+            "perspective": "rival",
+            "rival": "hezbollah",
+            "text": "They fly over our hills as if the sky belonged to them."
+          }
+        ],
+        "voiceIdeas": [
+          "Formation covered. Moving together.",
+          "Reservists, to the line."
+        ]
       }
     },
     {
@@ -324,6 +585,49 @@
           "engineFactionId": "hezbollah",
           "name": "Hezbollah"
         }
+      },
+      "identity": {
+        "motto": "Patience is our armor. The hills are our walls.",
+        "story": "We are sons and daughters of the southern hills, raised among olive groves, stone villages and the call to prayer. Our faith teaches patience, and patience has outlasted stronger armies. We have no fleets of jets, so we mastered what is simple, small and many: basic rockets, drones that fit in two hands, and hidden positions in every fold of the ridge. Our elite fighters train for years, and each of them carries the trust of a whole village. We do not fight for conquest; we fight so the villages behind us wake up free.",
+        "keywords": [
+          "Faith",
+          "Patience",
+          "Resistance"
+        ]
+      },
+      "rivalViews": [
+        {
+          "rival": "israel",
+          "kind": "propaganda",
+          "text": "They dig launchers into the hills and call it resistance. An armed movement that answers to a distant patron decides when a whole country goes to war, and the country is never asked."
+        },
+        {
+          "rival": "turkey",
+          "kind": "propaganda",
+          "text": "Guns outside a state's command are a debt the whole nation ends up paying. A militia with its own missiles is not a shield; it is a second army that no parliament approved."
+        },
+        {
+          "rival": "china",
+          "kind": "grievance",
+          "text": "Wars without front lines are poison for every port and partner. Their cheap rockets and swarms of tiny drones make the whole coast too dangerous to trade with, and they call that deterrence."
+        }
+      ],
+      "flavour": {
+        "loading": [
+          {
+            "perspective": "self",
+            "text": "Simple rockets. Small wings. Fighters who know every ridge."
+          },
+          {
+            "perspective": "rival",
+            "rival": "israel",
+            "text": "An armed movement that decides when a whole country goes to war."
+          }
+        ],
+        "voiceIdeas": [
+          "Quiet now. Let the ridge hide us.",
+          "Small wings, many eyes."
+        ]
       }
     }
   ],
