@@ -1235,7 +1235,7 @@
       "factionId": "hezbollah",
       "name": "Line Fighter",
       "role": "Line infantry",
-      "story": "Veteran rifle infantry, fewer and stronger: leaves the barracks Veteran, promotes quickly and takes less damage on rough ground. Conceals while stationary; moving, firing or taking damage reveals it. Detectors and splash defeat it.",
+      "story": "Veteran rifle infantry, fewer and stronger: leaves the barracks Veteran and takes less damage on rough ground. Conceals while stationary; moving, firing or taking damage reveals it. Detectors and splash defeat it.",
       "strengths": "Use the role and support relationships shown in the current mode’s rule-derived roster.",
       "counterplay": "Respect detection, range, armor and support dependencies; the local evaluation tools expose these tradeoffs.",
       "assetIds": [
@@ -1252,7 +1252,7 @@
           "role": "Line infantry"
         },
         "ra2": {
-          "description": "Veteran rifle infantry, fewer and stronger: leaves the barracks Veteran, promotes quickly and takes less damage on rough ground. Conceals while stationary; moving, firing or taking damage reveals it. Detectors and splash defeat it.",
+          "description": "Veteran rifle infantry, fewer and stronger: leaves the barracks Veteran and takes less damage on rough ground. Conceals while stationary; moving, firing or taking damage reveals it. Detectors and splash defeat it.",
           "actorId": "r2hzrifle",
           "repository": "mod",
           "rulesPath": "mods/rtsai/modern-factions/hezbollah-roster.yaml",
@@ -1328,7 +1328,7 @@
       "factionId": "hezbollah",
       "name": "Cedar Scout",
       "role": "Line infantry",
-      "story": "The faction's hero: one concealed scout who leaves the barracks Elite, with a suppressed carbine and demolition ability. Firing or damage breaks concealment. Vulnerable once detected.",
+      "story": "The faction's hero: one concealed Veteran scout with a suppressed carbine and demolition ability. Firing or damage breaks concealment. Vulnerable once detected.",
       "strengths": "Use the role and support relationships shown in the current mode’s rule-derived roster.",
       "counterplay": "Respect detection, range, armor and support dependencies; the local evaluation tools expose these tradeoffs.",
       "assetIds": [
@@ -1345,7 +1345,7 @@
           "role": "Line infantry"
         },
         "ra2": {
-          "description": "The faction's hero: one concealed scout who leaves the barracks Elite, with a suppressed carbine and demolition ability. Firing or damage breaks concealment. Vulnerable once detected.",
+          "description": "The faction's hero: one concealed Veteran scout with a suppressed carbine and demolition ability. Firing or damage breaks concealment. Vulnerable once detected.",
           "actorId": "r2hzscout",
           "repository": "mod",
           "rulesPath": "mods/rtsai/modern-factions/hezbollah-roster.yaml",
