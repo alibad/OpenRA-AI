@@ -1,5 +1,11 @@
 # RTS AI roadmap
 
+## Owner clarification — 9 October 2026
+
+RTS AI must require no owned Red Alert or Red Alert 2 installation. Keep both Classic/top-down and RA2/isometric gameplay, with one product entry and an in-game mode choice. The canonical mod is `RTSAI-Mod`; consolidate its original-content standalone work there and preserve custom resources, models, generators, maps, audio and provenance from the older repositories before any cleanup. See `../RTSAI-Mod/docs/product-direction.md` and `../RTSAI-Mod/resources/resource-transition.json`.
+
+The sections below record earlier decisions and verification. Their RA2 ownership requirement, RA2-only scope and parked-Classic status are superseded. The default mod now uses standalone original content; Classic mode and the combined chooser still require a port. Do not claim the old owned-RA2 add-on is that dependency-free Classic mode.
+
 Updated 2 October 2026. Approved by the owner. This replaces the 12 September dual-mode roadmap.
 
 ## Status, 6 October 2026
@@ -167,6 +173,8 @@ Still open: China, Türkiye and Iran trail America and Russia in bot play; RA2 m
 - Then macOS, RA2 missions (starting with the Red Sea theatre) and a mod-directory listing.
 
 ## Phase 5 — Red Alert 4 on the web (later, owner direction 5 October 2026)
+
+**Owner direction, 9 October 2026:** execute contextual in-match strategy choices and persistent confirmed-action goals in `RTSAI-WebGame` locally. Preserve all five browser AI opportunities in [the browser AI roadmap](../../RTSAI-WebGame/docs/AI-ROADMAP.md): (1) contextual strategies/persistent goals, (2) battlefield communication, (3) replay coaching/practice, (4) adaptive opponent personalities (lower priority), and (5) conversational scenario creation. This adds a local browser workstream; it does not authorize publication or deployment. Detailed implementation scope and acceptance criteria live in that roadmap.
 
 The owner wants to eventually build a "Red Alert 4" in the browser with the best web graphics technology. It starts from the installable local app and reuses the factions catalog, the 122 authored 3D models, the rules facts and the hosted AI co-commander. This revises the 2 October "no web game" decision, but only for the period after the mod ships. Phases 2–4 come first.
 
