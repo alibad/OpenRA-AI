@@ -13,7 +13,10 @@ from dataclasses import dataclass
 import math
 from typing import Iterable
 
+import numpy as np
 from PIL import Image, ImageDraw, ImageFilter
+
+from faction_palette import team_marker
 
 
 Vec3 = tuple[float, float, float]
@@ -208,6 +211,13 @@ OLIVE_LIGHT = (145, 138, 83)
 OLIVE_DARK = (72, 72, 48)
 METAL = (78, 76, 65)
 RED = (168, 58, 38)
+
+# Ownership materials: the primary paint of each model becomes the player
+# remap ramp; running gear, weapons, glass and secondary panels keep their
+# material colors so the player color never erases equipment.
+TEAM_SAUDI = frozenset({SAND, SAND_LIGHT})
+TEAM_SAUDI_AIR = frozenset({AIRFRAME})
+TEAM_YEMEN = frozenset({OLIVE})
 
 
 def _m1_hull() -> Mesh:
@@ -485,6 +495,108 @@ def _ah64sa_airframe() -> Mesh:
     return mesh
 
 
+def _edge_key(vertex: Vec3) -> tuple[float, float, float]:
+    return (round(vertex[0], 4), round(vertex[1], 4), round(vertex[2], 4))
+
+
+def _classic_faces(mesh: Mesh) -> list[Face]:
+    """Faces oriented as the classic sprite camera must draw them.
+
+    The shared meshes are authored with inconsistent winding: Y-axis cylinders
+    are inside-out, X-axis cylinder walls face inward, and several hull decks
+    are wound backwards.  The RA2 voxel builders consume the same meshes with
+    their own normal corrections, so the meshes themselves stay untouched and
+    the classic renderer orients every face here instead:
+
+    * faces joined by shared edges are made consistently wound (so a closed
+      shell never mixes inward and outward faces) and each shell is turned
+      outward by the sign of its enclosed volume;
+    * a stand-alone flat panel (wing, tailplane, glacis, hydroplane) is
+      single-sided and is drawn facing up, since the camera always looks down.
+
+    Normals use Newell's area-weighted method, because the first three
+    vertices of a concave panel (a swept wing) can point the opposite way.
+    """
+
+    faces = list(mesh.faces)
+    keys = [[_edge_key(v) for v in face.vertices] for face in faces]
+    edges: dict[tuple, list[tuple[int, bool]]] = {}
+    for index, points in enumerate(keys):
+        for a, b in zip(points, points[1:] + points[:1]):
+            if a == b:
+                continue
+            forward = a <= b
+            edges.setdefault((a, b) if forward else (b, a), []).append((index, forward))
+
+    flips = [False] * len(faces)
+    component = [-1] * len(faces)
+    neighbours: list[list[tuple[int, bool]]] = [[] for _ in faces]
+    for users in edges.values():
+        if len(users) != 2:
+            continue  # boundary or non-manifold edge: no orientation constraint
+        (first, first_forward), (second, second_forward) = users
+        # Consistently wound neighbours walk a shared edge in opposite
+        # directions; walking it the same way means one of them must flip.
+        same_direction = first_forward == second_forward
+        neighbours[first].append((second, same_direction))
+        neighbours[second].append((first, same_direction))
+
+    shells: list[list[int]] = []
+    for seed in range(len(faces)):
+        if component[seed] != -1:
+            continue
+        component[seed] = len(shells)
+        members = [seed]
+        stack = [seed]
+        while stack:
+            current = stack.pop()
+            for other, must_differ in neighbours[current]:
+                if component[other] != -1:
+                    continue
+                component[other] = len(shells)
+                flips[other] = flips[current] != must_differ
+                members.append(other)
+                stack.append(other)
+        shells.append(members)
+
+    def oriented(index: int) -> tuple[Vec3, ...]:
+        vertices = faces[index].vertices
+        return tuple(reversed(vertices)) if flips[index] else vertices
+
+    for members in shells:
+        if len(members) == 1:
+            normal = _newell_normal(faces[members[0]].vertices)
+            flips[members[0]] = normal[2] < 0
+            continue
+        volume = 0.0
+        for index in members:
+            vertices = oriented(index)
+            a = vertices[0]
+            for b, c in zip(vertices[1:-1], vertices[2:]):
+                volume += (a[0] * (b[1] * c[2] - b[2] * c[1]) - a[1] * (b[0] * c[2] - b[2] * c[0])
+                           + a[2] * (b[0] * c[1] - b[1] * c[0]))
+        if volume < 0:
+            for index in members:
+                flips[index] = not flips[index]
+
+    result = []
+    for index, face in enumerate(faces):
+        vertices = oriented(index)
+        result.append(Face(vertices, _newell_normal(vertices), face.color, face.outline))
+    return result
+
+
+def _newell_normal(vertices: tuple[Vec3, ...]) -> Vec3:
+    nx = ny = nz = 0.0
+    for index, current in enumerate(vertices):
+        following = vertices[(index + 1) % len(vertices)]
+        nx += (current[1] - following[1]) * (current[2] + following[2])
+        ny += (current[2] - following[2]) * (current[0] + following[0])
+        nz += (current[0] - following[0]) * (current[1] + following[1])
+    length = math.sqrt(nx * nx + ny * ny + nz * nz) or 1.0
+    return (nx / length, ny / length, nz / length)
+
+
 def _rotate(point: Vec3, angle: float) -> Vec3:
     radians = math.radians(angle)
     cosine, sine = math.cos(radians), math.sin(radians)
@@ -503,8 +615,64 @@ def _dot(a: Vec3, b: Vec3) -> float:
     return a[0] * b[0] + a[1] * b[1] + a[2] * b[2]
 
 
+def _luma(color: Color) -> float:
+    return 0.2126 * color[0] + 0.7152 * color[1] + 0.0722 * color[2]
+
+
 def _shade(color: Color, intensity: float) -> Color:
     return tuple(max(0, min(255, round(value * intensity))) for value in color)  # type: ignore[return-value]
+
+
+def _zbuffer_faces(faces: list[tuple[list[float], list[tuple[float, float]], Color, bool]],
+                   size: tuple[int, int], outline_width: int) -> Image.Image:
+    """Rasterize flat-shaded faces with a per-pixel depth test.
+
+    Sorting whole faces by average depth (the painter's algorithm) fails for
+    large panels: a ship deck's centroid is nearer than a superstructure that
+    stands on its far half, so the deck was painted over it.  Each face's depth
+    is interpolated across its pixels from the plane through its projected
+    vertices; outlines use the same plane with a small bias toward the camera.
+    """
+
+    width, height = size
+    zbuffer = np.full((height, width), -np.inf)
+    pixels = np.zeros((height, width, 4), dtype=np.uint8)
+    for depths, points, color, outline in faces:
+        xs = np.array([p[0] for p in points])
+        ys = np.array([p[1] for p in points])
+        matrix = np.column_stack([xs, ys, np.ones(len(xs))])
+        plane, *_ = np.linalg.lstsq(matrix, np.array(depths), rcond=None)
+        pad = outline_width + 1
+        left = max(0, int(math.floor(xs.min())) - pad)
+        top = max(0, int(math.floor(ys.min())) - pad)
+        right = min(width, int(math.ceil(xs.max())) + pad + 1)
+        bottom = min(height, int(math.ceil(ys.max())) + pad + 1)
+        if right <= left or bottom <= top:
+            continue
+        box = (right - left, bottom - top)
+        local = [(x - left, y - top) for x, y in points]
+        grid_y, grid_x = np.mgrid[top:bottom, left:right]
+        depth = plane[0] * (grid_x + 0.5) + plane[1] * (grid_y + 0.5) + plane[2]
+        # Faces are planar within a few pixels; clamp the interpolation to the
+        # vertex depth range so steep, nearly edge-on faces cannot overshoot.
+        depth = np.clip(depth, min(depths), max(depths))
+        layers = [(color, 0.0, "fill")]
+        if outline:
+            layers.append((_shade(color, 0.46), 0.02, "line"))
+        for layer_color, bias, kind in layers:
+            mask_image = Image.new("L", box, 0)
+            drawer = ImageDraw.Draw(mask_image)
+            if kind == "fill":
+                drawer.polygon(local, fill=255)
+            else:
+                drawer.line(local + [local[0]], fill=255, width=outline_width, joint="curve")
+            mask = np.array(mask_image) > 0
+            region = zbuffer[top:bottom, left:right]
+            biased = depth + bias
+            write = mask & (biased >= region)
+            region[write] = biased[write]
+            pixels[top:bottom, left:right][write] = (*layer_color, 255)
+    return Image.fromarray(pixels, "RGBA")
 
 
 def _render(
@@ -517,13 +685,31 @@ def _render(
     center_y_factor: float = 0.63,
     pitch: float = 0.0,
     flat_colors: frozenset[Color] = frozenset(),
+    team_colors: frozenset[Color] = frozenset(),
 ) -> Image.Image:
+    """Render one fixed-camera view of a mesh.
+
+    Faces whose base color is in ``team_colors`` are drawn as magenta
+    ownership markers whose brightness carries the lighting; the indexed
+    quantizer (``faction_palette.quantize_sprite``) maps them onto the whole
+    player-remap ramp.  Without markers the nearest-color quantizer could only
+    match the paint to the darkest remap shades, and only at some facings.
+    """
+
     supersample = 4
+    team_reference = max((_luma(color) for color in team_colors), default=1.0)
     scale = frame_size * supersample / model_span
     center_x = frame_size * supersample / 2
     center_y = frame_size * supersample * center_y_factor
-    camera = (0.0, -0.82, 0.57)
-    light = (-0.48, -0.58, 0.66)
+    # The projection below draws +Y toward the bottom of the screen and +Z up,
+    # i.e. the view of a camera south of and above the model.  The visibility
+    # and depth vector must describe that same camera; the earlier (0, -0.82,
+    # 0.57) looked from the north, so near walls were culled and far walls were
+    # painted over the tops of hulls, turrets and superstructures.
+    camera = (0.0, 0.82, 0.57)
+    # Key light from the upper left on the camera side, as the original
+    # lighting was designed relative to its (mirrored) camera.
+    light = (-0.48, 0.58, 0.66)
 
     canvas = Image.new("RGBA", (frame_size * supersample, frame_size * supersample), (0, 0, 0, 0))
     if shadow:
@@ -539,28 +725,27 @@ def _render(
         shadow_layer = shadow_layer.filter(ImageFilter.GaussianBlur(2.7 * supersample))
         canvas.alpha_composite(shadow_layer)
 
-    visible: list[tuple[float, list[tuple[float, float]], Color, bool]] = []
-    for face in mesh.faces:
+    visible: list[tuple[list[float], list[tuple[float, float]], Color, bool]] = []
+    for face in _classic_faces(mesh):
         vertices = tuple(_rotate(_pitch(vertex, pitch), angle) for vertex in face.vertices)
         normal = _rotate(_pitch(face.normal, pitch), angle)
         visibility = _dot(normal, camera)
         if visibility <= 0.005:
             continue
         points = [(center_x + x * scale, center_y + (y * 0.57 - z * 0.82) * scale) for x, y, z in vertices]
-        depth = sum(_dot(vertex, camera) for vertex in vertices) / len(vertices)
+        depths = [_dot(vertex, camera) for vertex in vertices]
         diffuse = max(0.0, _dot(normal, light))
         # Some asset families reserve exact source colors as palette markers.
         # Keep these stable so the indexed PNG builder can translate them into
         # native player-remap ramps after the per-facing geometry is rendered.
-        color = face.color if face.color in flat_colors else _shade(face.color, 0.62 + 0.48 * diffuse)
-        visible.append((depth, points, color, face.outline))
+        intensity = 0.62 + 0.48 * diffuse
+        if face.color in team_colors:
+            color = team_marker(intensity * _luma(face.color) / (team_reference * 1.10))
+        else:
+            color = face.color if face.color in flat_colors else _shade(face.color, intensity)
+        visible.append((depths, points, color, face.outline))
 
-    draw = ImageDraw.Draw(canvas)
-    for _, points, color, outline in sorted(visible, key=lambda item: item[0]):
-        draw.polygon(points, fill=(*color, 255))
-        if outline:
-            edge = _shade(color, 0.46)
-            draw.line(points + [points[0]], fill=(*edge, 255), width=max(2, supersample // 2), joint="curve")
+    canvas.alpha_composite(_zbuffer_faces(visible, canvas.size, max(2, supersample // 2)))
 
     return canvas.resize((frame_size, frame_size), Image.Resampling.LANCZOS)
 
@@ -593,42 +778,43 @@ def render_m1a2s_frames(frame_size: int = 40, facings: int = 32) -> tuple[list[I
     hull = _m1_hull()
     turret = _m1_turret()
     angles = _angles(facings, classic=True)
-    hull_frames = [_render(hull, angle, frame_size, shadow=True, model_span=6.20) for angle in angles]
-    turret_frames = [_render(turret, angle, frame_size, shadow=False, model_span=6.20) for angle in angles]
+    hull_frames = [_render(hull, angle, frame_size, shadow=True, model_span=6.20, team_colors=TEAM_SAUDI) for angle in angles]
+    turret_frames = [_render(turret, angle, frame_size, shadow=False, model_span=6.20, team_colors=TEAM_SAUDI) for angle in angles]
     return hull_frames, turret_frames
 
 
 def render_sads_frames(frame_size: int = 40, facings: int = 32) -> tuple[list[Image.Image], list[Image.Image]]:
     angles = _angles(facings, classic=True)
-    hull = [_render(_sads_hull(), angle, frame_size, shadow=True, model_span=5.25) for angle in angles]
-    turret = [_render(_sads_turret(), angle, frame_size, shadow=False, model_span=5.25) for angle in angles]
+    hull = [_render(_sads_hull(), angle, frame_size, shadow=True, model_span=5.25, team_colors=TEAM_SAUDI) for angle in angles]
+    turret = [_render(_sads_turret(), angle, frame_size, shadow=False, model_span=5.25, team_colors=TEAM_SAUDI) for angle in angles]
     return hull, turret
 
 
 def render_tech_frames(frame_size: int = 28, facings: int = 32) -> tuple[list[Image.Image], list[Image.Image]]:
     angles = _angles(facings, classic=True)
-    hull = [_render(_tech_hull(), angle, frame_size, shadow=True, model_span=3.95) for angle in angles]
-    turret = [_render(_tech_turret(), angle, frame_size, shadow=False, model_span=3.95) for angle in angles]
+    hull = [_render(_tech_hull(), angle, frame_size, shadow=True, model_span=3.95, team_colors=TEAM_YEMEN) for angle in angles]
+    turret = [_render(_tech_turret(), angle, frame_size, shadow=False, model_span=3.95, team_colors=TEAM_YEMEN) for angle in angles]
     return hull, turret
 
 
 def render_ymlr_frames(frame_size: int = 40, facings: int = 32) -> tuple[list[Image.Image], list[Image.Image]]:
     angles = _angles(facings, classic=True)
-    loaded = [_render(_ymlr_hull(loaded=True), angle, frame_size, shadow=True, model_span=5.45) for angle in angles]
-    empty = [_render(_ymlr_hull(loaded=False), angle, frame_size, shadow=True, model_span=5.45) for angle in angles]
+    loaded = [_render(_ymlr_hull(loaded=True), angle, frame_size, shadow=True, model_span=5.45, team_colors=TEAM_YEMEN) for angle in angles]
+    empty = [_render(_ymlr_hull(loaded=False), angle, frame_size, shadow=True, model_span=5.45, team_colors=TEAM_YEMEN) for angle in angles]
     return loaded, empty
 
 
 def render_samad_frames(frame_size: int = 40, facings: int = 16) -> list[Image.Image]:
     angles = _angles(facings, classic=False)
     loiter = [
-        _render(_samad_airframe(), angle, frame_size, shadow=False, model_span=4.85, center_y_factor=0.58)
+        _render(_samad_airframe(), angle, frame_size, shadow=False, model_span=4.85, center_y_factor=0.58,
+                team_colors=TEAM_YEMEN)
         for angle in angles
     ]
     dive = [
         _render(
             _samad_airframe(), angle, frame_size, shadow=False, model_span=4.85,
-            center_y_factor=0.58, pitch=24,
+            center_y_factor=0.58, pitch=24, team_colors=TEAM_YEMEN,
         )
         for angle in angles
     ]
@@ -638,7 +824,8 @@ def render_samad_frames(frame_size: int = 40, facings: int = 16) -> list[Image.I
 def render_f15sa_frames(frame_size: int = 56, facings: int = 16) -> list[Image.Image]:
     angles = _angles(facings, classic=False)
     return [
-        _render(_f15sa_airframe(), angle, frame_size, shadow=False, model_span=7.25, center_y_factor=0.59)
+        _render(_f15sa_airframe(), angle, frame_size, shadow=False, model_span=7.25, center_y_factor=0.59,
+                team_colors=TEAM_SAUDI_AIR)
         for angle in angles
     ]
 
@@ -646,7 +833,8 @@ def render_f15sa_frames(frame_size: int = 56, facings: int = 16) -> list[Image.I
 def render_ah64sa_frames(frame_size: int = 56, facings: int = 32) -> list[Image.Image]:
     angles = _angles(facings, classic=True)
     return [
-        _render(_ah64sa_airframe(), angle, frame_size, shadow=False, model_span=8.40, center_y_factor=0.59)
+        _render(_ah64sa_airframe(), angle, frame_size, shadow=False, model_span=8.40, center_y_factor=0.59,
+                team_colors=TEAM_SAUDI)
         for angle in angles
     ]
 
@@ -679,7 +867,9 @@ def render_air_muzzle_frames(frame_size: int = 48) -> list[Image.Image]:
     supersample = 4
     images: list[Image.Image] = []
     for facing in range(8):
-        direction = math.radians(facing * 45 - 90)
+        # OpenRA facings turn counter-clockwise on screen: 0 north, 2 west,
+        # 4 south, 6 east.  Screen y grows downward, so the angle decreases.
+        direction = math.radians(-90 - facing * 45)
         for phase in range(6):
             canvas = Image.new("RGBA", (frame_size * supersample, frame_size * supersample), (0, 0, 0, 0))
             draw = ImageDraw.Draw(canvas)

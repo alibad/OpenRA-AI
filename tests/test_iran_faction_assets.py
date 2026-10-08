@@ -32,11 +32,13 @@ def digest(image) -> str:
 
 
 def remap_share(frames) -> float:
+    # Share of the unit's body: transparent (0) and the translucent contact
+    # shadow (index 4, drawn by the engine as a shadow) are not body pixels.
     opaque = 0
     remap = 0
     for frame in frames:
         values = frame.tobytes()
-        opaque += sum(value != 0 for value in values)
+        opaque += sum(value not in (0, 4) for value in values)
         remap += sum(80 <= value <= 95 for value in values)
     return remap / opaque
 

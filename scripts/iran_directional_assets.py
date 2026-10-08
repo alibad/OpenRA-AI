@@ -211,6 +211,33 @@ def _peykaap_turret() -> Mesh:
     return mesh
 
 
+def _classic_peykaap_hull() -> Mesh:
+    """Peykaap hull carrying its fixed aft missile racks.
+
+    ``_peykaap_turret`` also contains the racks, so in the classic sprites they
+    swung around the hull with the gun.  The RA2 builders keep using the
+    shared meshes unchanged.
+    """
+
+    mesh = _peykaap_hull()
+    for x in (-0.53, 0.25):
+        mesh.slanted_box_y(x, x + 0.28, 0.42, 1.38, 0.42, 0.55, 0.20, TEAM_LIGHT)
+    return mesh
+
+
+def _classic_peykaap_turret() -> Mesh:
+    """The forward gun mount alone, centred so it rotates in place.
+
+    ``Turreted.Offset`` (400 forward) seats it on the foredeck.
+    """
+
+    mesh = Mesh()
+    mesh.cylinder_z((0, 0.0, 0.31), 0.09, 0.28, TEAM_DEEP)
+    mesh.box(-0.26, 0.26, -0.26, 0.25, 0.33, 0.60, TEAM_MID)
+    mesh.cylinder_y((0, -0.54, 0.49), 0.83, 0.055, METAL, segments=8)
+    return mesh
+
+
 def _ghadir_hull() -> Mesh:
     mesh = Mesh()
     mesh.cylinder_y((0, 0, 0.34), 4.56, 0.55, TEAM_DARK, segments=12)
@@ -281,8 +308,8 @@ def render_loiter(frame_size: int = 40, facings: int = 16) -> list[Image.Image]:
 
 def render_peykaap(frame_size: int = 44, facings: int = 16) -> tuple[list[Image.Image], list[Image.Image]]:
     assert facings == 16
-    hull = [_render(_peykaap_hull(), angle, frame_size, shadow=False, model_span=6.1, center_y_factor=0.62, flat_colors=TEAM_MARKERS) for angle in _angles(16, classic=False)]
-    turret = [_render(_peykaap_turret(), angle, frame_size, shadow=False, model_span=6.1, center_y_factor=0.62, flat_colors=TEAM_MARKERS) for angle in _angles(32, classic=True)]
+    hull = [_render(_classic_peykaap_hull(), angle, frame_size, shadow=False, model_span=6.1, center_y_factor=0.62, flat_colors=TEAM_MARKERS) for angle in _angles(16, classic=False)]
+    turret = [_render(_classic_peykaap_turret(), angle, frame_size, shadow=False, model_span=6.1, center_y_factor=0.62, flat_colors=TEAM_MARKERS) for angle in _angles(32, classic=True)]
     return hull, turret
 
 
@@ -425,7 +452,9 @@ def render_effect(kind: str, frame_size: int = 48) -> list[Image.Image]:
             draw = ImageDraw.Draw(image)
             c = frame_size * 2
             p = phase / max(1, phases - 1)
-            angle = math.radians(facing * 360 / facings - 90)
+            # OpenRA facings advance counter-clockwise on screen (north, then
+            # west); screen y grows downward, so the angle decreases.
+            angle = math.radians(-90 - facing * 360 / facings)
             if kind == "muzzle":
                 length = (9 - phase) * 4
                 dx, dy = math.cos(angle) * length, math.sin(angle) * length

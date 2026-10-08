@@ -10,8 +10,12 @@ from pathlib import Path
 
 from PIL import Image, ImageChops, ImageDraw, ImageEnhance, ImageFilter, ImageFont
 
-from red_sea_directional_vehicle import render_air_impact_frames, render_air_muzzle_frames
-from turkey_directional_assets import render_air, render_ground, render_rotor, render_ship, render_spinner
+from faction_palette import quantize_sprite
+from red_sea_directional_vehicle import _render, render_air_impact_frames, render_air_muzzle_frames
+from turkey_directional_assets import (
+	_airframe, _classic_ship_hull, _ship_turret, _tracked_hull, _turret, _wheeled_hull,
+	render_air, render_ground, render_rotor, render_ship, render_spinner,
+)
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -57,10 +61,10 @@ def clear(name: str) -> Path:
 	return output
 
 
-def save(name: str, frames: list[Image.Image], palette: Image.Image) -> None:
+def save(name: str, frames: list[Image.Image], palette: Image.Image, *, shadow: bool = True) -> None:
 	output = clear(name)
 	for index, frame in enumerate(frames):
-		quantize_to_reference(frame, palette).save(output / f"{name}-{index:04d}.png", transparency=0)
+		quantize_to_reference(frame, palette, shadow=shadow).save(output / f"{name}-{index:04d}.png", transparency=0)
 	cols = min(8, len(frames))
 	rows = math.ceil(len(frames) / cols)
 	size = frames[0].size[0]
@@ -175,10 +179,62 @@ def build_infantry(role: str, color: tuple[int,int,int]) -> list[Image.Image]:
 	return frames
 
 
-def icon_frame(name: str, art: Image.Image, label: str) -> Image.Image:
+PORTRAIT_YAW = -38.0  # a front-left three-quarter view, never a sprite facing
+
+
+def portrait(name: str) -> Image.Image:
+	"""Render a dedicated three-quarter production-portrait model.
+
+	Production icons must be authored compositions, not a downscaled world
+	frame.  The portrait renders the complete vehicle (hull and turret
+	together), aircraft or ship at 4x the sprite resolution from a camera yaw
+	that no world facing uses, then ``icon_frame`` composes it over a
+	sky-and-ground backdrop with the label band.
+	"""
+
+	kind, _ = LIVE[name]
+	size = 144
+	if kind == "ground":
+		hull = _tracked_hull() if name == "bozkir" else _wheeled_hull(4, ew=name == "sancak", amphibious=name == "denizkaplan")
+		turret = _turret(name if name in {"bozkir", "yildirim", "gokkalkan", "sancak"} else "remote")
+		art = _render(hull, PORTRAIT_YAW, size, shadow=True, model_span=6.4)
+		art.alpha_composite(_render(turret, PORTRAIT_YAW, size, shadow=False, model_span=6.4))
+		return art
+	if kind == "air":
+		return _render(_airframe(name), PORTRAIT_YAW, size, shadow=False, model_span=7.6 if name == "sahinx" else 6.6, center_y_factor=.55)
+	art = _render(_classic_ship_hull(name), PORTRAIT_YAW, size, shadow=False, model_span=7.4, center_y_factor=.56)
+	art.alpha_composite(_render(_ship_turret(name), PORTRAIT_YAW, size, shadow=False, model_span=7.4, center_y_factor=.56))
+	return art
+
+
+def icon_backdrop(kind: str) -> Image.Image:
+	"""Muted sky/ground (or sea) plate in the spirit of native RA cameos."""
+
 	background=Image.new("RGBA",(64,48),(25,31,29,255))
+	draw=ImageDraw.Draw(background)
+	horizon=21
 	for y in range(48):
-		ImageDraw.Draw(background).line((0,y,63,y),fill=(25+y//4,31+y//5,29+y//6,255))
+		if y < horizon:
+			t=y/horizon
+			color=(round(92+30*t),round(108+26*t),round(116+14*t))
+		elif kind == "ship":
+			t=(y-horizon)/(48-horizon)
+			color=(round(48-18*t),round(78-26*t),round(92-28*t))
+		else:
+			t=(y-horizon)/(48-horizon)
+			color=(round(104-44*t),round(98-42*t),round(70-30*t))
+		draw.line((0,y,63,y),fill=(*color,255))
+	return background
+
+
+def icon_frame(name: str, art: Image.Image, label: str) -> Image.Image:
+	kind=LIVE.get(name, ("infantry", 0))[0]
+	if kind == "infantry":
+		background=Image.new("RGBA",(64,48),(25,31,29,255))
+		for y in range(48):
+			ImageDraw.Draw(background).line((0,y,63,y),fill=(25+y//4,31+y//5,29+y//6,255))
+	else:
+		background=icon_backdrop(kind)
 	copy=art.copy()
 	bbox=copy.getchannel("A").getbbox()
 	if bbox:
@@ -201,7 +257,13 @@ def icon_frame(name: str, art: Image.Image, label: str) -> Image.Image:
 def save_icon(name: str, art: Image.Image, label: str, palette: Image.Image) -> None:
 	icon=icon_frame(name,art,label)
 	output=clear(name+"icon")
-	quantize_icon_to_reference(icon,palette).save(output/f"{name}icon-0000.png")
+	if name in LIVE:
+		# Exact, deterministic cameo quantization (never index 0/3/4 or the
+		# animated water/light indices).
+		indexed=quantize_sprite(icon,palette,opaque=True,allow_remap_matches=True)
+	else:
+		indexed=quantize_icon_to_reference(icon,palette)
+	indexed.save(output/f"{name}icon-0000.png")
 	icon.save(FRAME_ROOT/f"{name}icon-review.png")
 
 
@@ -258,13 +320,14 @@ def main() -> int:
 	FRAME_ROOT.mkdir(parents=True,exist_ok=True)
 	cache={}
 	for name in LIVE:
-		frames=live_frames(name); cache[name]=frames; save(name,frames,palette)
 		kind,_=LIVE[name]
+		# Aircraft get their shadow from the WithShadow trait, never baked in.
+		frames=live_frames(name); cache[name]=frames; save(name,frames,palette,shadow=kind != "air")
 		if kind in {"ground","air"}:
-			husk_name=name+"husk"; save(husk_name,corpse_frames(name,frames),palette)
+			husk_name=name+"husk"; save(husk_name,corpse_frames(name,frames),palette,shadow=kind != "air")
 		else:
 			save(name+"sink",sink_frames(name,frames),palette)
-		save_icon(name,frames[0],LABELS[name],palette)
+		save_icon(name,portrait(name),LABELS[name],palette)
 	for role,(label,color) in INFANTRY.items():
 		frames=build_infantry(role,color); save(role,frames,palette); save_icon(role,frames[0],label,palette)
 	save("turnaahrotor",render_rotor(60),palette)

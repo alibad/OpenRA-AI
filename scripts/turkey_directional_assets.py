@@ -9,7 +9,7 @@ from __future__ import annotations
 import math
 from PIL import Image, ImageDraw, ImageFilter
 
-from red_sea_directional_vehicle import Mesh, _angles, _render
+from red_sea_directional_vehicle import Face, Mesh, _angles, _normal, _render
 
 
 OLIVE = (91, 102, 65)
@@ -28,6 +28,14 @@ NAVAL_DARK = (55, 67, 69)
 AIR = (91, 101, 102)
 AIR_LIGHT = (130, 139, 136)
 AIR_DARK = (47, 55, 58)
+
+# Ownership materials for the classic sprites: primary paint becomes the
+# player-remap ramp; running gear, weapons, glass, decks and secondary
+# panels keep their material colors.
+TEAM_GROUND = frozenset({OLIVE, OLIVE_LIGHT})
+TEAM_AIR = frozenset({AIR})
+TEAM_ROTOR = frozenset({OLIVE})
+TEAM_NAVAL = frozenset({NAVAL})
 
 
 def _wheeled_hull(axles: int, *, amphibious: bool = False, ew: bool = False) -> Mesh:
@@ -174,7 +182,39 @@ def _ship_turret(kind: str) -> Mesh:
 	return mesh
 
 
-def render_ground(name: str, size: int) -> list[Image.Image]:
+def _classic_ship_hull(kind: str) -> Mesh:
+	"""The classic-sprite hull with an outward-wound deck.
+
+	``_ship_hull`` lists the deck perimeter as bow, port-front, starboard-front,
+	starboard-rear, port-rear: a self-crossing outline whose normal points
+	down, so the camera culled the deck and the hull rendered as an open frame.
+	The RA2 voxel builder already reorders the same five vertices; the shared
+	mesh itself stays untouched for that consumer.
+	"""
+
+	mesh = _ship_hull(kind)
+	deck = mesh.faces[5]
+	vertices = tuple(deck.vertices[i] for i in (0, 2, 3, 4, 1))
+	mesh.faces[5] = Face(vertices, _normal(vertices), deck.color, deck.outline)
+	return mesh
+
+
+def _classic_ship_turret(kind: str) -> Mesh:
+	"""Ship turret centred on its own mount.
+
+	The shared mesh places the mount 0.75 units ahead of the origin, so the
+	turret orbited the hull's centre as it turned instead of rotating in
+	place.  ``Turreted.Offset`` already positions the mount on the foredeck.
+	"""
+
+	mesh = Mesh()
+	for face in _ship_turret(kind).faces:
+		vertices = tuple((x, y + 0.75, z) for x, y, z in face.vertices)
+		mesh.faces.append(Face(vertices, face.normal, face.color, face.outline))
+	return mesh
+
+
+def render_ground(name: str, size: int, *, team: bool = True) -> list[Image.Image]:
 	angles = _angles(32, classic=True)
 	if name == "bozkir":
 		hull = _tracked_hull()
@@ -182,21 +222,26 @@ def render_ground(name: str, size: int) -> list[Image.Image]:
 		hull = _wheeled_hull(4, ew=True)
 	else:
 		hull = _wheeled_hull(4, amphibious=name == "denizkaplan")
-	bodies = [_render(hull, a, size, shadow=True, model_span=6.2) for a in angles]
+	colors = TEAM_GROUND if team else frozenset()
+	bodies = [_render(hull, a, size, shadow=True, model_span=6.2, team_colors=colors) for a in angles]
 	turret = _turret(name if name in {"bozkir", "yildirim", "gokkalkan", "sancak"} else "remote")
-	return bodies + [_render(turret, a, size, shadow=False, model_span=6.2) for a in angles]
+	return bodies + [_render(turret, a, size, shadow=False, model_span=6.2, team_colors=colors) for a in angles]
 
 
-def render_air(name: str, size: int) -> list[Image.Image]:
+def render_air(name: str, size: int, *, team: bool = True) -> list[Image.Image]:
 	facings = 32 if name == "turnaah" else 16
 	angles = _angles(facings, classic=facings == 32)
 	span = 7.4 if name == "sahinx" else 6.3
-	return [_render(_airframe(name), a, size, shadow=False, model_span=span, center_y_factor=.59) for a in angles]
+	colors = (TEAM_ROTOR if name == "turnaah" else TEAM_AIR) if team else frozenset()
+	return [_render(_airframe(name), a, size, shadow=False, model_span=span, center_y_factor=.59, team_colors=colors) for a in angles]
 
 
-def render_ship(name: str, size: int) -> list[Image.Image]:
-	bodies = [_render(_ship_hull(name), a, size, shadow=False, model_span=7.2, center_y_factor=.58) for a in _angles(16, classic=False)]
-	turrets = [_render(_ship_turret(name), a, size, shadow=False, model_span=7.2, center_y_factor=.58) for a in _angles(32, classic=True)]
+def render_ship(name: str, size: int, *, team: bool = True) -> list[Image.Image]:
+	# Poyraz's cabin is painted NAVAL_DARK; include it so ownership stays
+	# visible when the small hull is seen bow-on.
+	colors = (TEAM_NAVAL | ({NAVAL_DARK} if name == "poyraz" else set())) if team else frozenset()
+	bodies = [_render(_classic_ship_hull(name), a, size, shadow=False, model_span=7.2, center_y_factor=.58, team_colors=colors) for a in _angles(16, classic=False)]
+	turrets = [_render(_classic_ship_turret(name), a, size, shadow=False, model_span=7.2, center_y_factor=.58, team_colors=colors) for a in _angles(32, classic=True)]
 	return bodies + turrets
 
 

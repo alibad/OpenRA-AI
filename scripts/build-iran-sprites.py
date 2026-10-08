@@ -8,11 +8,13 @@ from pathlib import Path
 import sys
 
 from PIL import Image, ImageChops, ImageDraw, ImageEnhance, ImageFilter, ImageFont
+import numpy as np
 
 SCRIPT_ROOT = Path(__file__).resolve().parent
 if str(SCRIPT_ROOT) not in sys.path:
     sys.path.insert(0, str(SCRIPT_ROOT))
 
+from faction_palette import nearest_indices, palette_rgb
 from iran_directional_assets import (
     TEAM_DARK,
     TEAM_DEEP,
@@ -31,6 +33,9 @@ REMAP_MARKERS = {
     TEAM_DARK: 89,
     TEAM_DEEP: 93,
 }
+
+
+SHADOW_INDEX = 4
 
 
 def remap_marker_index(rgb: bytes) -> int | None:
@@ -100,7 +105,11 @@ ICONS = {
 }
 
 
-def quantize(image: Image.Image, palette: Image.Image, *, opaque: bool = False) -> Image.Image:
+AIRCRAFT = frozenset({"irazar", "irtoufan", "irmohajer", "irloiter",
+                      "irazarhusk", "irtoufanhusk", "irmohajerhusk"})
+
+
+def quantize(image: Image.Image, palette: Image.Image, *, opaque: bool = False, shadow: bool = True) -> Image.Image:
     indexed = image.convert("RGB").quantize(palette=palette.copy(), dither=Image.Dither.NONE)
     data = bytearray(indexed.tobytes())
     source = image.convert("RGB").tobytes()
@@ -116,12 +125,24 @@ def quantize(image: Image.Image, palette: Image.Image, *, opaque: bool = False) 
         alpha = image.getchannel("A").tobytes()
         for index, value in enumerate(alpha):
             if value < 96:
-                data[index] = 0
+                # The renderer's translucent contact shadow becomes the
+                # engine's shadow index instead of being discarded.
+                rgb = source[index * 3:index * 3 + 3]
+                data[index] = SHADOW_INDEX if shadow and value >= 40 and max(rgb) <= 8 else 0
             else:
                 rgb = source[index * 3:index * 3 + 3]
                 remap = remap_marker_index(rgb)
                 if remap is not None:
                     data[index] = remap
+        # Indices 96..102 cycle as water and 103 blinks in the player palette;
+        # move any accidental match to the nearest static color.
+        animated = [index for index, value in enumerate(data) if 96 <= value <= 103]
+        if animated:
+            reference = palette_rgb(palette)
+            pixels = np.array([list(source[index * 3:index * 3 + 3]) for index in animated], dtype=np.int32)
+            allowed = [i for i in range(256) if i not in (0, 1, 3, SHADOW_INDEX, *range(80, 104))]
+            for index, value in zip(animated, nearest_indices(pixels, reference, allowed)):
+                data[index] = int(value)
     indexed.frombytes(bytes(data))
     if not opaque:
         indexed.info["transparency"] = 0
@@ -134,7 +155,8 @@ def save_frames(name: str, frames: list[Image.Image], palette: Image.Image) -> N
     for stale in output.glob(f"{name}-[0-9][0-9][0-9][0-9].png"):
         stale.unlink()
     for index, frame in enumerate(frames):
-        quantize(frame, palette).save(output / f"{name}-{index:04d}.png", transparency=0)
+        # Aircraft get their shadow from the WithShadow trait, never baked in.
+        quantize(frame, palette, shadow=name not in AIRCRAFT).save(output / f"{name}-{index:04d}.png", transparency=0)
 
 
 def sheet(name: str, frames: list[Image.Image], *, columns: int = 8, limit: int | None = None) -> None:

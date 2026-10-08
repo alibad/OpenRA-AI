@@ -28,6 +28,7 @@ from red_sea_directional_vehicle import (
     render_directional_asset,
 )
 from red_sea_infantry import render_infantry_asset
+from faction_palette import neutralize_team_markers, quantize_sprite
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -108,6 +109,7 @@ EFFECTS = {
         "scales": (0.52, 0.82, 1.00, 0.88, 0.70, 0.50),
         "opacities": (255, 255, 245, 195, 125, 55),
         "facings": 8,
+        "anchor": "base",
     },
     "redsea-drone-impact": {
         "source": "drone-impact-source-v1.png",
@@ -117,6 +119,9 @@ EFFECTS = {
         "facings": 1,
     },
 }
+
+
+AIRCRAFT_MODELS = frozenset({"samad", "f15sa", "ah64sa"})
 
 
 WRECKS = {
@@ -241,20 +246,12 @@ def frame(
     return canvas
 
 
-def quantize_to_reference(image: Image.Image, palette_image: Image.Image) -> Image.Image:
-    # Reserve index 0 for transparency.  The source palette is the native RA
-    # palette exported by OpenRA.Utility, preserving its expected color space.
-    reference = palette_image.copy()
-    paletted = image.convert("RGB").quantize(palette=reference, dither=Image.Dither.NONE)
-    alpha = image.getchannel("A")
-    data = bytearray(paletted.tobytes())
-    alpha_data = alpha.tobytes()
-    for index, value in enumerate(alpha_data):
-        if value < 96:
-            data[index] = 0
-    paletted.frombytes(bytes(data))
-    paletted.info["transparency"] = 0
-    return paletted
+def quantize_to_reference(image: Image.Image, palette_image: Image.Image, *, shadow: bool = True) -> Image.Image:
+    # Exact, deterministic quantization against the native RA palette exported
+    # by OpenRA.Utility.  Ownership comes only from authored team materials,
+    # the renderer's contact shadow becomes the engine shadow index, and the
+    # animated water/light indices are never used for ordinary artwork.
+    return quantize_sprite(image, palette_image, shadow=shadow)
 
 
 def quantize_icon_to_reference(image: Image.Image, palette_image: Image.Image) -> Image.Image:
@@ -328,8 +325,10 @@ def save_directional_model(name: str, definition: dict[str, object], palette: Im
     output = FRAME_ROOT / name
     output.mkdir(parents=True, exist_ok=True)
     clear_output_frames(output, name)
+    # Aircraft get their shadow from the WithShadow trait, never baked in.
+    shadow = model_name not in AIRCRAFT_MODELS
     for index, result in enumerate(images):
-        quantized = quantize_to_reference(result, palette)
+        quantized = quantize_to_reference(result, palette, shadow=shadow)
         quantized.save(output / f"{name}-{index:04d}.png", transparency=0)
 
     # Show every authored direction, not an eight-frame sample.  This sheet is
@@ -347,7 +346,7 @@ def save_directional_model(name: str, definition: dict[str, object], palette: Im
 def wreck_frame(image: Image.Image, facing: int, *, turret: bool) -> Image.Image:
     """Turn one live directional render into a deterministic scorched wreck."""
 
-    damaged = ImageEnhance.Color(image.convert("RGBA")).enhance(0.22)
+    damaged = ImageEnhance.Color(neutralize_team_markers(image)).enhance(0.22)
     damaged = ImageEnhance.Brightness(damaged).enhance(0.58 if not turret else 0.52)
     damaged = ImageEnhance.Contrast(damaged).enhance(1.15)
 
@@ -390,8 +389,9 @@ def save_wreck_frames(name: str, definition: dict[str, object], palette: Image.I
     output = FRAME_ROOT / name
     output.mkdir(parents=True, exist_ok=True)
     clear_output_frames(output, name)
+    shadow = str(definition["model"]) not in AIRCRAFT_MODELS
     for index, result in enumerate(images):
-        quantize_to_reference(result, palette).save(output / f"{name}-{index:04d}.png", transparency=0)
+        quantize_to_reference(result, palette, shadow=shadow).save(output / f"{name}-{index:04d}.png", transparency=0)
 
     columns = 8
     rows = math.ceil(len(images) / columns)
@@ -410,7 +410,7 @@ def save_animation_frames(name: str, definition: dict[str, object], palette: Ima
     output.mkdir(parents=True, exist_ok=True)
     clear_output_frames(output, name)
     for index, result in enumerate(images):
-        quantize_to_reference(result, palette).save(output / f"{name}-{index:04d}.png", transparency=0)
+        quantize_to_reference(result, palette, shadow=False).save(output / f"{name}-{index:04d}.png", transparency=0)
 
     sheet = Image.new("RGBA", (4 * frame_size, math.ceil(len(images) / 4) * frame_size), (42, 36, 28, 255))
     for index, result in enumerate(images):
@@ -565,9 +565,14 @@ def effect_frame(
     angle: float,
     scale: float,
     opacity: int,
+    anchor_base: bool = False,
 ) -> Image.Image:
-    rotated = component.rotate(-angle, resample=Image.Resampling.BICUBIC, expand=True)
-    target = max(4, round(frame_size * 0.90 * scale))
+    # The source points north. OpenRA facings advance counter-clockwise on
+    # screen (8 facings: north, north-west, west, ...), which is PIL's positive
+    # rotation direction.
+    rotated = component.rotate(angle, resample=Image.Resampling.BICUBIC, expand=True)
+    # A base-anchored flash occupies at most half of the canvas.
+    target = max(4, round(frame_size * (0.46 if anchor_base else 0.90) * scale))
     ratio = target / max(rotated.width, rotated.height)
     art = rotated.resize(
         (max(1, round(rotated.width * ratio)), max(1, round(rotated.height * ratio))),
@@ -577,7 +582,17 @@ def effect_frame(
         art.putalpha(art.getchannel("A").point(lambda value: round(value * opacity / 255)))
 
     canvas = Image.new("RGBA", (frame_size, frame_size), (0, 0, 0, 0))
-    canvas.alpha_composite(art, ((frame_size - art.width) // 2, (frame_size - art.height) // 2))
+    left = (frame_size - art.width) // 2
+    top = (frame_size - art.height) // 2
+    if anchor_base:
+        # A muzzle flash starts at the muzzle point (the canvas centre) and
+        # extends forward; centring it would draw half the flash back over the
+        # barrel. Shift the art forward by half its length along the facing.
+        radians = math.radians(angle)
+        reach = target * 0.42
+        left += round(-math.sin(radians) * reach)
+        top += round(-math.cos(radians) * reach)
+    canvas.alpha_composite(art, (left, top))
     return canvas
 
 
@@ -598,10 +613,11 @@ def save_effect_frames(name: str, definition: dict[str, object], palette: Image.
     for facing in range(facings):
         angle = 360 * facing / facings
         for scale, opacity in zip(scales, opacities, strict=True):
-            images.append(effect_frame(component, frame_size, angle, scale, opacity))
+            images.append(effect_frame(component, frame_size, angle, scale, opacity,
+                                       anchor_base=definition.get("anchor") == "base"))
 
     for index, result in enumerate(images):
-        quantized = quantize_to_reference(result, palette)
+        quantized = quantize_to_reference(result, palette, shadow=False)
         quantized.save(output / f"{name}-{index:04d}.png", transparency=0)
 
     columns = len(scales)
