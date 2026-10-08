@@ -1,0 +1,1310 @@
+{
+  "policy": "Exact historical source variants; not runtime activation. Current canonical code remains authoritative. Git history and the safety bundles retain complete commits.",
+  "branches": [
+    {
+      "name": "codex/air-warfare",
+      "head": "e248191c2c0f4028516e17989d39f2e90fc89c41",
+      "base": "4dcdbd91bfbf0094b11507a8452bfcd25b141536",
+      "files": [
+        {
+          "path": ".gitignore",
+          "gitObject": "a27bbecf964d05ffe6b685c30049ebf3d3dda220",
+          "sha256": "f63f34ef72d01fff5f3b1b256fad3644444676f0c824a4f339a3b158533ddc08",
+          "bytes": 547,
+          "member": "objects/f63f34ef72d01fff5f3b1b256fad3644444676f0c824a4f339a3b158533ddc08"
+        },
+        {
+          "path": "README.md",
+          "gitObject": "3de4f10d64258a065bb64ec38ca1aa3feb466960",
+          "sha256": "8e4fd58821639e9bfa6a86c8dca52bb0ae9306184d67ae6312cd5b7e19d01f53",
+          "bytes": 13329,
+          "member": "objects/8e4fd58821639e9bfa6a86c8dca52bb0ae9306184d67ae6312cd5b7e19d01f53"
+        },
+        {
+          "path": "assets/red-sea-2026/infantry-concepts/saudi-infantry-concept.png",
+          "gitObject": "eef9fb057f9d856a1deb7fed514213206ec8792b",
+          "sha256": "587c3502c20e5edb203f452ae4ca404e7d903b9f01b1b80e6d9efe4537475c64",
+          "bytes": 1975944,
+          "member": "objects/587c3502c20e5edb203f452ae4ca404e7d903b9f01b1b80e6d9efe4537475c64"
+        },
+        {
+          "path": "assets/red-sea-2026/infantry-concepts/yemen-infantry-concept.png",
+          "gitObject": "a30a0a1ed730fe63e2b18dfa6b06c6a565f56609",
+          "sha256": "bfa826e52c9073982704fb0c45663f0796905c7daa43f1f19b42f20ef7bd430e",
+          "bytes": 1966081,
+          "member": "objects/bfa826e52c9073982704fb0c45663f0796905c7daa43f1f19b42f20ef7bd430e"
+        },
+        {
+          "path": "assets/red-sea-2026/voice-provenance.json",
+          "gitObject": "a9e45c422ade8e96b0068fc6e28c44cf16b49f4f",
+          "sha256": "f81120783e7c2098fa2a9edca9d4fcb409a5f12810663685559c65262fab6990",
+          "bytes": 21811,
+          "member": "objects/f81120783e7c2098fa2a9edca9d4fcb409a5f12810663685559c65262fab6990"
+        },
+        {
+          "path": "docs/air-warfare-validation.md",
+          "gitObject": "f0ac21297894ea2dee0fc9d815cd5f5a31a428cd",
+          "sha256": "7c3fa1963d6d1599dcda0175844b04d1a50c8e9d2ff2c09a78e7b9cd47b7bfad",
+          "bytes": 5726,
+          "member": "objects/7c3fa1963d6d1599dcda0175844b04d1a50c8e9d2ff2c09a78e7b9cd47b7bfad"
+        },
+        {
+          "path": "docs/experience-composer/README.md",
+          "gitObject": "e4f64d1a51cace4a2fbe546abb3d97749baad4ad",
+          "sha256": "5470d25331a6b1c2743cf55673a8622fc8aac10ddeb47f8e00e9b25192e1f2b6",
+          "bytes": 2861,
+          "member": "objects/5470d25331a6b1c2743cf55673a8622fc8aac10ddeb47f8e00e9b25192e1f2b6"
+        },
+        {
+          "path": "docs/experience-composer/presentation-pack-template/assets/PUT-FILES-HERE.md",
+          "gitObject": "c666f8659e9c9b268f66d06168e737d9f70bc0ed",
+          "sha256": "b75538fd19118c62900041990b1aa83164e9ccbfdda813937c65c33e2a8b9d0c",
+          "bytes": 253,
+          "member": "objects/b75538fd19118c62900041990b1aa83164e9ccbfdda813937c65c33e2a8b9d0c"
+        },
+        {
+          "path": "docs/experience-composer/presentation-pack-template/pack.yaml",
+          "gitObject": "d87401259eb6835ba1f8e6927c7d7a8d67a02eb4",
+          "sha256": "a0ac9cd4b479527275ca4dbbeda674bba98b0d1e3da2207fa588fbc65d21503a",
+          "bytes": 277,
+          "member": "objects/a0ac9cd4b479527275ca4dbbeda674bba98b0d1e3da2207fa588fbc65d21503a"
+        },
+        {
+          "path": "docs/experience-composer/presentation-pack.schema.json",
+          "gitObject": "dd3197983c399b049d9fb4fde9f4fa5e929ce0af",
+          "sha256": "c88f59b3619d20e381de359a647e242cc40ddc126d1ad1d01aa5b59ee61bde06",
+          "bytes": 869,
+          "member": "objects/c88f59b3619d20e381de359a647e242cc40ddc126d1ad1d01aa5b59ee61bde06"
+        },
+        {
+          "path": "docs/red-sea-2026.md",
+          "gitObject": "ec0fda301b4133ccd080454ce574a967eb9d9fd4",
+          "sha256": "bd66e9984cfe3c556a44448a196ac6dfac886f16b9ac09b71fe3a34a37c3058a",
+          "bytes": 7100,
+          "member": "objects/bd66e9984cfe3c556a44448a196ac6dfac886f16b9ac09b71fe3a34a37c3058a"
+        },
+        {
+          "path": "docs/upstream-reuse/PORTFOLIO.md",
+          "gitObject": "07e4489fae0daa02b028a85a1f3e738f1071be85",
+          "sha256": "f7ad67d1d1520b8c78759351dc1cc8e517dc65e1a5bf2788645a760cf02cc2a9",
+          "bytes": 10839,
+          "member": "objects/f7ad67d1d1520b8c78759351dc1cc8e517dc65e1a5bf2788645a760cf02cc2a9"
+        },
+        {
+          "path": "docs/upstream-reuse/README.md",
+          "gitObject": "dbeca9a9e3f0f2ae452d92438ff9051f3ce6d164",
+          "sha256": "ff2b167e5f6601a3baaff27ccfc36795566ca1378c58aba840308916714d57ed",
+          "bytes": 2781,
+          "member": "objects/ff2b167e5f6601a3baaff27ccfc36795566ca1378c58aba840308916714d57ed"
+        },
+        {
+          "path": "docs/upstream-reuse/component.schema.json",
+          "gitObject": "22fbcb53edd58dabcce6e7d3dfb46001f18a2f77",
+          "sha256": "8b637e6386227d9c1377f6b8d38f09da6994953c54c144bc1c28bcbda44242e0",
+          "bytes": 3382,
+          "member": "objects/8b637e6386227d9c1377f6b8d38f09da6994953c54c144bc1c28bcbda44242e0"
+        },
+        {
+          "path": "docs/upstream-reuse/components/battlefield-salvage.json",
+          "gitObject": "54397d89f3e88212b98518880d9d86a5e65a2011",
+          "sha256": "afecb759f7bc98aa2466e70d7c99d227c24072c875fd64b9ca8f4b69b6726921",
+          "bytes": 2357,
+          "member": "objects/afecb759f7bc98aa2466e70d7c99d227c24072c875fd64b9ca8f4b69b6726921"
+        },
+        {
+          "path": "docs/upstream-reuse/components/minefield-generator.json",
+          "gitObject": "7b8c7acb2eb19c7e6f9f486e73eb34693dd19c00",
+          "sha256": "0fc45452f6e67bc3ca7c489cc09840220a54be1e961c08d65cbd1d883af73eb0",
+          "bytes": 2275,
+          "member": "objects/0fc45452f6e67bc3ca7c489cc09840220a54be1e961c08d65cbd1d883af73eb0"
+        },
+        {
+          "path": "docs/upstream-reuse/components/mission-aware-minelayer-ai.json",
+          "gitObject": "3b67fc070a36269fd2817a38c70810a175e7d197",
+          "sha256": "1afabfba575e7bcba1e9cd20f3c88a98dfc0957d2604522eae6ff7ec680d1421",
+          "bytes": 2126,
+          "member": "objects/1afabfba575e7bcba1e9cd20f3c88a98dfc0957d2604522eae6ff7ec680d1421"
+        },
+        {
+          "path": "docs/upstream-reuse/components/point-defense-interception.json",
+          "gitObject": "9c8ebe13241f2c45a2b601f5b6f43e5c29c54456",
+          "sha256": "9150dd8566789053b269cb714da36569732c49432a7e3f6f2ced4cfa50f25807",
+          "bytes": 3024,
+          "member": "objects/9150dd8566789053b269cb714da36569732c49432a7e3f6f2ced4cfa50f25807"
+        },
+        {
+          "path": "docs/upstream-reuse/roadmap.json",
+          "gitObject": "982af5692fa398501375fc189dcd4782b6ca682b",
+          "sha256": "2851808a42b070eb1f1b8478a647a6b65c2422a6f695be15e07d6ec3071dfcf0",
+          "bytes": 16855,
+          "member": "objects/2851808a42b070eb1f1b8478a647a6b65c2422a6f695be15e07d6ec3071dfcf0"
+        },
+        {
+          "path": "docs/upstream-reuse/sources.json",
+          "gitObject": "e02c2e5997127c92e57ab0ee533ba81bba8cd348",
+          "sha256": "502a8ad27494c68bcc951a96beb7cc7417090b8d221e0e9c66c309fc38bf909b",
+          "bytes": 4489,
+          "member": "objects/502a8ad27494c68bcc951a96beb7cc7417090b8d221e0e9c66c309fc38bf909b"
+        },
+        {
+          "path": "engine/openra",
+          "type": "commit",
+          "gitObject": "4fd8f8da0999a40dcf5b58464c8473e857e062ee"
+        },
+        {
+          "path": "missions/red-sea-2026/hodeidah-lifeline/map.yaml",
+          "gitObject": "4d35377b7eadcf454d94fdba493725384e529867",
+          "sha256": "74b781d801b54089bf5bf3503c2b58ca1bb3e47ba406491bcba033e195285af0",
+          "bytes": 3438,
+          "member": "objects/74b781d801b54089bf5bf3503c2b58ca1bb3e47ba406491bcba033e195285af0"
+        },
+        {
+          "path": "scripts/build-red-sea-air-assets.ps1",
+          "gitObject": "33e4c2b3a518905f244783f9787f4e2d82f79938",
+          "sha256": "1d88491be0b646f2338fca900ac88d39a247c1a76172f400a7de8b0ffa20fb2a",
+          "bytes": 3537,
+          "member": "objects/1d88491be0b646f2338fca900ac88d39a247c1a76172f400a7de8b0ffa20fb2a"
+        },
+        {
+          "path": "scripts/build-red-sea-assets.ps1",
+          "gitObject": "85881009f7c66cb35d1bd96ffbbf488bbb700e41",
+          "sha256": "92e3816bace613fe86a67356e2fc5906ef1f2a4caf13e981fb8cfdd458c78d30",
+          "bytes": 4201,
+          "member": "objects/92e3816bace613fe86a67356e2fc5906ef1f2a4caf13e981fb8cfdd458c78d30"
+        },
+        {
+          "path": "scripts/build-red-sea-mission.py",
+          "gitObject": "4a8b41493fc31e18aa65cf5344336dfeba6cee6f",
+          "sha256": "2f07745d7014eab46940082eca50adf23a822ae7541551bf880bca611ada0e59",
+          "bytes": 6958,
+          "member": "objects/2f07745d7014eab46940082eca50adf23a822ae7541551bf880bca611ada0e59"
+        },
+        {
+          "path": "scripts/build-red-sea-sprites.py",
+          "gitObject": "00974807991ef9e2e83e54bdbcb01c7bc840f478",
+          "sha256": "4eb2e01772afcecf545497ceddf296c0c67b8ae29140811a235c68e2b63e0258",
+          "bytes": 26843,
+          "member": "objects/4eb2e01772afcecf545497ceddf296c0c67b8ae29140811a235c68e2b63e0258"
+        },
+        {
+          "path": "scripts/check_openra_reuse.py",
+          "gitObject": "57d27b1379e388c14327a28e83af21290dae2417",
+          "sha256": "a1ad792dfcdf1d2a3c15601ef43f46c203c342f85663df21c8e869756a429a27",
+          "bytes": 5229,
+          "member": "objects/a1ad792dfcdf1d2a3c15601ef43f46c203c342f85663df21c8e869756a429a27"
+        },
+        {
+          "path": "scripts/generate-red-sea-sfx.py",
+          "gitObject": "417aab12180524ea194019cb54b9fd6c51c239c5",
+          "sha256": "34d8903fc96f174701cfaaeacbf3de12164cff332b7bcfc3c4039206b0b86cbe",
+          "bytes": 14630,
+          "member": "objects/34d8903fc96f174701cfaaeacbf3de12164cff332b7bcfc3c4039206b0b86cbe"
+        },
+        {
+          "path": "scripts/generate-red-sea-voices.py",
+          "gitObject": "b90bea3ea5d5db22b827ba55d768b72b695bfc90",
+          "sha256": "06fd2ea20174db57068c3cc974d68c869aa4d797c286a037681469c8ee200eee",
+          "bytes": 12554,
+          "member": "objects/06fd2ea20174db57068c3cc974d68c869aa4d797c286a037681469c8ee200eee"
+        },
+        {
+          "path": "scripts/openra_upstream_inventory.py",
+          "gitObject": "6a530204011cc2e605cc864a3419347e15fd669c",
+          "sha256": "0045765bf7b15c4e80c9cc625d5c95bf3dffc39e3122190af3235437eb14ed60",
+          "bytes": 23411,
+          "member": "objects/0045765bf7b15c4e80c9cc625d5c95bf3dffc39e3122190af3235437eb14ed60"
+        },
+        {
+          "path": "scripts/red_sea_directional_vehicle.py",
+          "gitObject": "132dbead4b9223b64aef5e7fe263b6eecf922895",
+          "sha256": "3440f42d84f4a782101ec1507793f38e02a24c1ba49d83999a3dd2c0f81c777f",
+          "bytes": 31152,
+          "member": "objects/3440f42d84f4a782101ec1507793f38e02a24c1ba49d83999a3dd2c0f81c777f"
+        },
+        {
+          "path": "scripts/red_sea_infantry.py",
+          "gitObject": "d08c62ca9f9bb88e28fd094cb38d7fa32e66d28b",
+          "sha256": "c7249f200c351301fc75fb5fe70abf8c159d10cd0586299cb8b37aa1c3066461",
+          "bytes": 21009,
+          "member": "objects/c7249f200c351301fc75fb5fe70abf8c159d10cd0586299cb8b37aa1c3066461"
+        },
+        {
+          "path": "scripts/verify-experience-composer.ps1",
+          "gitObject": "e4d9d02e3292d312c02f671f73a21eca52290366",
+          "sha256": "3ac6adf8fa4d743b0359de0f24561dd60f9206705e77237377748d059fd81643",
+          "bytes": 1418,
+          "member": "objects/3ac6adf8fa4d743b0359de0f24561dd60f9206705e77237377748d059fd81643"
+        },
+        {
+          "path": "scripts/verify_openra_reuse.ps1",
+          "gitObject": "8334245f3abfaf62d78c218c660834e74f73994c",
+          "sha256": "9575d1eddd526e9633e7a5ff988106b2c0859683b902fc27da14ba2b661817e0",
+          "bytes": 2552,
+          "member": "objects/9575d1eddd526e9633e7a5ff988106b2c0859683b902fc27da14ba2b661817e0"
+        },
+        {
+          "path": "services/worldgen/src/openra_ai_worldgen/native.py",
+          "gitObject": "7acc6677b09400e46dde363f87a99e5c99c06283",
+          "sha256": "44700bcafedc3824719640f449ca4ecc70a1b7c7cd93fe082a0f6d46ab3d0430",
+          "bytes": 9119,
+          "member": "objects/44700bcafedc3824719640f449ca4ecc70a1b7c7cd93fe082a0f6d46ab3d0430"
+        },
+        {
+          "path": "services/worldgen/tests/test_air_warfare_assets.py",
+          "gitObject": "5a7f03a7c219461e25f7a3a05ed362f3bbd9a23b",
+          "sha256": "12c5beaa050eedc9ebb6951c1ef076de8381253b8d5de485f753b1963df18676",
+          "bytes": 7035,
+          "member": "objects/12c5beaa050eedc9ebb6951c1ef076de8381253b8d5de485f753b1963df18676"
+        },
+        {
+          "path": "services/worldgen/tests/test_red_sea_assets.py",
+          "gitObject": "853204b7a8297fb227efde1c1740d8683c7784ab",
+          "sha256": "4a8ef87e5cda2ec7447fc57b5bbcc384f7f95592a99f81f878dfa35d43d1f95f",
+          "bytes": 26684,
+          "member": "objects/4a8ef87e5cda2ec7447fc57b5bbcc384f7f95592a99f81f878dfa35d43d1f95f"
+        },
+        {
+          "path": "services/worldgen/tests/test_red_sea_infantry_assets.py",
+          "gitObject": "b7b2c417443398a30e5a5694ce48f30e46c64866",
+          "sha256": "1e14c1e7daf55d343d829c770569c446bc0524f02b8b90b94a3f916f7dbe2c0a",
+          "bytes": 8415,
+          "member": "objects/1e14c1e7daf55d343d829c770569c446bc0524f02b8b90b94a3f916f7dbe2c0a"
+        },
+        {
+          "path": "services/worldgen/tests/test_worldgen.py",
+          "gitObject": "879f75be70e2c3e09e70f0290487b73af41fef21",
+          "sha256": "3c8bbc9c3e4785de09c6b5b79a7df0c78e88a713e820b8e84227f08470d90573",
+          "bytes": 22032,
+          "member": "objects/3c8bbc9c3e4785de09c6b5b79a7df0c78e88a713e820b8e84227f08470d90573"
+        }
+      ]
+    },
+    {
+      "name": "codex/china-faction",
+      "head": "845d00022f2dbc3cdcb350023aa2963e48cc2032",
+      "base": "4dcdbd91bfbf0094b11507a8452bfcd25b141536",
+      "files": [
+        {
+          "path": "assets/china-faction/icon-sources/china-gap-cameo-atlas-v2.png",
+          "gitObject": "cf39af32a8923e62f2de21a938f04da47d427b4d",
+          "sha256": "a022b1c22b07c87e730b3172481acfda46912f4b0ed0bc4d4edb9bb64923f25e",
+          "bytes": 2137865,
+          "member": "objects/a022b1c22b07c87e730b3172481acfda46912f4b0ed0bc4d4edb9bb64923f25e"
+        },
+        {
+          "path": "assets/china-faction/icon-sources/china-unit-cameo-atlas-v1.png",
+          "gitObject": "977c9bc99aa6c4e333cde6bdf4963dec2e98fff4",
+          "sha256": "400ae26323a5439224e9f4d48fc4c2eab516724ab10cb4ec49bd3be88d5549d0",
+          "bytes": 2412360,
+          "member": "objects/400ae26323a5439224e9f4d48fc4c2eab516724ab10cb4ec49bd3be88d5549d0"
+        },
+        {
+          "path": "assets/china-faction/voice-provenance.json",
+          "gitObject": "8475d1bb43a20b04aaa01980c39091b6c9c1a126",
+          "sha256": "e4d1e8f9e6a13c662981518b48b40926d837ed680e680f7975ca8a49a4871b64",
+          "bytes": 11334,
+          "member": "objects/e4d1e8f9e6a13c662981518b48b40926d837ed680e680f7975ca8a49a4871b64"
+        },
+        {
+          "path": "docs/air-warfare-validation.md",
+          "gitObject": "876decda22b0b5c1c71cf3552253b68b8dabe3a9",
+          "sha256": "9a09299c419fd4a22fb2ebdb0cc39a68446c5fc8e81ed338865ff0d682bc4261",
+          "bytes": 5323,
+          "member": "objects/9a09299c419fd4a22fb2ebdb0cc39a68446c5fc8e81ed338865ff0d682bc4261"
+        },
+        {
+          "path": "docs/china-faction-research.md",
+          "gitObject": "4039c9b4cef3a3731ed6082ce75d9010163cfdf8",
+          "sha256": "e6c5c88dd671abb82218b628cb495783d724ac436ccc131b4f7af08e8977f937",
+          "bytes": 10056,
+          "member": "objects/e6c5c88dd671abb82218b628cb495783d724ac436ccc131b4f7af08e8977f937"
+        },
+        {
+          "path": "docs/china-faction-validation.md",
+          "gitObject": "ca918811ecd490d39326f4d5773f2cf08507f652",
+          "sha256": "9225f14e2592bec186f327aafc9a330e5061527caa858d7e880886a71a93760b",
+          "bytes": 10593,
+          "member": "objects/9225f14e2592bec186f327aafc9a330e5061527caa858d7e880886a71a93760b"
+        },
+        {
+          "path": "engine/openra",
+          "type": "commit",
+          "gitObject": "667687c52f2d826dcb5f04581698e0f7b93c6fb6"
+        },
+        {
+          "path": "missions/china-faction/ai-build-contract/README.md",
+          "gitObject": "be4b0fbd706e2a70daf2897ffdbc7ee05a91f6ae",
+          "sha256": "d697457cbe9c9e3d8979e475be106c450322db5f32ea20f2e912e11069d19015",
+          "bytes": 459,
+          "member": "objects/d697457cbe9c9e3d8979e475be106c450322db5f32ea20f2e912e11069d19015"
+        },
+        {
+          "path": "missions/china-faction/ai-build-contract/map.bin",
+          "gitObject": "65dc4cf9cdce8a28e4d4cc5aefbf06029254f7ed",
+          "sha256": "689d647357a08954575e75b18aa90c50a7e0583235f2f12f69e56b2f05ac2d26",
+          "bytes": 46097,
+          "member": "objects/689d647357a08954575e75b18aa90c50a7e0583235f2f12f69e56b2f05ac2d26"
+        },
+        {
+          "path": "missions/china-faction/ai-build-contract/map.png",
+          "gitObject": "0e3bfe08fa83794791229cab8cefc502df6d0213",
+          "sha256": "ccc46a5556fd9f0fb8bfec64aed587596282e89aa124e733ed062b8b0bfc5b7e",
+          "bytes": 887,
+          "member": "objects/ccc46a5556fd9f0fb8bfec64aed587596282e89aa124e733ed062b8b0bfc5b7e"
+        },
+        {
+          "path": "missions/china-faction/ai-build-contract/map.yaml",
+          "gitObject": "4c1095f0a024c63971a0fdb74787a8fdca3374b8",
+          "sha256": "3500395e202393e3a0134c26b404a78c70d7fa913be6210d260f0d64fe4d2bf0",
+          "bytes": 899,
+          "member": "objects/3500395e202393e3a0134c26b404a78c70d7fa913be6210d260f0d64fe4d2bf0"
+        },
+        {
+          "path": "missions/china-faction/ai-build-contract/rules.yaml",
+          "gitObject": "03218664cd8d343b52714d2d4c6a1c62e3b887a5",
+          "sha256": "7cf07c35c9e0d5b640ba2ad3bda336e4653d06e39da96d0851c78d850731ddc5",
+          "bytes": 2761,
+          "member": "objects/7cf07c35c9e0d5b640ba2ad3bda336e4653d06e39da96d0851c78d850731ddc5"
+        },
+        {
+          "path": "missions/china-faction/haitan-network/README.md",
+          "gitObject": "376a00ad5b1ed5f5f07c2dcb59d25072eba94fc5",
+          "sha256": "1a47404a4e2aaea648d4a976e4ca33ced5ce6cc4f446219c0dfafc97c500f7a6",
+          "bytes": 546,
+          "member": "objects/1a47404a4e2aaea648d4a976e4ca33ced5ce6cc4f446219c0dfafc97c500f7a6"
+        },
+        {
+          "path": "missions/china-faction/haitan-network/briefing.md",
+          "gitObject": "82bdb305923b51e575c96e36095ffb6048945d46",
+          "sha256": "fd886a2b36629f999391c34a07d8d75b76b3851025db088779fb2bca5d5b0e43",
+          "bytes": 499,
+          "member": "objects/fd886a2b36629f999391c34a07d8d75b76b3851025db088779fb2bca5d5b0e43"
+        },
+        {
+          "path": "missions/china-faction/haitan-network/haitan-network.lua",
+          "gitObject": "3dcc33accc8b44f65a7ccb51cb5619e32201556e",
+          "sha256": "89645474e0cfb63d1a3412b051ea1d18bd71f81776f9f21eec7c0749dffe5a14",
+          "bytes": 5946,
+          "member": "objects/89645474e0cfb63d1a3412b051ea1d18bd71f81776f9f21eec7c0749dffe5a14"
+        },
+        {
+          "path": "missions/china-faction/haitan-network/map.bin",
+          "gitObject": "65dc4cf9cdce8a28e4d4cc5aefbf06029254f7ed",
+          "sha256": "689d647357a08954575e75b18aa90c50a7e0583235f2f12f69e56b2f05ac2d26",
+          "bytes": 46097,
+          "member": "objects/689d647357a08954575e75b18aa90c50a7e0583235f2f12f69e56b2f05ac2d26"
+        },
+        {
+          "path": "missions/china-faction/haitan-network/map.ftl",
+          "gitObject": "f3e847de323969f114866f96195c94a45d98f25f",
+          "sha256": "2e9b0d0b2f8dbd1c6226a5387580656576824bee345692b752f4fabbac2bd3be",
+          "bytes": 2249,
+          "member": "objects/2e9b0d0b2f8dbd1c6226a5387580656576824bee345692b752f4fabbac2bd3be"
+        },
+        {
+          "path": "missions/china-faction/haitan-network/map.png",
+          "gitObject": "0e3bfe08fa83794791229cab8cefc502df6d0213",
+          "sha256": "ccc46a5556fd9f0fb8bfec64aed587596282e89aa124e733ed062b8b0bfc5b7e",
+          "bytes": 887,
+          "member": "objects/ccc46a5556fd9f0fb8bfec64aed587596282e89aa124e733ed062b8b0bfc5b7e"
+        },
+        {
+          "path": "missions/china-faction/haitan-network/map.yaml",
+          "gitObject": "1f99285e3e69f6da15b4568623f14fc1c2a8e0e9",
+          "sha256": "5d98b9e2e4a44ce901c4752732aa822c6b96e37ca648a3e08b54f0a28a9445e8",
+          "bytes": 4405,
+          "member": "objects/5d98b9e2e4a44ce901c4752732aa822c6b96e37ca648a3e08b54f0a28a9445e8"
+        },
+        {
+          "path": "missions/china-faction/haitan-network/rules.yaml",
+          "gitObject": "aa0c65b920bb2009ecf0101edcb8fd1ee95cc3c5",
+          "sha256": "3698bfd3b43c598cdabf5c2ed7fcaa6097d5cf33324306f202e60e9846aefd14",
+          "bytes": 1225,
+          "member": "objects/3698bfd3b43c598cdabf5c2ed7fcaa6097d5cf33324306f202e60e9846aefd14"
+        },
+        {
+          "path": "scripts/build-china-assets.ps1",
+          "gitObject": "358c0819cf1987c7cc224223a8f6306a8d392c68",
+          "sha256": "aa95eb475964111c1b1f6b6b44ded7269b5cd72af787ca511317adc4955e6475",
+          "bytes": 4718,
+          "member": "objects/aa95eb475964111c1b1f6b6b44ded7269b5cd72af787ca511317adc4955e6475"
+        },
+        {
+          "path": "scripts/build-china-assets.py",
+          "gitObject": "54675100cef4109dcc4a4fad3fa0a3b64bb2eeb8",
+          "sha256": "f429ccbca9097b5171953963ddf63227e14b9690af973ec272b0a88834867368",
+          "bytes": 24442,
+          "member": "objects/f429ccbca9097b5171953963ddf63227e14b9690af973ec272b0a88834867368"
+        },
+        {
+          "path": "scripts/build-china-mission.py",
+          "gitObject": "bd8c7bfa4b543d954ee2158f507b57dad560b951",
+          "sha256": "1d770e57c190c50785f2b2129733b8cbcf7043287377af54ca93560507caed5c",
+          "bytes": 2472,
+          "member": "objects/1d770e57c190c50785f2b2129733b8cbcf7043287377af54ca93560507caed5c"
+        },
+        {
+          "path": "scripts/build-china-ui.py",
+          "gitObject": "12e86c9011a0986aa5bd39fbd83750552e4101f4",
+          "sha256": "e3f63b8566178ee0aca765acb99b1f7a7b16ffdf2793299632926eba785a6a53",
+          "bytes": 3270,
+          "member": "objects/e3f63b8566178ee0aca765acb99b1f7a7b16ffdf2793299632926eba785a6a53"
+        },
+        {
+          "path": "scripts/capture-openra-window.ps1",
+          "gitObject": "f5f6ebab44a1325eac1771e59e25cd425b73b627",
+          "sha256": "6982ce6de6d9b6bdad71e050f86c5ce2609df9c6bf2f297607476485178b216b",
+          "bytes": 2900,
+          "member": "objects/6982ce6de6d9b6bdad71e050f86c5ce2609df9c6bf2f297607476485178b216b"
+        },
+        {
+          "path": "scripts/china_directional_assets.py",
+          "gitObject": "13de7289e78801860cf23ec0237f5e753b66fe90",
+          "sha256": "3a6b4c96f97e4cc1d8cfc652cd296714dcf3631079f98c3dfc55d2cb484d0d7a",
+          "bytes": 19560,
+          "member": "objects/3a6b4c96f97e4cc1d8cfc652cd296714dcf3631079f98c3dfc55d2cb484d0d7a"
+        },
+        {
+          "path": "scripts/generate-china-sfx.py",
+          "gitObject": "2678500d2e0000e7c13a70f4c94667807cfebaad",
+          "sha256": "b6e7238c00f04ebfba25a6550286a9f4a9e6466f157da8f799de0c6116946995",
+          "bytes": 4943,
+          "member": "objects/b6e7238c00f04ebfba25a6550286a9f4a9e6466f157da8f799de0c6116946995"
+        },
+        {
+          "path": "scripts/generate-china-voices.py",
+          "gitObject": "f1b4a71fafd7764fc05f0984ebf331dc52b3031b",
+          "sha256": "98f38e12d3590fd1ea04f8a8b0bfcfbf0f99b0652c10c30e250007f5ca607967",
+          "bytes": 7486,
+          "member": "objects/98f38e12d3590fd1ea04f8a8b0bfcfbf0f99b0652c10c30e250007f5ca607967"
+        },
+        {
+          "path": "scripts/verify-china-ai-build-tree.py",
+          "gitObject": "c64876566d052d5d734f4047b21bba1d7b445e34",
+          "sha256": "ab074f81a43e951acd812fae535767cb720badd32ea38715536752cfc707bfd7",
+          "bytes": 5464,
+          "member": "objects/ab074f81a43e951acd812fae535767cb720badd32ea38715536752cfc707bfd7"
+        },
+        {
+          "path": "scripts/verify-china-live.py",
+          "gitObject": "1a18d02bf1c4b2b017dc8f828c240376e0025b31",
+          "sha256": "b33a21e77ecf159ba799b27ad9140f3ad08faf32cfe847bce88e5476f181769f",
+          "bytes": 12805,
+          "member": "objects/b33a21e77ecf159ba799b27ad9140f3ad08faf32cfe847bce88e5476f181769f"
+        },
+        {
+          "path": "services/companion/evals/test_mission_eval.py",
+          "gitObject": "fd796b18df3442e21e13567bdb9463c9d8a35a48",
+          "sha256": "469e6711702e634dff6944823cc21b702ac48180312b556f9019494a82ef8bb3",
+          "bytes": 1683,
+          "member": "objects/469e6711702e634dff6944823cc21b702ac48180312b556f9019494a82ef8bb3"
+        },
+        {
+          "path": "services/companion/src/openra_ai_companion/autonomous.py",
+          "gitObject": "783ddcda3d87cf5d8c1540b41341f0603af6d2ef",
+          "sha256": "7d6cea2bd208b9284cf0f274c61a49eb003fd6516725235e0679bfd2f1d02878",
+          "bytes": 44211,
+          "member": "objects/7d6cea2bd208b9284cf0f274c61a49eb003fd6516725235e0679bfd2f1d02878"
+        },
+        {
+          "path": "services/worldgen/tests/test_air_warfare_assets.py",
+          "gitObject": "5d332fb027f148e272684f50142e3a777add7497",
+          "sha256": "848e660ba24f892a78f2b878a2fea7bacf4f65874fcdb9738294cb8596dca6c7",
+          "bytes": 5595,
+          "member": "objects/848e660ba24f892a78f2b878a2fea7bacf4f65874fcdb9738294cb8596dca6c7"
+        },
+        {
+          "path": "services/worldgen/tests/test_china_faction.py",
+          "gitObject": "725700576421f1e0ea98f62fe00a3ff6edc28936",
+          "sha256": "0803f85a1388941ccc3fe6315cb902013f12a4c9ebc5aec8fab0f440769ec008",
+          "bytes": 14509,
+          "member": "objects/0803f85a1388941ccc3fe6315cb902013f12a4c9ebc5aec8fab0f440769ec008"
+        },
+        {
+          "path": "services/worldgen/tests/test_red_sea_assets.py",
+          "gitObject": "b58376f7017da2d65e4d639b419369dd40ea807a",
+          "sha256": "eb9415386650b4eaa52ef51b5c9f9b3b6a93974dbe7e0c68a1894936384b2acb",
+          "bytes": 23766,
+          "member": "objects/eb9415386650b4eaa52ef51b5c9f9b3b6a93974dbe7e0c68a1894936384b2acb"
+        }
+      ]
+    },
+    {
+      "name": "codex/iran-faction-archive-20260812",
+      "head": "a12d020de15423950b7a3c59e4dd1a171145f1a3",
+      "base": "4dcdbd91bfbf0094b11507a8452bfcd25b141536",
+      "files": [
+        {
+          "path": "assets/iran-faction/sound-provenance.json",
+          "gitObject": "48f06be7f0e03f797d60c2462903fecc98329fe7",
+          "sha256": "5dbc62b024855703e9259e96bed4ca7dd389b182557ee358c03819e6c0abc49e",
+          "bytes": 3263,
+          "member": "objects/5dbc62b024855703e9259e96bed4ca7dd389b182557ee358c03819e6c0abc49e"
+        },
+        {
+          "path": "assets/iran-faction/voice-provenance.json",
+          "gitObject": "7106a341844c93f7285eb9cd9104347f4c73aa44",
+          "sha256": "f64212010f3e25e19c0ffe1ebc7d506398518f704435a005b1241b853fa9e5cd",
+          "bytes": 10433,
+          "member": "objects/f64212010f3e25e19c0ffe1ebc7d506398518f704435a005b1241b853fa9e5cd"
+        },
+        {
+          "path": "docs/air-warfare-validation.md",
+          "gitObject": "876decda22b0b5c1c71cf3552253b68b8dabe3a9",
+          "sha256": "9a09299c419fd4a22fb2ebdb0cc39a68446c5fc8e81ed338865ff0d682bc4261",
+          "bytes": 5323,
+          "member": "objects/9a09299c419fd4a22fb2ebdb0cc39a68446c5fc8e81ed338865ff0d682bc4261"
+        },
+        {
+          "path": "docs/iran-faction-evidence/01-doctrine-range.png",
+          "gitObject": "87bf5ef82fcac9df571ed4c7acdd4d1be9074ed1",
+          "sha256": "a441327a4235b28975c7b58afdf71d3ea5e87c9b0aefcc0deb71f9e48371c068",
+          "bytes": 1112049,
+          "member": "objects/a441327a4235b28975c7b58afdf71d3ea5e87c9b0aefcc0deb71f9e48371c068"
+        },
+        {
+          "path": "docs/iran-faction-evidence/02-live-headings.png",
+          "gitObject": "a13a46b3d9a852c5f2a28ea6d11e4951cdba3a1c",
+          "sha256": "f60b26da7b8b4575e7e6bacb1483dc234ab7d4ca7291511266d9078998095ad0",
+          "bytes": 1386132,
+          "member": "objects/f60b26da7b8b4575e7e6bacb1483dc234ab7d4ca7291511266d9078998095ad0"
+        },
+        {
+          "path": "docs/iran-faction-evidence/03-shadow-sabotage.png",
+          "gitObject": "ffbc9cf4f8ed70ca43ff713cc749a3e7e54dd0a5",
+          "sha256": "89e33070d62c80d9ce1587e53493753fdfcad80bf3a2a66932e9d3f026269d17",
+          "bytes": 1390433,
+          "member": "objects/89e33070d62c80d9ce1587e53493753fdfcad80bf3a2a66932e9d3f026269d17"
+        },
+        {
+          "path": "docs/iran-faction-evidence/04-loitering-attack.png",
+          "gitObject": "12870709930da674f27cb57659e4d86dcffa61cf",
+          "sha256": "f276f8b1218cfb6c0da8e3aee6f5160e802f69014ff2ee5aa23a56d297dc431f",
+          "bytes": 1391955,
+          "member": "objects/f276f8b1218cfb6c0da8e3aee6f5160e802f69014ff2ee5aa23a56d297dc431f"
+        },
+        {
+          "path": "docs/iran-faction-evidence/05-naval-combat.png",
+          "gitObject": "ccafff7b9a283837b7e8e52687eda6a87ddece49",
+          "sha256": "23ae75a535d8b034465953677673afd8760ca427258f8c7aeb04688d2e55cca0",
+          "bytes": 1394511,
+          "member": "objects/23ae75a535d8b034465953677673afd8760ca427258f8c7aeb04688d2e55cca0"
+        },
+        {
+          "path": "docs/iran-faction-evidence/ai-validation.json",
+          "gitObject": "3d660cb400ab1b3cbc9849bdcdf7b17614199707",
+          "sha256": "a05b09853fa0226f956e81b59be124313e0cc12c1d5e01827b6fbcc9963d9ae2",
+          "bytes": 30913,
+          "member": "objects/a05b09853fa0226f956e81b59be124313e0cc12c1d5e01827b6fbcc9963d9ae2"
+        },
+        {
+          "path": "docs/iran-faction-evidence/live-validation.json",
+          "gitObject": "099382bb0d575fc88e0dcd9902d0c642b961330c",
+          "sha256": "91e7dcb9285fbd543ffe5905ae5e82b6d15947c8eb681e432fb3fe48b490154b",
+          "bytes": 64045,
+          "member": "objects/91e7dcb9285fbd543ffe5905ae5e82b6d15947c8eb681e432fb3fe48b490154b"
+        },
+        {
+          "path": "docs/iran-faction-research.md",
+          "gitObject": "5cd29788ba9212292092c11fb1b6904402606523",
+          "sha256": "d3505a446fda2bdebc948694c0c899356f9d70b430b078eb9f7325071b5c4612",
+          "bytes": 7994,
+          "member": "objects/d3505a446fda2bdebc948694c0c899356f9d70b430b078eb9f7325071b5c4612"
+        },
+        {
+          "path": "engine/openra",
+          "type": "commit",
+          "gitObject": "e1e11e6934ebd004467a77dd6fb773dcd12f4b2d"
+        },
+        {
+          "path": "scripts/build-iran-assets.ps1",
+          "gitObject": "9a4a13843c6b0e00cfb8e7632cbcb994f8112da4",
+          "sha256": "91b255ab88c53301ffe82d551b2412a2e5248d3c94b160029da37db4d1b11ca1",
+          "bytes": 4345,
+          "member": "objects/91b255ab88c53301ffe82d551b2412a2e5248d3c94b160029da37db4d1b11ca1"
+        },
+        {
+          "path": "scripts/build-iran-map.py",
+          "gitObject": "608497e9f9d0f182146289ab8c94d42474e3115e",
+          "sha256": "f403ee936376158ad7a55d19ccd646593165ad13f73745239e5e600195e402d0",
+          "bytes": 7319,
+          "member": "objects/f403ee936376158ad7a55d19ccd646593165ad13f73745239e5e600195e402d0"
+        },
+        {
+          "path": "scripts/build-iran-sprites.py",
+          "gitObject": "c581308fb1932c9d33e487d485ea2eccccd4319f",
+          "sha256": "cc42e77f7047ab6e488c7f9c9c4d8b2d1f2a700e5b173c1fc35dcdf513218a73",
+          "bytes": 9631,
+          "member": "objects/cc42e77f7047ab6e488c7f9c9c4d8b2d1f2a700e5b173c1fc35dcdf513218a73"
+        },
+        {
+          "path": "scripts/build-red-sea-ui.py",
+          "gitObject": "fab6b1cbbeed92954264216fcd0743086eb6c791",
+          "sha256": "08501e23098e21565933a80f69f7371bd2ca2aa3117d3495bbd38771ef6fde3e",
+          "bytes": 3766,
+          "member": "objects/08501e23098e21565933a80f69f7371bd2ca2aa3117d3495bbd38771ef6fde3e"
+        },
+        {
+          "path": "scripts/generate-iran-sfx.py",
+          "gitObject": "65ae8bf2f2bde4e65c8e71ada7738ee7f0d003ae",
+          "sha256": "cd73ef0dc1373a03cbe2459bbbf1dc145c14c842d57e245f009888a3ea305ecf",
+          "bytes": 3662,
+          "member": "objects/cd73ef0dc1373a03cbe2459bbbf1dc145c14c842d57e245f009888a3ea305ecf"
+        },
+        {
+          "path": "scripts/generate-iran-voices.py",
+          "gitObject": "790e07848ded717ad35c733075712b2c6e409a24",
+          "sha256": "2404f3251c4b3a99ef34d19bbc13f37225a16119062613cfcdfba666cb4fdaf0",
+          "bytes": 6495,
+          "member": "objects/2404f3251c4b3a99ef34d19bbc13f37225a16119062613cfcdfba666cb4fdaf0"
+        },
+        {
+          "path": "scripts/iran_directional_assets.py",
+          "gitObject": "dc1008e11458f46f56a4e7704f66628f3623cfd9",
+          "sha256": "f5c6c67faa92ea95e64f7b126c4ce21ad986dbadeb137fd69a99b92d6c6136f5",
+          "bytes": 22492,
+          "member": "objects/f5c6c67faa92ea95e64f7b126c4ce21ad986dbadeb137fd69a99b92d6c6136f5"
+        },
+        {
+          "path": "scripts/validate-iran-ai.py",
+          "gitObject": "5b3967d35af2f0eec22ed17dbc1562420ed75f00",
+          "sha256": "29d9e8d3e8655f7a9eacfb0a1d82fa69e0754d44dde7edff83c64aef04cdb675",
+          "bytes": 7459,
+          "member": "objects/29d9e8d3e8655f7a9eacfb0a1d82fa69e0754d44dde7edff83c64aef04cdb675"
+        },
+        {
+          "path": "scripts/validate-iran-live.py",
+          "gitObject": "8693fc8e7304e53d37fab71f7fe1e004f3f7df81",
+          "sha256": "522f07a5f673e24c8ec02c88c74b3b42d12d29b65973e31513a4f263947947a3",
+          "bytes": 15088,
+          "member": "objects/522f07a5f673e24c8ec02c88c74b3b42d12d29b65973e31513a4f263947947a3"
+        },
+        {
+          "path": "services/worldgen/tests/test_air_warfare_assets.py",
+          "gitObject": "5d332fb027f148e272684f50142e3a777add7497",
+          "sha256": "848e660ba24f892a78f2b878a2fea7bacf4f65874fcdb9738294cb8596dca6c7",
+          "bytes": 5595,
+          "member": "objects/848e660ba24f892a78f2b878a2fea7bacf4f65874fcdb9738294cb8596dca6c7"
+        },
+        {
+          "path": "tests/test_iran_faction_assets.py",
+          "gitObject": "3d914ec2eeeccef569cb4ceb9ce8687b4e8cd30a",
+          "sha256": "80c1f8e52295bbb39a8c9a0b6918088107e1bc6f0103e1c6dc3b8a25924beaf2",
+          "bytes": 6993,
+          "member": "objects/80c1f8e52295bbb39a8c9a0b6918088107e1bc6f0103e1c6dc3b8a25924beaf2"
+        }
+      ]
+    },
+    {
+      "name": "codex/local-ai-installer",
+      "head": "71556716b8c33c84773816a7185fcbb63a67b9f9",
+      "base": "e56ce7f30f6890e03ed860d2b825d3d69b80cf38",
+      "files": [
+        {
+          "path": "README.md",
+          "gitObject": "a611c961e2f1e7a63c4c70d770199069e0c0a1c1",
+          "sha256": "61973ca5700e5db4f76a0ed907fa241e63587c93d4b6b7f663758f8ba8070b27",
+          "bytes": 15256,
+          "member": "objects/61973ca5700e5db4f76a0ed907fa241e63587c93d4b6b7f663758f8ba8070b27"
+        },
+        {
+          "path": "apps/installer/windows/OpenRAAI.nsi",
+          "gitObject": "1171c9b8f5436d70bbec450aa0134bd3fcb6dcbb",
+          "sha256": "9c70ae7f53438af19b4474093f28ead141667daa71607ac5b6a638f9b6bb7f45",
+          "bytes": 7361,
+          "member": "objects/9c70ae7f53438af19b4474093f28ead141667daa71607ac5b6a638f9b6bb7f45"
+        },
+        {
+          "path": "apps/launcher/Install-AIPack.ps1",
+          "gitObject": "cf7be47e0e381d47980a65181ae31590d4a307a7",
+          "sha256": "227074953f994463530f71d2a25f2060453f4faf309517b2b6284479d7e49a11",
+          "bytes": 1706,
+          "member": "objects/227074953f994463530f71d2a25f2060453f4faf309517b2b6284479d7e49a11"
+        },
+        {
+          "path": "apps/launcher/Start-OpenRAAI.ps1",
+          "gitObject": "6d44b7b042f8c7b93bc1e66ad97271ade141773d",
+          "sha256": "8005c020bcd7aa280a4557026e1f35cba0fff7134a5e42c6ecafd6e70b0b754b",
+          "bytes": 7747,
+          "member": "objects/8005c020bcd7aa280a4557026e1f35cba0fff7134a5e42c6ecafd6e70b0b754b"
+        },
+        {
+          "path": "apps/launcher/local_ai_entry.py",
+          "gitObject": "ee6b500b382dc9616d77c20c624a5cad793a7534",
+          "sha256": "bab3c80f9ec0f865358d516e27c61f7b97770cad23e9f81fcfad2e2a19ca7c04",
+          "bytes": 109,
+          "member": "objects/bab3c80f9ec0f865358d516e27c61f7b97770cad23e9f81fcfad2e2a19ca7c04"
+        },
+        {
+          "path": "apps/web/app/page.tsx",
+          "gitObject": "8a480c922bc7db0a92418e6b697a5e6b347ba10d",
+          "sha256": "61db96cd8d38584f66426d663fe86a7f0334297818c658dfd45c90c09637ee7e",
+          "bytes": 10271,
+          "member": "objects/61db96cd8d38584f66426d663fe86a7f0334297818c658dfd45c90c09637ee7e"
+        },
+        {
+          "path": "apps/web/lib/release.ts",
+          "gitObject": "94568ad59829f33ae7c9633e443abf061cd716dd",
+          "sha256": "fd72f89ecd261790daffb0555e819cdf16ca524de785979b99e7adbc94022dfb",
+          "bytes": 681,
+          "member": "objects/fd72f89ecd261790daffb0555e819cdf16ca524de785979b99e7adbc94022dfb"
+        },
+        {
+          "path": "docs/experience-composer/README.md",
+          "gitObject": "339fc1194bcfd8e4ff520487f4eaf06f803d3a52",
+          "sha256": "1ab8bfc6659bb8b978e76f7f581b415c3cc746d43fced3c82be6b58882c98a6f",
+          "bytes": 6372,
+          "member": "objects/1ab8bfc6659bb8b978e76f7f581b415c3cc746d43fced3c82be6b58882c98a6f"
+        },
+        {
+          "path": "docs/models.md",
+          "gitObject": "629d1d4595ea78db191fc5f00db201ed0846aa63",
+          "sha256": "d871e76ba1f81a47063e6ecacdeb6a6f5d4e755d6d915b207ae536205a6b1436",
+          "bytes": 2701,
+          "member": "objects/d871e76ba1f81a47063e6ecacdeb6a6f5d4e755d6d915b207ae536205a6b1436"
+        },
+        {
+          "path": "docs/releasing.md",
+          "gitObject": "4ad6978726935d5bcc2f27ab51b6dc8d467229a3",
+          "sha256": "abba284daf27dd3f5a50ad4e3f51f956395e0c71c56512d85c4ed5c1d44b737f",
+          "bytes": 3776,
+          "member": "objects/abba284daf27dd3f5a50ad4e3f51f956395e0c71c56512d85c4ed5c1d44b737f"
+        },
+        {
+          "path": "engine/openra",
+          "type": "commit",
+          "gitObject": "e410de7265818eee8c007c7f93154d9b363c90fc"
+        },
+        {
+          "path": "packaging/THIRD_PARTY_MODELS.md",
+          "gitObject": "0320a844e13e8278cac03d4e857f1f36a5fd8561",
+          "sha256": "4aff0883b47c5bf746e4f1dc036d7ac8e7e8972712eeaf8225f02ac165dc709f",
+          "bytes": 1249,
+          "member": "objects/4aff0883b47c5bf746e4f1dc036d7ac8e7e8972712eeaf8225f02ac165dc709f"
+        },
+        {
+          "path": "packaging/ai-pack.lock.json",
+          "gitObject": "b5c3511be200094633424d0343a4c00554d9dabd",
+          "sha256": "2793e0cac63a67b637a62032faeede1b11729c4b7bb7badfb94ce130ad6f2a4f",
+          "bytes": 3133,
+          "member": "objects/2793e0cac63a67b637a62032faeede1b11729c4b7bb7badfb94ce130ad6f2a4f"
+        },
+        {
+          "path": "packaging/ai-runtime.lock.json",
+          "gitObject": "f92dd5d7d5197737a0e5023a9fd1633075f67f8e",
+          "sha256": "1c531946bd3b0827d733474c364cc622bd0affddd30c2596934d12d2d31059e8",
+          "bytes": 1015,
+          "member": "objects/1c531946bd3b0827d733474c364cc622bd0affddd30c2596934d12d2d31059e8"
+        },
+        {
+          "path": "packaging/release-plan.json",
+          "gitObject": "879e05393f2cf48b2e6b4b3aedb3b03ca2324ee9",
+          "sha256": "d36a6507d78fb311932d2d025c553acfdd3a3e1c69b5d519dd7d2450e95f8e12",
+          "bytes": 1687,
+          "member": "objects/d36a6507d78fb311932d2d025c553acfdd3a3e1c69b5d519dd7d2450e95f8e12"
+        },
+        {
+          "path": "scripts/ai_pack.py",
+          "gitObject": "71657f734c95e3163c32ee5823edbe0b42d8c789",
+          "sha256": "e9c06e3c8bd443e303e5d7b2082dca57d89dff879dca68b101c4bec1f991150c",
+          "bytes": 14387,
+          "member": "objects/e9c06e3c8bd443e303e5d7b2082dca57d89dff879dca68b101c4bec1f991150c"
+        },
+        {
+          "path": "scripts/check.ps1",
+          "gitObject": "fcb1bd5b3e43101c529b9b6238e7a796f7eb9561",
+          "sha256": "263b478bb913e9d0d36eddf80c93e161197c8a5dc59dedc675fe00feb4316a14",
+          "bytes": 6215,
+          "member": "objects/263b478bb913e9d0d36eddf80c93e161197c8a5dc59dedc675fe00feb4316a14"
+        },
+        {
+          "path": "scripts/package-windows-installer.ps1",
+          "gitObject": "066625b61666246dd0f9023ee5d678e7a2956906",
+          "sha256": "80893b91365f0c450454bae365f2d16ef8a26df9343f90c152c2993468bc26f7",
+          "bytes": 4219,
+          "member": "objects/80893b91365f0c450454bae365f2d16ef8a26df9343f90c152c2993468bc26f7"
+        },
+        {
+          "path": "scripts/package-windows.ps1",
+          "gitObject": "9bef6d56fd8dcba8466e4aabb476714cfeb331e0",
+          "sha256": "825ad6d075723cdb5671fa417c13d9c1923fad33d5b7b2c89a62e6bc122992df",
+          "bytes": 8257,
+          "member": "objects/825ad6d075723cdb5671fa417c13d9c1923fad33d5b7b2c89a62e6bc122992df"
+        },
+        {
+          "path": "scripts/release.py",
+          "gitObject": "c13b972890c04e3d29d2718d8da4b609b06a5265",
+          "sha256": "05e219bc6971b0f4273e5cc1bdf5a062e65ab7479a6e4f56facdfb43004019f1",
+          "bytes": 10570,
+          "member": "objects/05e219bc6971b0f4273e5cc1bdf5a062e65ab7479a6e4f56facdfb43004019f1"
+        },
+        {
+          "path": "scripts/setup.ps1",
+          "gitObject": "be6b3a95dd1050023821eb0cb22899749d5621c9",
+          "sha256": "4bff6a94de10259c45db300105041fe73b385478c2c55937f2510b19e57fc7fb",
+          "bytes": 1178,
+          "member": "objects/4bff6a94de10259c45db300105041fe73b385478c2c55937f2510b19e57fc7fb"
+        },
+        {
+          "path": "scripts/smoke-windows-installer.ps1",
+          "gitObject": "961b1c25ff1bb7a797b1a4cf0838bd4d0d6ef33f",
+          "sha256": "cbefb987ec2e78428e77ba6f5f41e5ffefb44e1dc71a4d54a8d497ed2174d2fb",
+          "bytes": 2549,
+          "member": "objects/cbefb987ec2e78428e77ba6f5f41e5ffefb44e1dc71a4d54a8d497ed2174d2fb"
+        },
+        {
+          "path": "services/companion/README.md",
+          "gitObject": "1b9d6388993099ffebdb96680f0b68ebe0177685",
+          "sha256": "ceec0aa2f3519c77dcd18bc14fd1290eea1b06545c10deaff9586c48797c2d10",
+          "bytes": 10762,
+          "member": "objects/ceec0aa2f3519c77dcd18bc14fd1290eea1b06545c10deaff9586c48797c2d10"
+        },
+        {
+          "path": "services/companion/pyproject.toml",
+          "gitObject": "ba649f246d23d148042937607150d2d696f368b6",
+          "sha256": "4d4fc258b5c55da4864b75a8ed660ddd48c03c3ea3c342512d6194e92c2fa044",
+          "bytes": 757,
+          "member": "objects/4d4fc258b5c55da4864b75a8ed660ddd48c03c3ea3c342512d6194e92c2fa044"
+        },
+        {
+          "path": "services/companion/src/openra_ai_companion/local_runtime.py",
+          "gitObject": "5f1729b3d4881208233cbecc6e1e519dbae93bc3",
+          "sha256": "a2035644e0fc48750dd51fd3d7d9c4bd007ee1707ead12413202eb15b6e125ea",
+          "bytes": 17196,
+          "member": "objects/a2035644e0fc48750dd51fd3d7d9c4bd007ee1707ead12413202eb15b6e125ea"
+        },
+        {
+          "path": "services/companion/tests/test_local_runtime.py",
+          "gitObject": "dafb6e3e9b35ba6b6e446c126fa34a287e878b27",
+          "sha256": "9d073718fbf9b11bd537a2a8e511d732aa13a2d12c747ecca7b66bb0782b7672",
+          "bytes": 6302,
+          "member": "objects/9d073718fbf9b11bd537a2a8e511d732aa13a2d12c747ecca7b66bb0782b7672"
+        },
+        {
+          "path": "services/worldgen/tests/test_red_sea_assets.py",
+          "gitObject": "794418cc24bafaa5038f06480517b68213cd9ad3",
+          "sha256": "4e2969fc97d275c832f72b5cd50b265aaa2910939c95b112bb63242109da68ea",
+          "bytes": 32356,
+          "member": "objects/4e2969fc97d275c832f72b5cd50b265aaa2910939c95b112bb63242109da68ea"
+        },
+        {
+          "path": "services/worldgen/tests/test_turkey_faction.py",
+          "gitObject": "709402dcaca793b137f7f0b073cca8254830869b",
+          "sha256": "f6361e98a16e2a9cdc84407309fcb44b6703e265d6dba244512705b3c84dde4d",
+          "bytes": 7663,
+          "member": "objects/f6361e98a16e2a9cdc84407309fcb44b6703e265d6dba244512705b3c84dde4d"
+        }
+      ]
+    },
+    {
+      "name": "codex/mandab-campaign",
+      "head": "ad017d6e429b2de9f323157cab4f4ae17074e84f",
+      "base": "caa2a1143257da33e2b70916c536edd006a2d315",
+      "files": [
+        {
+          "path": "README.md",
+          "gitObject": "2823308bb88691cab6524966e7277246dc93e4a7",
+          "sha256": "f359e280efbd033542c16127de17889d2f4c20638e4e8f354678562f7511c7e5",
+          "bytes": 13518,
+          "member": "objects/f359e280efbd033542c16127de17889d2f4c20638e4e8f354678562f7511c7e5"
+        },
+        {
+          "path": "assets/red-sea-2026/mandab-mission-preview.png",
+          "gitObject": "ac82fda46c4d9d0820205384c8e92f1b3d09a0f2",
+          "sha256": "471f82068d527ea504bdace7b910f2fb232086175fb1938ea5b1419b51c9aa6f",
+          "bytes": 16014,
+          "member": "objects/471f82068d527ea504bdace7b910f2fb232086175fb1938ea5b1419b51c9aa6f"
+        },
+        {
+          "path": "assets/red-sea-2026/mandab-voice-provenance.json",
+          "gitObject": "9519b587b5682c0af00070b1e8d40afff70249ab",
+          "sha256": "835009e19e3d6996f47c841ff20b036d3d3a9218d9abe8f9668c9ff7c49a2e6b",
+          "bytes": 4591,
+          "member": "objects/835009e19e3d6996f47c841ff20b036d3d3a9218d9abe8f9668c9ff7c49a2e6b"
+        },
+        {
+          "path": "docs/red-sea-2026-playtest.md",
+          "gitObject": "7f0b8687fdb3ad43b71b7596225b5db3c2212315",
+          "sha256": "7ad6c5296895c0ba661b55f89ad19f71e0c675077425ddf31fe3eb3a88d613bc",
+          "bytes": 6610,
+          "member": "objects/7ad6c5296895c0ba661b55f89ad19f71e0c675077425ddf31fe3eb3a88d613bc"
+        },
+        {
+          "path": "docs/red-sea-2026.md",
+          "gitObject": "2408b696b1f29fd811c4dda078fcba9dd9056739",
+          "sha256": "383f59dcd751169942f2b29974fe59762ff8e809362560eda2103497fa8f2bc1",
+          "bytes": 7084,
+          "member": "objects/383f59dcd751169942f2b29974fe59762ff8e809362560eda2103497fa8f2bc1"
+        },
+        {
+          "path": "engine/openra",
+          "type": "commit",
+          "gitObject": "c00559119b1c6093b25beaab3a80f378814ef289"
+        },
+        {
+          "path": "missions/red-sea-2026/bab-al-mandab-passage/README.md",
+          "gitObject": "8d1f9725def80f434b66f83590646e07a69b098b",
+          "sha256": "b985357c6dba989b719b795cb1f89564dc65ec422ee8a0905262dfa288e19a2b",
+          "bytes": 4197,
+          "member": "objects/b985357c6dba989b719b795cb1f89564dc65ec422ee8a0905262dfa288e19a2b"
+        },
+        {
+          "path": "missions/red-sea-2026/bab-al-mandab-passage/bab-al-mandab-passage.lua",
+          "gitObject": "f3d95dc6ecff8dc44b17462371b0d4e2cf8fbfa0",
+          "sha256": "61cd0b81aae86c8f74b1b46640cd3c77682add8e55471f9d1258d9c5f925d4b1",
+          "bytes": 18710,
+          "member": "objects/61cd0b81aae86c8f74b1b46640cd3c77682add8e55471f9d1258d9c5f925d4b1"
+        },
+        {
+          "path": "missions/red-sea-2026/bab-al-mandab-passage/briefing.md",
+          "gitObject": "396be95518d410ca695a814945ee708b7bcffc7b",
+          "sha256": "a546f579d3eb693386e3fff033b0147afa7ad413e47d964c2112812975c33010",
+          "bytes": 2739,
+          "member": "objects/a546f579d3eb693386e3fff033b0147afa7ad413e47d964c2112812975c33010"
+        },
+        {
+          "path": "missions/red-sea-2026/bab-al-mandab-passage/map.bin",
+          "gitObject": "93971e7575340b34cdd406a7d333a719ee97bf9b",
+          "sha256": "d96c6eacd2dc0337879d77f43b2700889fcdf2a459f06c3bc04e9ffcf60abe1f",
+          "bytes": 46097,
+          "member": "objects/d96c6eacd2dc0337879d77f43b2700889fcdf2a459f06c3bc04e9ffcf60abe1f"
+        },
+        {
+          "path": "missions/red-sea-2026/bab-al-mandab-passage/map.ftl",
+          "gitObject": "a53c1e7bc6deb3e5aa6cf8dc9aebbfc5f6949128",
+          "sha256": "0d19756f29e2d02efabf6650438998d7dec6e2dbda9acb635c10b6e0df248532",
+          "bytes": 3826,
+          "member": "objects/0d19756f29e2d02efabf6650438998d7dec6e2dbda9acb635c10b6e0df248532"
+        },
+        {
+          "path": "missions/red-sea-2026/bab-al-mandab-passage/map.yaml",
+          "gitObject": "5cdc50eb0b2eb3844bdda4138faaac424ebb48ff",
+          "sha256": "fd6262a700907155322ca44f0c174801c510741e2550613d731f301708d4e74d",
+          "bytes": 4640,
+          "member": "objects/fd6262a700907155322ca44f0c174801c510741e2550613d731f301708d4e74d"
+        },
+        {
+          "path": "missions/red-sea-2026/bab-al-mandab-passage/rules.yaml",
+          "gitObject": "6c78275b6e5be58550a9ce23c9f12e39753a1ace",
+          "sha256": "0d19840ef1a39f90ef1a8c1634040963b4c847ef7e89e7db8aa6446f45a111de",
+          "bytes": 1375,
+          "member": "objects/0d19840ef1a39f90ef1a8c1634040963b4c847ef7e89e7db8aa6446f45a111de"
+        },
+        {
+          "path": "scripts/build-mandab-terrain.py",
+          "gitObject": "0c13c46eb37729481fb27ac166a664d555f3d0b2",
+          "sha256": "780d359259bd838c42412b363e95ed73baf29978426ed98c3aa53b87e008d545",
+          "bytes": 2723,
+          "member": "objects/780d359259bd838c42412b363e95ed73baf29978426ed98c3aa53b87e008d545"
+        },
+        {
+          "path": "scripts/build-red-sea-assets.ps1",
+          "gitObject": "3fb3f68068a01459d4cd24c05f4f96b10a3a883b",
+          "sha256": "f34e1dac4a205bdb55e0fc0077fbe1ef68a08ae894b6996a92ed9a340f113eab",
+          "bytes": 3804,
+          "member": "objects/f34e1dac4a205bdb55e0fc0077fbe1ef68a08ae894b6996a92ed9a340f113eab"
+        },
+        {
+          "path": "scripts/build-red-sea-mission.py",
+          "gitObject": "7b565b35016d87209f59a7f24f213c813a9fa01e",
+          "sha256": "da314e01a26b22ca080cd131c9062e7683e1129865dc64b712277f35a49d5b7f",
+          "bytes": 8085,
+          "member": "objects/da314e01a26b22ca080cd131c9062e7683e1129865dc64b712277f35a49d5b7f"
+        },
+        {
+          "path": "scripts/generate-mandab-voices.py",
+          "gitObject": "3db94e0ceeeb23ae6b8470747dcf63bdc371cc04",
+          "sha256": "a7e365f8d2246233ac4eb539dc60320a033d9ce4267ef10951e719b3a8b3ee61",
+          "bytes": 5967,
+          "member": "objects/a7e365f8d2246233ac4eb539dc60320a033d9ce4267ef10951e719b3a8b3ee61"
+        },
+        {
+          "path": "scripts/play-red-sea-2026.ps1",
+          "gitObject": "32e2c3b9cd8e2f8c9da2f049faccd289dab36268",
+          "sha256": "250bc7943319c080298738d84162be1b700cfba77f5811cb33d03ba7ffc55419",
+          "bytes": 2633,
+          "member": "objects/250bc7943319c080298738d84162be1b700cfba77f5811cb33d03ba7ffc55419"
+        },
+        {
+          "path": "scripts/validate-mandab-mission.py",
+          "gitObject": "62f11ecdc06416ce6154276e32c3ff5f5d3b46cd",
+          "sha256": "3735d85e7fe4189147a6d22d26e2e6d7a862d5387da9a53a5c1d198018c51644",
+          "bytes": 9852,
+          "member": "objects/3735d85e7fe4189147a6d22d26e2e6d7a862d5387da9a53a5c1d198018c51644"
+        },
+        {
+          "path": "services/companion/evals/test_mission_eval.py",
+          "gitObject": "7a0a10fe54ac1f93fa7e6137210344f4f76fb8fa",
+          "sha256": "9839569c7bb429d5fd977dc73c42808e2ef412ab22ca019487c9159f80932ee9",
+          "bytes": 1711,
+          "member": "objects/9839569c7bb429d5fd977dc73c42808e2ef412ab22ca019487c9159f80932ee9"
+        },
+        {
+          "path": "services/worldgen/tests/test_red_sea_assets.py",
+          "gitObject": "19fb19b32b0068d4896233aaf7cb8cfc90184e87",
+          "sha256": "7505fa362cccdff8e19e73f02b3aade17be52c0087fc6ad9b0712e5384bdfe9b",
+          "bytes": 26023,
+          "member": "objects/7505fa362cccdff8e19e73f02b3aade17be52c0087fc6ad9b0712e5384bdfe9b"
+        }
+      ]
+    },
+    {
+      "name": "codex/turkey-faction",
+      "head": "78d0801e85fdcc20e33d6fb9ad6020bcfcdc9380",
+      "base": "4dcdbd91bfbf0094b11507a8452bfcd25b141536",
+      "files": [
+        {
+          "path": "artifacts/turkey-faction/ai-progression-telemetry.json",
+          "gitObject": "cb3248f301b5569f63962c0bb93ea22d782e6ca7",
+          "sha256": "43857f4d19eab29ee54e53e1cfc6e2469b6bf29a40623aa25a6136d7c7b9d21a",
+          "bytes": 8265,
+          "member": "objects/43857f4d19eab29ee54e53e1cfc6e2469b6bf29a40623aa25a6136d7c7b9d21a"
+        },
+        {
+          "path": "artifacts/turkey-faction/asset-build-telemetry.json",
+          "gitObject": "5985a562b8f31a12a4cda0c6b30a359a79bdd5b3",
+          "sha256": "2c73750fcb345a1f30ff376d9bf593268ff8e54b7f4f748da68cde08aecf0260",
+          "bytes": 2804,
+          "member": "objects/2c73750fcb345a1f30ff376d9bf593268ff8e54b7f4f748da68cde08aecf0260"
+        },
+        {
+          "path": "artifacts/turkey-faction/directional-audit/all-facing-composites.png",
+          "gitObject": "9f68bd0b2aec25f63b0e91ccbba4431d5c4afec9",
+          "sha256": "38d37fc74a0777b4cab58b368aadda11e102a8fdf629b56d9afcfc419bc7cf81",
+          "bytes": 473869,
+          "member": "objects/38d37fc74a0777b4cab58b368aadda11e102a8fdf629b56d9afcfc419bc7cf81"
+        },
+        {
+          "path": "artifacts/turkey-faction/directional-audit/audit-report.json",
+          "gitObject": "c83eda1745dd19d0b95df387367790205d8b9b61",
+          "sha256": "3b993186c505d08716b40ee153378ee38176663e9a02e65b0b1ddcbc93d78073",
+          "bytes": 4323,
+          "member": "objects/3b993186c505d08716b40ee153378ee38176663e9a02e65b0b1ddcbc93d78073"
+        },
+        {
+          "path": "artifacts/turkey-faction/directional-audit/bozkir-independent-turret.png",
+          "gitObject": "7e029c6e3c9477a47f146c8fa83289f735d60bc8",
+          "sha256": "8a6c67dfca1b287028284419ac641fd951cc1c861c087a6716d8104b619109a8",
+          "bytes": 31450,
+          "member": "objects/8a6c67dfca1b287028284419ac641fd951cc1c861c087a6716d8104b619109a8"
+        },
+        {
+          "path": "artifacts/turkey-faction/directional-audit/cardinal-handedness-check.png",
+          "gitObject": "3b5df6328a7295c6018ee6f0a5fb1439dc5277da",
+          "sha256": "e2d70c9a2a1f17e008c18c9dc855a2851e74ed14cfc56ca4e98c009febb1050b",
+          "bytes": 124569,
+          "member": "objects/e2d70c9a2a1f17e008c18c9dc855a2851e74ed14cfc56ca4e98c009febb1050b"
+        },
+        {
+          "path": "artifacts/turkey-faction/directional-audit/layer-breakdown.png",
+          "gitObject": "ae7f9f5a133b06be8cfde2776e97b287972cd5db",
+          "sha256": "93a9ebab7889b67dbde5e02b2cb88330c20edb1fe10a37db1103a9f776858757",
+          "bytes": 209869,
+          "member": "objects/93a9ebab7889b67dbde5e02b2cb88330c20edb1fe10a37db1103a9f776858757"
+        },
+        {
+          "path": "artifacts/turkey-faction/live/live-validation-telemetry.json",
+          "gitObject": "2bc1f20a2980a23cde853d4d292a753ebfacd762",
+          "sha256": "bb81f8a7ccb7752ad3bbb45a7d9ab842e2d8d4f01d30afb9e9e41325d3e2c29f",
+          "bytes": 7111,
+          "member": "objects/bb81f8a7ccb7752ad3bbb45a7d9ab842e2d8d4f01d30afb9e9e41325d3e2c29f"
+        },
+        {
+          "path": "artifacts/turkey-faction/live/straits-shield-live-combat.png",
+          "gitObject": "19690a3c80ce82a58bd578d357c1d3ccf288df9a",
+          "sha256": "73b1e69b44e359b62bc8f84870545cc8c6d71ba394b4c86fca294f084cd59c0a",
+          "bytes": 1065711,
+          "member": "objects/73b1e69b44e359b62bc8f84870545cc8c6d71ba394b4c86fca294f084cd59c0a"
+        },
+        {
+          "path": "artifacts/turkey-faction/live/straits-shield-opening.png",
+          "gitObject": "1739f75bc1e6bbc02b98526b1fdbb02a2e42ecef",
+          "sha256": "8d173c64ee96ac6eedcb0759b1fa826ef7c504d0aa8c374baac6c831f5b658f5",
+          "bytes": 1041663,
+          "member": "objects/8d173c64ee96ac6eedcb0759b1fa826ef7c504d0aa8c374baac6c831f5b658f5"
+        },
+        {
+          "path": "artifacts/turkey-faction/turkey-ai-progression.png",
+          "gitObject": "8b1ebbb2fbdf5be6a0a497a31621c65c25f16f7b",
+          "sha256": "3c5d5e4a14229d2dcaf17a1bfeba7d852b01ce754e25afb3703ff6697cd9594c",
+          "bytes": 534509,
+          "member": "objects/3c5d5e4a14229d2dcaf17a1bfeba7d852b01ce754e25afb3703ff6697cd9594c"
+        },
+        {
+          "path": "assets/turkey-faction/concept-sources/README.md",
+          "gitObject": "20dc009fe2c197065910d59218ba5cbfdcb02399",
+          "sha256": "34fb934eccb89208dc81e4ac57f6308d18e036065453848285b83dc18dd18030",
+          "bytes": 901,
+          "member": "objects/34fb934eccb89208dc81e4ac57f6308d18e036065453848285b83dc18dd18030"
+        },
+        {
+          "path": "assets/turkey-faction/concept-sources/turkey-roster-concept.png",
+          "gitObject": "b408f5015e83992f3e42edb1dbbce6bcfd234f9a",
+          "sha256": "7eb55e766054a2e0732c7752e6e3a5c6763a647975c42df60de234c12b8fdd5e",
+          "bytes": 2643985,
+          "member": "objects/7eb55e766054a2e0732c7752e6e3a5c6763a647975c42df60de234c12b8fdd5e"
+        },
+        {
+          "path": "assets/turkey-faction/voice-provenance.json",
+          "gitObject": "00f62e03c0209d632f89134ffcf116ace46255bb",
+          "sha256": "0b63bd1d596839d39dfdf67cf30902b39997041c6e217fbaba1e82073fe58568",
+          "bytes": 12640,
+          "member": "objects/0b63bd1d596839d39dfdf67cf30902b39997041c6e217fbaba1e82073fe58568"
+        },
+        {
+          "path": "docs/air-warfare-validation.md",
+          "gitObject": "876decda22b0b5c1c71cf3552253b68b8dabe3a9",
+          "sha256": "9a09299c419fd4a22fb2ebdb0cc39a68446c5fc8e81ed338865ff0d682bc4261",
+          "bytes": 5323,
+          "member": "objects/9a09299c419fd4a22fb2ebdb0cc39a68446c5fc8e81ed338865ff0d682bc4261"
+        },
+        {
+          "path": "docs/turkey-faction-research.md",
+          "gitObject": "36b943b8625cde05f4c00f57cfcc4af0ebdf2949",
+          "sha256": "70ca14f6f0479f6e012eabdd70f692a1af4bc952d5bb6f284fa9a5c3aa6214d3",
+          "bytes": 10158,
+          "member": "objects/70ca14f6f0479f6e012eabdd70f692a1af4bc952d5bb6f284fa9a5c3aa6214d3"
+        },
+        {
+          "path": "docs/turkey-faction-validation.md",
+          "gitObject": "8b0cf61f12532390fab6bc0e0c09cf2aef52b9dd",
+          "sha256": "96878f42966f9155bd97bb860b70a9a58f1c3cf33afdb1e11ad81fe9feb5c105",
+          "bytes": 9975,
+          "member": "objects/96878f42966f9155bd97bb860b70a9a58f1c3cf33afdb1e11ad81fe9feb5c105"
+        },
+        {
+          "path": "engine/openra",
+          "type": "commit",
+          "gitObject": "8d436c02090b6b7e53f2dba3d2b164065b8ce678"
+        },
+        {
+          "path": "missions/turkey-faction/straits-shield/README.md",
+          "gitObject": "2b310aa0fa579ff993d6a6f1c309b0751b74b8fa",
+          "sha256": "aa66c93dff849ffa4597e05257abe749a6cb6eee3d747ac0217bfb479288c871",
+          "bytes": 294,
+          "member": "objects/aa66c93dff849ffa4597e05257abe749a6cb6eee3d747ac0217bfb479288c871"
+        },
+        {
+          "path": "missions/turkey-faction/straits-shield/briefing.md",
+          "gitObject": "8c035b6d1486a7b7acb98a302785fdc52eb72011",
+          "sha256": "b3c3b8bc1a937bdccbecef0c8977320c47d21a53e7cd2698ab81ae76b6c3f0bd",
+          "bytes": 452,
+          "member": "objects/b3c3b8bc1a937bdccbecef0c8977320c47d21a53e7cd2698ab81ae76b6c3f0bd"
+        },
+        {
+          "path": "missions/turkey-faction/straits-shield/map.ftl",
+          "gitObject": "49a2195c20d579b19d8f454e88c12ede592dcfef",
+          "sha256": "26181e8e03c270cb73548a0968f017bf2e906b60ed5c152bd9d48aee5e229068",
+          "bytes": 2133,
+          "member": "objects/26181e8e03c270cb73548a0968f017bf2e906b60ed5c152bd9d48aee5e229068"
+        },
+        {
+          "path": "missions/turkey-faction/straits-shield/map.yaml",
+          "gitObject": "20292cbd69cbd8d0d66dc3164536818d0f4ea69d",
+          "sha256": "dbcb5c2dacf7862c174d0cfaa2ef0d5e7f6df99069d28e26774e2f7966e45d9a",
+          "bytes": 4306,
+          "member": "objects/dbcb5c2dacf7862c174d0cfaa2ef0d5e7f6df99069d28e26774e2f7966e45d9a"
+        },
+        {
+          "path": "missions/turkey-faction/straits-shield/rules.yaml",
+          "gitObject": "46d0b6cd79c0f4165956f8af01429ab1493f6fd2",
+          "sha256": "e056652b42098c4c93e607a83d205a6de85b8f2f632eeab875763d75acb29d21",
+          "bytes": 1390,
+          "member": "objects/e056652b42098c4c93e607a83d205a6de85b8f2f632eeab875763d75acb29d21"
+        },
+        {
+          "path": "missions/turkey-faction/straits-shield/straits-shield.lua",
+          "gitObject": "bd4e0065501324bcdd9b86b6c852691645cc2b28",
+          "sha256": "12efe7db352f32cbf954dcb3b32db48418b9e224dea6e27c316d751c0386639b",
+          "bytes": 5107,
+          "member": "objects/12efe7db352f32cbf954dcb3b32db48418b9e224dea6e27c316d751c0386639b"
+        },
+        {
+          "path": "scripts/build-red-sea-ui.py",
+          "gitObject": "18a16f9e695267b3ed162005b2081ee057c466d9",
+          "sha256": "5c5090759e9806d68a43081c0b026fa451ec397f5a5dce0df1670bb992b6d84e",
+          "bytes": 4035,
+          "member": "objects/5c5090759e9806d68a43081c0b026fa451ec397f5a5dce0df1670bb992b6d84e"
+        },
+        {
+          "path": "scripts/build-turkey-ai-validation-map.py",
+          "gitObject": "7941971318314b3e2772a3efe7d3017e14a0d211",
+          "sha256": "a76dc0cf1b3ab2b9400f176f6534274a9c516d313fc9c7a00ffc4904cbe181c2",
+          "bytes": 2447,
+          "member": "objects/a76dc0cf1b3ab2b9400f176f6534274a9c516d313fc9c7a00ffc4904cbe181c2"
+        },
+        {
+          "path": "scripts/build-turkey-assets.ps1",
+          "gitObject": "f05ab46ce488cc1124f2afc1f7eae20c0efe0261",
+          "sha256": "4c4de207b14fc040c26d3f9e67034e780d3dfff0fe6c9f2994b9dc811214c082",
+          "bytes": 5643,
+          "member": "objects/4c4de207b14fc040c26d3f9e67034e780d3dfff0fe6c9f2994b9dc811214c082"
+        },
+        {
+          "path": "scripts/build-turkey-mission.py",
+          "gitObject": "7c0c1a345b114e48031fe49beb78cf5cad39b0d5",
+          "sha256": "798dc0b0ededf6510ebca39aa13aaff33f60e53c42fac7174d235c273f72b579",
+          "bytes": 2180,
+          "member": "objects/798dc0b0ededf6510ebca39aa13aaff33f60e53c42fac7174d235c273f72b579"
+        },
+        {
+          "path": "scripts/build-turkey-sprites.py",
+          "gitObject": "bfe9c7d8638a8aa797cfcf6f69d0c35062d548f1",
+          "sha256": "09cdbc1bb03f724a54df0b046541577240137b0955f5dedf82a02d2b8a5170fb",
+          "bytes": 12963,
+          "member": "objects/09cdbc1bb03f724a54df0b046541577240137b0955f5dedf82a02d2b8a5170fb"
+        },
+        {
+          "path": "scripts/generate-turkey-sfx.py",
+          "gitObject": "0f704afab7c546eaa739c319eb38aacfcde04e90",
+          "sha256": "a4913740b31087e74c8f2a9542c48491b86eaaff6e5ef07adfdd9f3dfd82e60d",
+          "bytes": 3700,
+          "member": "objects/a4913740b31087e74c8f2a9542c48491b86eaaff6e5ef07adfdd9f3dfd82e60d"
+        },
+        {
+          "path": "scripts/generate-turkey-voices.py",
+          "gitObject": "7120b7629211dd75603872b02f2659859d8c3edb",
+          "sha256": "0e53157539fba953088c62a3e77a03cf62564f5a0b002a449275f79ae9613b33",
+          "bytes": 6022,
+          "member": "objects/0e53157539fba953088c62a3e77a03cf62564f5a0b002a449275f79ae9613b33"
+        },
+        {
+          "path": "scripts/turkey_directional_assets.py",
+          "gitObject": "ec0f2fb91c6026b1ed2b8cf804e87cddee73de96",
+          "sha256": "d793f9a7e377eb0127ad0b243510a3ec41e352c0ca68142c2929aaadeaf1593b",
+          "bytes": 11266,
+          "member": "objects/d793f9a7e377eb0127ad0b243510a3ec41e352c0ca68142c2929aaadeaf1593b"
+        },
+        {
+          "path": "scripts/validate-turkey-ai-progression.py",
+          "gitObject": "d27cdac7bff61cbadc0b762295a3f65b5c042c25",
+          "sha256": "a8e1e3aec6bf88a01c731926cfbb7872217269075d514ad9f0f8fc8e60560a43",
+          "bytes": 4678,
+          "member": "objects/a8e1e3aec6bf88a01c731926cfbb7872217269075d514ad9f0f8fc8e60560a43"
+        },
+        {
+          "path": "scripts/validate-turkey-live.py",
+          "gitObject": "de83fb55f4c9ea603cf4cba4d24f19abbf3d1ace",
+          "sha256": "7f0548818d0271ce7633cf10c1b547b515c980e830012b8dbb167ab9b2a8bf10",
+          "bytes": 11735,
+          "member": "objects/7f0548818d0271ce7633cf10c1b547b515c980e830012b8dbb167ab9b2a8bf10"
+        },
+        {
+          "path": "services/worldgen/tests/test_air_warfare_assets.py",
+          "gitObject": "5d332fb027f148e272684f50142e3a777add7497",
+          "sha256": "848e660ba24f892a78f2b878a2fea7bacf4f65874fcdb9738294cb8596dca6c7",
+          "bytes": 5595,
+          "member": "objects/848e660ba24f892a78f2b878a2fea7bacf4f65874fcdb9738294cb8596dca6c7"
+        },
+        {
+          "path": "services/worldgen/tests/test_turkey_faction.py",
+          "gitObject": "f81213f3b848a3d045d8aa5e4c02d85654efbc70",
+          "sha256": "9f0fbcdbf424035e3431cc6e0dcf9fc50d9ad4d1774795e00481559d7b48b92d",
+          "bytes": 7619,
+          "member": "objects/9f0fbcdbf424035e3431cc6e0dcf9fc50d9ad4d1774795e00481559d7b48b92d"
+        }
+      ]
+    }
+  ],
+  "archiveSha256": "3a10944d7c6a583db1d95d498d84ca8f9166f41d0b2cd7967a6df0c655190e5c"
+}
