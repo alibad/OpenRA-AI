@@ -45,3 +45,12 @@ live here. These scripts are the replacement for hosted workflows.
   `docs/balance-baseline-2026-09.md`.
 - `native_fixture.py` holds the shared game-time budgets, exact-destination
   movement checks and Windows-safe paths/links used by the RA2 validators.
+- `build-usa-concept-board.py` renders the United States (`usa`) Checkpoint B
+  concept and silhouette boards from original low-poly geometry in
+  `usa_concept_actors.py` (renderer in `usa_concept_models.py`, OpenRA
+  player-colour remap port in `usa_concept_render.py`). It needs a built engine
+  checkout and a read-only directory containing owned Red Alert content
+  (`Content/ra/v2`) for palettes, terrain statistics and stock scale
+  references; boards and a checksummed `manifest.json` are written to the
+  engine's `docs/concept/usa/`. Concept art only - it produces no SHP, rules
+  or sequences.
