@@ -1,0 +1,47 @@
+r2ymr:
+	Voiced:
+		VoiceSet: R2YemeninfantryVoice
+
+r2yrpg:
+	Voiced:
+		VoiceSet: R2YemeninfantryVoice
+
+r2yspot:
+	Voiced:
+		VoiceSet: R2YemenspotterVoice
+
+r2wadighost:
+	Voiced:
+		VoiceSet: R2YemenghostVoice
+
+r2technical:
+	Voiced:
+		VoiceSet: R2YemenvehicleVoice
+
+r2ytechrr:
+	Voiced:
+		VoiceSet: R2YemenvehicleVoice
+
+r2yzu:
+	Voiced:
+		VoiceSet: R2YemenvehicleVoice
+
+r2ymlr:
+	Voiced:
+		VoiceSet: R2YemenvehicleVoice
+
+r2samad:
+	Voiced:
+		VoiceSet: R2YemendroneVoice
+
+r2hodeidah:
+	Voiced:
+		VoiceSet: R2YemennavalVoice
+
+r2sahaab:
+	Voiced:
+		VoiceSet: R2YemendroneVoice
+
+r2mokha:
+	Voiced:
+		VoiceSet: R2YemennavalVoice

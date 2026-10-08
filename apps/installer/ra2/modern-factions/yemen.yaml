@@ -1,0 +1,253 @@
+World:
+	Faction@yemen:
+		Name: ra2-modern-yemen-name
+		InternalName: yemen
+		Side: Soviets
+		RandomFactionMemberOf: random-soviets
+		Description: ra2-modern-yemen-description
+	StartingUnits@yemen-none:
+		Class: none
+		ClassName: options-starting-units.mcv-only
+		Factions: yemen
+		BaseActor: smcv
+		BaseActorFacing: 896
+	StartingUnits@yemen-light:
+		Class: light
+		ClassName: options-starting-units.light
+		Factions: yemen
+		BaseActor: smcv
+		BaseActorFacing: 896
+		SupportActors: dog, r2ymr, r2ymr, r2ymr, r2yrpg
+		SupportActorsFacing: 896
+		InnerSupportRadius: 3
+		OuterSupportRadius: 5
+	StartingUnits@yemen-medium:
+		Class: medium
+		ClassName: options-starting-units.medium
+		Factions: yemen
+		BaseActor: smcv
+		BaseActorFacing: 896
+		SupportActors: dog, r2ymr, r2ymr, r2ymr, r2yrpg, r2technical, r2technical, engineer
+		SupportActorsFacing: 896
+		InnerSupportRadius: 3
+		OuterSupportRadius: 5
+	StartingUnits@yemen-heavy:
+		Class: heavy
+		ClassName: options-starting-units.heavy
+		Factions: yemen
+		BaseActor: smcv
+		BaseActorFacing: 896
+		SupportActors: dog, r2ymr, r2ymr, r2yrpg, r2yrpg, r2yspot, r2technical, r2ytechrr, r2yzu, r2ymlr, engineer
+		SupportActorsFacing: 896
+		InnerSupportRadius: 3
+		OuterSupportRadius: 5
+
+Player:
+	ProvidesPrerequisite@yemen:
+		Prerequisite: faction.yemen
+		Factions: yemen
+	UnitBuilderBotModule@normal:
+		UnitsToBuild:
+			r2technical: 45
+			r2ytechrr: 40
+			r2yzu: 20
+			r2ymlr: 22
+		UnitLimits:
+			r2ymlr: 4
+	UnitBuilderBotModule@medium:
+		UnitsToBuild:
+			r2technical: 45
+			r2ytechrr: 40
+			r2yzu: 20
+			r2ymlr: 22
+		UnitLimits:
+			r2ymlr: 4
+	UnitBuilderBotModule@rush:
+		UnitsToBuild:
+			r2technical: 45
+			r2ytechrr: 40
+			r2yzu: 20
+			r2ymlr: 22
+		UnitLimits:
+			r2ymlr: 4
+	UnitBuilderBotModule@turtle:
+		UnitsToBuild:
+			r2technical: 45
+			r2ytechrr: 40
+			r2yzu: 20
+			r2ymlr: 22
+		UnitLimits:
+			r2ymlr: 4
+	UnitBuilderBotModule@naval:
+		UnitsToBuild:
+			r2technical: 45
+			r2ytechrr: 40
+			r2yzu: 20
+			r2ymlr: 22
+		UnitLimits:
+			r2ymlr: 4
+
+naweap:
+	GrantConditionOnProduction@yemen-drone:
+		Actors: r2samad
+		Condition: roof-open
+		Duration: 50
+		ShowSelectionBar: false
+
+# The shipyard's shore relay keeps a fresh Sahaab boat controllable at the pier.
+nayard:
+	GrantConditionOnFaction@yemen-relay:
+		Condition: yemen-relay
+		Factions: yemen
+	ProximityExternalCondition@yemen-relay:
+		Condition: r2-ye-link
+		Range: 6c0
+		ValidRelationships: Ally
+		RequiresCondition: yemen-relay
+
+dog:
+	RenderSprites:
+		FactionImages:
+			yemen: dog
+
+^R2YemenVoxels:
+	RenderVoxels:
+		PlayerPalette: yemenvoxelplayer
+
+# Drone Spotter guidance: longer reach and faster reloads, never stacking.
+^R2YemenGuided:
+	ExternalCondition@guidance:
+		Condition: r2-ye-guidance
+	RangeMultiplier@guidance:
+		Modifier: 120
+		RequiresCondition: r2-ye-guidance
+	ReloadDelayMultiplier@guidance:
+		Modifier: 80
+		RequiresCondition: r2-ye-guidance
+	WithColoredOverlay@guidance:
+		Color: 52E7D628
+		RequiresCondition: r2-ye-guidance
+
+r2technical:
+	Inherits: ^R2ModernVehicle
+	Inherits@palette: ^R2YemenVoxels
+	Tooltip:
+		Name: ra2-r2technical-name
+	Buildable:
+		BuildPaletteOrder: 11
+		Prerequisites: ~faction.yemen, naweap
+		Description: ra2-r2technical-description
+	Valued:
+		Cost: 400
+	Health:
+		HP: 180
+	Armor:
+		Type: Light
+	Mobile:
+		Speed: 150
+		Locomotor: wheeled
+		TurnSpeed: 32
+	Turreted:
+		Offset: -147,0,0
+		TurnSpeed: 40
+	Armament:
+		Weapon: R2TechnicalMG
+		LocalOffset: 380,0,420
+		MuzzleSequence: muzzle
+	RevealsShroud:
+		Range: 8c0
+
+r2ytechrr:
+	Inherits: ^R2ModernVehicle
+	Inherits@palette: ^R2YemenVoxels
+	Tooltip:
+		Name: ra2-r2ytechrr-name
+	Buildable:
+		BuildPaletteOrder: 21
+		Prerequisites: ~faction.yemen, naweap
+		Description: ra2-r2ytechrr-description
+	Valued:
+		Cost: 550
+	Health:
+		HP: 170
+	Armor:
+		Type: Light
+	Mobile:
+		Speed: 145
+		Locomotor: wheeled
+		TurnSpeed: 32
+	Turreted:
+		Offset: -147,0,0
+		TurnSpeed: 32
+	Armament:
+		Weapon: R2RecoillessRifle
+		LocalOffset: 470,0,400
+		MuzzleSequence: muzzle
+
+r2yzu:
+	Inherits: ^R2ModernVehicle
+	Inherits@palette: ^R2YemenVoxels
+	Inherits@AUTOTARGET: ^AutoTargetAir
+	Tooltip:
+		Name: ra2-r2yzu-name
+	Buildable:
+		BuildPaletteOrder: 41
+		Prerequisites: ~faction.yemen, naweap
+		Description: ra2-r2yzu-description
+	Valued:
+		Cost: 600
+	Health:
+		HP: 190
+	Armor:
+		Type: Light
+	Mobile:
+		Speed: 140
+		Locomotor: wheeled
+		TurnSpeed: 32
+	Turreted:
+		Offset: -147,0,0
+		TurnSpeed: 48
+	Armament:
+		Weapon: R2ZU23
+		LocalOffset: 440,0,480
+	AutoTarget:
+		ScanRadius: 9
+
+r2ymlr:
+	Inherits: ^R2ModernVehicle
+	Inherits@palette: ^R2YemenVoxels
+	Inherits@guidance: ^R2YemenGuided
+	Tooltip:
+		Name: ra2-r2ymlr-name
+	Buildable:
+		BuildPaletteOrder: 61
+		Prerequisites: ~faction.yemen, naweap, radar
+		Description: ra2-r2ymlr-description
+	Valued:
+		Cost: 900
+	Health:
+		HP: 180
+	Armor:
+		Type: Light
+	Mobile:
+		Speed: 90
+		Locomotor: wheeled
+	-WithVoxelTurret:
+	-Turreted:
+	-AttackTurreted:
+	AttackFrontal:
+		Voice: Attack
+		FacingTolerance: 32
+	Armament:
+		Weapon: R2YemenStrikeMissile
+		LocalOffset: 300,0,520
+		ReloadingCondition: reloading
+	# The empty erector is the visible reload window; flank it then.
+	-WithVoxelBody:
+	WithVoxelBody@loaded:
+		RequiresCondition: !reloading
+	WithVoxelBody@empty:
+		Sequence: empty
+		RequiresCondition: reloading
+	WithRangeCircle:
+		Range: 13c0

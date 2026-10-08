@@ -1,0 +1,294 @@
+R2MountainRifle:
+	Inherits: M1Carbine
+	Range: 5c0
+	ReloadDelay: 36
+	Burst: 2
+	BurstDelays: 5
+	Report: ra2|modern-factions/audio/redsea-mountain-rifle.wav
+	Warhead@1Dam: SpreadDamage
+		Damage: 13
+
+R2YemenRPG:
+	Inherits: Maverick
+	Range: 4c512
+	MinRange: 0c768
+	ReloadDelay: 90
+	Report: ra2|modern-factions/audio/redsea-rpg-launch.wav
+	Projectile: Missile
+		Speed: 300
+		MinimumLaunchAngle: 0
+		MaximumLaunchAngle: 16
+		CruiseAltitude: 256
+		RangeLimit: 7c0
+	Warhead@1Dam: SpreadDamage
+		Damage: 80
+		Versus:
+			None: 12
+			Flak: 20
+			Plate: 25
+			Light: 110
+			Medium: 100
+			Heavy: 95
+			Wood: 55
+			Steel: 45
+			Concrete: 35
+	Warhead@2Eff: CreateEffect
+		ImpactSounds: ra2|modern-factions/audio/redsea-drone-impact.wav
+
+R2SpotterCarbine:
+	Inherits: M1Carbine
+	Range: 4c0
+	ReloadDelay: 46
+	Burst: 2
+	BurstDelays: 5
+	Report: ra2|modern-factions/audio/redsea-mountain-rifle.wav
+	Warhead@1Dam: SpreadDamage
+		Damage: 7
+
+R2GhostCarbine:
+	Inherits: M60
+	Range: 5c512
+	ReloadDelay: 48
+	Burst: 2
+	BurstDelays: 5
+	Report: ra2|modern-factions/audio/redsea-suppressed.wav
+	Warhead@1Dam: SpreadDamage
+		Damage: 30
+		Versus:
+			None: 100
+			Flak: 90
+			Plate: 80
+			Light: 45
+			Medium: 25
+			Heavy: 15
+			Wood: 20
+			Steel: 15
+			Concrete: 10
+
+# Remote charge: planted on structures, detonates 3.2 seconds later.
+R2RemoteCharge:
+	Range: 1c512
+	ReloadDelay: 200
+	ValidTargets: Structure
+	Report: ra2|modern-factions/audio/redsea-remote-charge.wav
+	Projectile: InstantHit
+	Warhead@1Dam: SpreadDamage
+		Delay: 80
+		Spread: 256
+		Damage: 320
+		ValidTargets: Structure
+		Versus:
+			Wood: 100
+			Steel: 100
+			Concrete: 100
+		DamageTypes: ExplosionDeath
+	Warhead@2Eff: CreateEffect
+		Delay: 80
+		Explosions: medium_clsn
+		ImpactSounds: ra2|modern-factions/audio/redsea-drone-impact.wav
+		ValidTargets: Ground, Structure
+
+R2TechnicalMG:
+	Inherits: M60
+	Range: 5c512
+	ReloadDelay: 26
+	Burst: 4
+	BurstDelays: 3
+	ValidTargets: Ground, Water
+	Warhead@1Dam: SpreadDamage
+		Damage: 11
+		ValidTargets: Ground, Water
+		Versus:
+			None: 100
+			Flak: 90
+			Plate: 70
+			Light: 60
+			Medium: 20
+			Heavy: 10
+
+R2RecoillessRifle:
+	Inherits: 105mm
+	Range: 6c0
+	ReloadDelay: 100
+	Report: ra2|modern-factions/audio/redsea-rpg-launch.wav
+	Warhead@1Dam: SpreadDamage
+		Damage: 85
+		Versus:
+			None: 25
+			Flak: 25
+			Plate: 30
+			Light: 110
+			Medium: 100
+			Heavy: 90
+			Wood: 60
+			Steel: 45
+			Concrete: 50
+
+R2ZU23:
+	Inherits: FlakTrackAAGun
+	Range: 8c0
+	Burst: 4
+	BurstDelays: 3
+	ReloadDelay: 45
+	Warhead@1Dam: SpreadDamage
+		Damage: 14
+
+# Mobile Missile Launcher: long-range salvo with a minimum range. Drone
+# guidance extends range and shortens reload (^R2YemenGuided).
+R2YemenStrikeMissile:
+	Inherits: Maverick
+	Range: 13c0
+	MinRange: 5c0
+	ReloadDelay: 220
+	ValidTargets: Ground, Water
+	Report: ra2|modern-factions/audio/redsea-mobile-launch.wav
+	Projectile: Missile
+		Speed: 280
+		RangeLimit: 20c0
+		MinimumLaunchAngle: 64
+		MaximumLaunchAngle: 128
+		CruiseAltitude: 2c0
+	Warhead@1Dam: SpreadDamage
+		Damage: 150
+		Spread: 384
+		Falloff: 100, 50, 20, 0
+		Versus:
+			None: 60
+			Flak: 65
+			Plate: 70
+			Light: 100
+			Medium: 90
+			Heavy: 80
+			Wood: 120
+			Steel: 100
+			Concrete: 90
+	Warhead@2Eff: CreateEffect
+		ImpactSounds: ra2|modern-factions/audio/redsea-drone-impact.wav
+
+R2SamadWarhead:
+	Inherits: Maverick
+	Range: 1c512
+	ReloadDelay: 100
+	Report: ra2|modern-factions/audio/redsea-drone-strike.wav
+	Projectile: Bullet
+		Speed: 2048
+	Warhead@1Dam: SpreadDamage
+		Damage: 220
+		Spread: 384
+		Versus:
+			None: 30
+			Flak: 30
+			Plate: 35
+			Light: 90
+			Medium: 80
+			Heavy: 70
+			Wood: 140
+			Steel: 130
+			Concrete: 110
+	Warhead@2Eff: CreateEffect
+		ImpactSounds: ra2|modern-factions/audio/redsea-drone-impact.wav
+
+R2HodeidahMissile:
+	Inherits: Maverick
+	Range: 10c0
+	MinRange: 3c0
+	Burst: 2
+	BurstDelays: 12
+	ReloadDelay: 160
+	ValidTargets: Water, Ground
+	Report: ra2|modern-factions/audio/naval-missile-launch.wav
+	Projectile: Missile
+		CruiseAltitude: 256
+		MinimumLaunchAngle: 0
+		MaximumLaunchAngle: 32
+		RangeLimit: 14c0
+	Warhead@1Dam: SpreadDamage
+		Damage: 60
+		Versus:
+			None: 20
+			Flak: 25
+			Plate: 30
+			Light: 110
+			Medium: 100
+			Heavy: 100
+			Wood: 70
+			Steel: 60
+			Concrete: 50
+
+R2USVCharge:
+	Range: 0c768
+	ReloadDelay: 1000
+	ValidTargets: Water
+	Report: ra2|modern-factions/audio/naval-naval-alarm.wav
+	Projectile: InstantHit
+	Warhead@1Dam: SpreadDamage
+		Spread: 384
+		Damage: 260
+		ValidTargets: Water, Ground
+		Versus:
+			None: 60
+			Light: 100
+			Medium: 100
+			Heavy: 100
+		DamageTypes: ExplosionDeath
+	Warhead@2Eff: CreateEffect
+		Explosions: medium_clsn
+		ImpactSounds: ra2|modern-factions/audio/redsea-drone-impact.wav
+		ValidTargets: Ground, Water
+
+R2MokhaGun:
+	Inherits: 20mm
+	Range: 5c0
+	ReloadDelay: 20
+	ValidTargets: Ground, Water
+	Report: ra2|modern-factions/audio/naval-ciws-burst.wav
+	Warhead@1Dam: SpreadDamage
+		Damage: 10
+		ValidTargets: Ground, Water
+	Warhead@2Eff: CreateEffect
+		ValidTargets: Ground, Water
+
+R2BunkerMG:
+	Inherits: M60
+	Range: 5c512
+	Burst: 3
+	BurstDelays: 4
+	ReloadDelay: 24
+	Warhead@1Dam: SpreadDamage
+		Damage: 13
+
+R2ZUNest:
+	Inherits: FlakTrackAAGun
+	Range: 9c0
+	Burst: 4
+	BurstDelays: 3
+	ReloadDelay: 45
+	Warhead@1Dam: SpreadDamage
+		Damage: 16
+
+R2YemenCoastalMissile:
+	Inherits: Maverick
+	Range: 12c0
+	MinRange: 3c0
+	Burst: 2
+	BurstDelays: 12
+	ReloadDelay: 170
+	ValidTargets: Water, Ground
+	Report: ra2|modern-factions/audio/naval-missile-launch.wav
+	Projectile: Missile
+		RangeLimit: 16c0
+		CruiseAltitude: 512
+		MinimumLaunchAngle: 0
+		MaximumLaunchAngle: 32
+	Warhead@1Dam: SpreadDamage
+		Damage: 75
+		Versus:
+			None: 10
+			Flak: 20
+			Plate: 20
+			Light: 100
+			Medium: 100
+			Heavy: 100
+			Wood: 60
+			Steel: 60
+			Concrete: 50

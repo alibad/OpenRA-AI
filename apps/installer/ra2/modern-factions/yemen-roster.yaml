@@ -1,0 +1,495 @@
+# Yemen: dispersed, concealed and inexpensive. Drone Spotters guide RPGs and
+# missile trucks; coastal forces need surveillance links; defenses hide until
+# they fire. Heavy armor and prepared detection punish long exposed trades.
+^Palettes:
+	PaletteFromFile@yemen:
+		Name: yemen-art
+		Filename: ra2|modern-factions/yemen-art/yemen.pal
+	PlayerColorPalette@yemen:
+		BasePalette: yemen-art
+		BaseName: yemenplayer
+		RemapIndex: 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31
+	PaletteFromFile@yemen-voxels:
+		Name: yemen-voxels
+		Filename: ra2|modern-factions/yemen-art/yemen-voxels.pal
+	PlayerColorPalette@yemen-voxels:
+		BasePalette: yemen-voxels
+		BaseName: yemenvoxelplayer
+		RemapIndex: 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31
+
+^R2YemenInfantry:
+	Inherits: ^Infantry
+	Inherits@AUTOTARGET: ^AutoTargetGroundAssaultMove
+	Inherits@MC: ^MindControllable
+	Buildable:
+		Queue: Infantry
+	UpdatesPlayerStatistics:
+		AddToArmyValue: true
+	Selectable:
+		Bounds: 600, 1500, 0, -530
+	RenderSprites:
+		PlayerPalette: yemenplayer
+	-TakeCover:
+	-WithDeathAnimation@effect:
+	WithDeathAnimation@normal:
+		DeathSequencePalette: yemenplayer
+		DeathPaletteIsPlayerPalette: true
+	AttackFrontal:
+		Voice: Attack
+		FacingTolerance: 32
+	Armament:
+		Weapon: R2MountainRifle
+	ProducibleWithLevel:
+		Prerequisites: barracks.infiltrated
+	RevealsShroud:
+		Range: 5c0
+
+r2ymr:
+	Inherits: ^R2YemenInfantry
+	Tooltip:
+		Name: ra2-r2ymr-name
+	Buildable:
+		Prerequisites: ~faction.yemen, nahand
+		BuildPaletteOrder: 10
+		Description: ra2-r2ymr-description
+	Valued:
+		Cost: 100
+	Health:
+		HP: 100
+	Mobile:
+		Speed: 66
+	Cloak:
+		InitialDelay: 85
+		CloakDelay: 95
+		UncloakOn: Attack, Move, Damage
+		DetectionTypes: Cloak
+		IsPlayerPalette: true
+
+r2yrpg:
+	Inherits: ^R2YemenInfantry
+	Inherits@guidance: ^R2YemenGuided
+	Tooltip:
+		Name: ra2-r2yrpg-name
+	Buildable:
+		Prerequisites: ~faction.yemen, nahand
+		BuildPaletteOrder: 20
+		Description: ra2-r2yrpg-description
+	Valued:
+		Cost: 300
+	Health:
+		HP: 95
+	Mobile:
+		Speed: 60
+	Armament:
+		Weapon: R2YemenRPG
+	RevealsShroud:
+		Range: 6c0
+
+r2yspot:
+	Inherits: ^R2YemenInfantry
+	Tooltip:
+		Name: ra2-r2yspot-name
+	Buildable:
+		Prerequisites: ~faction.yemen, nahand, radar
+		BuildPaletteOrder: 60
+		Description: ra2-r2yspot-description
+	Valued:
+		Cost: 525
+	Health:
+		HP: 90
+	Mobile:
+		Speed: 64
+	Armament:
+		Weapon: R2SpotterCarbine
+	RevealsShroud:
+		Range: 10c0
+	DetectCloaked:
+		DetectionTypes: Cloak
+		Range: 7c0
+	RenderDetectionCircle:
+	ProximityExternalCondition@guidance:
+		Condition: r2-ye-guidance
+		Range: 6c0
+		ValidRelationships: Ally
+	WithRangeCircle@guidance:
+		Range: 6c0
+		Color: 52E7D680
+
+r2wadighost:
+	Inherits: ^R2YemenInfantry
+	Tooltip:
+		Name: ra2-r2wadighost-name
+	Buildable:
+		Prerequisites: ~faction.yemen, nahand, natech
+		BuildPaletteOrder: 140
+		BuildLimit: 1
+		Description: ra2-r2wadighost-description
+	Valued:
+		Cost: 1650
+	Health:
+		HP: 170
+	Mobile:
+		Speed: 82
+	Armament:
+		Weapon: R2GhostCarbine
+	Armament@remote:
+		Name: secondary
+		Weapon: R2RemoteCharge
+	AttackFrontal:
+		Armaments: primary, secondary
+	Demolition:
+		DetonationDelay: 80
+		Voice: Demolish
+	Passenger:
+		CustomPipType: red
+	# Persistent camouflage: moving does not reveal the Ghost, attacking does.
+	Cloak:
+		InitialDelay: 40
+		CloakDelay: 70
+		UncloakOn: Attack, Demolish, Damage
+		DetectionTypes: Cloak
+		IsPlayerPalette: true
+	RevealsShroud:
+		Range: 7c0
+	VoiceAnnouncement:
+		Voice: Build
+
+# One-way loitering munition: removed on its terminal attack, no rearming.
+r2samad:
+	Inherits: ^R2ModernDrone
+	Inherits@palette: ^R2YemenVoxels
+	Tooltip:
+		Name: ra2-r2samad-name
+	Buildable:
+		Prerequisites: ~faction.yemen, naweap, radar
+		BuildPaletteOrder: 85
+		Description: ra2-r2samad-description
+	Valued:
+		Cost: 700
+	Health:
+		HP: 90
+	Aircraft:
+		Speed: 150
+		CruiseAltitude: 1536
+	Armament:
+		Weapon: R2SamadWarhead
+	AmbientSound@loiter:
+		SoundFiles: ra2|modern-factions/audio/redsea-drone-loiter.wav
+		RequiresCondition: cruising
+	RevealsShroud:
+		Range: 8c0
+	GrantConditionOnAttack:
+		Condition: expended
+	KillsSelf:
+		RequiresCondition: expended
+		RemoveInstead: true
+	SpawnActorOnDeath:
+		Actor: r2samadhusk
+
+r2samadhusk:
+	Inherits: ^R2DroneHusk
+	Inherits@palette: ^R2YemenVoxels
+	RenderVoxels:
+		Image: r2samad
+
+^R2YemenShip:
+	Inherits: ^Ship
+	Tooltip:
+		GenericName: ra2-modern-ship
+	Inherits@AUTOTARGET: ^AutoTargetAllAssaultMove
+	Inherits@MC: ^MindControllable
+	Buildable:
+		Queue: Ship
+	UpdatesPlayerStatistics:
+		AddToArmyValue: true
+	RenderSprites:
+	RenderVoxels:
+		PlayerPalette: yemenvoxelplayer
+		Scale: 22
+		LightAmbientColor: -0.3,-0.3,-0.3
+		LightDiffuseColor: 0.75,0.75,0.75
+	WithVoxelBody:
+	Selectable:
+		Bounds: 1500, 3000, 0, -289
+	RevealsShroud:
+		Range: 8c0
+	HitShape:
+
+r2hodeidah:
+	Inherits: ^R2YemenShip
+	Tooltip:
+		Name: ra2-r2hodeidah-name
+	Buildable:
+		Prerequisites: ~faction.yemen, nayard, radar
+		BuildPaletteOrder: 20
+		Description: ra2-r2hodeidah-description
+	Valued:
+		Cost: 1100
+	Health:
+		HP: 300
+	Armor:
+		Type: Light
+	Mobile:
+		Speed: 120
+		TurnSpeed: 28
+	AttackFrontal:
+		Voice: Attack
+		FacingTolerance: 48
+	Armament:
+		Weapon: R2HodeidahMissile
+		LocalOffset: 600,-200,300, 600,200,300
+	# Mokha surveillance links coordinate the missile craft's fire.
+	ExternalCondition@targeting:
+		Condition: r2-ye-targeting
+	RangeMultiplier@targeting:
+		Modifier: 120
+		RequiresCondition: r2-ye-targeting
+	FirepowerMultiplier@targeting:
+		Modifier: 112
+		RequiresCondition: r2-ye-targeting
+	WithColoredOverlay@targeting:
+		Color: E0604012
+		RequiresCondition: r2-ye-targeting
+	# Firing reveals the craft in explored enemy fog for eight seconds.
+	-HiddenUnderFog:
+	NavalRadarVisibility:
+		RequiresCondition: missile-revealed
+	GrantConditionOnAttack@reveal:
+		Condition: missile-revealed
+		RevokeDelay: 190
+
+r2sahaab:
+	Inherits: ^R2YemenShip
+	Tooltip:
+		Name: ra2-r2sahaab-name
+	Buildable:
+		Prerequisites: ~faction.yemen, nayard
+		BuildPaletteOrder: 10
+		Description: ra2-r2sahaab-description
+	Valued:
+		Cost: 300
+	Health:
+		HP: 90
+	Armor:
+		Type: Light
+	Mobile:
+		Speed: 140
+		TurnSpeed: 40
+		PauseOnCondition: !r2-ye-link || chronodisable
+	ExternalCondition@link:
+		Condition: r2-ye-link
+	Selectable:
+		Bounds: 1000, 1500, 0, -200
+	AttackFrontal:
+		Voice: Attack
+		FacingTolerance: 24
+	Armament:
+		Weapon: R2USVCharge
+	GrantConditionOnAttack@trigger:
+		Condition: usv-triggered
+	KillsSelf:
+		RequiresCondition: usv-triggered
+	RevealsShroud:
+		Range: 3c0
+	RevealsShroud@link:
+		Range: 5c0
+		RequiresCondition: r2-ye-link
+	WithTextDecoration@nolink:
+		Text: NO LINK
+		Position: Top
+		Margin: 0, -10
+		Color: E07050
+		RequiresSelection: true
+		RequiresCondition: !r2-ye-link
+
+r2mokha:
+	Inherits: ^R2YemenShip
+	Tooltip:
+		Name: ra2-r2mokha-name
+	Buildable:
+		Prerequisites: ~faction.yemen, nayard, radar
+		BuildPaletteOrder: 30
+		Description: ra2-r2mokha-description
+	Valued:
+		Cost: 900
+	Health:
+		HP: 280
+	Armor:
+		Type: Light
+	Mobile:
+		Speed: 105
+	WithVoxelTurret:
+	Turreted:
+		Offset: 531,0,0
+		TurnSpeed: 36
+	AttackTurreted:
+		Voice: Attack
+	Armament:
+		Weapon: R2MokhaGun
+		LocalOffset: 280,0,300
+	DetectCloaked:
+		DetectionTypes: Underwater, Cloak
+		Range: 6c0
+	DetectCloakedMultiplier@radar:
+		Modifier: 175
+		RequiresCondition: active-radar
+	RenderDetectionCircle:
+	RevealsShroudMultiplier@radar:
+		Modifier: 165
+		RequiresCondition: active-radar
+	# Passive links reach 6 cells; deployed active radar extends them to 14
+	# but reveals the craft in explored enemy fog.
+	ProximityExternalCondition@link:
+		Condition: r2-ye-link
+		Range: 6c0
+		ValidRelationships: Ally
+	ProximityExternalCondition@targeting:
+		Condition: r2-ye-targeting
+		Range: 6c0
+		ValidRelationships: Ally
+	ProximityExternalCondition@radar-link:
+		Condition: r2-ye-link
+		Range: 14c0
+		ValidRelationships: Ally
+		RequiresCondition: active-radar
+	ProximityExternalCondition@radar-targeting:
+		Condition: r2-ye-targeting
+		Range: 14c0
+		ValidRelationships: Ally
+		RequiresCondition: active-radar
+	WithRangeCircle@link:
+		Range: 6c0
+		Color: E0604060
+		RequiresCondition: !active-radar
+	WithRangeCircle@radar:
+		Range: 14c0
+		Color: E0604080
+		RequiresCondition: active-radar
+	GrantConditionOnDeploy@radar:
+		DeployedCondition: active-radar
+		SkipMakeAnimation: true
+		UndeployOnMove: false
+		DeploySounds: ra2|modern-factions/audio/naval-radar-sweep.wav
+		UndeploySounds: ra2|modern-factions/audio/naval-radar-sweep.wav
+	-HiddenUnderFog:
+	NavalRadarVisibility:
+		RequiresCondition: active-radar
+	WithTextDecoration@radar:
+		Text: RADAR
+		Position: Top
+		Margin: 0, -14
+		Color: E08060
+		RequiresSelection: true
+		RequiresCondition: active-radar
+
+^R2YemenDefense:
+	Inherits: ^SupportBuilding
+	Inherits@AUTOTARGET: ^AutoTargetGround
+	Buildable:
+		Queue: Support
+	Building:
+		Footprint: x
+		Dimensions: 1, 1
+	Armor:
+		Type: Steel
+	RenderSprites:
+		PlayerPalette: yemenplayer
+	WithSpriteTurret:
+		RequiresCondition: !build-incomplete
+	Turreted:
+		TurnSpeed: 28
+		InitialFacing: 640
+	BodyOrientation:
+		QuantizedFacings: 32
+	AttackTurreted:
+		Voice: Attack
+		RequiresCondition: !build-incomplete
+		PauseOnCondition: lowpower
+	IsometricSelectable:
+		Height: 40
+	Armament:
+		Weapon: R2BunkerMG
+		LocalOffset: 500,0,500
+	GrantConditionOnPowerState@LOWPOWER:
+		Condition: lowpower
+		ValidPowerStates: Low, Critical
+	RevealsShroud:
+		Range: 8c0
+	RequiresBuildableArea:
+		Adjacent: 6
+
+# Concealed positions: camouflaged until they fire or are hit.
+^R2YemenConcealed:
+	Cloak:
+		InitialDelay: 125
+		CloakDelay: 125
+		UncloakOn: Attack, Damage
+		DetectionTypes: Cloak
+		IsPlayerPalette: true
+		RequiresCondition: !build-incomplete
+
+r2ybunker:
+	Inherits: ^R2YemenDefense
+	Inherits@concealed: ^R2YemenConcealed
+	Tooltip:
+		Name: ra2-r2ybunker-name
+	Buildable:
+		Prerequisites: ~faction.yemen, barracks
+		BuildPaletteOrder: 20
+		Description: ra2-r2ybunker-description
+	Valued:
+		Cost: 450
+	Health:
+		HP: 550
+	Power:
+		Amount: -10
+	WithRangeCircle:
+		Range: 5c512
+
+r2yzunest:
+	Inherits: ^R2YemenDefense
+	Inherits@AUTOTARGET: ^AutoTargetAir
+	Tooltip:
+		Name: ra2-r2yzunest-name
+	Buildable:
+		Prerequisites: ~faction.yemen, barracks, radar
+		BuildPaletteOrder: 30
+		Description: ra2-r2yzunest-description
+	Valued:
+		Cost: 800
+	Health:
+		HP: 450
+	Power:
+		Amount: -30
+	Armament:
+		Weapon: R2ZUNest
+		LocalOffset: 700,0,650
+	WithRangeCircle:
+		Range: 9c0
+
+r2ycoastal:
+	Inherits: ^R2YemenDefense
+	Inherits@concealed: ^R2YemenConcealed
+	Tooltip:
+		Name: ra2-r2ycoastal-name
+	Buildable:
+		Prerequisites: ~faction.yemen, radar
+		BuildPaletteOrder: 40
+		Description: ra2-r2ycoastal-description
+	Valued:
+		Cost: 1200
+	Health:
+		HP: 600
+	Power:
+		Amount: -50
+	Armament:
+		Weapon: R2YemenCoastalMissile
+		LocalOffset: 600,0,650
+	# Surveillance-craft links also coordinate the shore battery.
+	ExternalCondition@targeting:
+		Condition: r2-ye-targeting
+	RangeMultiplier@targeting:
+		Modifier: 120
+		RequiresCondition: r2-ye-targeting
+	WithRangeCircle:
+		Range: 12c0

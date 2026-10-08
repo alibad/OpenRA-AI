@@ -1,0 +1,61 @@
+R2SaudiinfantryVoice:
+	Inherits: ^InfantryDeath
+	DefaultVariant: .wav
+	Voices:
+		Select: ra2|modern-factions/audio/rsa-inf-select-ar, ra2|modern-factions/audio/rsa-inf-select-en
+		Move: ra2|modern-factions/audio/rsa-inf-action-ar, ra2|modern-factions/audio/rsa-inf-action-en
+		Attack: ra2|modern-factions/audio/rsa-inf-action-ar, ra2|modern-factions/audio/rsa-inf-action-en
+		Action: ra2|modern-factions/audio/rsa-inf-action-ar, ra2|modern-factions/audio/rsa-inf-action-en
+		Die: igidia, igidib, igidic
+
+R2SaudijtacVoice:
+	Inherits: ^InfantryDeath
+	DefaultVariant: .wav
+	Voices:
+		Select: ra2|modern-factions/audio/rsa-jtac-select-ar, ra2|modern-factions/audio/rsa-jtac-select-en
+		Move: ra2|modern-factions/audio/rsa-inf-action-ar, ra2|modern-factions/audio/rsa-inf-action-en
+		Attack: ra2|modern-factions/audio/rsa-jtac-action-ar, ra2|modern-factions/audio/rsa-jtac-action-en
+		Action: ra2|modern-factions/audio/rsa-jtac-action-ar, ra2|modern-factions/audio/rsa-jtac-action-en
+		Die: igidia, igidib, igidic
+
+R2SaudifalconVoice:
+	Inherits: ^InfantryDeath
+	DefaultVariant: .wav
+	Voices:
+		Select: ra2|modern-factions/audio/rsa-falcon-select-ar, ra2|modern-factions/audio/rsa-falcon-select-en
+		Move: ra2|modern-factions/audio/rsa-falcon-move-ar, ra2|modern-factions/audio/rsa-falcon-move-en
+		Attack: ra2|modern-factions/audio/rsa-falcon-action-ar, ra2|modern-factions/audio/rsa-falcon-action-en
+		Action: ra2|modern-factions/audio/rsa-falcon-action-ar, ra2|modern-factions/audio/rsa-falcon-action-en
+		Demolish: ra2|modern-factions/audio/rsa-falcon-action-ar, ra2|modern-factions/audio/rsa-falcon-action-en
+		Build: ra2|modern-factions/audio/rsa-falcon-build-ar, ra2|modern-factions/audio/rsa-falcon-build-en
+		Die: igidia, igidib, igidic
+
+R2SaudivehicleVoice:
+	Inherits: ^InfantryDeath
+	DefaultVariant: .wav
+	Voices:
+		Select: ra2|modern-factions/audio/rsa-veh-select-ar, ra2|modern-factions/audio/rsa-veh-select-en
+		Move: ra2|modern-factions/audio/rsa-veh-action-ar, ra2|modern-factions/audio/rsa-veh-action-en
+		Attack: ra2|modern-factions/audio/rsa-veh-action-ar, ra2|modern-factions/audio/rsa-veh-action-en
+		Action: ra2|modern-factions/audio/rsa-veh-action-ar, ra2|modern-factions/audio/rsa-veh-action-en
+		Die: igidia, igidib, igidic
+
+R2SaudiairVoice:
+	Inherits: ^InfantryDeath
+	DefaultVariant: .wav
+	Voices:
+		Select: ra2|modern-factions/audio/rsa-air-select-ar, ra2|modern-factions/audio/rsa-air-select-en
+		Move: ra2|modern-factions/audio/rsa-air-action-ar, ra2|modern-factions/audio/rsa-air-action-en
+		Attack: ra2|modern-factions/audio/rsa-air-action-ar, ra2|modern-factions/audio/rsa-air-action-en
+		Action: ra2|modern-factions/audio/rsa-air-action-ar, ra2|modern-factions/audio/rsa-air-action-en
+		Die: igidia, igidib, igidic
+
+R2SaudinavalVoice:
+	Inherits: ^InfantryDeath
+	DefaultVariant: .wav
+	Voices:
+		Select: ra2|modern-factions/audio/rsa-naval-select-ar, ra2|modern-factions/audio/rsa-naval-select-en
+		Move: ra2|modern-factions/audio/rsa-naval-action-ar, ra2|modern-factions/audio/rsa-naval-action-en
+		Attack: ra2|modern-factions/audio/rsa-naval-action-ar, ra2|modern-factions/audio/rsa-naval-action-en
+		Action: ra2|modern-factions/audio/rsa-naval-action-ar, ra2|modern-factions/audio/rsa-naval-action-en
+		Die: igidia, igidib, igidic

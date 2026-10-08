@@ -124,6 +124,28 @@ RA2_LINES = (
 )
 
 
+# Red Alert 2 vehicle and naval crews. Classic had Arabic-only vehicle
+# acknowledgements and no Red Sea naval voices; RA2 pairs each with English.
+RA2_LINES = (
+    VoiceLine("rsa-veh-select-ar.wav", "ar-SA", "ar-SA-HamedNeural", "طاقم المدرعة جاهز.", "Saudi vehicle crew", False),
+    VoiceLine("rsa-veh-select-en.wav", "en-US", "en-US-GuyNeural", "Armor crew ready.", "Saudi vehicle crew", False),
+    VoiceLine("rsa-veh-action-ar.wav", "ar-SA", "ar-SA-HamedNeural", "تم الاستلام، نتحرك.", "Saudi vehicle crew", False),
+    VoiceLine("rsa-veh-action-en.wav", "en-US", "en-US-GuyNeural", "Copy. Moving out.", "Saudi vehicle crew", False),
+    VoiceLine("rsa-naval-select-ar.wav", "ar-SA", "ar-SA-HamedNeural", "السفينة جاهزة، الحساسات تعمل.", "Saudi naval crew", False),
+    VoiceLine("rsa-naval-select-en.wav", "en-US", "en-US-GuyNeural", "Bridge here. Sensors up.", "Saudi naval crew", False),
+    VoiceLine("rsa-naval-action-ar.wav", "ar-SA", "ar-SA-HamedNeural", "تغيير المسار الآن.", "Saudi naval crew", False),
+    VoiceLine("rsa-naval-action-en.wav", "en-US", "en-US-GuyNeural", "Coming about. Steady.", "Saudi naval crew", False),
+    VoiceLine("rye-veh-select-ar.wav", "ar-YE", "ar-YE-SalehNeural", "الطاقم جاهز على الطريق.", "Yemeni vehicle crew", False),
+    VoiceLine("rye-veh-select-en.wav", "en-US", "en-US-GuyNeural", "Crew ready. Engine running.", "Yemeni vehicle crew", False),
+    VoiceLine("rye-veh-action-ar.wav", "ar-YE", "ar-YE-SalehNeural", "نتحرك بسرعة.", "Yemeni vehicle crew", False),
+    VoiceLine("rye-veh-action-en.wav", "en-US", "en-US-GuyNeural", "Moving fast. Stay low.", "Yemeni vehicle crew", False),
+    VoiceLine("rye-naval-select-ar.wav", "ar-YE", "ar-YE-SalehNeural", "الزورق جاهز، الرابط متصل.", "Yemeni coastal crew", False),
+    VoiceLine("rye-naval-select-en.wav", "en-US", "en-US-GuyNeural", "Boat ready. Link is up.", "Yemeni coastal crew", False),
+    VoiceLine("rye-naval-action-ar.wav", "ar-YE", "ar-YE-SalehNeural", "نقترب من الساحل.", "Yemeni coastal crew", False),
+    VoiceLine("rye-naval-action-en.wav", "en-US", "en-US-GuyNeural", "Closing on the coast.", "Yemeni coastal crew", False),
+)
+
+
 def radio_finish(path: Path, enabled: bool) -> None:
     with wave.open(str(path), "rb") as source:
         rate = source.getframerate()

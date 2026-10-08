@@ -1,0 +1,33 @@
+r2m1a2s:
+	idle: ra2|modern-factions/voxels/r2m1a2s
+	turret: ra2|modern-factions/voxels/r2m1a2stur
+
+r2sads:
+	idle: ra2|modern-factions/voxels/r2sads
+	turret: ra2|modern-factions/voxels/r2sadstur
+
+r2caesar:
+	idle: ra2|modern-factions/voxels/r2caesar
+
+r2bradley:
+	idle: ra2|modern-factions/voxels/r2bradley
+	turret: ra2|modern-factions/voxels/r2bradleytur
+
+r2f15sa:
+	idle: ra2|modern-factions/voxels/r2f15sa
+
+r2ah64sa:
+	idle: ra2|modern-factions/voxels/r2ah64sa
+	rotor: ra2|modern-factions/voxels/r2ah64satur
+	slow-rotor: ra2|modern-factions/voxels/r2ah64satur
+
+r2sadiq:
+	idle: ra2|modern-factions/voxels/r2sadiq
+	turret: ra2|modern-factions/voxels/r2sadiqtur
+
+r2riyadh:
+	idle: ra2|modern-factions/voxels/r2riyadh
+	turret: ra2|modern-factions/voxels/r2riyadhtur
+
+r2jubail:
+	idle: ra2|modern-factions/voxels/r2jubail

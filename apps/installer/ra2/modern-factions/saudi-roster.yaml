@@ -1,0 +1,606 @@
+# Saudi Arabia: expeditionary combined arms. JTAC laser marks only amplify
+# Saudi guided weapons (ATGM, TOW, howitzer, Hellfire, F-15 strike and the
+# Falcon One precision bomb); they are not a global damage buff.
+^Palettes:
+	PaletteFromFile@saudi:
+		Name: saudi-art
+		Filename: ra2|modern-factions/saudi-art/saudi.pal
+	PlayerColorPalette@saudi:
+		BasePalette: saudi-art
+		BaseName: saudiplayer
+		RemapIndex: 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31
+	PaletteFromFile@saudi-voxels:
+		Name: saudi-voxels
+		Filename: ra2|modern-factions/saudi-art/saudi-voxels.pal
+	PlayerColorPalette@saudi-voxels:
+		BasePalette: saudi-voxels
+		BaseName: saudivoxelplayer
+		RemapIndex: 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31
+
+^ExistsInWorld:
+	ExternalCondition@R2LASED:
+		Condition: r2-lased
+	Targetable@R2LASED:
+		TargetTypes: R2Lased
+		RequiresCondition: r2-lased
+	WithColoredOverlay@R2LASED:
+		Color: FF303022
+		RequiresCondition: r2-lased
+
+^R2SaudiVoxels:
+	RenderVoxels:
+		PlayerPalette: saudivoxelplayer
+
+^R2SaudiInfantry:
+	Inherits: ^Infantry
+	Inherits@AUTOTARGET: ^AutoTargetGroundAssaultMove
+	Inherits@MC: ^MindControllable
+	Buildable:
+		Queue: Infantry
+	UpdatesPlayerStatistics:
+		AddToArmyValue: true
+	Selectable:
+		Bounds: 600, 1500, 0, -530
+	RenderSprites:
+		PlayerPalette: saudiplayer
+	-TakeCover:
+	-WithDeathAnimation@effect:
+	WithDeathAnimation@normal:
+		DeathSequencePalette: saudiplayer
+		DeathPaletteIsPlayerPalette: true
+	AttackFrontal:
+		Voice: Attack
+		FacingTolerance: 32
+	Armament:
+		Weapon: R2GuardRifle
+	ProducibleWithLevel:
+		Prerequisites: barracks.infiltrated
+	RevealsShroud:
+		Range: 5c0
+
+r2sang:
+	Inherits: ^R2SaudiInfantry
+	Tooltip:
+		Name: ra2-r2sang-name
+	Buildable:
+		Prerequisites: ~faction.saudi, gapile
+		BuildPaletteOrder: 10
+		Description: ra2-r2sang-description
+	Valued:
+		Cost: 220
+	Health:
+		HP: 135
+	Mobile:
+		Speed: 55
+		PauseOnCondition: braced || chronodisable
+	GrantConditionOnDeploy:
+		DeployedCondition: braced
+		SkipMakeAnimation: true
+		UndeployOnMove: true
+		Voice: Move
+		DeploySounds: ra2|modern-factions/audio/redsea-guard-rifle.wav
+	RangeMultiplier@braced:
+		Modifier: 118
+		RequiresCondition: braced
+	ReloadDelayMultiplier@braced:
+		Modifier: 80
+		RequiresCondition: braced
+	DamageMultiplier@braced:
+		Modifier: 72
+		RequiresCondition: braced
+	WithColoredOverlay@braced:
+		Color: D8C48930
+		RequiresCondition: braced
+	WithTextDecoration@braced:
+		Text: BRACED
+		Position: Top
+		Margin: 0, -14
+		Color: F0D890
+		RequiresSelection: true
+		RequiresCondition: braced
+
+r2saat:
+	Inherits: ^R2SaudiInfantry
+	Tooltip:
+		Name: ra2-r2saat-name
+	Buildable:
+		Prerequisites: ~faction.saudi, gapile
+		BuildPaletteOrder: 20
+		Description: ra2-r2saat-description
+	Valued:
+		Cost: 500
+	Health:
+		HP: 95
+	Mobile:
+		Speed: 45
+	Armament:
+		Weapon: R2SaudiATGM
+	RevealsShroud:
+		Range: 7c0
+
+r2sajtac:
+	Inherits: ^R2SaudiInfantry
+	Tooltip:
+		Name: ra2-r2sajtac-name
+	Buildable:
+		Prerequisites: ~faction.saudi, gapile, radar
+		BuildPaletteOrder: 60
+		Description: ra2-r2sajtac-description
+	Valued:
+		Cost: 600
+	Health:
+		HP: 90
+	Mobile:
+		Speed: 60
+	Armament:
+		Weapon: R2JTACLaser
+		LocalOffset: 300,0,500
+	AutoTarget:
+		ScanRadius: 9
+	RevealsShroud:
+		Range: 10c0
+	DetectCloaked:
+		DetectionTypes: Cloak
+		Range: 5c0
+	RenderDetectionCircle:
+
+r2falcon:
+	Inherits: ^R2SaudiInfantry
+	Tooltip:
+		Name: ra2-r2falcon-name
+	Buildable:
+		Prerequisites: ~faction.saudi, gapile, gatech
+		BuildPaletteOrder: 140
+		BuildLimit: 1
+		Description: ra2-r2falcon-description
+	Valued:
+		Cost: 1900
+	Health:
+		HP: 190
+	Mobile:
+		Speed: 78
+	Armament:
+		Weapon: R2FalconRifle
+	Demolition:
+		DetonationDelay: 55
+		Voice: Demolish
+	Passenger:
+		CustomPipType: red
+	RevealsShroud:
+		Range: 8c0
+	VoiceAnnouncement:
+		Voice: Build
+	AirstrikePower@falcon:
+		OrderName: R2FalconPrecisionStrike
+		IconImage: r2falcon
+		Icon: strike
+		ChargeInterval: 1800
+		StartFullyCharged: true
+		Name: ra2-r2falcon-strike-name
+		Description: ra2-r2falcon-strike-description
+		UnitType: r2f15strike
+		SquadSize: 1
+		QuantizedFacings: 8
+		CameraActor: camera
+		CameraRemoveDelay: 120
+		SupportPowerPaletteOrder: 25
+
+r2f15sa:
+	Inherits: orca
+	Inherits@AUTOTARGET: ^AutoTargetAll
+	Inherits@palette: ^R2SaudiVoxels
+	Tooltip:
+		Name: ra2-r2f15sa-name
+	Buildable:
+		BuildPaletteOrder: 20
+		Prerequisites: ~faction.saudi, gaairc, gatech
+		Description: ra2-r2f15sa-description
+	Valued:
+		Cost: 2200
+	Health:
+		HP: 240
+	Aircraft:
+		Speed: 270
+	Armament:
+		Name: aam
+		Weapon: R2F15AAM
+		PauseOnCondition: !aam-ammo
+	Armament@strike:
+		Name: strike
+		Weapon: R2F15Strike
+		PauseOnCondition: !strike-ammo
+	AttackAircraft:
+		Armaments: aam, strike
+	AmmoPool:
+		Name: aam
+		Armaments: aam
+		Ammo: 4
+		AmmoCondition: aam-ammo
+	AmmoPool@strike:
+		Name: strike
+		Armaments: strike
+		Ammo: 2
+		AmmoCondition: strike-ammo
+	Rearmable:
+		AmmoPools: aam, strike
+	RenderSprites:
+		Image: r2f15sa
+	RenderVoxels:
+		Image: r2f15sa
+		Scale: 15.2
+		LightAmbientColor: -0.3,-0.3,-0.3
+		LightDiffuseColor: 0.75,0.75,0.75
+	SpawnActorOnDeath:
+		Actor: r2f15sahusk
+
+r2f15sahusk:
+	Inherits: orcahusk
+	Inherits@palette: ^R2SaudiVoxels
+	Tooltip:
+		Name: ra2-r2f15sa-name
+		GenericName: ra2-modern-husk
+	RenderVoxels:
+		Image: r2f15sa
+		Scale: 15.2
+		LightAmbientColor: -0.3,-0.3,-0.3
+		LightDiffuseColor: 0.75,0.75,0.75
+
+# Falcon One's precision strike: a single F-15SA pass, not a buildable unit.
+r2f15strike:
+	Inherits: pdplane
+	Inherits@palette: ^R2SaudiVoxels
+	-ParaDrop:
+	-Cargo:
+	Tooltip:
+		Name: ra2-r2f15sa-name
+	Aircraft:
+		CruiseAltitude: 4096
+		Speed: 300
+		TurnSpeed: 20
+	Health:
+		HP: 240
+	AttackBomber:
+		FacingTolerance: 8
+	AmmoPool:
+		Ammo: 1
+	Armament:
+		Weapon: R2PrecisionBomb
+	RenderSprites:
+		Image: r2f15sa
+	RenderVoxels:
+		Image: r2f15sa
+		Scale: 15.2
+		LightAmbientColor: -0.3,-0.3,-0.3
+		LightDiffuseColor: 0.75,0.75,0.75
+	SpawnActorOnDeath:
+		Actor: r2f15sahusk
+
+r2ah64sa:
+	Inherits: ^R2ModernDrone
+	Inherits@palette: ^R2SaudiVoxels
+	Tooltip:
+		Name: ra2-r2ah64sa-name
+	Buildable:
+		Prerequisites: ~faction.saudi, gaweap, gatech
+		BuildPaletteOrder: 100
+		Description: ra2-r2ah64sa-description
+	Valued:
+		Cost: 1700
+	Health:
+		HP: 280
+	Aircraft:
+		Speed: 150
+	Armament@primary:
+		Weapon: R2ApacheCannon
+		LocalOffset: 700,0,-100
+	Armament@rockets:
+		Name: secondary
+		Weapon: R2ApacheRockets
+		LocalOffset: 200,-330,-60, 200,330,-60
+	AttackAircraft:
+		Armaments: primary, secondary
+	WithVoxelHelicopterBody:
+		Sequence: rotor
+		TickRate: 1
+	SpawnActorOnDeath:
+		Actor: r2ah64sahusk
+
+r2ah64sahusk:
+	Inherits: ^R2DroneHusk
+	Inherits@palette: ^R2SaudiVoxels
+	RenderVoxels:
+		Image: r2ah64sa
+
+^R2SaudiShip:
+	Inherits: ^Ship
+	Tooltip:
+		GenericName: ra2-modern-ship
+	Inherits@AUTOTARGET: ^AutoTargetAllAssaultMove
+	Inherits@MC: ^MindControllable
+	Buildable:
+		Queue: Ship
+	UpdatesPlayerStatistics:
+		AddToArmyValue: true
+	RenderSprites:
+	RenderVoxels:
+		PlayerPalette: saudivoxelplayer
+		Scale: 22
+		LightAmbientColor: -0.3,-0.3,-0.3
+		LightDiffuseColor: 0.75,0.75,0.75
+	WithVoxelBody:
+	WithVoxelTurret:
+	Turreted:
+		TurnSpeed: 32
+	AttackTurreted:
+		Voice: Attack
+	Selectable:
+		Bounds: 1600, 3400, 0, -289
+	RevealsShroud:
+		Range: 9c0
+	HitShape:
+	# Al Jubail's replenishment aura repairs Saudi hulls and interceptor magazines.
+	ExternalCondition@fleet:
+		Condition: r2-fleet-support
+	ChangesHealth@fleet:
+		PercentageStep: 2
+		Delay: 25
+		StartIfBelow: 100
+		DamageCooldown: 0
+		RequiresCondition: r2-fleet-support
+	WithColoredOverlay@fleet:
+		Color: 60C0FF10
+		RequiresCondition: r2-fleet-support
+
+r2sadiq:
+	Inherits: ^R2SaudiShip
+	Tooltip:
+		Name: ra2-r2sadiq-name
+	Buildable:
+		Prerequisites: ~faction.saudi, gayard
+		BuildPaletteOrder: 10
+		Description: ra2-r2sadiq-description
+	Valued:
+		Cost: 650
+	Health:
+		HP: 230
+	Armor:
+		Type: Light
+	Mobile:
+		Speed: 150
+		TurnSpeed: 36
+	Turreted:
+		Offset: 553,0,0
+		TurnSpeed: 44
+	Armament:
+		Weapon: R2SadiqCannon
+		LocalOffset: 330,0,330
+	DetectCloaked:
+		DetectionTypes: Underwater
+		Range: 5c0
+	RenderDetectionCircle:
+
+r2riyadh:
+	Inherits: ^R2SaudiShip
+	Tooltip:
+		Name: ra2-r2riyadh-name
+	Buildable:
+		Prerequisites: ~faction.saudi, gayard, radar
+		BuildPaletteOrder: 30
+		Description: ra2-r2riyadh-description
+	Valued:
+		Cost: 1850
+	Health:
+		HP: 700
+	Armor:
+		Type: Heavy
+	Mobile:
+		Speed: 75
+	Turreted:
+		Offset: 907,0,0
+		TurnSpeed: 28
+	Armament@primary:
+		Weapon: R2FrigateGun
+		LocalOffset: 560,0,450
+	Armament@ciws:
+		Name: secondary
+		Weapon: R2FrigateCIWS
+		LocalOffset: 0,0,300
+	Armament@asw:
+		Name: asw
+		Weapon: R2FrigateASW
+		LocalOffset: 0,0,0
+	AttackTurreted:
+		Armaments: primary, secondary, asw
+	RevealsShroudMultiplier@radar:
+		Modifier: 150
+		RequiresCondition: active-radar
+	DetectCloaked:
+		DetectionTypes: Underwater, Cloak
+		Range: 6c0
+	DetectCloakedMultiplier@radar:
+		Modifier: 175
+		RequiresCondition: active-radar
+	RenderDetectionCircle:
+	GrantConditionOnDeploy@radar:
+		DeployedCondition: active-radar
+		SkipMakeAnimation: true
+		UndeployOnMove: false
+		DeploySounds: ra2|modern-factions/audio/naval-radar-sweep.wav
+		UndeploySounds: ra2|modern-factions/audio/naval-radar-sweep.wav
+	# Active emission reveals the frigate in explored enemy fog.
+	-HiddenUnderFog:
+	NavalRadarVisibility:
+		RequiresCondition: active-radar
+	WithTextDecoration@radar:
+		Text: RADAR
+		Position: Top
+		Margin: 0, -14
+		Color: 80E0B0
+		RequiresSelection: true
+		RequiresCondition: active-radar
+	WithRangeCircle@radar:
+		Range: 8c0
+		Color: 50D8A080
+		RequiresCondition: active-radar
+	AmmoPool@interceptors:
+		Name: interceptors
+		Armaments: interceptor-magazine
+		Ammo: 8
+	ReloadAmmoPool@interceptors:
+		AmmoPool: interceptors
+		Delay: 150
+		Count: 1
+	ReloadAmmoPool@fleet:
+		AmmoPool: interceptors
+		Delay: 40
+		Count: 1
+		RequiresCondition: r2-fleet-support
+	JamsMissiles@passive:
+		Range: 4c0
+		Chance: 60
+		DeflectionRelationships: Enemy, Neutral
+		AmmoPool: interceptors
+		AmmoUsage: 1
+		InterceptCooldown: 18
+		InterceptSound: ra2|modern-factions/audio/naval-ciws-burst.wav
+		RequiresCondition: !active-radar
+	JamsMissiles@active:
+		Range: 8c0
+		Chance: 85
+		DeflectionRelationships: Enemy, Neutral
+		AmmoPool: interceptors
+		AmmoUsage: 1
+		InterceptCooldown: 14
+		InterceptSound: ra2|modern-factions/audio/naval-ciws-burst.wav
+		RequiresCondition: active-radar
+	WithAmmoPipsDecoration:
+		Position: BottomLeft
+		RequiresSelection: true
+		FullSequence: pip-ammo
+		EmptySequence: pip-ammoempty
+		Palette: pips
+
+r2jubail:
+	Inherits: ^R2SaudiShip
+	Tooltip:
+		Name: ra2-r2jubail-name
+	Buildable:
+		Prerequisites: ~faction.saudi, gayard, radar
+		BuildPaletteOrder: 50
+		Description: ra2-r2jubail-description
+	Valued:
+		Cost: 1500
+	Health:
+		HP: 800
+	Armor:
+		Type: Heavy
+	Mobile:
+		Speed: 55
+	-WithVoxelTurret:
+	-Turreted:
+	-AttackTurreted:
+	-AutoTarget:
+	-AutoTargetPriority@DEFAULT:
+	-AutoTargetPriority@ATTACKANYTHING:
+	-AttackMove:
+	ProximityExternalCondition@fleet:
+		Condition: r2-fleet-support
+		Range: 5c0
+		ValidRelationships: Ally
+	WithRangeCircle@fleet:
+		Range: 5c0
+		Color: 60C0FF80
+	RevealsShroud:
+		Range: 9c0
+
+^R2SaudiDefense:
+	Inherits: ^SupportBuilding
+	Inherits@AUTOTARGET: ^AutoTargetGround
+	Buildable:
+		Queue: Support
+	Building:
+		Footprint: x
+		Dimensions: 1, 1
+	Armor:
+		Type: Steel
+	RenderSprites:
+		PlayerPalette: saudiplayer
+	WithSpriteTurret:
+		RequiresCondition: !build-incomplete
+	Turreted:
+		TurnSpeed: 32
+		InitialFacing: 640
+	BodyOrientation:
+		QuantizedFacings: 32
+	AttackTurreted:
+		Voice: Attack
+		RequiresCondition: !build-incomplete
+		PauseOnCondition: lowpower
+	IsometricSelectable:
+		Height: 40
+	Armament:
+		Weapon: R2GuardTowerMG
+		LocalOffset: 550,0,700
+	GrantConditionOnPowerState@LOWPOWER:
+		Condition: lowpower
+		ValidPowerStates: Low, Critical
+	RevealsShroud:
+		Range: 8c0
+	RequiresBuildableArea:
+		Adjacent: 5
+
+r2saguard:
+	Inherits: ^R2SaudiDefense
+	Tooltip:
+		Name: ra2-r2saguard-name
+	Buildable:
+		Prerequisites: ~faction.saudi, barracks
+		BuildPaletteOrder: 20
+		Description: ra2-r2saguard-description
+	Valued:
+		Cost: 600
+	Health:
+		HP: 500
+	Power:
+		Amount: -20
+	WithRangeCircle:
+		Range: 6c0
+
+r2sapatriot:
+	Inherits: ^R2SaudiDefense
+	Inherits@AUTOTARGET: ^AutoTargetAir
+	Tooltip:
+		Name: ra2-r2sapatriot-name
+	Buildable:
+		Prerequisites: ~faction.saudi, barracks, radar
+		BuildPaletteOrder: 30
+		Description: ra2-r2sapatriot-description
+	Valued:
+		Cost: 1200
+	Health:
+		HP: 600
+	Power:
+		Amount: -60
+	Armament:
+		Weapon: R2PatriotMissile
+	WithRangeCircle:
+		Range: 14c0
+
+r2satow:
+	Inherits: ^R2SaudiDefense
+	Tooltip:
+		Name: ra2-r2satow-name
+	Buildable:
+		Prerequisites: ~faction.saudi, radar
+		BuildPaletteOrder: 40
+		Description: ra2-r2satow-description
+	Valued:
+		Cost: 1100
+	Health:
+		HP: 650
+	Power:
+		Amount: -45
+	Armament:
+		Weapon: R2TOWMissile
+	WithRangeCircle:
+		Range: 9c0

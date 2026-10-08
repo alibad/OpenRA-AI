@@ -1,0 +1,53 @@
+r2m1a2s:
+	Inherits@MC: ^MindControllable
+	Inherits@Muzzle: ^WithCannonMuzzle
+	icon:
+		Filename: ra2|modern-factions/icons/r2m1a2s.png
+
+r2sads:
+	Inherits@MC: ^MindControllable
+	Inherits@Muzzle: ^WithCannonMuzzle
+	icon:
+		Filename: ra2|modern-factions/icons/r2sads.png
+
+r2caesar:
+	Inherits@MC: ^MindControllable
+	Inherits@Muzzle: ^WithCannonMuzzle
+	icon:
+		Filename: ra2|modern-factions/icons/r2caesar.png
+
+r2bradley:
+	Inherits@MC: ^MindControllable
+	Inherits@Muzzle: ^WithCannonMuzzle
+	icon:
+		Filename: ra2|modern-factions/icons/r2bradley.png
+
+r2f15sa:
+	Inherits@MC: ^MindControllable
+	Inherits@Muzzle: ^WithCannonMuzzle
+	icon:
+		Filename: ra2|modern-factions/icons/r2f15sa.png
+
+r2ah64sa:
+	Inherits@MC: ^MindControllable
+	Inherits@Muzzle: ^WithCannonMuzzle
+	icon:
+		Filename: ra2|modern-factions/icons/r2ah64sa.png
+
+r2sadiq:
+	Inherits@MC: ^MindControllable
+	Inherits@Muzzle: ^WithCannonMuzzle
+	icon:
+		Filename: ra2|modern-factions/icons/r2sadiq.png
+
+r2riyadh:
+	Inherits@MC: ^MindControllable
+	Inherits@Muzzle: ^WithCannonMuzzle
+	icon:
+		Filename: ra2|modern-factions/icons/r2riyadh.png
+
+r2jubail:
+	Inherits@MC: ^MindControllable
+	Inherits@Muzzle: ^WithCannonMuzzle
+	icon:
+		Filename: ra2|modern-factions/icons/r2jubail.png

@@ -1,0 +1,166 @@
+Player:
+	UnitBuilderBotModule@normal:
+		UnitsToBuild:
+			r2ymr: 75
+			r2yrpg: 32
+			r2yspot: 7
+			r2wadighost: 2
+			r2samad: 10
+			r2hodeidah: 24
+			r2sahaab: 10
+			r2mokha: 6
+		UnitLimits:
+			r2yspot: 3
+			r2wadighost: 1
+			r2ymlr: 4
+			r2samad: 5
+			r2sahaab: 3
+			r2mokha: 2
+	BaseBuilderBotModule@normal:
+		BuildingFractions:
+			r2ybunker: 10
+			r2yzunest: 7
+			r2ycoastal: 5
+		BuildingLimits:
+			r2ybunker: 6
+			r2yzunest: 4
+			r2ycoastal: 4
+		AdditionalDefenseTypes:
+			yemen: r2ybunker, r2yzunest, r2ycoastal
+	SquadManagerBotModule@normal:
+		AdditionalAirUnitsTypes:
+			yemen: r2samad
+		AdditionalNavalUnitsTypes:
+			yemen: r2hodeidah, r2sahaab, r2mokha
+	UnitBuilderBotModule@medium:
+		UnitsToBuild:
+			r2ymr: 75
+			r2yrpg: 32
+			r2yspot: 7
+			r2wadighost: 2
+			r2samad: 10
+			r2hodeidah: 24
+			r2sahaab: 10
+			r2mokha: 6
+		UnitLimits:
+			r2yspot: 3
+			r2wadighost: 1
+			r2ymlr: 4
+			r2samad: 5
+			r2sahaab: 3
+			r2mokha: 2
+	BaseBuilderBotModule@medium:
+		BuildingFractions:
+			r2ybunker: 10
+			r2yzunest: 7
+			r2ycoastal: 5
+		BuildingLimits:
+			r2ybunker: 6
+			r2yzunest: 4
+			r2ycoastal: 4
+		AdditionalDefenseTypes:
+			yemen: r2ybunker, r2yzunest, r2ycoastal
+	SquadManagerBotModule@medium:
+		AdditionalAirUnitsTypes:
+			yemen: r2samad
+		AdditionalNavalUnitsTypes:
+			yemen: r2hodeidah, r2sahaab, r2mokha
+	UnitBuilderBotModule@rush:
+		UnitsToBuild:
+			r2ymr: 75
+			r2yrpg: 32
+			r2yspot: 7
+			r2wadighost: 2
+			r2samad: 10
+			r2hodeidah: 24
+			r2sahaab: 10
+			r2mokha: 6
+		UnitLimits:
+			r2yspot: 3
+			r2wadighost: 1
+			r2ymlr: 4
+			r2samad: 5
+			r2sahaab: 3
+			r2mokha: 2
+	BaseBuilderBotModule@rush:
+		BuildingFractions:
+			r2ybunker: 10
+			r2yzunest: 7
+			r2ycoastal: 5
+		BuildingLimits:
+			r2ybunker: 6
+			r2yzunest: 4
+			r2ycoastal: 4
+		AdditionalDefenseTypes:
+			yemen: r2ybunker, r2yzunest, r2ycoastal
+	SquadManagerBotModule@rush:
+		AdditionalAirUnitsTypes:
+			yemen: r2samad
+		AdditionalNavalUnitsTypes:
+			yemen: r2hodeidah, r2sahaab, r2mokha
+	UnitBuilderBotModule@turtle:
+		UnitsToBuild:
+			r2ymr: 75
+			r2yrpg: 32
+			r2yspot: 7
+			r2wadighost: 2
+			r2samad: 10
+			r2hodeidah: 24
+			r2sahaab: 10
+			r2mokha: 6
+		UnitLimits:
+			r2yspot: 3
+			r2wadighost: 1
+			r2ymlr: 4
+			r2samad: 5
+			r2sahaab: 3
+			r2mokha: 2
+	BaseBuilderBotModule@turtle:
+		BuildingFractions:
+			r2ybunker: 10
+			r2yzunest: 7
+			r2ycoastal: 5
+		BuildingLimits:
+			r2ybunker: 6
+			r2yzunest: 4
+			r2ycoastal: 4
+		AdditionalDefenseTypes:
+			yemen: r2ybunker, r2yzunest, r2ycoastal
+	SquadManagerBotModule@turtle:
+		AdditionalAirUnitsTypes:
+			yemen: r2samad
+		AdditionalNavalUnitsTypes:
+			yemen: r2hodeidah, r2sahaab, r2mokha
+	UnitBuilderBotModule@naval:
+		UnitsToBuild:
+			r2ymr: 75
+			r2yrpg: 32
+			r2yspot: 7
+			r2wadighost: 2
+			r2samad: 10
+			r2hodeidah: 24
+			r2sahaab: 10
+			r2mokha: 6
+		UnitLimits:
+			r2yspot: 3
+			r2wadighost: 1
+			r2ymlr: 4
+			r2samad: 5
+			r2sahaab: 3
+			r2mokha: 2
+	BaseBuilderBotModule@naval:
+		BuildingFractions:
+			r2ybunker: 10
+			r2yzunest: 7
+			r2ycoastal: 5
+		BuildingLimits:
+			r2ybunker: 6
+			r2yzunest: 4
+			r2ycoastal: 4
+		AdditionalDefenseTypes:
+			yemen: r2ybunker, r2yzunest, r2ycoastal
+	SquadManagerBotModule@naval:
+		AdditionalAirUnitsTypes:
+			yemen: r2samad
+		AdditionalNavalUnitsTypes:
+			yemen: r2hodeidah, r2sahaab, r2mokha

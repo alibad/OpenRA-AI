@@ -1,0 +1,74 @@
+r2ymr:
+	StrategicRole:
+		Roles: line-infantry
+		Domain: ground
+
+r2yrpg:
+	StrategicRole:
+		Roles: anti-armor
+		Domain: ground
+
+r2yspot:
+	StrategicRole:
+		Roles: support
+		Domain: ground
+
+r2wadighost:
+	StrategicRole:
+		Roles: line-infantry
+		Domain: ground
+
+r2technical:
+	StrategicRole:
+		Roles: line-infantry
+		Domain: ground
+
+r2ytechrr:
+	StrategicRole:
+		Roles: anti-armor
+		Domain: ground
+
+r2yzu:
+	StrategicRole:
+		Roles: anti-air
+		Domain: ground
+
+r2ymlr:
+	StrategicRole:
+		Roles: artillery
+		Domain: ground
+
+r2samad:
+	StrategicRole:
+		Roles: strike-aircraft
+		Domain: air
+
+r2hodeidah:
+	StrategicRole:
+		Roles: naval-screen
+		Domain: naval
+
+r2sahaab:
+	StrategicRole:
+		Roles: naval-screen
+		Domain: naval
+
+r2mokha:
+	StrategicRole:
+		Roles: support
+		Domain: naval
+
+r2ybunker:
+	StrategicRole:
+		Roles: line-infantry
+		Domain: defense
+
+r2yzunest:
+	StrategicRole:
+		Roles: anti-air
+		Domain: defense
+
+r2ycoastal:
+	StrategicRole:
+		Roles: anti-armor
+		Domain: defense

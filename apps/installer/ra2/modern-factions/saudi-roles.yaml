@@ -1,0 +1,79 @@
+r2sang:
+	StrategicRole:
+		Roles: line-infantry
+		Domain: ground
+
+r2saat:
+	StrategicRole:
+		Roles: anti-armor
+		Domain: ground
+
+r2sajtac:
+	StrategicRole:
+		Roles: support
+		Domain: ground
+
+r2falcon:
+	StrategicRole:
+		Roles: line-infantry
+		Domain: ground
+
+r2m1a2s:
+	StrategicRole:
+		Roles: main-battle-tank
+		Domain: ground
+
+r2sads:
+	StrategicRole:
+		Roles: anti-air
+		Domain: ground
+
+r2caesar:
+	StrategicRole:
+		Roles: artillery
+		Domain: ground
+
+r2bradley:
+	StrategicRole:
+		Roles: transport
+		Domain: ground
+
+r2f15sa:
+	StrategicRole:
+		Roles: interceptor, strike-aircraft
+		Domain: air
+
+r2ah64sa:
+	StrategicRole:
+		Roles: strike-aircraft
+		Domain: air
+
+r2sadiq:
+	StrategicRole:
+		Roles: naval-screen
+		Domain: naval
+
+r2riyadh:
+	StrategicRole:
+		Roles: anti-submarine
+		Domain: naval
+
+r2jubail:
+	StrategicRole:
+		Roles: support
+		Domain: naval
+
+r2saguard:
+	StrategicRole:
+		Roles: line-infantry
+		Domain: defense
+
+r2sapatriot:
+	StrategicRole:
+		Roles: anti-air
+		Domain: defense
+
+r2satow:
+	StrategicRole:
+		Roles: anti-armor
+		Domain: defense

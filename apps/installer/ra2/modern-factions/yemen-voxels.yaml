@@ -1,0 +1,28 @@
+r2technical:
+	idle: ra2|modern-factions/voxels/r2technical
+	turret: ra2|modern-factions/voxels/r2technicaltur
+
+r2ytechrr:
+	idle: ra2|modern-factions/voxels/r2ytechrr
+	turret: ra2|modern-factions/voxels/r2ytechrrtur
+
+r2yzu:
+	idle: ra2|modern-factions/voxels/r2yzu
+	turret: ra2|modern-factions/voxels/r2yzutur
+
+r2ymlr:
+	idle: ra2|modern-factions/voxels/r2ymlr
+	empty: ra2|modern-factions/voxels/r2ymlrempty
+
+r2samad:
+	idle: ra2|modern-factions/voxels/r2samad
+
+r2hodeidah:
+	idle: ra2|modern-factions/voxels/r2hodeidah
+
+r2sahaab:
+	idle: ra2|modern-factions/voxels/r2sahaab
+
+r2mokha:
+	idle: ra2|modern-factions/voxels/r2mokha
+	turret: ra2|modern-factions/voxels/r2mokhatur

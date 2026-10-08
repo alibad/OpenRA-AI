@@ -1,0 +1,58 @@
+{
+  "r2ymr": {
+    "frames": 112,
+    "size": [
+      48,
+      48
+    ],
+    "sha256": "e39fc7932ff2a52a8ebc087339c1d3df6294cb83b92a511da3d420c78a0d639a"
+  },
+  "r2yrpg": {
+    "frames": 112,
+    "size": [
+      48,
+      48
+    ],
+    "sha256": "796dbe4f8c354a3e06a53074007f9c4bdfedabd65d932610eb22119dab63207d"
+  },
+  "r2yspot": {
+    "frames": 112,
+    "size": [
+      48,
+      48
+    ],
+    "sha256": "03e28e3f41ce6b658ee4b1bbe9988718b5470acb7206e20d771d7469e2230fb2"
+  },
+  "r2wadighost": {
+    "frames": 112,
+    "size": [
+      48,
+      48
+    ],
+    "sha256": "73ee9416bd88ad7d74ae2c5746aded37cbb25d0e28fafb96e77eeb90fe952688"
+  },
+  "r2ybunker": {
+    "frames": 41,
+    "size": [
+      96,
+      96
+    ],
+    "sha256": "3b791d2741ac275f6ff42175e6bd4802785756c00dd5e28e3d09cb1df0929df1"
+  },
+  "r2yzunest": {
+    "frames": 41,
+    "size": [
+      96,
+      96
+    ],
+    "sha256": "7c9d168844424251ad6713146a46eb3690f6229fb1a94f035a87f45c2c1c51f5"
+  },
+  "r2ycoastal": {
+    "frames": 41,
+    "size": [
+      96,
+      96
+    ],
+    "sha256": "840c322cb45fd2182d52af561abbd54dcf1c7cf4df43521aad6f71e016699d0a"
+  }
+}

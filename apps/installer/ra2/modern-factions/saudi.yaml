@@ -1,0 +1,221 @@
+World:
+	Faction@saudi:
+		Name: ra2-modern-saudi-name
+		InternalName: saudi
+		Side: Allies
+		RandomFactionMemberOf: random-allies
+		Description: ra2-modern-saudi-description
+	StartingUnits@saudi-none:
+		Class: none
+		ClassName: options-starting-units.mcv-only
+		Factions: saudi
+		BaseActor: amcv
+		BaseActorFacing: 896
+	StartingUnits@saudi-light:
+		Class: light
+		ClassName: options-starting-units.light
+		Factions: saudi
+		BaseActor: amcv
+		BaseActorFacing: 896
+		SupportActors: r2sang, r2sang, r2sang, r2saat
+		SupportActorsFacing: 896
+		InnerSupportRadius: 3
+		OuterSupportRadius: 5
+	StartingUnits@saudi-medium:
+		Class: medium
+		ClassName: options-starting-units.medium
+		Factions: saudi
+		BaseActor: amcv
+		BaseActorFacing: 896
+		SupportActors: r2sang, r2sang, r2sang, r2saat, r2m1a2s, engineer
+		SupportActorsFacing: 896
+		InnerSupportRadius: 3
+		OuterSupportRadius: 5
+	StartingUnits@saudi-heavy:
+		Class: heavy
+		ClassName: options-starting-units.heavy
+		Factions: saudi
+		BaseActor: amcv
+		BaseActorFacing: 896
+		SupportActors: r2sang, r2sang, r2saat, r2sajtac, r2m1a2s, r2bradley, r2sads, engineer
+		SupportActorsFacing: 896
+		InnerSupportRadius: 3
+		OuterSupportRadius: 5
+
+Player:
+	ProvidesPrerequisite@saudi:
+		Prerequisite: faction.saudi
+		Factions: saudi
+	UnitBuilderBotModule@normal:
+		UnitsToBuild:
+			r2m1a2s: 60
+			r2sads: 20
+			r2caesar: 20
+			r2bradley: 12
+		UnitLimits:
+			r2bradley: 3
+	UnitBuilderBotModule@medium:
+		UnitsToBuild:
+			r2m1a2s: 60
+			r2sads: 20
+			r2caesar: 20
+			r2bradley: 12
+		UnitLimits:
+			r2bradley: 3
+	UnitBuilderBotModule@rush:
+		UnitsToBuild:
+			r2m1a2s: 60
+			r2sads: 20
+			r2caesar: 20
+			r2bradley: 12
+		UnitLimits:
+			r2bradley: 3
+	UnitBuilderBotModule@turtle:
+		UnitsToBuild:
+			r2m1a2s: 60
+			r2sads: 20
+			r2caesar: 20
+			r2bradley: 12
+		UnitLimits:
+			r2bradley: 3
+	UnitBuilderBotModule@naval:
+		UnitsToBuild:
+			r2m1a2s: 60
+			r2sads: 20
+			r2caesar: 20
+			r2bradley: 12
+		UnitLimits:
+			r2bradley: 3
+
+gaairc:
+	ProvidesPrerequisite@harrier-saudi:
+		Prerequisite: aircraft.harrier
+		Factions: saudi
+
+gaweap:
+	GrantConditionOnProduction@saudi-helicopter:
+		Actors: r2ah64sa
+		Condition: roof-open
+		Duration: 50
+		ShowSelectionBar: false
+
+r2m1a2s:
+	Inherits: ^R2ModernVehicle
+	Inherits@palette: ^R2SaudiVoxels
+	Tooltip:
+		Name: ra2-r2m1a2s-name
+	Buildable:
+		BuildPaletteOrder: 21
+		Prerequisites: ~faction.saudi, gaweap
+		Description: ra2-r2m1a2s-description
+	Valued:
+		Cost: 1250
+	Health:
+		HP: 520
+	Armor:
+		Type: Heavy
+	Mobile:
+		Speed: 80
+	Turreted:
+		TurnSpeed: 24
+	Armament:
+		Weapon: R2AbramsGun
+		LocalOffset: 900,0,450
+		MuzzleSequence: muzzle
+
+r2sads:
+	Inherits: ^R2ModernVehicle
+	Inherits@palette: ^R2SaudiVoxels
+	Inherits@AUTOTARGET: ^AutoTargetAir
+	Tooltip:
+		Name: ra2-r2sads-name
+	Buildable:
+		BuildPaletteOrder: 41
+		Prerequisites: ~faction.saudi, gaweap, radar
+		Description: ra2-r2sads-description
+	Valued:
+		Cost: 1050
+	Health:
+		HP: 240
+	Armor:
+		Type: Light
+	Mobile:
+		Speed: 105
+	Turreted:
+		Offset: -128,0,0
+	Armament:
+		Weapon: R2SADSInterceptor
+		LocalOffset: 600,0,450
+	AutoTarget:
+		ScanRadius: 12
+	RevealsShroud:
+		Range: 11c0
+
+r2caesar:
+	Inherits: ^R2ModernVehicle
+	Inherits@palette: ^R2SaudiVoxels
+	Tooltip:
+		Name: ra2-r2caesar-name
+	Buildable:
+		BuildPaletteOrder: 61
+		Prerequisites: ~faction.saudi, gaweap, radar
+		Description: ra2-r2caesar-description
+	Valued:
+		Cost: 1250
+	Health:
+		HP: 200
+	Armor:
+		Type: Light
+	Mobile:
+		Speed: 115
+		Locomotor: wheeled
+	-WithVoxelTurret:
+	-Turreted:
+	-AttackTurreted:
+	AttackFrontal:
+		Voice: Attack
+		FacingTolerance: 32
+	Armament:
+		Weapon: R2CaesarShell
+		LocalOffset: 780,0,450
+		MuzzleSequence: muzzle
+	WithRangeCircle:
+		Range: 13c0
+
+r2bradley:
+	Inherits: ^R2ModernVehicle
+	Inherits@palette: ^R2SaudiVoxels
+	Tooltip:
+		Name: ra2-r2bradley-name
+	Buildable:
+		BuildPaletteOrder: 31
+		Prerequisites: ~faction.saudi, gaweap
+		Description: ra2-r2bradley-description
+	Valued:
+		Cost: 850
+	Health:
+		HP: 300
+	Armor:
+		Type: Light
+	Mobile:
+		Speed: 110
+		PauseOnCondition: loading || chronodisable
+	Cargo:
+		Types: Infantry
+		MaxWeight: 5
+		UnloadVoice: Move
+		LoadingCondition: loading
+	WithCargoPipsDecoration:
+		Position: BottomLeft
+		RequiresSelection: true
+		Palette: pips
+	Armament:
+		Weapon: R2BradleyCannon
+		LocalOffset: 500,30,480
+		MuzzleSequence: muzzle
+	Armament@tow:
+		Name: secondary
+		Weapon: R2BradleyTOW
+		LocalOffset: 300,-210,480
+	AttackTurreted:
+		Armaments: primary, secondary

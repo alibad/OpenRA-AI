@@ -1,0 +1,58 @@
+{
+  "r2sang": {
+    "frames": 112,
+    "size": [
+      48,
+      48
+    ],
+    "sha256": "cc5acd935241aa0b9a5588cd7235fe0ae3a5b1c07d827d2e5f08bd87ba943ad3"
+  },
+  "r2saat": {
+    "frames": 112,
+    "size": [
+      48,
+      48
+    ],
+    "sha256": "da825c2add5870bf545bb501e09c2b8d6792832d5948278969f76dd6623e6273"
+  },
+  "r2sajtac": {
+    "frames": 112,
+    "size": [
+      48,
+      48
+    ],
+    "sha256": "f4627428aa8641144d8db48658fe7c07af905602b11954148d10343b40be4ed3"
+  },
+  "r2falcon": {
+    "frames": 112,
+    "size": [
+      48,
+      48
+    ],
+    "sha256": "69a06965c47a205c87f8f0125b48e419bd66cdf300de23ef8a243820db962cad"
+  },
+  "r2saguard": {
+    "frames": 41,
+    "size": [
+      96,
+      96
+    ],
+    "sha256": "ead779b086e44145577442f52d8b6b046d5a3e05bd3f83038e7bba935a2b17b8"
+  },
+  "r2sapatriot": {
+    "frames": 41,
+    "size": [
+      96,
+      96
+    ],
+    "sha256": "7428c674148a1598105d0f6873efc2ebaebadd11f5b916e1d3e24cad31c1125d"
+  },
+  "r2satow": {
+    "frames": 41,
+    "size": [
+      96,
+      96
+    ],
+    "sha256": "249f8649eba515cdf1ce20437e9a71e0bc42f08fffbd64ebf69dde7db939128c"
+  }
+}

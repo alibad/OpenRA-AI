@@ -1,0 +1,51 @@
+r2sang:
+	Voiced:
+		VoiceSet: R2SaudiinfantryVoice
+
+r2saat:
+	Voiced:
+		VoiceSet: R2SaudiinfantryVoice
+
+r2sajtac:
+	Voiced:
+		VoiceSet: R2SaudijtacVoice
+
+r2falcon:
+	Voiced:
+		VoiceSet: R2SaudifalconVoice
+
+r2m1a2s:
+	Voiced:
+		VoiceSet: R2SaudivehicleVoice
+
+r2sads:
+	Voiced:
+		VoiceSet: R2SaudivehicleVoice
+
+r2caesar:
+	Voiced:
+		VoiceSet: R2SaudivehicleVoice
+
+r2bradley:
+	Voiced:
+		VoiceSet: R2SaudivehicleVoice
+
+r2f15sa:
+	Voiced:
+		VoiceSet: R2SaudiairVoice
+
+r2ah64sa:
+	Voiced:
+		VoiceSet: R2SaudiairVoice
+
+r2sadiq:
+	Voiced:
+		VoiceSet: R2SaudinavalVoice
+
+r2riyadh:
+	Voiced:
+		VoiceSet: R2SaudinavalVoice
+
+r2jubail:
+	Voiced:
+		VoiceSet: R2SaudinavalVoice
