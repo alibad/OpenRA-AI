@@ -1,0 +1,278 @@
+{
+  "smoke": {
+    "description": "Four quick matches that exercise both game modes end to end.",
+    "seed": 7,
+    "experiences": {
+      "world-war-iii": {
+        "profile": "world-war-iii"
+      },
+      "ra2-modern": {
+        "profile": "ra2-modern"
+      }
+    },
+    "suites": [
+      {
+        "id": "classic-smoke",
+        "mod": "ra",
+        "experience": "world-war-iii",
+        "factions": [
+          "china",
+          "russia"
+        ],
+        "bots": [
+          "normal"
+        ],
+        "replicates": 1,
+        "tick_cap": 60000,
+        "maps": [
+          {
+            "map": "forgotten-plains.oramap",
+            "title": "Forgotten Plains",
+            "kind": "land"
+          }
+        ]
+      },
+      {
+        "id": "ra2-smoke",
+        "mod": "ra2",
+        "experience": "ra2-modern",
+        "factions": [
+          "turkey",
+          "america"
+        ],
+        "bots": [
+          "normal"
+        ],
+        "replicates": 1,
+        "tick_cap": 60000,
+        "maps": [
+          {
+            "map": "dustbowl",
+            "title": "Dustbowl",
+            "kind": "land"
+          }
+        ]
+      }
+    ]
+  },
+  "replay-probe": {
+    "description": "Short (5-minute) Classic matches for replay-determinism checks with `replay`.",
+    "seed": 3,
+    "experiences": {
+      "world-war-iii": {
+        "profile": "world-war-iii"
+      },
+      "ai-assistant-only": {
+        "profile": "ai-assistant-only"
+      }
+    },
+    "suites": [
+      {
+        "id": "classic-wwiii-replay",
+        "mod": "ra",
+        "experience": "world-war-iii",
+        "factions": [
+          "china",
+          "russia"
+        ],
+        "bots": [
+          "normal"
+        ],
+        "replicates": 1,
+        "tick_cap": 7500,
+        "maps": [
+          {
+            "map": "forgotten-plains.oramap",
+            "title": "Forgotten Plains",
+            "kind": "land"
+          }
+        ]
+      },
+      {
+        "id": "classic-plain-replay",
+        "mod": "ra",
+        "experience": "ai-assistant-only",
+        "factions": [
+          "england",
+          "russia"
+        ],
+        "bots": [
+          "normal"
+        ],
+        "replicates": 1,
+        "tick_cap": 7500,
+        "maps": [
+          {
+            "map": "forgotten-plains.oramap",
+            "title": "Forgotten Plains",
+            "kind": "land"
+          }
+        ]
+      }
+    ]
+  },
+  "baseline-2026-09": {
+    "description": "September 2026 baseline: every faction pairing, both slot orientations, land and naval maps. Modern factions are additionally measured with the rush bot (Classic) and with upstream bot production (RA2).",
+    "seed": 20260928,
+    "wall_guard_seconds": 1800,
+    "experiences": {
+      "world-war-iii": {
+        "profile": "world-war-iii"
+      },
+      "ra2-modern": {
+        "profile": "ra2-modern"
+      },
+      "ra2-modern-upstream-bots": {
+        "components": [
+          "ra2-china",
+          "ra2-iran",
+          "ra2-turkey"
+        ]
+      }
+    },
+    "suites": [
+      {
+        "id": "classic-wwiii",
+        "mod": "ra",
+        "experience": "world-war-iii",
+        "factions": [
+          "china",
+          "iran",
+          "saudi",
+          "yemen",
+          "turkey",
+          "england",
+          "france",
+          "germany",
+          "russia",
+          "ukraine"
+        ],
+        "bots": [
+          "normal"
+        ],
+        "replicates": 2,
+        "tick_cap": 60000,
+        "maps": [
+          {
+            "map": "forgotten-plains.oramap",
+            "title": "Forgotten Plains",
+            "kind": "land"
+          },
+          {
+            "map": "dual-cold-front.oramap",
+            "title": "Dual Cold Front",
+            "kind": "naval"
+          }
+        ]
+      },
+      {
+        "id": "classic-wwiii-rush",
+        "mod": "ra",
+        "experience": "world-war-iii",
+        "factions": [
+          "china",
+          "iran",
+          "saudi",
+          "yemen",
+          "turkey",
+          "england",
+          "france",
+          "germany",
+          "russia",
+          "ukraine"
+        ],
+        "focus": [
+          "china",
+          "iran",
+          "saudi",
+          "yemen",
+          "turkey"
+        ],
+        "bots": [
+          "rush"
+        ],
+        "replicates": 1,
+        "tick_cap": 60000,
+        "maps": [
+          {
+            "map": "forgotten-plains.oramap",
+            "title": "Forgotten Plains",
+            "kind": "land"
+          }
+        ]
+      },
+      {
+        "id": "ra2-modern",
+        "mod": "ra2",
+        "experience": "ra2-modern",
+        "factions": [
+          "china",
+          "iran",
+          "turkey",
+          "america",
+          "england",
+          "france",
+          "germany",
+          "korea",
+          "russia",
+          "iraq",
+          "cuba",
+          "libya"
+        ],
+        "bots": [
+          "normal"
+        ],
+        "replicates": 1,
+        "tick_cap": 60000,
+        "maps": [
+          {
+            "map": "dustbowl",
+            "title": "Dustbowl",
+            "kind": "land"
+          },
+          {
+            "map": "little-big-lake",
+            "title": "Little Big Lake",
+            "kind": "naval"
+          }
+        ]
+      },
+      {
+        "id": "ra2-upstream-bots",
+        "mod": "ra2",
+        "experience": "ra2-modern-upstream-bots",
+        "factions": [
+          "china",
+          "iran",
+          "turkey",
+          "america",
+          "england",
+          "france",
+          "germany",
+          "korea",
+          "russia",
+          "iraq",
+          "cuba",
+          "libya"
+        ],
+        "focus": [
+          "china",
+          "iran",
+          "turkey"
+        ],
+        "bots": [
+          "normal"
+        ],
+        "replicates": 1,
+        "tick_cap": 60000,
+        "maps": [
+          {
+            "map": "dustbowl",
+            "title": "Dustbowl",
+            "kind": "land"
+          }
+        ]
+      }
+    ]
+  }
+}

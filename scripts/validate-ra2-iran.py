@@ -13,6 +13,7 @@ import time
 
 from openra_ai_companion.bridge import OpenRABridge
 from openra_ai_companion.models import ActionCommand
+from native_fixture import ExactMoveCheck, TickBudget, absolute_path, link_directory, startup_failure
 from ra2_iran_assets import UNITS, DEFENSES
 
 SPEC=importlib.util.spec_from_file_location("turkey_fixture",Path(__file__).with_name("validate-ra2-turkey.py"))
@@ -32,6 +33,10 @@ EDGES=(("r2toophan","mtnk",20,20,4,4),("r2fajr","mtnk",50,20,7,2),
        ("r2mohajer","mtnk",80,55,4,2),("r2toufan","e1",100,55,4,2),
        ("r2azar","mtnk",100,20,4,4))
 EDGE_RANGES=(7,11,11,13,8,10,11,6,6,6,7)
+# Both ships, each with a distinct clear water cell (MPos).
+WATER_DESTINATIONS={"r2peykaap":(25,115),"r2ghadir":(37,115)}
+# 160 seconds of game time at normal speed (the former wall-clock allowance).
+GAME_SECONDS=160
 
 
 def edge_distances():
@@ -138,7 +143,7 @@ def fixture(resources,profile,mode,scene="infantry"):
 def run(resources,binaries,content,output,mode,scene="infantry"):
     output.mkdir(parents=True,exist_ok=True)
     profile=Path(tempfile.mkdtemp(prefix="iran-",dir=output))
-    (profile/"Content").symlink_to(content,target_is_directory=True)
+    link_directory(profile/"Content",content)
     targets=fixture(resources,profile,mode,scene)
     with socket.socket() as sock: sock.bind(("127.0.0.1",0)); port=sock.getsockname()[1]
     env={**os.environ,"OPENRA_AI_COMPANION":"1","OPENRA_AI_COMPANION_READY":"1","OPENRA_AI_STARTUP_ENABLED":"1",
@@ -153,12 +158,15 @@ def run(resources,binaries,content,output,mode,scene="infantry"):
         process=subprocess.Popen(cmd,cwd=binaries,env=env,stdout=log,stderr=subprocess.STDOUT)
         bridge=OpenRABridge(f"127.0.0.1:{port}",timeout=1)
         try:
-            deadline=time.monotonic()+160
-            phase="queue"; placed=set(); cleared=set(); known={}; moved=set(); seen_loiter=False
-            while process.poll() is None and time.monotonic()<deadline:
+            budget=TickBudget.from_seconds(GAME_SECONDS); report["budget"]=budget.as_dict(); water=None
+            phase="queue"; placed=set(); cleared=set(); known={}; seen_loiter=False
+            phase_ticks=report.setdefault("phase_ticks",{})
+            while process.poll() is None and budget.wall_ok():
                 try:
                     state=bridge.observe(); units={u.kind:u for u in state.units}; buildings={u.kind:u for u in state.buildings}
                     report["tick"]=state.tick
+                    phase_ticks.setdefault(phase,state.tick)
+                    budget.check(state.tick,phase)
                     if mode=="visual":
                         if state.tick>=60:
                             frame=bridge.capture_frame()
@@ -193,14 +201,14 @@ def run(resources,binaries,content,output,mode,scene="infantry"):
                                 raise ValueError("Bridge metadata omits coastal launcher's structure target domain")
                             if not buildings["r2iraasite"].can_target_air or not buildings["r2ircoast"].can_target_ground:
                                 raise ValueError("Bridge metadata omits defense weapon domains")
-                            for i,a in enumerate(("r2peykaap","r2ghadir")):
-                                bridge.execute_actions("water-"+a,state.tick,(ActionCommand("move",actor_id=units[a].actor_id,target_x=25+i*12,target_y=115),))
+                            water=ExactMoveCheck("water",WATER_DESTINATIONS)
+                            water.dispatch(bridge,state.tick,units)
                             phase="water"
                         if phase=="water":
-                            for i,a in enumerate(("r2peykaap","r2ghadir")):
-                                if (units[a].cell_x,units[a].cell_y)==(25+i*12,115): moved.add(a)
-                            if len(moved)==2:
-                                report.update(passed=True,defenses=sorted(placed),water_movement=sorted(moved)); break
+                            arrived=water.update(bridge,state.tick,units)
+                            report["water"]=water.as_dict()
+                            if arrived:
+                                report.update(passed=True,defenses=sorted(placed),water_movement=sorted(water.arrived)); break
                     else:
                         enemy={u.actor_id:u for u in state.visible_enemies+state.visible_enemy_buildings}
                         for name,pos in targets.items():
@@ -225,9 +233,12 @@ def run(resources,binaries,content,output,mode,scene="infantry"):
                     bridge.update_companion_status("ready","Private Iran verification",muted=True)
                 except RuntimeError as exc: report["last_connection_error"]=str(exc)
                 time.sleep(.15)
-            if not report["passed"]: report["error"]="Process ended or deadline reached"
+            if not report["passed"]:
+                report["error"]=budget.failure(phase,process.poll() is None)
+                if not phase_ticks and process.poll() is not None: startup_failure(report,profile)
         except Exception as exc: report["error"]=str(exc)
         finally:
+            report["wall_seconds"]=budget.elapsed() if "budget" in report else None
             bridge.close()
             if process.poll() is None:
                 process.terminate()
@@ -244,4 +255,4 @@ if __name__=="__main__":
     parser.add_argument("--mode",choices=("production","combat","edges","visual"),default="production")
     parser.add_argument("--scene",choices=("infantry","armor","navy"),default="infantry")
     args=parser.parse_args()
-    raise SystemExit(0 if run(*(getattr(args,k).resolve() for k in ("resources","binaries","content","output")),args.mode,args.scene) else 1)
+    raise SystemExit(0 if run(*(absolute_path(getattr(args,k)) for k in ("resources","binaries","content","output")),args.mode,args.scene) else 1)
