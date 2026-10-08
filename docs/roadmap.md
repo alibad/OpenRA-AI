@@ -19,6 +19,7 @@ The full earlier roadmap is preserved in `roadmap-before-consolidation-20261009.
 - [ ] Clean-machine acceptance outside the development machine.
 - [ ] Independently play through all mission outcomes and broader roster/balance combinations.
 - [ ] Port additional historical Classic mechanics, maps and presentation retained in the older fork. This Classic profile presents shared standalone army rules on a rectangular grid; it does not reproduce every old Classic feature.
+- [ ] Integrate the complete browser workshop, coaching and call experience into the downloadable suite and verify parity.
 - [ ] Native-speaker review of outstanding voice sheet entries.
 - [ ] Optional signing and public distribution after an explicit release request.
 - [ ] macOS package and acceptance on the owner's Mac.
@@ -47,6 +48,7 @@ The browser model co-commander uses a local companion service. Native bots, tact
 - [x] Main integration of current catalog, companion, harness, art, mission and mod work.
 - [x] Commit loose art models/candidates and film resources on their main branches.
 - [x] Preserve 5,104 legacy resource entries; verify 4,019 installed original-content resources.
+- [x] Preserve and hash-check 182 changed entries from six older overlapping companion/faction/installer branches in `resources/history/branch-variants-20261009.zip` with a tracked index.
 - [ ] Resolve older branch variants and engine differences without replacing newer reviewed assets or intentional build targets blindly.
 - [ ] Retire redundant worktrees only after unique files and commits have verified destinations. No deletion is part of this delivery.
 
