@@ -115,6 +115,8 @@ foreach ($file in @("ai-pack.lock.json", "ai-runtime.lock.json", "THIRD_PARTY_MO
     Copy-Item -LiteralPath (Join-Path $repositoryRoot "packaging\$file") -Destination $packagingTarget
 }
 Copy-Item -LiteralPath (Join-Path $repositoryRoot "LICENSE") -Destination (Join-Path $companionRoot "LICENSE.txt")
+New-Item -ItemType Directory -Path (Join-Path $companionRoot "catalog") -Force | Out-Null
+Copy-Item -LiteralPath (Join-Path $repositoryRoot "catalog\factions.json") -Destination (Join-Path $companionRoot "catalog\factions.json")
 
 # Pinned CPU runtimes for local voice (whisper-server) and the optional local model (llama-server).
 Invoke-Native $Python @((Join-Path $PSScriptRoot "ai_pack.py"), "prepare-runtime", "--target", "windows-x64",

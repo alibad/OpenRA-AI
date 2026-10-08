@@ -46,8 +46,8 @@ class RA2IntegrationTests(unittest.TestCase):
                 expected = source.crop((x, y, x + 30, y + 15)).convert("RGBA")
                 actual = atlas.crop((i * 30, 256, (i + 1) * 30, 271))
                 self.assertEqual(actual.tobytes(), expected.tobytes(), country)
-            self.assertIsNone(atlas.crop((90, 256, 256, 512)).getbbox())
-            self.assertIsNone(atlas.crop((0, 271, 90, 512)).getbbox())
+            self.assertIsNone(atlas.crop((len(prepare.MODERN_FLAGS)*30, 256, 256, 512)).getbbox())
+            self.assertIsNone(atlas.crop((0, 271, len(prepare.MODERN_FLAGS)*30, 512)).getbbox())
 
     def test_modern_flags_fit_lobby_rows_without_touching_country_names(self):
         chrome = (ROOT / "engine/openra/mods/common/chrome/lobby-players.yaml").read_text()

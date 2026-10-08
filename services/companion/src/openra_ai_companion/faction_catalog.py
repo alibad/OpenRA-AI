@@ -30,6 +30,7 @@ from typing import Any, Mapping
 
 DIGEST_SCHEMA = "openra-ai.faction-catalog.live/1"
 DIGEST_DIRECTORY_ENV = "OPENRA_AI_FACTION_DIGEST_DIR"
+MODE_ALIASES = {"rtsai": "ra2", "rtsai-topdown": "ra2"}
 MODE_NAMES = {"ra": "Classic", "ra2": "Red Alert 2"}
 MODE_WORDS = {
     "ra2": ("red alert 2", "ra2", "ra 2"),
@@ -430,6 +431,7 @@ class FactionKnowledge:
         if not self.is_catalog_question(question):
             return None
         text = normalize(question)
+        mode = MODE_ALIASES.get(mode, mode)
         current = mode if mode in MODE_NAMES else (self._last_mode or "ra")
         mode = self._requested_mode(text, current)
         units = self._match_units(text, mode)
@@ -658,6 +660,7 @@ class FactionKnowledge:
     def context(self, question: str, mode: str | None) -> dict[str, Any] | None:
         """Compact, mode-filtered facts about the factions/units a question names, for model prompts."""
         text = normalize(question)
+        mode = MODE_ALIASES.get(mode, mode)
         mode = self._requested_mode(text, mode if mode in MODE_NAMES else (self._last_mode or "ra"))
         units = self._match_units(text, mode)
         factions = self._match_factions(text, mode)
@@ -687,6 +690,7 @@ class FactionKnowledge:
 
     def lookup(self, query: str, mode: str | None) -> dict[str, Any]:
         """Game-tool view: facts for the named factions/units, or the mode's faction overview."""
+        mode = MODE_ALIASES.get(mode, mode)
         mode = self._requested_mode(normalize(query), mode if mode in MODE_NAMES else (self._last_mode or "ra"))
         found = self.context(query, mode) if query.strip() else None
         result = found or {

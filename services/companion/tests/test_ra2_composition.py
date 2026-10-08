@@ -20,10 +20,10 @@ class FactionCompositionTests(unittest.TestCase):
         actors = {}
         for actor, requirements in re.findall(r"(?m)^(\w+):\n\tBuildable:\n\t\tPrerequisites: (.+)$", merged):
             actors[actor] = requirements.split(", ")
-        self.assertEqual(actors["e1"], ["~gapile", "~!faction.china", "~!faction.turkey"])
-        self.assertEqual(actors["e2"], ["~nahand", "~!faction.iran"])
-        for count in range(4):
-            for selected in itertools.combinations(("china", "iran", "turkey"), count):
+        self.assertEqual(actors["e1"], ["~gapile", "~!faction.china", "~!faction.turkey", "~!faction.saudi"])
+        self.assertEqual(actors["e2"], ["~nahand", "~!faction.iran", "~!faction.yemen"])
+        for count in range(6):
+            for selected in itertools.combinations(PREPARE.MODERN_COUNTRIES, count):
                 for player_country in ("china", "iran", "turkey", "america", "england", "france", "germany", "korea", "russia", "iraq", "cuba", "libya"):
                     provided = {"faction." + player_country} if player_country in selected else set()
                     for actor, requirements in actors.items():

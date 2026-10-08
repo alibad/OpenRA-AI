@@ -96,6 +96,12 @@ class LiveDigestTests(unittest.TestCase):
 
 
 class CatalogAnswerTests(unittest.TestCase):
+    def test_standalone_profiles_use_the_shared_modern_catalog_contract(self):
+        store = knowledge("ra2")
+        canonical = store.answer("What does the Qilin counter?", mode="ra2")
+        for mode in ("rtsai", "rtsai-topdown"):
+            self.assertEqual(store.answer("What does the Qilin counter?", mode=mode), canonical)
+
     def test_what_does_the_qilin_counter_uses_rules_counters_and_catalog_advice(self):
         answer = knowledge("ra").answer("What does the Qilin counter?", "ra")
         self.assertIn("Qilin Main Battle Tank (China, Classic)", answer.text)
@@ -118,6 +124,10 @@ class CatalogAnswerTests(unittest.TestCase):
 
     def test_other_mode_factions_and_units_are_never_described_in_this_mode(self):
         store = knowledge("ra", "ra2")
+        # A synthetic catalog with two deliberately unavailable variants exercises mode isolation.
+        for faction in store.catalog["factions"]:
+            if faction["id"] in {"yemen", "saudi-arabia"}:
+                faction["variants"]["ra2"]["status"] = "planned"
         yemen = store.answer("Which Yemen unit is anti-air?", "ra2")
         self.assertIn("Yemen isn't available in Red Alert 2 mode", yemen.text)
         self.assertIn("available in Classic", yemen.text)
@@ -239,7 +249,7 @@ class ServiceAndToolTests(unittest.TestCase):
         self.assertIn("Gokkalkan", result["answer"])
         self.assertEqual(overview["mode"], "Red Alert 2")
         self.assertEqual({f["name"] for f in overview["factions"] if f["kind"] == "modern"}, {"China", "Iran", "Türkiye"})
-        self.assertIn("Saudi Arabia", overview["not_in_this_mode"])
+        self.assertEqual(overview["not_in_this_mode"], [])
 
 
 if __name__ == "__main__":

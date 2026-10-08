@@ -27,7 +27,7 @@ from .agent_models import default_agent_model, default_agent_provider, default_a
 def _parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="openra-ai-companion")
     commands = parser.add_subparsers(dest="command", required=True)
-    commands.add_parser("content-check", help="discover and import owned RA2 content; missing content does not block Red Alert")
+    commands.add_parser("content-check", help="inspect optional legacy content paths; standalone RTS AI needs no owned game")
     server = commands.add_parser("serve", help="start the local companion API")
     server.add_argument("--host", default="127.0.0.1")
     server.add_argument("--port", type=int, default=8787)
