@@ -202,7 +202,6 @@ R2F15AAM:
 R2F15Strike:
 	Inherits: Maverick
 	Range: 8c0
-	MinRange: 2c0
 	ReloadDelay: 60
 	Report: ra2|modern-factions/audio/redsea-f15-missile.wav
 	Warhead@1Dam: SpreadDamage
