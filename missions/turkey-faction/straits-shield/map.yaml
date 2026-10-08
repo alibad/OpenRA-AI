@@ -233,6 +233,10 @@ Actors:
 		Location: 51,67
 		Owner: Neutral
 
-Rules: ra|rules/campaign-rules.yaml, ra|rules/campaign-tooltips.yaml, ra|rules/campaign-palettes.yaml, rules.yaml
+Rules: ra|rules/campaign-rules.yaml, ra|rules/campaign-tooltips.yaml, ra|rules/campaign-palettes.yaml, ra|experiences/components/faction-doctrine-contract.yaml, ra|experiences/components/status-and-thermal-system.yaml, ra|experiences/components/targeted-unit-abilities.yaml, ra|experiences/components/mind-control-and-disguise.yaml, ra|rules/turkey.yaml, ra|experiences/factions/turkey.yaml, rules.yaml
+
+Weapons: ra|experiences/weapons/status-and-thermal-system.yaml, ra|experiences/weapons/reusable-abilities.yaml, ra|weapons/turkey.yaml
+
+Sequences: ra|sequences/turkey.yaml
 
 FluentMessages: ra|fluent/lua.ftl, ra|fluent/campaign.ftl, map.ftl
