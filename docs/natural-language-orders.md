@@ -13,9 +13,7 @@ player text / Whisper transcript
   -> refusal screen (surrender, lifecycle, support powers, cheats, own forces,
      selling everything)                       -> clear refusal, no model call
   -> question?                                 -> one answer call (sanitized)
-  -> advice / "what should we do"?             -> advisor (advisor.py): next step from the
-                                                  game state, no model call; open advice
-                                                  gets one short call (never the planner)
+  -> advice / "what should we do"?             -> existing MCP planner path
   -> deterministic parser (explicit phrasing)  -> typed steps
      otherwise one JSON-schema constrained model call -> typed steps
   -> Python grounding against the fog-respecting snapshot
@@ -68,60 +66,6 @@ Construction Yard exists yet, the first legal step (deploying the MCV) is
 proposed with a note. The validator now also rejects premature placement from
 any path. After a confirmed build, the existing contextual suggestion offers
 placement when the structure completes.
-
-### Offers, prerequisites and advice (7 October live test fixes)
-
-The first live test on real local models (RTSAI-WebGame `tools/cocommander-live.mjs`) found
-four problems; this is how each now works.
-
-- **Offers persist.** The companion holds up to three offers (cards). A question, or an order
-  for something else, leaves them standing; a newer offer replaces an older one only when it is
-  about the same item or the same units (`proposal_subjects` in `core.py`), or when the player
-  cancels it ("cancel" cancels the newest, "cancel all" every offer). A bare "confirm" accepts
-  the newest. Offers the battlefield makes impossible (a building placed by hand, a unit lost)
-  are dropped on the next snapshot. A finished structure always keeps a placement offer, held
-  silently behind the player's own cards when it finishes during a question. `/v1/state` keeps
-  `pending_action` (the newest offer) and adds `pending_actions` (all of them, newest first).
-- **Every faction item is known.** `scripts/build-companion-tech-tree.py` resolves the RTS AI
-  mod's rules (MiniYAML inheritance and removals, Fluent names) into
-  `services/companion/src/openra_ai_companion/data/tech_tree.json`: for every faction of the
-  main mod and of the standalone game, each unit and building with its name, queue, cost and the
-  buildings that unlock it, plus the catalogue names from `catalog/factions.json`.
-  `techtree.py` picks the profile and faction from the snapshot. An item that is not buildable
-  yet is explained and its first step is offered: "Build a barracks" before the Power Plant is
-  placed gives *The Barracks needs a Power Plant first* and a card to build (or place) it; a
-  prerequisite that is still building is reported with its progress; another faction's unit is
-  named as such. Regenerate the data after roster changes:
-  `python scripts/build-companion-tech-tree.py --profile rtsai=../RTSAI-Mod@main --profile standalone=../RTSAI-Mod@rtsai/standalone`.
-- **Advice is fast.** "What should I build first?" and "what should I do next?" used to run the
-  interactive MCP planner (several model calls, 9 to 24 s on the local 2B model). A plain
-  next-step question is now decided from the game state (`advisor.py`: place finished
-  buildings, fix power, the opening build order, harvesters, army, scouting, attack) with the
-  order as a card and no model call; status questions use the deterministic briefing; other
-  advice ("should we attack now?") gets one short model call (120 tokens) over a compact state
-  summary. The planner remains for AUTO, scouting requests and planner follow-ups.
-- **Parsing.** Compass directions ("send the tanks east") ground deterministically (only
-  screen-relative words and "that tank" go to the model), "the selected tanks" means all of them
-  (the observation has no selection), generic "soldiers" and "tanks" pick the faction's own line
-  infantry and battle tank, and the misses of the offline benchmark are parsed (units-first
-  attacks and special actions, "put four riflemen in the APC", "turn the radar dome off", "start
-  repairs on the factory", "gis deploy", exact words beating sound-alikes). Orders keep the same
-  command format, so replays are unaffected.
-
-Measured on 8 October (Qwen3-VL 2B on CUDA llama.cpp, Whisper large-v3, Kokoro; the same
-machine and stack for both sides, the old code run from 96171fb):
-
-| | Before | After |
-|---|---|---|
-| Live harness, talk key released to reply playing (2 runs, 24 turns): median / p95 / max | 0.94 / 6.3 / 12.5 s | 0.98 / 2.1 / 3.1 s |
-| "What should I build first?" / "What should I do next?" | 3.3 to 12.5 s | 0.6 to 1.1 s |
-| Spoken orders that became the right card (14) | 9 | 12 |
-| Native replay parity | identical | identical |
-| Order benchmark with the live model (281 cases): overall / executable / unsafe accepts | 95.0 % / 95.5 % / 1 | 98.6 % / 99.5 % / 0 |
-| Offline deterministic benchmark: overall / executable | 91.8 % / 92.7 % | 97.2 % / 99.5 % |
-
-The two remaining harness misses are "Build a power plant" right after the harness accepted the
-advice card from "What should I build first?": the reply is the correct "already 39% built".
 
 ## Evaluation
 
