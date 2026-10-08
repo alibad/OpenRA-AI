@@ -70,6 +70,9 @@ r2yrpg:
 	Inherits@guidance: ^R2YemenGuided
 	Tooltip:
 		Name: ra2-r2yrpg-name
+	WithColoredOverlay@guidance:
+		Color: 52E7D628
+		RequiresCondition: r2-ye-guidance
 	Buildable:
 		Prerequisites: ~faction.yemen, nahand
 		BuildPaletteOrder: 20
@@ -237,7 +240,8 @@ r2hodeidah:
 		FacingTolerance: 48
 	Armament:
 		Weapon: R2HodeidahMissile
-		LocalOffset: 600,-200,300, 600,200,300
+		# Sea-level muzzles below ~500 spawn the missile into the water.
+		LocalOffset: 600,-200,520, 600,200,520
 	# Mokha surveillance links coordinate the missile craft's fire.
 	ExternalCondition@targeting:
 		Condition: r2-ye-targeting
@@ -247,8 +251,12 @@ r2hodeidah:
 	FirepowerMultiplier@targeting:
 		Modifier: 112
 		RequiresCondition: r2-ye-targeting
-	WithColoredOverlay@targeting:
-		Color: E0604012
+	WithTextDecoration@targeting:
+		Text: LINKED
+		Position: Top
+		Margin: 0, -14
+		Color: E08060
+		RequiresSelection: true
 		RequiresCondition: r2-ye-targeting
 	# Firing reveals the craft in explored enemy fog for eight seconds.
 	-HiddenUnderFog:

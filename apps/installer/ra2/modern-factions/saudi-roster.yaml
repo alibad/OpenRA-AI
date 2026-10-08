@@ -72,7 +72,6 @@ r2sang:
 		HP: 135
 	Mobile:
 		Speed: 55
-		PauseOnCondition: braced || chronodisable
 	GrantConditionOnDeploy:
 		DeployedCondition: braced
 		SkipMakeAnimation: true
@@ -347,8 +346,12 @@ r2ah64sahusk:
 		StartIfBelow: 100
 		DamageCooldown: 0
 		RequiresCondition: r2-fleet-support
-	WithColoredOverlay@fleet:
-		Color: 60C0FF10
+	WithTextDecoration@fleet:
+		Text: SUPPLIED
+		Position: Top
+		Margin: 0, -14
+		Color: 80D0FF
+		RequiresSelection: true
 		RequiresCondition: r2-fleet-support
 
 r2sadiq:

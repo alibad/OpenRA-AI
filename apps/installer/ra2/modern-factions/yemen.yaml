@@ -124,8 +124,12 @@ dog:
 	ReloadDelayMultiplier@guidance:
 		Modifier: 80
 		RequiresCondition: r2-ye-guidance
-	WithColoredOverlay@guidance:
-		Color: 52E7D628
+	WithTextDecoration@guidance:
+		Text: GUIDED
+		Position: Top
+		Margin: 0, -14
+		Color: 70F0E0
+		RequiresSelection: true
 		RequiresCondition: r2-ye-guidance
 
 r2technical:
