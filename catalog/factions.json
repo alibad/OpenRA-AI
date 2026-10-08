@@ -11,6 +11,11 @@
     "productCommit": "8fc59f71ab71a5e4834f8476506a65c01d734a05",
     "modCommit": "fce87fdd10ee44f3baf7f5023324d5cac50721c1"
   },
+  "links": {
+    "origin": "https://rtsai.net",
+    "faction": "/factions/{factionId}?mode={mode}",
+    "unit": "/units/{unitId}?mode={mode}"
+  },
   "modes": [
     {
       "id": "ra",

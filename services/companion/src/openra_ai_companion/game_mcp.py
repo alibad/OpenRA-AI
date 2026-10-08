@@ -5,6 +5,7 @@ from pathlib import Path
 
 from mcp.server.fastmcp import FastMCP
 
+from .faction_catalog import FactionKnowledge
 from .game_runtime import GameRuntime
 from .models import ActionCommand
 
@@ -42,6 +43,15 @@ def _submit(commands: tuple[ActionCommand, ...]) -> dict:
 def battlefield() -> dict:
     """Read current fog-respecting state plus faction/map-specific strategy, scout, placement, and economy guidance."""
     return _game().battlefield()
+
+
+@mcp.tool()
+def faction_catalog(query: str = "") -> dict:
+    """Look up faction/unit knowledge for this game mode: signature units, roles, counters, air/ground reach, costs and weapon ranges from the loaded rules. Static knowledge only; never reveals match state."""
+    knowledge = FactionKnowledge.load()
+    snapshot = getattr(runtime, "_snapshot", None) if runtime is not None else None
+    mode = snapshot.mod_id if snapshot is not None else knowledge.last_mode
+    return knowledge.lookup(query, mode)
 
 
 @mcp.tool()

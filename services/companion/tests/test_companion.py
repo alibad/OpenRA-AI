@@ -709,7 +709,7 @@ class CompanionTests(unittest.TestCase):
             tool_choice="battlefield",
         )
         self.assertEqual(settings.tool_choice, "battlefield")
-        self.assertEqual(InteractiveMCPPlanner.TOOL_COUNT, 28)
+        self.assertEqual(InteractiveMCPPlanner.TOOL_COUNT, 29)
         self.assertTrue(_requests_action("Can you build a Barracks and send scouts?"))
         self.assertTrue(_requests_action("Do something useful about that."))
         self.assertTrue(_requests_action("What should we do next?"))

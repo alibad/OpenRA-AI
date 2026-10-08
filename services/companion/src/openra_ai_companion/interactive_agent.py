@@ -189,7 +189,7 @@ class InteractiveDecision(BaseModel):
 class InteractiveMCPPlanner:
     """Runs the full MCP tool loop in non-executing proposal mode."""
 
-    TOOL_COUNT = 28
+    TOOL_COUNT = 29
 
     def __init__(
         self,
