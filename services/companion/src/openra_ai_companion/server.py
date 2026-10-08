@@ -81,6 +81,7 @@ class CompanionHandler(BaseHTTPRequestHandler):
             "pending_action": self.companion.pending_action(),
             # Every offer still waiting, newest first ("pending_action" is the newest one).
             "pending_actions": self.companion.pending_actions(),
+            "contextual_strategy": self.companion.contextual_strategy_state(),
             "brain": self.companion.brain_state(),
             "snapshot": self.companion.latest_snapshot.compact() if self.companion.latest_snapshot else None,
             "threat": self.companion.threat_status(),
@@ -285,6 +286,8 @@ class CompanionHandler(BaseHTTPRequestHandler):
                     self._json(HTTPStatus.NOT_FOUND, {"error": "frame_not_found"})
             else:
                 self._json(HTTPStatus.NOT_FOUND, {"error": "not_found"})
+        elif path == "/v1/strategies":
+            self._json(HTTPStatus.OK, self.companion.contextual_strategy_state())
         elif path in {"/v1/state", "/v1/usage"}:
             state = self._state_payload()
             self._json(HTTPStatus.OK, state if path == "/v1/state" else state["usage"])
@@ -378,6 +381,16 @@ class CompanionHandler(BaseHTTPRequestHandler):
             elif path == "/v1/observe":
                 response = self.companion.observe(GameSnapshot.from_dict(json.loads(self._payload() or b"{}")))
                 self._json(HTTPStatus.OK, {"speak": response is not None, "response": response.as_dict() if response else None})
+            elif path == "/v1/strategies":
+                payload = json.loads(self._payload() or b"{}")
+                self._json(HTTPStatus.OK, self.companion.select_contextual_strategy(payload.get("strategy"), payload.get("reserve", 0)))
+            elif path == "/v1/strategies/step":
+                payload = json.loads(self._payload() or b"{}")
+                if not isinstance(payload.get("automatic", False), bool):
+                    raise ValueError("automatic must be a boolean")
+                response = self.companion.contextual_strategy_step(automatic=payload.get("automatic", False))
+                self._publish_action_response(response)
+                self._json(HTTPStatus.OK, response.as_dict())
             elif path == "/v1/ask":
                 payload = json.loads(self._payload() or b"{}")
                 self.companion.begin_user_turn()

@@ -233,6 +233,7 @@ class Actor:
     provides: list[tuple[str, list[str]]]  # (token, factions)
     produces: list[str]
     transforms: str
+    roles: list[str] = field(default_factory=list)
 
 
 def actors_from_rules(rules: dict[str, Node], names: dict[str, str]) -> dict[str, Actor]:
@@ -259,6 +260,7 @@ def actors_from_rules(rules: dict[str, Node], names: dict[str, str]) -> dict[str
         production = next((child for child in node.children if child.key == "Production" or child.key.startswith("Production@")), None)
         transforms = node.child("Transforms")
         valued = node.child("Valued")
+        strategic_role = node.child("StrategicRole")
         actors[actor_id.lower()] = Actor(
             id=actor_id.lower(),
             name=name,
@@ -270,6 +272,7 @@ def actors_from_rules(rules: dict[str, Node], names: dict[str, str]) -> dict[str
             provides=provides,
             produces=split_list(production.get("Produces")) if production else [],
             transforms=(transforms.get("IntoActor").lower() if transforms else ""),
+            roles=split_list(strategic_role.get("Roles")) if strategic_role else [],
         )
     return actors
 
@@ -398,6 +401,7 @@ def faction_tree(rules: dict[str, Node], actors: dict[str, Actor], faction: str)
             **({"limit": actor.build_limit} if actor.build_limit else {}),
             "needs": needs,
             "provides": sorted({token for token, factions in actor.provides if _applies(factions, faction)}),
+            **({"roles": actor.roles} if actor.roles else {}),
             **({"produces": sorted({queue.lower() for queue in actor.produces})} if actor.produces else {}),
         }
     return {"base": base, "start": sorted(owned), "items": items}
@@ -489,7 +493,7 @@ def main() -> int:
     for name, profile in profiles.items():
         counts = ", ".join(f"{faction} {len(tree['items'])}" for faction, tree in sorted(profile["factions"].items()))
         print(f"{name}: {counts}")
-    print(f"wrote {args.output.relative_to(REPOSITORY)} ({args.output.stat().st_size // 1024} KB)")
+    print(f"wrote {args.output.resolve()} ({args.output.stat().st_size // 1024} KB)")
     return 0
 
 

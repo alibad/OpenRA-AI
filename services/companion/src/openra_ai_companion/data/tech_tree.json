@@ -374,7 +374,10 @@
        ],
        "order": 30,
        "provides": [],
-       "queue": "Ship"
+       "queue": "Ship",
+       "roles": [
+        "anti-air"
+       ]
       },
       "amcv": {
        "cost": 3000,
@@ -449,7 +452,10 @@
        ],
        "order": 60,
        "provides": [],
-       "queue": "Ship"
+       "queue": "Ship",
+       "roles": [
+        "artillery"
+       ]
       },
       "cleg": {
        "cost": 1500,
@@ -465,7 +471,10 @@
        ],
        "order": 150,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "anti-armor"
+       ]
       },
       "cmin": {
        "cost": 1400,
@@ -494,7 +503,10 @@
        ],
        "order": 20,
        "provides": [],
-       "queue": "Ship"
+       "queue": "Ship",
+       "roles": [
+        "naval-screen"
+       ]
       },
       "dlph": {
        "cost": 500,
@@ -510,7 +522,10 @@
        ],
        "order": 40,
        "provides": [],
-       "queue": "Ship"
+       "queue": "Ship",
+       "roles": [
+        "anti-submarine"
+       ]
       },
       "dog": {
        "cost": 200,
@@ -523,7 +538,10 @@
        ],
        "order": 40,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "support"
+       ]
       },
       "e1": {
        "cost": 200,
@@ -536,7 +554,10 @@
        ],
        "order": 10,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "line-infantry"
+       ]
       },
       "engineer": {
        "cost": 500,
@@ -562,7 +583,10 @@
        ],
        "order": 30,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "anti-air"
+       ]
       },
       "gacnst": {
        "cost": 3000,
@@ -856,7 +880,10 @@
        ],
        "order": 60,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "strike-aircraft"
+       ]
       },
       "lcrf": {
        "cost": 900,
@@ -869,7 +896,10 @@
        ],
        "order": 10,
        "provides": [],
-       "queue": "Ship"
+       "queue": "Ship",
+       "roles": [
+        "transport"
+       ]
       },
       "mgtk": {
        "cost": 1000,
@@ -885,7 +915,10 @@
        ],
        "order": 70,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "main-battle-tank"
+       ]
       },
       "mtnk": {
        "cost": 700,
@@ -898,7 +931,10 @@
        ],
        "order": 20,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "main-battle-tank"
+       ]
       },
       "nasam": {
        "cost": 1000,
@@ -927,7 +963,10 @@
        ],
        "order": 10,
        "provides": [],
-       "queue": "Aircraft"
+       "queue": "Aircraft",
+       "roles": [
+        "strike-aircraft"
+       ]
       },
       "shad": {
        "cost": 1000,
@@ -940,7 +979,10 @@
        ],
        "order": 90,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "transport"
+       ]
       },
       "spy": {
        "cost": 1000,
@@ -972,7 +1014,10 @@
        ],
        "order": 50,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "artillery"
+       ]
       },
       "tany": {
        "cost": 1000,
@@ -989,7 +1034,10 @@
        ],
        "order": 140,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "line-infantry"
+       ]
       }
      },
      "name": "America",
@@ -1045,7 +1093,10 @@
        ],
        "order": 40,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "support"
+       ]
       },
       "engineer": {
        "cost": 500,
@@ -1359,7 +1410,10 @@
        ],
        "order": 20,
        "provides": [],
-       "queue": "Support"
+       "queue": "Support",
+       "roles": [
+        "line-infantry"
+       ]
       },
       "r2cloud": {
        "cost": 1000,
@@ -1375,7 +1429,10 @@
        ],
        "order": 81,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "strike-aircraft"
+       ]
       },
       "r2cnnetwork": {
        "cost": 550,
@@ -1391,7 +1448,10 @@
        ],
        "order": 65,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "support"
+       ]
       },
       "r2cnportable": {
        "cost": 400,
@@ -1404,7 +1464,10 @@
        ],
        "order": 30,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "anti-armor"
+       ]
       },
       "r2cnrifle": {
        "cost": 170,
@@ -1417,7 +1480,10 @@
        ],
        "order": 10,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "line-infantry"
+       ]
       },
       "r2crane": {
        "cost": 1200,
@@ -1433,7 +1499,10 @@
        ],
        "order": 95,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "transport"
+       ]
       },
       "r2haiwang": {
        "cost": 2400,
@@ -1449,7 +1518,10 @@
        ],
        "order": 65,
        "provides": [],
-       "queue": "Ship"
+       "queue": "Ship",
+       "roles": [
+        "artillery"
+       ]
       },
       "r2haiying": {
        "cost": 950,
@@ -1465,7 +1537,10 @@
        ],
        "order": 40,
        "provides": [],
-       "queue": "Ship"
+       "queue": "Ship",
+       "roles": [
+        "naval-screen"
+       ]
       },
       "r2jiaolong": {
        "cost": 1300,
@@ -1481,7 +1556,10 @@
        ],
        "order": 50,
        "provides": [],
-       "queue": "Ship"
+       "queue": "Ship",
+       "roles": [
+        "submarine"
+       ]
       },
       "r2kunlun": {
        "cost": 1100,
@@ -1494,7 +1572,10 @@
        ],
        "order": 10,
        "provides": [],
-       "queue": "Ship"
+       "queue": "Ship",
+       "roles": [
+        "transport"
+       ]
       },
       "r2luyang": {
        "cost": 1250,
@@ -1507,7 +1588,10 @@
        ],
        "order": 20,
        "provides": [],
-       "queue": "Ship"
+       "queue": "Ship",
+       "roles": [
+        "anti-submarine"
+       ]
       },
       "r2lynx": {
        "cost": 600,
@@ -1520,7 +1604,10 @@
        ],
        "order": 41,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "support"
+       ]
       },
       "r2mantis": {
        "cost": 950,
@@ -1533,7 +1620,10 @@
        ],
        "order": 61,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "anti-air"
+       ]
       },
       "r2phl": {
        "cost": 1500,
@@ -1549,7 +1639,10 @@
        ],
        "order": 75,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "artillery"
+       ]
       },
       "r2qilin": {
        "cost": 750,
@@ -1562,7 +1655,10 @@
        ],
        "order": 21,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "main-battle-tank"
+       ]
       },
       "r2redspear": {
        "cost": 1900,
@@ -1579,7 +1675,10 @@
        ],
        "order": 140,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "line-infantry"
+       ]
       },
       "r2skyshield": {
        "cost": 1000,
@@ -1598,7 +1697,10 @@
        ],
        "order": 30,
        "provides": [],
-       "queue": "Support"
+       "queue": "Support",
+       "roles": [
+        "anti-air"
+       ]
       },
       "r2skyspear": {
        "cost": 1700,
@@ -1614,7 +1716,10 @@
        ],
        "order": 10,
        "provides": [],
-       "queue": "Aircraft"
+       "queue": "Aircraft",
+       "roles": [
+        "interceptor"
+       ]
       },
       "r2spectrum": {
        "cost": 1200,
@@ -1630,7 +1735,10 @@
        ],
        "order": 60,
        "provides": [],
-       "queue": "Support"
+       "queue": "Support",
+       "roles": [
+        "support"
+       ]
       },
       "r2zbd": {
        "cost": 850,
@@ -1643,7 +1751,10 @@
        ],
        "order": 35,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "transport"
+       ]
       },
       "spy": {
        "cost": 1000,
@@ -1686,7 +1797,10 @@
        ],
        "order": 70,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "main-battle-tank"
+       ]
       },
       "dog": {
        "cost": 200,
@@ -1699,7 +1813,10 @@
        ],
        "order": 40,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "support"
+       ]
       },
       "dron": {
        "cost": 500,
@@ -1725,7 +1842,10 @@
        ],
        "order": 20,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "line-infantry"
+       ]
       },
       "engineer": {
        "cost": 500,
@@ -1754,7 +1874,10 @@
        ],
        "order": 70,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "anti-air"
+       ]
       },
       "harv": {
        "cost": 1400,
@@ -1783,7 +1906,10 @@
        ],
        "order": 30,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "anti-air"
+       ]
       },
       "htnk": {
        "cost": 900,
@@ -1796,7 +1922,10 @@
        ],
        "order": 20,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "main-battle-tank"
+       ]
       },
       "hyd": {
        "cost": 900,
@@ -1812,7 +1941,10 @@
        ],
        "order": 30,
        "provides": [],
-       "queue": "Ship"
+       "queue": "Ship",
+       "roles": [
+        "anti-air"
+       ]
       },
       "ivan": {
        "cost": 600,
@@ -1828,7 +1960,10 @@
        ],
        "order": 110,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "support"
+       ]
       },
       "naclon": {
        "cost": 2500,
@@ -2162,7 +2297,10 @@
        ],
        "order": 10,
        "provides": [],
-       "queue": "Ship"
+       "queue": "Ship",
+       "roles": [
+        "transport"
+       ]
       },
       "shk": {
        "cost": 500,
@@ -2175,7 +2313,10 @@
        ],
        "order": 50,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "anti-armor"
+       ]
       },
       "smcv": {
        "cost": 3000,
@@ -2207,7 +2348,10 @@
        ],
        "order": 40,
        "provides": [],
-       "queue": "Ship"
+       "queue": "Ship",
+       "roles": [
+        "submarine"
+       ]
       },
       "sub": {
        "cost": 1000,
@@ -2220,7 +2364,10 @@
        ],
        "order": 20,
        "provides": [],
-       "queue": "Ship"
+       "queue": "Ship",
+       "roles": [
+        "submarine"
+       ]
       },
       "terror": {
        "cost": 200,
@@ -2268,7 +2415,10 @@
        ],
        "order": 160,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "support"
+       ]
       },
       "zep": {
        "cost": 2000,
@@ -2284,7 +2434,10 @@
        ],
        "order": 90,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "strike-aircraft"
+       ]
       }
      },
      "name": "Cuba",
@@ -2311,7 +2464,10 @@
        ],
        "order": 30,
        "provides": [],
-       "queue": "Ship"
+       "queue": "Ship",
+       "roles": [
+        "anti-air"
+       ]
       },
       "amcv": {
        "cost": 3000,
@@ -2362,7 +2518,10 @@
        ],
        "order": 60,
        "provides": [],
-       "queue": "Ship"
+       "queue": "Ship",
+       "roles": [
+        "artillery"
+       ]
       },
       "cleg": {
        "cost": 1500,
@@ -2378,7 +2537,10 @@
        ],
        "order": 150,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "anti-armor"
+       ]
       },
       "cmin": {
        "cost": 1400,
@@ -2407,7 +2569,10 @@
        ],
        "order": 20,
        "provides": [],
-       "queue": "Ship"
+       "queue": "Ship",
+       "roles": [
+        "naval-screen"
+       ]
       },
       "dlph": {
        "cost": 500,
@@ -2423,7 +2588,10 @@
        ],
        "order": 40,
        "provides": [],
-       "queue": "Ship"
+       "queue": "Ship",
+       "roles": [
+        "anti-submarine"
+       ]
       },
       "dog": {
        "cost": 200,
@@ -2436,7 +2604,10 @@
        ],
        "order": 40,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "support"
+       ]
       },
       "e1": {
        "cost": 200,
@@ -2449,7 +2620,10 @@
        ],
        "order": 10,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "line-infantry"
+       ]
       },
       "engineer": {
        "cost": 500,
@@ -2475,7 +2649,10 @@
        ],
        "order": 30,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "anti-air"
+       ]
       },
       "gaairc": {
        "cost": 1000,
@@ -2793,7 +2970,10 @@
        ],
        "order": 60,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "strike-aircraft"
+       ]
       },
       "lcrf": {
        "cost": 900,
@@ -2806,7 +2986,10 @@
        ],
        "order": 10,
        "provides": [],
-       "queue": "Ship"
+       "queue": "Ship",
+       "roles": [
+        "transport"
+       ]
       },
       "mgtk": {
        "cost": 1000,
@@ -2822,7 +3005,10 @@
        ],
        "order": 70,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "main-battle-tank"
+       ]
       },
       "mtnk": {
        "cost": 700,
@@ -2835,7 +3021,10 @@
        ],
        "order": 20,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "main-battle-tank"
+       ]
       },
       "nasam": {
        "cost": 1000,
@@ -2864,7 +3053,10 @@
        ],
        "order": 10,
        "provides": [],
-       "queue": "Aircraft"
+       "queue": "Aircraft",
+       "roles": [
+        "strike-aircraft"
+       ]
       },
       "shad": {
        "cost": 1000,
@@ -2877,7 +3069,10 @@
        ],
        "order": 90,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "transport"
+       ]
       },
       "snipe": {
        "cost": 600,
@@ -2893,7 +3088,10 @@
        ],
        "order": 80,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "line-infantry"
+       ]
       },
       "spy": {
        "cost": 1000,
@@ -2925,7 +3123,10 @@
        ],
        "order": 50,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "artillery"
+       ]
       },
       "tany": {
        "cost": 1000,
@@ -2942,7 +3143,10 @@
        ],
        "order": 140,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "line-infantry"
+       ]
       }
      },
      "name": "England",
@@ -2969,7 +3173,10 @@
        ],
        "order": 30,
        "provides": [],
-       "queue": "Ship"
+       "queue": "Ship",
+       "roles": [
+        "anti-air"
+       ]
       },
       "amcv": {
        "cost": 3000,
@@ -3020,7 +3227,10 @@
        ],
        "order": 60,
        "provides": [],
-       "queue": "Ship"
+       "queue": "Ship",
+       "roles": [
+        "artillery"
+       ]
       },
       "cleg": {
        "cost": 1500,
@@ -3036,7 +3246,10 @@
        ],
        "order": 150,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "anti-armor"
+       ]
       },
       "cmin": {
        "cost": 1400,
@@ -3065,7 +3278,10 @@
        ],
        "order": 20,
        "provides": [],
-       "queue": "Ship"
+       "queue": "Ship",
+       "roles": [
+        "naval-screen"
+       ]
       },
       "dlph": {
        "cost": 500,
@@ -3081,7 +3297,10 @@
        ],
        "order": 40,
        "provides": [],
-       "queue": "Ship"
+       "queue": "Ship",
+       "roles": [
+        "anti-submarine"
+       ]
       },
       "dog": {
        "cost": 200,
@@ -3094,7 +3313,10 @@
        ],
        "order": 40,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "support"
+       ]
       },
       "e1": {
        "cost": 200,
@@ -3107,7 +3329,10 @@
        ],
        "order": 10,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "line-infantry"
+       ]
       },
       "engineer": {
        "cost": 500,
@@ -3133,7 +3358,10 @@
        ],
        "order": 30,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "anti-air"
+       ]
       },
       "gaairc": {
        "cost": 1000,
@@ -3467,7 +3695,10 @@
        ],
        "order": 60,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "strike-aircraft"
+       ]
       },
       "lcrf": {
        "cost": 900,
@@ -3480,7 +3711,10 @@
        ],
        "order": 10,
        "provides": [],
-       "queue": "Ship"
+       "queue": "Ship",
+       "roles": [
+        "transport"
+       ]
       },
       "mgtk": {
        "cost": 1000,
@@ -3496,7 +3730,10 @@
        ],
        "order": 70,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "main-battle-tank"
+       ]
       },
       "mtnk": {
        "cost": 700,
@@ -3509,7 +3746,10 @@
        ],
        "order": 20,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "main-battle-tank"
+       ]
       },
       "nasam": {
        "cost": 1000,
@@ -3538,7 +3778,10 @@
        ],
        "order": 10,
        "provides": [],
-       "queue": "Aircraft"
+       "queue": "Aircraft",
+       "roles": [
+        "strike-aircraft"
+       ]
       },
       "shad": {
        "cost": 1000,
@@ -3551,7 +3794,10 @@
        ],
        "order": 90,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "transport"
+       ]
       },
       "spy": {
        "cost": 1000,
@@ -3583,7 +3829,10 @@
        ],
        "order": 50,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "artillery"
+       ]
       },
       "tany": {
        "cost": 1000,
@@ -3600,7 +3849,10 @@
        ],
        "order": 140,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "line-infantry"
+       ]
       }
      },
      "name": "France",
@@ -3627,7 +3879,10 @@
        ],
        "order": 30,
        "provides": [],
-       "queue": "Ship"
+       "queue": "Ship",
+       "roles": [
+        "anti-air"
+       ]
       },
       "amcv": {
        "cost": 3000,
@@ -3678,7 +3933,10 @@
        ],
        "order": 60,
        "provides": [],
-       "queue": "Ship"
+       "queue": "Ship",
+       "roles": [
+        "artillery"
+       ]
       },
       "cleg": {
        "cost": 1500,
@@ -3694,7 +3952,10 @@
        ],
        "order": 150,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "anti-armor"
+       ]
       },
       "cmin": {
        "cost": 1400,
@@ -3723,7 +3984,10 @@
        ],
        "order": 20,
        "provides": [],
-       "queue": "Ship"
+       "queue": "Ship",
+       "roles": [
+        "naval-screen"
+       ]
       },
       "dlph": {
        "cost": 500,
@@ -3739,7 +4003,10 @@
        ],
        "order": 40,
        "provides": [],
-       "queue": "Ship"
+       "queue": "Ship",
+       "roles": [
+        "anti-submarine"
+       ]
       },
       "dog": {
        "cost": 200,
@@ -3752,7 +4019,10 @@
        ],
        "order": 40,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "support"
+       ]
       },
       "e1": {
        "cost": 200,
@@ -3765,7 +4035,10 @@
        ],
        "order": 10,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "line-infantry"
+       ]
       },
       "engineer": {
        "cost": 500,
@@ -3791,7 +4064,10 @@
        ],
        "order": 30,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "anti-air"
+       ]
       },
       "gaairc": {
        "cost": 1000,
@@ -4109,7 +4385,10 @@
        ],
        "order": 60,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "strike-aircraft"
+       ]
       },
       "lcrf": {
        "cost": 900,
@@ -4122,7 +4401,10 @@
        ],
        "order": 10,
        "provides": [],
-       "queue": "Ship"
+       "queue": "Ship",
+       "roles": [
+        "transport"
+       ]
       },
       "mgtk": {
        "cost": 1000,
@@ -4138,7 +4420,10 @@
        ],
        "order": 70,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "main-battle-tank"
+       ]
       },
       "mtnk": {
        "cost": 700,
@@ -4151,7 +4436,10 @@
        ],
        "order": 20,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "main-battle-tank"
+       ]
       },
       "nasam": {
        "cost": 1000,
@@ -4180,7 +4468,10 @@
        ],
        "order": 10,
        "provides": [],
-       "queue": "Aircraft"
+       "queue": "Aircraft",
+       "roles": [
+        "strike-aircraft"
+       ]
       },
       "shad": {
        "cost": 1000,
@@ -4193,7 +4484,10 @@
        ],
        "order": 90,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "transport"
+       ]
       },
       "spy": {
        "cost": 1000,
@@ -4225,7 +4519,10 @@
        ],
        "order": 50,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "artillery"
+       ]
       },
       "tany": {
        "cost": 1000,
@@ -4242,7 +4539,10 @@
        ],
        "order": 140,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "line-infantry"
+       ]
       },
       "tnkd": {
        "cost": 900,
@@ -4255,7 +4555,10 @@
        ],
        "order": 40,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "anti-armor"
+       ]
       }
      },
      "name": "Germany",
@@ -4279,7 +4582,10 @@
        ],
        "order": 40,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "support"
+       ]
       },
       "engineer": {
        "cost": 500,
@@ -4321,7 +4627,10 @@
        ],
        "order": 30,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "anti-air"
+       ]
       },
       "naclon": {
        "cost": 2500,
@@ -4628,7 +4937,10 @@
        ],
        "order": 30,
        "provides": [],
-       "queue": "Support"
+       "queue": "Support",
+       "roles": [
+        "anti-air"
+       ]
       },
       "r2hzat": {
        "cost": 500,
@@ -4641,7 +4953,10 @@
        ],
        "order": 20,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "anti-armor"
+       ]
       },
       "r2hzbunker": {
        "cost": 450,
@@ -4657,7 +4972,10 @@
        ],
        "order": 20,
        "provides": [],
-       "queue": "Support"
+       "queue": "Support",
+       "roles": [
+        "line-infantry"
+       ]
       },
       "r2hzcoastal": {
        "cost": 1000,
@@ -4673,7 +4991,10 @@
        ],
        "order": 40,
        "provides": [],
-       "queue": "Support"
+       "queue": "Support",
+       "roles": [
+        "anti-armor"
+       ]
       },
       "r2hzdrone": {
        "cost": 450,
@@ -4689,7 +5010,10 @@
        ],
        "order": 85,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "strike-aircraft"
+       ]
       },
       "r2hzescort": {
        "cost": 600,
@@ -4702,7 +5026,10 @@
        ],
        "order": 41,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "anti-air"
+       ]
       },
       "r2hzfpv": {
        "cost": 500,
@@ -4718,7 +5045,10 @@
        ],
        "order": 50,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "drone-swarm"
+       ]
       },
       "r2hzmissileboat": {
        "cost": 1000,
@@ -4734,7 +5064,10 @@
        ],
        "order": 20,
        "provides": [],
-       "queue": "Ship"
+       "queue": "Ship",
+       "roles": [
+        "naval-screen"
+       ]
       },
       "r2hzrail": {
        "cost": 450,
@@ -4747,7 +5080,10 @@
        ],
        "order": 55,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "artillery"
+       ]
       },
       "r2hzrecoilless": {
        "cost": 475,
@@ -4760,7 +5096,10 @@
        ],
        "order": 21,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "anti-armor"
+       ]
       },
       "r2hzrelay": {
        "cost": 750,
@@ -4776,7 +5115,10 @@
        ],
        "order": 65,
        "provides": [],
-       "queue": "Support"
+       "queue": "Support",
+       "roles": [
+        "support"
+       ]
       },
       "r2hzrifle": {
        "cost": 300,
@@ -4789,7 +5131,10 @@
        ],
        "order": 10,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "line-infantry"
+       ]
       },
       "r2hzrockets": {
        "cost": 800,
@@ -4805,7 +5150,10 @@
        ],
        "order": 61,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "artillery"
+       ]
       },
       "r2hzscout": {
        "cost": 1800,
@@ -4822,7 +5170,10 @@
        ],
        "order": 140,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "line-infantry"
+       ]
       },
       "r2hzskiff": {
        "cost": 300,
@@ -4835,7 +5186,10 @@
        ],
        "order": 10,
        "provides": [],
-       "queue": "Ship"
+       "queue": "Ship",
+       "roles": [
+        "naval-screen"
+       ]
       },
       "r2hzspotter": {
        "cost": 450,
@@ -4851,7 +5205,10 @@
        ],
        "order": 60,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "support"
+       ]
       },
       "r2hzsurvey": {
        "cost": 900,
@@ -4867,7 +5224,10 @@
        ],
        "order": 30,
        "provides": [],
-       "queue": "Ship"
+       "queue": "Ship",
+       "roles": [
+        "support"
+       ]
       },
       "r2hztechnical": {
        "cost": 400,
@@ -4880,7 +5240,10 @@
        ],
        "order": 11,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "line-infantry"
+       ]
       },
       "r2hzworkshop": {
        "cost": 900,
@@ -4896,7 +5259,10 @@
        ],
        "order": 66,
        "provides": [],
-       "queue": "Support"
+       "queue": "Support",
+       "roles": [
+        "support"
+       ]
       },
       "sapc": {
        "cost": 900,
@@ -4909,7 +5275,10 @@
        ],
        "order": 10,
        "provides": [],
-       "queue": "Ship"
+       "queue": "Ship",
+       "roles": [
+        "transport"
+       ]
       },
       "smcv": {
        "cost": 3000,
@@ -4949,7 +5318,10 @@
        ],
        "order": 40,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "support"
+       ]
       },
       "engineer": {
        "cost": 500,
@@ -4991,7 +5363,10 @@
        ],
        "order": 30,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "anti-air"
+       ]
       },
       "naclon": {
        "cost": 2500,
@@ -5295,7 +5670,10 @@
        ],
        "order": 120,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "strike-aircraft"
+       ]
       },
       "r2basij": {
        "cost": 90,
@@ -5308,7 +5686,10 @@
        ],
        "order": 10,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "line-infantry"
+       ]
       },
       "r2coast": {
        "cost": 1500,
@@ -5324,7 +5705,10 @@
        ],
        "order": 65,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "artillery"
+       ]
       },
       "r2dronecontrol": {
        "cost": 550,
@@ -5340,7 +5724,10 @@
        ],
        "order": 70,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "support"
+       ]
       },
       "r2fajr": {
        "cost": 1300,
@@ -5356,7 +5743,10 @@
        ],
        "order": 61,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "artillery"
+       ]
       },
       "r2ghadir": {
        "cost": 1050,
@@ -5372,7 +5762,10 @@
        ],
        "order": 40,
        "provides": [],
-       "queue": "Ship"
+       "queue": "Ship",
+       "roles": [
+        "submarine"
+       ]
       },
       "r2iraasite": {
        "cost": 950,
@@ -5391,7 +5784,10 @@
        ],
        "order": 30,
        "provides": [],
-       "queue": "Support"
+       "queue": "Support",
+       "roles": [
+        "anti-air"
+       ]
       },
       "r2irbunker": {
        "cost": 450,
@@ -5407,7 +5803,10 @@
        ],
        "order": 20,
        "provides": [],
-       "queue": "Support"
+       "queue": "Support",
+       "roles": [
+        "line-infantry"
+       ]
       },
       "r2ircoast": {
        "cost": 1250,
@@ -5423,7 +5822,10 @@
        ],
        "order": 40,
        "provides": [],
-       "queue": "Support"
+       "queue": "Support",
+       "roles": [
+        "anti-armor"
+       ]
       },
       "r2karrar": {
        "cost": 850,
@@ -5436,7 +5838,10 @@
        ],
        "order": 21,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "main-battle-tank"
+       ]
       },
       "r2loiter": {
        "cost": 500,
@@ -5452,7 +5857,10 @@
        ],
        "order": 85,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "strike-aircraft"
+       ]
       },
       "r2mohajer": {
        "cost": 950,
@@ -5468,7 +5876,10 @@
        ],
        "order": 81,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "strike-aircraft"
+       ]
       },
       "r2peykaap": {
        "cost": 750,
@@ -5481,7 +5892,10 @@
        ],
        "order": 20,
        "provides": [],
-       "queue": "Ship"
+       "queue": "Ship",
+       "roles": [
+        "naval-screen"
+       ]
       },
       "r2raad": {
        "cost": 1000,
@@ -5494,7 +5908,10 @@
        ],
        "order": 41,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "anti-air"
+       ]
       },
       "r2shadowone": {
        "cost": 1900,
@@ -5511,7 +5928,10 @@
        ],
        "order": 140,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "line-infantry"
+       ]
       },
       "r2toophan": {
        "cost": 450,
@@ -5524,7 +5944,10 @@
        ],
        "order": 30,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "anti-armor"
+       ]
       },
       "r2toufan": {
        "cost": 1450,
@@ -5540,7 +5963,10 @@
        ],
        "order": 95,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "strike-aircraft"
+       ]
       },
       "sapc": {
        "cost": 900,
@@ -5553,7 +5979,10 @@
        ],
        "order": 10,
        "provides": [],
-       "queue": "Ship"
+       "queue": "Ship",
+       "roles": [
+        "transport"
+       ]
       },
       "smcv": {
        "cost": 3000,
@@ -5596,7 +6025,10 @@
        ],
        "order": 70,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "main-battle-tank"
+       ]
       },
       "deso": {
        "cost": 600,
@@ -5612,7 +6044,10 @@
        ],
        "order": 120,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "line-infantry"
+       ]
       },
       "dog": {
        "cost": 200,
@@ -5625,7 +6060,10 @@
        ],
        "order": 40,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "support"
+       ]
       },
       "dron": {
        "cost": 500,
@@ -5651,7 +6089,10 @@
        ],
        "order": 20,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "line-infantry"
+       ]
       },
       "engineer": {
        "cost": 500,
@@ -5680,7 +6121,10 @@
        ],
        "order": 70,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "anti-air"
+       ]
       },
       "harv": {
        "cost": 1400,
@@ -5709,7 +6153,10 @@
        ],
        "order": 30,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "anti-air"
+       ]
       },
       "htnk": {
        "cost": 900,
@@ -5722,7 +6169,10 @@
        ],
        "order": 20,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "main-battle-tank"
+       ]
       },
       "hyd": {
        "cost": 900,
@@ -5738,7 +6188,10 @@
        ],
        "order": 30,
        "provides": [],
-       "queue": "Ship"
+       "queue": "Ship",
+       "roles": [
+        "anti-air"
+       ]
       },
       "ivan": {
        "cost": 600,
@@ -5754,7 +6207,10 @@
        ],
        "order": 110,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "support"
+       ]
       },
       "naclon": {
        "cost": 2500,
@@ -6088,7 +6544,10 @@
        ],
        "order": 10,
        "provides": [],
-       "queue": "Ship"
+       "queue": "Ship",
+       "roles": [
+        "transport"
+       ]
       },
       "shk": {
        "cost": 500,
@@ -6101,7 +6560,10 @@
        ],
        "order": 50,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "anti-armor"
+       ]
       },
       "smcv": {
        "cost": 3000,
@@ -6133,7 +6595,10 @@
        ],
        "order": 40,
        "provides": [],
-       "queue": "Ship"
+       "queue": "Ship",
+       "roles": [
+        "submarine"
+       ]
       },
       "sub": {
        "cost": 1000,
@@ -6146,7 +6611,10 @@
        ],
        "order": 20,
        "provides": [],
-       "queue": "Ship"
+       "queue": "Ship",
+       "roles": [
+        "submarine"
+       ]
       },
       "tesla": {
        "cost": 1500,
@@ -6178,7 +6646,10 @@
        ],
        "order": 160,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "support"
+       ]
       },
       "zep": {
        "cost": 2000,
@@ -6194,7 +6665,10 @@
        ],
        "order": 90,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "strike-aircraft"
+       ]
       }
      },
      "name": "Iraq",
@@ -6250,7 +6724,10 @@
        ],
        "order": 40,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "support"
+       ]
       },
       "engineer": {
        "cost": 500,
@@ -6561,7 +7038,10 @@
        ],
        "order": 10,
        "provides": [],
-       "queue": "Ship"
+       "queue": "Ship",
+       "roles": [
+        "transport"
+       ]
       },
       "r2ilat": {
        "cost": 500,
@@ -6574,7 +7054,10 @@
        ],
        "order": 20,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "anti-armor"
+       ]
       },
       "r2ilatpost": {
        "cost": 1100,
@@ -6590,7 +7073,10 @@
        ],
        "order": 40,
        "provides": [],
-       "queue": "Support"
+       "queue": "Support",
+       "roles": [
+        "anti-armor"
+       ]
       },
       "r2ilbattery": {
        "cost": 1200,
@@ -6609,7 +7095,10 @@
        ],
        "order": 30,
        "provides": [],
-       "queue": "Support"
+       "queue": "Support",
+       "roles": [
+        "anti-air"
+       ]
       },
       "r2ilfalcon": {
        "cost": 2200,
@@ -6625,7 +7114,11 @@
        ],
        "order": 20,
        "provides": [],
-       "queue": "Aircraft"
+       "queue": "Aircraft",
+       "roles": [
+        "interceptor",
+        "strike-aircraft"
+       ]
       },
       "r2ilfrigate": {
        "cost": 1850,
@@ -6641,7 +7134,10 @@
        ],
        "order": 30,
        "provides": [],
-       "queue": "Ship"
+       "queue": "Ship",
+       "roles": [
+        "anti-submarine"
+       ]
       },
       "r2ilgunship": {
        "cost": 1700,
@@ -6657,7 +7153,10 @@
        ],
        "order": 100,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "strike-aircraft"
+       ]
       },
       "r2ilhowitzer": {
        "cost": 1250,
@@ -6673,7 +7172,10 @@
        ],
        "order": 61,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "artillery"
+       ]
       },
       "r2ilobserver": {
        "cost": 600,
@@ -6689,7 +7191,10 @@
        ],
        "order": 60,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "support"
+       ]
       },
       "r2ilpatrol": {
        "cost": 650,
@@ -6702,7 +7207,10 @@
        ],
        "order": 10,
        "provides": [],
-       "queue": "Ship"
+       "queue": "Ship",
+       "roles": [
+        "naval-screen"
+       ]
       },
       "r2ilrecon": {
        "cost": 1900,
@@ -6719,7 +7227,10 @@
        ],
        "order": 140,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "line-infantry"
+       ]
       },
       "r2ilrelay": {
        "cost": 750,
@@ -6735,7 +7246,10 @@
        ],
        "order": 65,
        "provides": [],
-       "queue": "Support"
+       "queue": "Support",
+       "roles": [
+        "support"
+       ]
       },
       "r2ilrifle": {
        "cost": 220,
@@ -6748,7 +7262,10 @@
        ],
        "order": 10,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "line-infantry"
+       ]
       },
       "r2ilsentry": {
        "cost": 600,
@@ -6764,7 +7281,10 @@
        ],
        "order": 20,
        "provides": [],
-       "queue": "Support"
+       "queue": "Support",
+       "roles": [
+        "line-infantry"
+       ]
       },
       "r2ilshield": {
        "cost": 1050,
@@ -6780,7 +7300,10 @@
        ],
        "order": 41,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "anti-air"
+       ]
       },
       "r2iltender": {
        "cost": 1500,
@@ -6796,7 +7319,10 @@
        ],
        "order": 50,
        "provides": [],
-       "queue": "Ship"
+       "queue": "Ship",
+       "roles": [
+        "support"
+       ]
       },
       "r2ilworkshop": {
        "cost": 900,
@@ -6812,7 +7338,10 @@
        ],
        "order": 66,
        "provides": [],
-       "queue": "Support"
+       "queue": "Support",
+       "roles": [
+        "support"
+       ]
       },
       "r2merkava": {
        "cost": 1300,
@@ -6825,7 +7354,10 @@
        ],
        "order": 21,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "main-battle-tank"
+       ]
       },
       "r2namer": {
        "cost": 1050,
@@ -6838,7 +7370,10 @@
        ],
        "order": 31,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "transport"
+       ]
       },
       "spy": {
        "cost": 1000,
@@ -6881,7 +7416,10 @@
        ],
        "order": 30,
        "provides": [],
-       "queue": "Ship"
+       "queue": "Ship",
+       "roles": [
+        "anti-air"
+       ]
       },
       "amcv": {
        "cost": 3000,
@@ -6929,7 +7467,10 @@
        ],
        "order": 20,
        "provides": [],
-       "queue": "Aircraft"
+       "queue": "Aircraft",
+       "roles": [
+        "strike-aircraft"
+       ]
       },
       "carrier": {
        "cost": 2000,
@@ -6945,7 +7486,10 @@
        ],
        "order": 60,
        "provides": [],
-       "queue": "Ship"
+       "queue": "Ship",
+       "roles": [
+        "artillery"
+       ]
       },
       "cleg": {
        "cost": 1500,
@@ -6961,7 +7505,10 @@
        ],
        "order": 150,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "anti-armor"
+       ]
       },
       "cmin": {
        "cost": 1400,
@@ -6990,7 +7537,10 @@
        ],
        "order": 20,
        "provides": [],
-       "queue": "Ship"
+       "queue": "Ship",
+       "roles": [
+        "naval-screen"
+       ]
       },
       "dlph": {
        "cost": 500,
@@ -7006,7 +7556,10 @@
        ],
        "order": 40,
        "provides": [],
-       "queue": "Ship"
+       "queue": "Ship",
+       "roles": [
+        "anti-submarine"
+       ]
       },
       "dog": {
        "cost": 200,
@@ -7019,7 +7572,10 @@
        ],
        "order": 40,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "support"
+       ]
       },
       "e1": {
        "cost": 200,
@@ -7032,7 +7588,10 @@
        ],
        "order": 10,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "line-infantry"
+       ]
       },
       "engineer": {
        "cost": 500,
@@ -7058,7 +7617,10 @@
        ],
        "order": 30,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "anti-air"
+       ]
       },
       "gaairc": {
        "cost": 1000,
@@ -7375,7 +7937,10 @@
        ],
        "order": 60,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "strike-aircraft"
+       ]
       },
       "lcrf": {
        "cost": 900,
@@ -7388,7 +7953,10 @@
        ],
        "order": 10,
        "provides": [],
-       "queue": "Ship"
+       "queue": "Ship",
+       "roles": [
+        "transport"
+       ]
       },
       "mgtk": {
        "cost": 1000,
@@ -7404,7 +7972,10 @@
        ],
        "order": 70,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "main-battle-tank"
+       ]
       },
       "mtnk": {
        "cost": 700,
@@ -7417,7 +7988,10 @@
        ],
        "order": 20,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "main-battle-tank"
+       ]
       },
       "nasam": {
        "cost": 1000,
@@ -7446,7 +8020,10 @@
        ],
        "order": 90,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "transport"
+       ]
       },
       "spy": {
        "cost": 1000,
@@ -7478,7 +8055,10 @@
        ],
        "order": 50,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "artillery"
+       ]
       },
       "tany": {
        "cost": 1000,
@@ -7495,7 +8075,10 @@
        ],
        "order": 140,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "line-infantry"
+       ]
       }
      },
      "name": "Korea",
@@ -7522,7 +8105,10 @@
        ],
        "order": 70,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "main-battle-tank"
+       ]
       },
       "dog": {
        "cost": 200,
@@ -7535,7 +8121,10 @@
        ],
        "order": 40,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "support"
+       ]
       },
       "dron": {
        "cost": 500,
@@ -7577,7 +8166,10 @@
        ],
        "order": 20,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "line-infantry"
+       ]
       },
       "engineer": {
        "cost": 500,
@@ -7606,7 +8198,10 @@
        ],
        "order": 70,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "anti-air"
+       ]
       },
       "harv": {
        "cost": 1400,
@@ -7635,7 +8230,10 @@
        ],
        "order": 30,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "anti-air"
+       ]
       },
       "htnk": {
        "cost": 900,
@@ -7648,7 +8246,10 @@
        ],
        "order": 20,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "main-battle-tank"
+       ]
       },
       "hyd": {
        "cost": 900,
@@ -7664,7 +8265,10 @@
        ],
        "order": 30,
        "provides": [],
-       "queue": "Ship"
+       "queue": "Ship",
+       "roles": [
+        "anti-air"
+       ]
       },
       "ivan": {
        "cost": 600,
@@ -7680,7 +8284,10 @@
        ],
        "order": 110,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "support"
+       ]
       },
       "naclon": {
        "cost": 2500,
@@ -8014,7 +8621,10 @@
        ],
        "order": 10,
        "provides": [],
-       "queue": "Ship"
+       "queue": "Ship",
+       "roles": [
+        "transport"
+       ]
       },
       "shk": {
        "cost": 500,
@@ -8027,7 +8637,10 @@
        ],
        "order": 50,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "anti-armor"
+       ]
       },
       "smcv": {
        "cost": 3000,
@@ -8059,7 +8672,10 @@
        ],
        "order": 40,
        "provides": [],
-       "queue": "Ship"
+       "queue": "Ship",
+       "roles": [
+        "submarine"
+       ]
       },
       "sub": {
        "cost": 1000,
@@ -8072,7 +8688,10 @@
        ],
        "order": 20,
        "provides": [],
-       "queue": "Ship"
+       "queue": "Ship",
+       "roles": [
+        "submarine"
+       ]
       },
       "tesla": {
        "cost": 1500,
@@ -8104,7 +8723,10 @@
        ],
        "order": 160,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "support"
+       ]
       },
       "zep": {
        "cost": 2000,
@@ -8120,7 +8742,10 @@
        ],
        "order": 90,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "strike-aircraft"
+       ]
       }
      },
      "name": "Libya",
@@ -8147,7 +8772,10 @@
        ],
        "order": 70,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "main-battle-tank"
+       ]
       },
       "dog": {
        "cost": 200,
@@ -8160,7 +8788,10 @@
        ],
        "order": 40,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "support"
+       ]
       },
       "dron": {
        "cost": 500,
@@ -8186,7 +8817,10 @@
        ],
        "order": 20,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "line-infantry"
+       ]
       },
       "engineer": {
        "cost": 500,
@@ -8215,7 +8849,10 @@
        ],
        "order": 70,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "anti-air"
+       ]
       },
       "harv": {
        "cost": 1400,
@@ -8244,7 +8881,10 @@
        ],
        "order": 30,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "anti-air"
+       ]
       },
       "htnk": {
        "cost": 900,
@@ -8257,7 +8897,10 @@
        ],
        "order": 20,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "main-battle-tank"
+       ]
       },
       "hyd": {
        "cost": 900,
@@ -8273,7 +8916,10 @@
        ],
        "order": 30,
        "provides": [],
-       "queue": "Ship"
+       "queue": "Ship",
+       "roles": [
+        "anti-air"
+       ]
       },
       "ivan": {
        "cost": 600,
@@ -8289,7 +8935,10 @@
        ],
        "order": 110,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "support"
+       ]
       },
       "naclon": {
        "cost": 2500,
@@ -8623,7 +9272,10 @@
        ],
        "order": 10,
        "provides": [],
-       "queue": "Ship"
+       "queue": "Ship",
+       "roles": [
+        "transport"
+       ]
       },
       "shk": {
        "cost": 500,
@@ -8636,7 +9288,10 @@
        ],
        "order": 50,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "anti-armor"
+       ]
       },
       "smcv": {
        "cost": 3000,
@@ -8668,7 +9323,10 @@
        ],
        "order": 40,
        "provides": [],
-       "queue": "Ship"
+       "queue": "Ship",
+       "roles": [
+        "submarine"
+       ]
       },
       "sub": {
        "cost": 1000,
@@ -8681,7 +9339,10 @@
        ],
        "order": 20,
        "provides": [],
-       "queue": "Ship"
+       "queue": "Ship",
+       "roles": [
+        "submarine"
+       ]
       },
       "tesla": {
        "cost": 1500,
@@ -8713,7 +9374,10 @@
        ],
        "order": 50,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "anti-armor"
+       ]
       },
       "yuri": {
        "cost": 1200,
@@ -8729,7 +9393,10 @@
        ],
        "order": 160,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "support"
+       ]
       },
       "zep": {
        "cost": 2000,
@@ -8745,7 +9412,10 @@
        ],
        "order": 90,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "strike-aircraft"
+       ]
       }
      },
      "name": "Russia",
@@ -8801,7 +9471,10 @@
        ],
        "order": 40,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "support"
+       ]
       },
       "engineer": {
        "cost": 500,
@@ -9112,7 +9785,10 @@
        ],
        "order": 10,
        "provides": [],
-       "queue": "Ship"
+       "queue": "Ship",
+       "roles": [
+        "transport"
+       ]
       },
       "r2ah64sa": {
        "cost": 1700,
@@ -9128,7 +9804,10 @@
        ],
        "order": 100,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "strike-aircraft"
+       ]
       },
       "r2bradley": {
        "cost": 850,
@@ -9141,7 +9820,10 @@
        ],
        "order": 31,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "transport"
+       ]
       },
       "r2caesar": {
        "cost": 1250,
@@ -9157,7 +9839,10 @@
        ],
        "order": 61,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "artillery"
+       ]
       },
       "r2f15sa": {
        "cost": 2200,
@@ -9173,7 +9858,11 @@
        ],
        "order": 20,
        "provides": [],
-       "queue": "Aircraft"
+       "queue": "Aircraft",
+       "roles": [
+        "interceptor",
+        "strike-aircraft"
+       ]
       },
       "r2falcon": {
        "cost": 1900,
@@ -9190,7 +9879,10 @@
        ],
        "order": 140,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "line-infantry"
+       ]
       },
       "r2jubail": {
        "cost": 1500,
@@ -9206,7 +9898,10 @@
        ],
        "order": 50,
        "provides": [],
-       "queue": "Ship"
+       "queue": "Ship",
+       "roles": [
+        "support"
+       ]
       },
       "r2m1a2s": {
        "cost": 1150,
@@ -9219,7 +9914,10 @@
        ],
        "order": 21,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "main-battle-tank"
+       ]
       },
       "r2riyadh": {
        "cost": 1850,
@@ -9235,7 +9933,10 @@
        ],
        "order": 30,
        "provides": [],
-       "queue": "Ship"
+       "queue": "Ship",
+       "roles": [
+        "anti-submarine"
+       ]
       },
       "r2saat": {
        "cost": 500,
@@ -9248,7 +9949,10 @@
        ],
        "order": 20,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "anti-armor"
+       ]
       },
       "r2sadiq": {
        "cost": 650,
@@ -9261,7 +9965,10 @@
        ],
        "order": 10,
        "provides": [],
-       "queue": "Ship"
+       "queue": "Ship",
+       "roles": [
+        "naval-screen"
+       ]
       },
       "r2sads": {
        "cost": 1050,
@@ -9277,7 +9984,10 @@
        ],
        "order": 41,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "anti-air"
+       ]
       },
       "r2saguard": {
        "cost": 600,
@@ -9293,7 +10003,10 @@
        ],
        "order": 20,
        "provides": [],
-       "queue": "Support"
+       "queue": "Support",
+       "roles": [
+        "line-infantry"
+       ]
       },
       "r2sajtac": {
        "cost": 600,
@@ -9309,7 +10022,10 @@
        ],
        "order": 60,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "support"
+       ]
       },
       "r2sang": {
        "cost": 220,
@@ -9322,7 +10038,10 @@
        ],
        "order": 10,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "line-infantry"
+       ]
       },
       "r2sapatriot": {
        "cost": 1200,
@@ -9341,7 +10060,10 @@
        ],
        "order": 30,
        "provides": [],
-       "queue": "Support"
+       "queue": "Support",
+       "roles": [
+        "anti-air"
+       ]
       },
       "r2satow": {
        "cost": 1100,
@@ -9357,7 +10079,10 @@
        ],
        "order": 40,
        "provides": [],
-       "queue": "Support"
+       "queue": "Support",
+       "roles": [
+        "anti-armor"
+       ]
       },
       "spy": {
        "cost": 1000,
@@ -9429,7 +10154,10 @@
        ],
        "order": 40,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "support"
+       ]
       },
       "engineer": {
        "cost": 500,
@@ -9740,7 +10468,10 @@
        ],
        "order": 10,
        "provides": [],
-       "queue": "Ship"
+       "queue": "Ship",
+       "roles": [
+        "transport"
+       ]
       },
       "r2aras": {
        "cost": 650,
@@ -9753,7 +10484,10 @@
        ],
        "order": 15,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "transport"
+       ]
       },
       "r2boran": {
        "cost": 1300,
@@ -9782,7 +10516,10 @@
        ],
        "order": 21,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "main-battle-tank"
+       ]
       },
       "r2deniz": {
        "cost": 950,
@@ -9798,7 +10535,10 @@
        ],
        "order": 55,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "transport"
+       ]
       },
       "r2ege": {
        "cost": 1200,
@@ -9814,7 +10554,10 @@
        ],
        "order": 30,
        "provides": [],
-       "queue": "Ship"
+       "queue": "Ship",
+       "roles": [
+        "anti-submarine"
+       ]
       },
       "r2gokkalkan": {
        "cost": 950,
@@ -9827,7 +10570,10 @@
        ],
        "order": 35,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "anti-air"
+       ]
       },
       "r2greywolf": {
        "cost": 1800,
@@ -9844,7 +10590,10 @@
        ],
        "order": 140,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "line-infantry"
+       ]
       },
       "r2hisar": {
        "cost": 550,
@@ -9876,7 +10625,10 @@
        ],
        "order": 81,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "strike-aircraft"
+       ]
       },
       "r2marmara": {
        "cost": 2000,
@@ -9892,7 +10644,10 @@
        ],
        "order": 60,
        "provides": [],
-       "queue": "Ship"
+       "queue": "Ship",
+       "roles": [
+        "naval-screen"
+       ]
       },
       "r2poyraz": {
        "cost": 650,
@@ -9905,7 +10660,10 @@
        ],
        "order": 10,
        "provides": [],
-       "queue": "Ship"
+       "queue": "Ship",
+       "roles": [
+        "naval-screen"
+       ]
       },
       "r2sahin": {
        "cost": 1800,
@@ -9921,7 +10679,10 @@
        ],
        "order": 10,
        "provides": [],
-       "queue": "Aircraft"
+       "queue": "Aircraft",
+       "roles": [
+        "interceptor"
+       ]
       },
       "r2sancak": {
        "cost": 850,
@@ -9934,7 +10695,10 @@
        ],
        "order": 61,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "support"
+       ]
       },
       "r2siper": {
        "cost": 1100,
@@ -9966,7 +10730,10 @@
        ],
        "order": 20,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "anti-armor"
+       ]
       },
       "r2trdroneop": {
        "cost": 550,
@@ -9982,7 +10749,10 @@
        ],
        "order": 60,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "support"
+       ]
       },
       "r2trrifle": {
        "cost": 155,
@@ -9995,7 +10765,10 @@
        ],
        "order": 10,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "line-infantry"
+       ]
       },
       "r2turna": {
        "cost": 1600,
@@ -10011,7 +10784,10 @@
        ],
        "order": 100,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "strike-aircraft"
+       ]
       },
       "r2yildirim": {
        "cost": 1200,
@@ -10027,7 +10803,10 @@
        ],
        "order": 41,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "artillery"
+       ]
       },
       "spy": {
        "cost": 1000,
@@ -10067,7 +10846,10 @@
        ],
        "order": 40,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "support"
+       ]
       },
       "engineer": {
        "cost": 500,
@@ -10109,7 +10891,10 @@
        ],
        "order": 30,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "anti-air"
+       ]
       },
       "naclon": {
        "cost": 2500,
@@ -10413,7 +11198,10 @@
        ],
        "order": 20,
        "provides": [],
-       "queue": "Ship"
+       "queue": "Ship",
+       "roles": [
+        "naval-screen"
+       ]
       },
       "r2mokha": {
        "cost": 900,
@@ -10429,7 +11217,10 @@
        ],
        "order": 30,
        "provides": [],
-       "queue": "Ship"
+       "queue": "Ship",
+       "roles": [
+        "support"
+       ]
       },
       "r2sahaab": {
        "cost": 300,
@@ -10442,7 +11233,10 @@
        ],
        "order": 10,
        "provides": [],
-       "queue": "Ship"
+       "queue": "Ship",
+       "roles": [
+        "naval-screen"
+       ]
       },
       "r2samad": {
        "cost": 700,
@@ -10458,7 +11252,10 @@
        ],
        "order": 85,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "strike-aircraft"
+       ]
       },
       "r2technical": {
        "cost": 400,
@@ -10471,7 +11268,10 @@
        ],
        "order": 11,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "line-infantry"
+       ]
       },
       "r2wadighost": {
        "cost": 1650,
@@ -10488,7 +11288,10 @@
        ],
        "order": 140,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "line-infantry"
+       ]
       },
       "r2ybunker": {
        "cost": 450,
@@ -10504,7 +11307,10 @@
        ],
        "order": 20,
        "provides": [],
-       "queue": "Support"
+       "queue": "Support",
+       "roles": [
+        "line-infantry"
+       ]
       },
       "r2ycoastal": {
        "cost": 1200,
@@ -10520,7 +11326,10 @@
        ],
        "order": 40,
        "provides": [],
-       "queue": "Support"
+       "queue": "Support",
+       "roles": [
+        "anti-armor"
+       ]
       },
       "r2ymlr": {
        "cost": 900,
@@ -10536,7 +11345,10 @@
        ],
        "order": 61,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "artillery"
+       ]
       },
       "r2ymr": {
        "cost": 165,
@@ -10549,7 +11361,10 @@
        ],
        "order": 10,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "line-infantry"
+       ]
       },
       "r2yrpg": {
        "cost": 350,
@@ -10562,7 +11377,10 @@
        ],
        "order": 20,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "anti-armor"
+       ]
       },
       "r2yspot": {
        "cost": 525,
@@ -10578,7 +11396,10 @@
        ],
        "order": 60,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "support"
+       ]
       },
       "r2ytechrr": {
        "cost": 550,
@@ -10591,7 +11412,10 @@
        ],
        "order": 21,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "anti-armor"
+       ]
       },
       "r2yzu": {
        "cost": 600,
@@ -10604,7 +11428,10 @@
        ],
        "order": 41,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "anti-air"
+       ]
       },
       "r2yzunest": {
        "cost": 800,
@@ -10623,7 +11450,10 @@
        ],
        "order": 30,
        "provides": [],
-       "queue": "Support"
+       "queue": "Support",
+       "roles": [
+        "anti-air"
+       ]
       },
       "sapc": {
        "cost": 900,
@@ -10636,7 +11466,10 @@
        ],
        "order": 10,
        "provides": [],
-       "queue": "Ship"
+       "queue": "Ship",
+       "roles": [
+        "transport"
+       ]
       },
       "smcv": {
        "cost": 3000,
@@ -10712,7 +11545,10 @@
        ],
        "order": 40,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "support"
+       ]
       },
       "engineer": {
        "cost": 500,
@@ -10976,7 +11812,10 @@
        ],
        "order": 20,
        "provides": [],
-       "queue": "Support"
+       "queue": "Support",
+       "roles": [
+        "line-infantry"
+       ]
       },
       "r2cloud": {
        "cost": 1000,
@@ -10992,7 +11831,10 @@
        ],
        "order": 81,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "strike-aircraft"
+       ]
       },
       "r2cnnetwork": {
        "cost": 550,
@@ -11008,7 +11850,10 @@
        ],
        "order": 65,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "support"
+       ]
       },
       "r2cnportable": {
        "cost": 400,
@@ -11021,7 +11866,10 @@
        ],
        "order": 30,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "anti-armor"
+       ]
       },
       "r2cnrifle": {
        "cost": 170,
@@ -11034,7 +11882,10 @@
        ],
        "order": 10,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "line-infantry"
+       ]
       },
       "r2crane": {
        "cost": 1200,
@@ -11050,7 +11901,10 @@
        ],
        "order": 95,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "transport"
+       ]
       },
       "r2haiwang": {
        "cost": 2400,
@@ -11066,7 +11920,10 @@
        ],
        "order": 65,
        "provides": [],
-       "queue": "Ship"
+       "queue": "Ship",
+       "roles": [
+        "artillery"
+       ]
       },
       "r2haiying": {
        "cost": 950,
@@ -11082,7 +11939,10 @@
        ],
        "order": 40,
        "provides": [],
-       "queue": "Ship"
+       "queue": "Ship",
+       "roles": [
+        "naval-screen"
+       ]
       },
       "r2jiaolong": {
        "cost": 1300,
@@ -11098,7 +11958,10 @@
        ],
        "order": 50,
        "provides": [],
-       "queue": "Ship"
+       "queue": "Ship",
+       "roles": [
+        "submarine"
+       ]
       },
       "r2kunlun": {
        "cost": 1100,
@@ -11111,7 +11974,10 @@
        ],
        "order": 10,
        "provides": [],
-       "queue": "Ship"
+       "queue": "Ship",
+       "roles": [
+        "transport"
+       ]
       },
       "r2luyang": {
        "cost": 1250,
@@ -11124,7 +11990,10 @@
        ],
        "order": 20,
        "provides": [],
-       "queue": "Ship"
+       "queue": "Ship",
+       "roles": [
+        "anti-submarine"
+       ]
       },
       "r2lynx": {
        "cost": 600,
@@ -11137,7 +12006,10 @@
        ],
        "order": 41,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "support"
+       ]
       },
       "r2mantis": {
        "cost": 950,
@@ -11150,7 +12022,10 @@
        ],
        "order": 61,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "anti-air"
+       ]
       },
       "r2phl": {
        "cost": 1500,
@@ -11166,7 +12041,10 @@
        ],
        "order": 75,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "artillery"
+       ]
       },
       "r2qilin": {
        "cost": 750,
@@ -11179,7 +12057,10 @@
        ],
        "order": 21,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "main-battle-tank"
+       ]
       },
       "r2redspear": {
        "cost": 1900,
@@ -11196,7 +12077,10 @@
        ],
        "order": 140,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "line-infantry"
+       ]
       },
       "r2skyshield": {
        "cost": 1000,
@@ -11215,7 +12099,10 @@
        ],
        "order": 30,
        "provides": [],
-       "queue": "Support"
+       "queue": "Support",
+       "roles": [
+        "anti-air"
+       ]
       },
       "r2skyspear": {
        "cost": 1700,
@@ -11231,7 +12118,10 @@
        ],
        "order": 10,
        "provides": [],
-       "queue": "Aircraft"
+       "queue": "Aircraft",
+       "roles": [
+        "interceptor"
+       ]
       },
       "r2spectrum": {
        "cost": 1200,
@@ -11247,7 +12137,10 @@
        ],
        "order": 60,
        "provides": [],
-       "queue": "Support"
+       "queue": "Support",
+       "roles": [
+        "support"
+       ]
       },
       "r2zbd": {
        "cost": 850,
@@ -11260,7 +12153,10 @@
        ],
        "order": 35,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "transport"
+       ]
       },
       "spy": {
        "cost": 1000,
@@ -11300,7 +12196,10 @@
        ],
        "order": 40,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "support"
+       ]
       },
       "engineer": {
        "cost": 500,
@@ -11342,7 +12241,10 @@
        ],
        "order": 30,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "anti-air"
+       ]
       },
       "nacnst": {
        "cost": 3000,
@@ -11596,7 +12498,10 @@
        ],
        "order": 30,
        "provides": [],
-       "queue": "Support"
+       "queue": "Support",
+       "roles": [
+        "anti-air"
+       ]
       },
       "r2hzat": {
        "cost": 500,
@@ -11609,7 +12514,10 @@
        ],
        "order": 20,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "anti-armor"
+       ]
       },
       "r2hzbunker": {
        "cost": 450,
@@ -11625,7 +12533,10 @@
        ],
        "order": 20,
        "provides": [],
-       "queue": "Support"
+       "queue": "Support",
+       "roles": [
+        "line-infantry"
+       ]
       },
       "r2hzcoastal": {
        "cost": 1000,
@@ -11641,7 +12552,10 @@
        ],
        "order": 40,
        "provides": [],
-       "queue": "Support"
+       "queue": "Support",
+       "roles": [
+        "anti-armor"
+       ]
       },
       "r2hzdrone": {
        "cost": 450,
@@ -11657,7 +12571,10 @@
        ],
        "order": 85,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "strike-aircraft"
+       ]
       },
       "r2hzescort": {
        "cost": 600,
@@ -11670,7 +12587,10 @@
        ],
        "order": 41,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "anti-air"
+       ]
       },
       "r2hzfpv": {
        "cost": 500,
@@ -11686,7 +12606,10 @@
        ],
        "order": 50,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "drone-swarm"
+       ]
       },
       "r2hzmissileboat": {
        "cost": 1000,
@@ -11702,7 +12625,10 @@
        ],
        "order": 20,
        "provides": [],
-       "queue": "Ship"
+       "queue": "Ship",
+       "roles": [
+        "naval-screen"
+       ]
       },
       "r2hzrail": {
        "cost": 450,
@@ -11715,7 +12641,10 @@
        ],
        "order": 55,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "artillery"
+       ]
       },
       "r2hzrecoilless": {
        "cost": 475,
@@ -11728,7 +12657,10 @@
        ],
        "order": 21,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "anti-armor"
+       ]
       },
       "r2hzrelay": {
        "cost": 750,
@@ -11744,7 +12676,10 @@
        ],
        "order": 65,
        "provides": [],
-       "queue": "Support"
+       "queue": "Support",
+       "roles": [
+        "support"
+       ]
       },
       "r2hzrifle": {
        "cost": 300,
@@ -11757,7 +12692,10 @@
        ],
        "order": 10,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "line-infantry"
+       ]
       },
       "r2hzrockets": {
        "cost": 800,
@@ -11773,7 +12711,10 @@
        ],
        "order": 61,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "artillery"
+       ]
       },
       "r2hzscout": {
        "cost": 1800,
@@ -11790,7 +12731,10 @@
        ],
        "order": 140,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "line-infantry"
+       ]
       },
       "r2hzskiff": {
        "cost": 300,
@@ -11803,7 +12747,10 @@
        ],
        "order": 10,
        "provides": [],
-       "queue": "Ship"
+       "queue": "Ship",
+       "roles": [
+        "naval-screen"
+       ]
       },
       "r2hzspotter": {
        "cost": 450,
@@ -11819,7 +12766,10 @@
        ],
        "order": 60,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "support"
+       ]
       },
       "r2hzsurvey": {
        "cost": 900,
@@ -11835,7 +12785,10 @@
        ],
        "order": 30,
        "provides": [],
-       "queue": "Ship"
+       "queue": "Ship",
+       "roles": [
+        "support"
+       ]
       },
       "r2hztechnical": {
        "cost": 400,
@@ -11848,7 +12801,10 @@
        ],
        "order": 11,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "line-infantry"
+       ]
       },
       "r2hzworkshop": {
        "cost": 900,
@@ -11864,7 +12820,10 @@
        ],
        "order": 66,
        "provides": [],
-       "queue": "Support"
+       "queue": "Support",
+       "roles": [
+        "support"
+       ]
       },
       "sapc": {
        "cost": 900,
@@ -11877,7 +12836,10 @@
        ],
        "order": 10,
        "provides": [],
-       "queue": "Ship"
+       "queue": "Ship",
+       "roles": [
+        "transport"
+       ]
       },
       "smcv": {
        "cost": 3000,
@@ -11917,7 +12879,10 @@
        ],
        "order": 40,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "support"
+       ]
       },
       "engineer": {
        "cost": 500,
@@ -11959,7 +12924,10 @@
        ],
        "order": 30,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "anti-air"
+       ]
       },
       "nacnst": {
        "cost": 3000,
@@ -12210,7 +13178,10 @@
        ],
        "order": 120,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "strike-aircraft"
+       ]
       },
       "r2basij": {
        "cost": 90,
@@ -12223,7 +13194,10 @@
        ],
        "order": 10,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "line-infantry"
+       ]
       },
       "r2coast": {
        "cost": 1500,
@@ -12239,7 +13213,10 @@
        ],
        "order": 65,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "artillery"
+       ]
       },
       "r2dronecontrol": {
        "cost": 550,
@@ -12255,7 +13232,10 @@
        ],
        "order": 70,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "support"
+       ]
       },
       "r2fajr": {
        "cost": 1300,
@@ -12271,7 +13251,10 @@
        ],
        "order": 61,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "artillery"
+       ]
       },
       "r2ghadir": {
        "cost": 1050,
@@ -12287,7 +13270,10 @@
        ],
        "order": 40,
        "provides": [],
-       "queue": "Ship"
+       "queue": "Ship",
+       "roles": [
+        "submarine"
+       ]
       },
       "r2iraasite": {
        "cost": 950,
@@ -12306,7 +13292,10 @@
        ],
        "order": 30,
        "provides": [],
-       "queue": "Support"
+       "queue": "Support",
+       "roles": [
+        "anti-air"
+       ]
       },
       "r2irbunker": {
        "cost": 450,
@@ -12322,7 +13311,10 @@
        ],
        "order": 20,
        "provides": [],
-       "queue": "Support"
+       "queue": "Support",
+       "roles": [
+        "line-infantry"
+       ]
       },
       "r2ircoast": {
        "cost": 1250,
@@ -12338,7 +13330,10 @@
        ],
        "order": 40,
        "provides": [],
-       "queue": "Support"
+       "queue": "Support",
+       "roles": [
+        "anti-armor"
+       ]
       },
       "r2karrar": {
        "cost": 850,
@@ -12351,7 +13346,10 @@
        ],
        "order": 21,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "main-battle-tank"
+       ]
       },
       "r2loiter": {
        "cost": 500,
@@ -12367,7 +13365,10 @@
        ],
        "order": 85,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "strike-aircraft"
+       ]
       },
       "r2mohajer": {
        "cost": 950,
@@ -12383,7 +13384,10 @@
        ],
        "order": 81,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "strike-aircraft"
+       ]
       },
       "r2peykaap": {
        "cost": 750,
@@ -12396,7 +13400,10 @@
        ],
        "order": 20,
        "provides": [],
-       "queue": "Ship"
+       "queue": "Ship",
+       "roles": [
+        "naval-screen"
+       ]
       },
       "r2raad": {
        "cost": 1000,
@@ -12409,7 +13416,10 @@
        ],
        "order": 41,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "anti-air"
+       ]
       },
       "r2shadowone": {
        "cost": 1900,
@@ -12426,7 +13436,10 @@
        ],
        "order": 140,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "line-infantry"
+       ]
       },
       "r2toophan": {
        "cost": 450,
@@ -12439,7 +13452,10 @@
        ],
        "order": 30,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "anti-armor"
+       ]
       },
       "r2toufan": {
        "cost": 1450,
@@ -12455,7 +13471,10 @@
        ],
        "order": 95,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "strike-aircraft"
+       ]
       },
       "sapc": {
        "cost": 900,
@@ -12468,7 +13487,10 @@
        ],
        "order": 10,
        "provides": [],
-       "queue": "Ship"
+       "queue": "Ship",
+       "roles": [
+        "transport"
+       ]
       },
       "smcv": {
        "cost": 3000,
@@ -12540,7 +13562,10 @@
        ],
        "order": 40,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "support"
+       ]
       },
       "engineer": {
        "cost": 500,
@@ -12801,7 +13826,10 @@
        ],
        "order": 10,
        "provides": [],
-       "queue": "Ship"
+       "queue": "Ship",
+       "roles": [
+        "transport"
+       ]
       },
       "r2ilat": {
        "cost": 500,
@@ -12814,7 +13842,10 @@
        ],
        "order": 20,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "anti-armor"
+       ]
       },
       "r2ilatpost": {
        "cost": 1100,
@@ -12830,7 +13861,10 @@
        ],
        "order": 40,
        "provides": [],
-       "queue": "Support"
+       "queue": "Support",
+       "roles": [
+        "anti-armor"
+       ]
       },
       "r2ilbattery": {
        "cost": 1200,
@@ -12849,7 +13883,10 @@
        ],
        "order": 30,
        "provides": [],
-       "queue": "Support"
+       "queue": "Support",
+       "roles": [
+        "anti-air"
+       ]
       },
       "r2ilfalcon": {
        "cost": 2200,
@@ -12865,7 +13902,11 @@
        ],
        "order": 20,
        "provides": [],
-       "queue": "Aircraft"
+       "queue": "Aircraft",
+       "roles": [
+        "interceptor",
+        "strike-aircraft"
+       ]
       },
       "r2ilfrigate": {
        "cost": 1850,
@@ -12881,7 +13922,10 @@
        ],
        "order": 30,
        "provides": [],
-       "queue": "Ship"
+       "queue": "Ship",
+       "roles": [
+        "anti-submarine"
+       ]
       },
       "r2ilgunship": {
        "cost": 1700,
@@ -12897,7 +13941,10 @@
        ],
        "order": 100,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "strike-aircraft"
+       ]
       },
       "r2ilhowitzer": {
        "cost": 1250,
@@ -12913,7 +13960,10 @@
        ],
        "order": 61,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "artillery"
+       ]
       },
       "r2ilobserver": {
        "cost": 600,
@@ -12929,7 +13979,10 @@
        ],
        "order": 60,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "support"
+       ]
       },
       "r2ilpatrol": {
        "cost": 650,
@@ -12942,7 +13995,10 @@
        ],
        "order": 10,
        "provides": [],
-       "queue": "Ship"
+       "queue": "Ship",
+       "roles": [
+        "naval-screen"
+       ]
       },
       "r2ilrecon": {
        "cost": 1900,
@@ -12959,7 +14015,10 @@
        ],
        "order": 140,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "line-infantry"
+       ]
       },
       "r2ilrelay": {
        "cost": 750,
@@ -12975,7 +14034,10 @@
        ],
        "order": 65,
        "provides": [],
-       "queue": "Support"
+       "queue": "Support",
+       "roles": [
+        "support"
+       ]
       },
       "r2ilrifle": {
        "cost": 220,
@@ -12988,7 +14050,10 @@
        ],
        "order": 10,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "line-infantry"
+       ]
       },
       "r2ilsentry": {
        "cost": 600,
@@ -13004,7 +14069,10 @@
        ],
        "order": 20,
        "provides": [],
-       "queue": "Support"
+       "queue": "Support",
+       "roles": [
+        "line-infantry"
+       ]
       },
       "r2ilshield": {
        "cost": 1050,
@@ -13020,7 +14088,10 @@
        ],
        "order": 41,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "anti-air"
+       ]
       },
       "r2iltender": {
        "cost": 1500,
@@ -13036,7 +14107,10 @@
        ],
        "order": 50,
        "provides": [],
-       "queue": "Ship"
+       "queue": "Ship",
+       "roles": [
+        "support"
+       ]
       },
       "r2ilworkshop": {
        "cost": 900,
@@ -13052,7 +14126,10 @@
        ],
        "order": 66,
        "provides": [],
-       "queue": "Support"
+       "queue": "Support",
+       "roles": [
+        "support"
+       ]
       },
       "r2merkava": {
        "cost": 1300,
@@ -13065,7 +14142,10 @@
        ],
        "order": 21,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "main-battle-tank"
+       ]
       },
       "r2namer": {
        "cost": 1050,
@@ -13078,7 +14158,10 @@
        ],
        "order": 31,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "transport"
+       ]
       },
       "spy": {
        "cost": 1000,
@@ -13150,7 +14233,10 @@
        ],
        "order": 40,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "support"
+       ]
       },
       "engineer": {
        "cost": 500,
@@ -13411,7 +14497,10 @@
        ],
        "order": 10,
        "provides": [],
-       "queue": "Ship"
+       "queue": "Ship",
+       "roles": [
+        "transport"
+       ]
       },
       "r2ah64sa": {
        "cost": 1700,
@@ -13427,7 +14516,10 @@
        ],
        "order": 100,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "strike-aircraft"
+       ]
       },
       "r2bradley": {
        "cost": 850,
@@ -13440,7 +14532,10 @@
        ],
        "order": 31,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "transport"
+       ]
       },
       "r2caesar": {
        "cost": 1250,
@@ -13456,7 +14551,10 @@
        ],
        "order": 61,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "artillery"
+       ]
       },
       "r2f15sa": {
        "cost": 2200,
@@ -13472,7 +14570,11 @@
        ],
        "order": 20,
        "provides": [],
-       "queue": "Aircraft"
+       "queue": "Aircraft",
+       "roles": [
+        "interceptor",
+        "strike-aircraft"
+       ]
       },
       "r2falcon": {
        "cost": 1900,
@@ -13489,7 +14591,10 @@
        ],
        "order": 140,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "line-infantry"
+       ]
       },
       "r2jubail": {
        "cost": 1500,
@@ -13505,7 +14610,10 @@
        ],
        "order": 50,
        "provides": [],
-       "queue": "Ship"
+       "queue": "Ship",
+       "roles": [
+        "support"
+       ]
       },
       "r2m1a2s": {
        "cost": 1150,
@@ -13518,7 +14626,10 @@
        ],
        "order": 21,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "main-battle-tank"
+       ]
       },
       "r2riyadh": {
        "cost": 1850,
@@ -13534,7 +14645,10 @@
        ],
        "order": 30,
        "provides": [],
-       "queue": "Ship"
+       "queue": "Ship",
+       "roles": [
+        "anti-submarine"
+       ]
       },
       "r2saat": {
        "cost": 500,
@@ -13547,7 +14661,10 @@
        ],
        "order": 20,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "anti-armor"
+       ]
       },
       "r2sadiq": {
        "cost": 650,
@@ -13560,7 +14677,10 @@
        ],
        "order": 10,
        "provides": [],
-       "queue": "Ship"
+       "queue": "Ship",
+       "roles": [
+        "naval-screen"
+       ]
       },
       "r2sads": {
        "cost": 1050,
@@ -13576,7 +14696,10 @@
        ],
        "order": 41,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "anti-air"
+       ]
       },
       "r2saguard": {
        "cost": 600,
@@ -13592,7 +14715,10 @@
        ],
        "order": 20,
        "provides": [],
-       "queue": "Support"
+       "queue": "Support",
+       "roles": [
+        "line-infantry"
+       ]
       },
       "r2sajtac": {
        "cost": 600,
@@ -13608,7 +14734,10 @@
        ],
        "order": 60,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "support"
+       ]
       },
       "r2sang": {
        "cost": 220,
@@ -13621,7 +14750,10 @@
        ],
        "order": 10,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "line-infantry"
+       ]
       },
       "r2sapatriot": {
        "cost": 1200,
@@ -13640,7 +14772,10 @@
        ],
        "order": 30,
        "provides": [],
-       "queue": "Support"
+       "queue": "Support",
+       "roles": [
+        "anti-air"
+       ]
       },
       "r2satow": {
        "cost": 1100,
@@ -13656,7 +14791,10 @@
        ],
        "order": 40,
        "provides": [],
-       "queue": "Support"
+       "queue": "Support",
+       "roles": [
+        "anti-armor"
+       ]
       },
       "spy": {
        "cost": 1000,
@@ -13728,7 +14866,10 @@
        ],
        "order": 40,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "support"
+       ]
       },
       "engineer": {
        "cost": 500,
@@ -13989,7 +15130,10 @@
        ],
        "order": 10,
        "provides": [],
-       "queue": "Ship"
+       "queue": "Ship",
+       "roles": [
+        "transport"
+       ]
       },
       "r2aras": {
        "cost": 650,
@@ -14002,7 +15146,10 @@
        ],
        "order": 15,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "transport"
+       ]
       },
       "r2boran": {
        "cost": 1300,
@@ -14031,7 +15178,10 @@
        ],
        "order": 21,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "main-battle-tank"
+       ]
       },
       "r2deniz": {
        "cost": 950,
@@ -14047,7 +15197,10 @@
        ],
        "order": 55,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "transport"
+       ]
       },
       "r2ege": {
        "cost": 1200,
@@ -14063,7 +15216,10 @@
        ],
        "order": 30,
        "provides": [],
-       "queue": "Ship"
+       "queue": "Ship",
+       "roles": [
+        "anti-submarine"
+       ]
       },
       "r2gokkalkan": {
        "cost": 950,
@@ -14076,7 +15232,10 @@
        ],
        "order": 35,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "anti-air"
+       ]
       },
       "r2greywolf": {
        "cost": 1800,
@@ -14093,7 +15252,10 @@
        ],
        "order": 140,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "line-infantry"
+       ]
       },
       "r2hisar": {
        "cost": 550,
@@ -14125,7 +15287,10 @@
        ],
        "order": 81,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "strike-aircraft"
+       ]
       },
       "r2marmara": {
        "cost": 2000,
@@ -14141,7 +15306,10 @@
        ],
        "order": 60,
        "provides": [],
-       "queue": "Ship"
+       "queue": "Ship",
+       "roles": [
+        "naval-screen"
+       ]
       },
       "r2poyraz": {
        "cost": 650,
@@ -14154,7 +15322,10 @@
        ],
        "order": 10,
        "provides": [],
-       "queue": "Ship"
+       "queue": "Ship",
+       "roles": [
+        "naval-screen"
+       ]
       },
       "r2sahin": {
        "cost": 1800,
@@ -14170,7 +15341,10 @@
        ],
        "order": 10,
        "provides": [],
-       "queue": "Aircraft"
+       "queue": "Aircraft",
+       "roles": [
+        "interceptor"
+       ]
       },
       "r2sancak": {
        "cost": 850,
@@ -14183,7 +15357,10 @@
        ],
        "order": 61,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "support"
+       ]
       },
       "r2siper": {
        "cost": 1100,
@@ -14215,7 +15392,10 @@
        ],
        "order": 20,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "anti-armor"
+       ]
       },
       "r2trdroneop": {
        "cost": 550,
@@ -14231,7 +15411,10 @@
        ],
        "order": 60,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "support"
+       ]
       },
       "r2trrifle": {
        "cost": 155,
@@ -14244,7 +15427,10 @@
        ],
        "order": 10,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "line-infantry"
+       ]
       },
       "r2turna": {
        "cost": 1600,
@@ -14260,7 +15446,10 @@
        ],
        "order": 100,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "strike-aircraft"
+       ]
       },
       "r2yildirim": {
        "cost": 1200,
@@ -14276,7 +15465,10 @@
        ],
        "order": 41,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "artillery"
+       ]
       },
       "spy": {
        "cost": 1000,
@@ -14316,7 +15508,10 @@
        ],
        "order": 40,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "support"
+       ]
       },
       "engineer": {
        "cost": 500,
@@ -14358,7 +15553,10 @@
        ],
        "order": 30,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "anti-air"
+       ]
       },
       "nacnst": {
        "cost": 3000,
@@ -14609,7 +15807,10 @@
        ],
        "order": 20,
        "provides": [],
-       "queue": "Ship"
+       "queue": "Ship",
+       "roles": [
+        "naval-screen"
+       ]
       },
       "r2mokha": {
        "cost": 900,
@@ -14625,7 +15826,10 @@
        ],
        "order": 30,
        "provides": [],
-       "queue": "Ship"
+       "queue": "Ship",
+       "roles": [
+        "support"
+       ]
       },
       "r2sahaab": {
        "cost": 300,
@@ -14638,7 +15842,10 @@
        ],
        "order": 10,
        "provides": [],
-       "queue": "Ship"
+       "queue": "Ship",
+       "roles": [
+        "naval-screen"
+       ]
       },
       "r2samad": {
        "cost": 700,
@@ -14654,7 +15861,10 @@
        ],
        "order": 85,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "strike-aircraft"
+       ]
       },
       "r2technical": {
        "cost": 400,
@@ -14667,7 +15877,10 @@
        ],
        "order": 11,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "line-infantry"
+       ]
       },
       "r2wadighost": {
        "cost": 1650,
@@ -14684,7 +15897,10 @@
        ],
        "order": 140,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "line-infantry"
+       ]
       },
       "r2ybunker": {
        "cost": 450,
@@ -14700,7 +15916,10 @@
        ],
        "order": 20,
        "provides": [],
-       "queue": "Support"
+       "queue": "Support",
+       "roles": [
+        "line-infantry"
+       ]
       },
       "r2ycoastal": {
        "cost": 1200,
@@ -14716,7 +15935,10 @@
        ],
        "order": 40,
        "provides": [],
-       "queue": "Support"
+       "queue": "Support",
+       "roles": [
+        "anti-armor"
+       ]
       },
       "r2ymlr": {
        "cost": 900,
@@ -14732,7 +15954,10 @@
        ],
        "order": 61,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "artillery"
+       ]
       },
       "r2ymr": {
        "cost": 165,
@@ -14745,7 +15970,10 @@
        ],
        "order": 10,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "line-infantry"
+       ]
       },
       "r2yrpg": {
        "cost": 350,
@@ -14758,7 +15986,10 @@
        ],
        "order": 20,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "anti-armor"
+       ]
       },
       "r2yspot": {
        "cost": 525,
@@ -14774,7 +16005,10 @@
        ],
        "order": 60,
        "provides": [],
-       "queue": "Infantry"
+       "queue": "Infantry",
+       "roles": [
+        "support"
+       ]
       },
       "r2ytechrr": {
        "cost": 550,
@@ -14787,7 +16021,10 @@
        ],
        "order": 21,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "anti-armor"
+       ]
       },
       "r2yzu": {
        "cost": 600,
@@ -14800,7 +16037,10 @@
        ],
        "order": 41,
        "provides": [],
-       "queue": "Vehicle"
+       "queue": "Vehicle",
+       "roles": [
+        "anti-air"
+       ]
       },
       "r2yzunest": {
        "cost": 800,
@@ -14819,7 +16059,10 @@
        ],
        "order": 30,
        "provides": [],
-       "queue": "Support"
+       "queue": "Support",
+       "roles": [
+        "anti-air"
+       ]
       },
       "sapc": {
        "cost": 900,
@@ -14832,7 +16075,10 @@
        ],
        "order": 10,
        "provides": [],
-       "queue": "Ship"
+       "queue": "Ship",
+       "roles": [
+        "transport"
+       ]
       },
       "smcv": {
        "cost": 3000,

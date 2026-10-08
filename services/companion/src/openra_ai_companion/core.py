@@ -49,6 +49,7 @@ from .strategy_contracts import (
 )
 from . import nl_orders
 from .advisor import BUILD_FOCUS, Advice, Advisor, is_next_step_question, state_summary
+from .contextual_strategy import ContextualStrategy
 from .tactical_vision import tactical_overview_png
 from .vision_budget import fit_images
 from .threats import assess_threat
@@ -311,6 +312,9 @@ class Companion:
         self.auto_act_enabled = self.router.settings.auto_act_enabled
         self.native_strategy = self.router.settings.native_strategy
         self.native_profile = strategy_contract(self.native_strategy)["native_profile"]
+        self.contextual_strategy = ContextualStrategy()
+        self._contextual_strategy_lock = threading.RLock()
+        self._strategy_offer_signature = ""
         self._generation = 0
         self._lock = threading.Lock()
         self._action_lock = threading.Lock()
@@ -515,6 +519,9 @@ class Companion:
         )
         if match_changed:
             self._opening_scout_ids.clear()
+            with self._contextual_strategy_lock:
+                self.contextual_strategy = ContextualStrategy()
+                self._strategy_offer_signature = ""
             self._opening_scout_targets.clear()
             self._opening_scouts_committed = 0
             self.brain_arbiter = BrainArbiter()
@@ -749,16 +756,19 @@ class Companion:
         started = time.perf_counter()
         try:
             images, views = ([], []) if self.router.settings.vision_model == "local-no-vision" else self._vision_inputs(snapshot)
+            context = {"player_question": question, "snapshot": snapshot.compact()}
+            if self.contextual_strategy.active:
+                context["player_selected_strategy"] = self.contextual_strategy_state()
             if images:
                 result = self.router.vision_many(
                     SYSTEM_PROMPT + "\n" + FULL_VISION_PROMPT + "\nCONTEXT:\n" +
-                    json.dumps({"player_question": question, "snapshot": snapshot.compact(), "vision_views": views}, separators=(",", ":")),
+                    json.dumps({**context, "vision_views": views}, separators=(",", ":")),
                     images,
                 )
             else:
                 result = self.router.chat([
                     {"role": "system", "content": SYSTEM_PROMPT},
-                    {"role": "user", "content": json.dumps({"player_question": question, "snapshot": snapshot.compact()}, separators=(",", ":"))},
+                    {"role": "user", "content": json.dumps(context, separators=(",", ":"))},
                 ])
             metadata = {"model": result.model}
             if views:
@@ -822,6 +832,56 @@ class Companion:
         if persist:
             self.router.configure({"native_strategy": profile})
         return True
+
+    def contextual_strategy_state(self) -> dict:
+        with self._contextual_strategy_lock:
+            return self.contextual_strategy.state(self.latest_snapshot, self.current_threat)
+
+    def select_contextual_strategy(self, strategy: str | None, reserve: int = 0) -> dict:
+        with self._contextual_strategy_lock:
+            snapshot = self.latest_snapshot
+            if snapshot is None or not self.enabled:
+                raise ValueError("Connect an enabled co-commander to a live skirmish first")
+            self.contextual_strategy.select(strategy, reserve, snapshot)
+            self._strategy_offer_signature = ""
+            # Withdraw only steps owned by the previous plan. Explicit player orders survive a switch.
+            with self._action_lock:
+                self._pending_actions = [p for p in self._pending_actions if not p.instruction.startswith("contextual-strategy:")]
+            return self.contextual_strategy_state()
+
+    def contextual_strategy_step(self, *, automatic: bool = False) -> CompanionResponse:
+        with self._contextual_strategy_lock:
+            snapshot = self.latest_snapshot
+            plan = self.contextual_strategy
+            if not self.enabled or snapshot is None or plan.active is None or snapshot.done or snapshot.mission_mode:
+                return CompanionResponse("Select a strategy during a live skirmish first.", "contextual-strategy")
+            advice = plan.advice(snapshot, self.current_threat)
+            if advice is None:
+                return CompanionResponse("Wait for current production and orders to finish.", "contextual-strategy")
+            response = CompanionResponse(advice.text, "contextual-strategy", metadata={"contextual_strategy": self.contextual_strategy_state()})
+            if not advice.commands or self.pending_action() is not None:
+                return response
+            signature = json.dumps([plan.active, advice.commands, sorted(u.actor_id for u in snapshot.units),
+                                    sorted(b.actor_id for b in snapshot.buildings),
+                                    [(p.get("item"), p.get("queue_type")) for p in snapshot.production]], sort_keys=True)
+            if automatic and signature == self._strategy_offer_signature:
+                return response
+            try:
+                commands = self._validate_action_commands(snapshot, advice.commands, player_request=True)
+            except ValueError:
+                response.text = "The next strategy step is not currently executable. Wait for the battlefield to change."
+                return response
+            proposal = ActionProposal(proposal_id=str(uuid.uuid4()), instruction=f"contextual-strategy:{plan.active}",
+                                      summary=advice.summary, expected_tick=snapshot.tick, commands=commands,
+                                      created_at=time.monotonic(), player_request=True)
+            if self._offer(proposal, only_if_idle=True):
+                self._strategy_offer_signature = signature
+                response.metadata["action"] = {"state": "pending", **proposal.as_dict()}
+            return response
+
+    def _selected_strategy_advice(self, snapshot: GameSnapshot, *, build_focus: bool = False) -> Advice | None:
+        with self._contextual_strategy_lock:
+            return self.contextual_strategy.advice(snapshot, self.current_threat, build_focus=build_focus)
 
     def apply_adaptive_profile(self, profile: str) -> bool:
         """Let the slow strategy director switch native doctrine without leaving Adaptive mode."""
@@ -1967,10 +2027,10 @@ class Companion:
         created_proposal: ActionProposal | None = None
         suggestion: tuple[str, str, list[dict]] | None = None
         if not self.auto_act_enabled:
-            advice = Advisor(snapshot, threat).next_step()
+            advice = self._selected_strategy_advice(snapshot)
             if advice is not None and advice.commands:
                 suggestion = (advice.summary, advice.text, advice.commands)
-            elif pending is None:
+            elif pending is None and self.contextual_strategy.active is None:
                 opening_mcv = any(
                     unit.kind.split(".", 1)[0] == "mcv" for unit in snapshot.units
                 ) and not snapshot.buildings
@@ -1991,7 +2051,7 @@ class Companion:
                 else:
                     created_proposal = self._equivalent_pending(commands) or ActionProposal(
                         proposal_id=str(uuid.uuid4()),
-                        instruction="strategy:next-step",
+                        instruction=f"contextual-strategy:{self.contextual_strategy.active}" if self.contextual_strategy.active else "strategy:next-step",
                         summary=summary,
                         expected_tick=snapshot.tick,
                         commands=commands,
@@ -2040,8 +2100,9 @@ class Companion:
         trade_status = ""
         if snapshot.kills_cost or snapshot.deaths_cost:
             trade_status = f", combat trades {trade_delta:+,}"
+        selected = self.contextual_strategy_state().get("active")
         facts = (
-            f"{active['name']} is active; threat {threat.level}, power {power_balance:+}, "
+            f"{selected['name'] if selected else active['name']} is active; threat {threat.level}, power {power_balance:+}, "
             f"{snapshot.harvester_count} harvester{'s' if snapshot.harvester_count != 1 else ''}{trade_status}"
         )
 
@@ -2109,7 +2170,7 @@ class Companion:
             # Status, "what's left?" and anything while AUTO plays: the deterministic briefing
             # (facts, the next step as a card, what remains), no model call.
             return self._strategy_progress_response(snapshot, generation)
-        advice: Advice | None = Advisor(snapshot, self.current_threat).next_step(
+        advice: Advice | None = self._selected_strategy_advice(snapshot,
             build_focus=bool(BUILD_FOCUS.search(nl_orders.normalize(instruction)))
         )
         proposal: ActionProposal | None = None
@@ -2121,7 +2182,7 @@ class Companion:
             if commands:
                 proposal = self._equivalent_pending(commands) or ActionProposal(
                     proposal_id=str(uuid.uuid4()),
-                    instruction=f"advice:{advice.key}",
+                    instruction=f"contextual-strategy:{self.contextual_strategy.active}" if self.contextual_strategy.active else f"advice:{advice.key}",
                     summary=advice.summary,
                     expected_tick=snapshot.tick,
                     commands=commands,
@@ -2135,6 +2196,8 @@ class Companion:
             latency_ms = round((time.perf_counter() - started) * 1000)
         else:
             context = state_summary(snapshot, self.current_threat)
+            if self.contextual_strategy.active:
+                context += "\nPlayer-selected strategy: " + json.dumps(self.contextual_strategy_state())
             if advice is not None:
                 context += f"\nSuggested next step{' (offered as a card)' if proposal else ''}: {advice.text}"
             try:
@@ -2355,6 +2418,19 @@ class Companion:
         if _is_confirm_intent(instruction):
             return self.confirm_action()
 
+        normalized = nl_orders.normalize(instruction).strip(" .!?")
+        contextual_names = {
+            "expand economy": "economy", "scout first": "scout", "press the attack": "pressure",
+            "protect the economy": "defend", "regroup and rebuild": "regroup", "add air defense": "anti_air",
+            "counter enemy armor": "anti_armor", "build combined arms": "balanced",
+        }
+        named = re.sub(r"^(?:select|choose|use|switch to) (?:the )?", "", normalized)
+        if named in contextual_names or normalized == "release strategy":
+            state = self.select_contextual_strategy(contextual_names.get(named), self.contextual_strategy.reserve)
+            selected = state.get("active")
+            return CompanionResponse(f"Strategy selected: {selected['name']}. Steps need your acceptance." if selected else "Strategy released.",
+                                     "contextual-strategy", metadata={"contextual_strategy": state})
+
         strategy_intent, requested_strategy = detect_strategy_intent(instruction)
         background = instruction.lower().startswith(nl_orders.AUTO_INSTRUCTION_PREFIX)
         if strategy_intent == "set" and not background and not nl_orders.is_strategy_command(instruction):
@@ -2363,6 +2439,14 @@ class Companion:
             strategy_intent, requested_strategy = "", None
         if strategy_intent == "query":
             generation = self._begin()
+            if requested_strategy is None and self.contextual_strategy.active:
+                state = self.contextual_strategy_state()
+                selected = state["active"]
+                if any(word in instruction.lower() for word in ("available", "options", "strategies")):
+                    return CompanionResponse(state["reason"] + " Choices: " + ", ".join(choice["name"] for choice in state["choices"]) + ".",
+                                             "contextual-strategy", utterance_id=generation, metadata={"contextual_strategy": state})
+                return CompanionResponse(f"Current strategy: {selected['name']}. {selected['next']}", "contextual-strategy",
+                                         utterance_id=generation, metadata={"contextual_strategy": state})
             metadata_strategy = strategy_contract(requested_strategy or self.native_strategy)
             if requested_strategy is not None:
                 answer = strategy_answer(requested_strategy, include_sequence=True)
@@ -2396,6 +2480,8 @@ class Companion:
                     utterance_id=generation,
                     metadata={"strategy": strategy_contract(self.native_strategy)},
                 )
+            if self.contextual_strategy.active and self.latest_snapshot and not self.latest_snapshot.mission_mode and not self.latest_snapshot.done:
+                self.select_contextual_strategy(None)
             mission = self.latest_snapshot is not None and self.latest_snapshot.mission_mode
             execution = (
                 "The mission brain keeps control; skirmish strategy is suspended"
@@ -2659,6 +2745,14 @@ class Companion:
             )
 
         try:
+            if proposal.instruction.startswith("contextual-strategy:"):
+                with self._contextual_strategy_lock:
+                    plan = self.contextual_strategy
+                    if proposal.instruction != f"contextual-strategy:{plan.active}":
+                        raise ValueError("The strategy changed")
+                    cost = plan.cost(snapshot, [command.as_dict() for command in proposal.commands])
+                    if plan.reserve and (cost is None or (cost > 0 and snapshot.cash + snapshot.ore - cost < plan.reserve)):
+                        raise ValueError("The step would spend the selected credit reserve")
             commands = self._validate_action_commands(
                 snapshot,
                 [command.as_dict() for command in proposal.commands],
@@ -2885,6 +2979,7 @@ class Companion:
                 else {**strategy_contract(self.native_strategy), "active_native_profile": self.native_profile}
             ),
             "has_snapshot": self.latest_snapshot is not None,
+            "contextual_strategy": self.contextual_strategy_state(),
             "pending_action": self.pending_action(),
             "pending_actions": self.pending_actions(),
             "threat": self.threat_status(),
