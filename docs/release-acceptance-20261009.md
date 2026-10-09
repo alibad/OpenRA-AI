@@ -15,7 +15,7 @@ Neither product requires owning Red Alert or Red Alert 2. Windows includes Class
 
 ## Source cleanup and preservation
 
-31 redundant or historical checkouts were retired: 44 reduced to 13. Eight primary repositories remain on main. The five additional folders are pinned native/browser engines, the preview/public mod build inputs and a generator-history source checkout. They are dependencies, not user-selectable product versions.
+32 redundant or historical checkouts were retired: 44 reduced to 12. Eight primary repositories remain on main. The four additional folders are the shared native/browser engine, the preview/public mod build inputs and a generator-history source checkout. They are dependencies, not user-selectable product versions.
 
 The tracked recovery index is `resources/history/workspace-retirement-20261009.json`; full snapshots and directory-link records are in `D:/rtsai-consolidation/cleanup-20261009/index.json`. Historical sources have recovery refs and archived dirty files. Their preservation does not claim that all historical engine/asset variants are runtime-integrated. Editable art, audio, maps, generators and film work remain recoverable. Regenerable dependencies can be installed from the archived lockfiles.
 
@@ -31,3 +31,11 @@ Unused interrupted backup files remain alongside the verified snapshots because 
 - `artifacts/consolidation-20261009/site-release-tests.log`, `online-peer-tests.log`, `online-installed-skirmish-tests.log`, `post-cleanup-native-tests.log`, `cleanup-final.log`, `canonical-studio-launch.log`
 
 The active roadmap retains clean-machine, cross-network, broader campaign/balance, historical Classic, voice review, Mac and trailer/signing work. No hosted CI or paid service was added.
+
+## Campaign, roster and voice follow-up
+
+Local native acceptance now records 228/228 assisted campaign-condition fixtures across both modes and all three difficulties; 160/160 bot matches across all sixteen factions completed without errors. The 140 capped draws leave competitive balance open. All 126 non-English voice clips passed integrity checks and received fresh ASR; three pronunciation listening priorities, 43 other review entries and all 126 fluent-speaker approvals remain open. This does not claim completed human campaign playthroughs.
+
+The canonical mod fixes secondary protection completion, exposes campaign difficulty, preserves objectives in smoke fixtures, and uses independent square-grid Classic fog/shroud masks. Existing custom resources remain preserved. Generators and regression checks retain those fixes. Public browser and installer artifacts were not redeployed.
+
+[Interactive native acceptance report](../../RTSAI-Mod/docs/acceptance-20261009/index.html) · [Scope, reproduction and remaining gates](../../RTSAI-Mod/docs/acceptance-20261009/README.md). Raw evidence: D:/rtsai-acceptance-20261009. The report includes Classic before/after screenshots and a playable voice-review queue.
