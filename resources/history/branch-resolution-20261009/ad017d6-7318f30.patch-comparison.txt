@@ -1,0 +1,77 @@
+1:  ad017d6 ! 1:  7318f30 Add Bab al-Mandab Passage campaign mission
+    @@ docs/red-sea-2026.md: supplies inland, disperse mobile assets before a surveilla
+     +- `bab-al-mandab-passage-2026`.
+      
+      The mission packages are reproducible via `scripts/build-red-sea-mission.py` and
+    - are listed under **Red Sea 2026** in the mission browser. Remaining release
+    + are listed in order under **OpenRA AI** in the mission browser. Remaining release
+     @@ docs/red-sea-2026.md: network-backed disclosed synthetic voice sources should be regenerated.
+      
+      ## Validation
+    @@ docs/red-sea-2026.md: network-backed disclosed synthetic voice sources should be
+     
+      ## engine/openra ##
+     @@
+    --Subproject commit 9b699898f9f1b3933082243281e4f4012aa48ab0
+    -+Subproject commit c00559119b1c6093b25beaab3a80f378814ef289
+    +-Subproject commit 69e693344bd07656dd03d8b86855d518b8254c7c
+    ++Subproject commit 30d2b8029f0084ca406736aa1a6303ee30d7da54
+     
+      ## missions/red-sea-2026/bab-al-mandab-passage/README.md (new) ##
+     @@
+    @@ services/companion/evals/test_mission_eval.py: class MissionCorpusEvalTests(unit
+          def test_every_declared_red_alert_mission_is_inventoried(self) -> None:
+              missions = inventory_missions()
+      
+    --        self.assertEqual(len(missions), 62)
+    -+        self.assertEqual(len(missions), 63)
+    +-        self.assertEqual(len(missions), 65)
+    ++        self.assertEqual(len(missions), 66)
+              self.assertTrue(all(mission.available for mission in missions))
+    --        self.assertEqual(len({mission.map_name for mission in missions}), 62)
+    -+        self.assertEqual(len({mission.map_name for mission in missions}), 63)
+    +-        self.assertEqual(len({mission.map_name for mission in missions}), 65)
+    ++        self.assertEqual(len({mission.map_name for mission in missions}), 66)
+      
+          def test_required_human_slots_are_detected_from_each_map(self) -> None:
+              missions = {mission.map_name: mission for mission in inventory_missions()}
+     @@ services/companion/evals/test_mission_eval.py: class MissionCorpusEvalTests(unittest.TestCase):
+    -         self.assertEqual(mission.player_slot, "Saudi Arabia")
+    -         self.assertEqual(missions["hodeidah-lifeline-2026"].request_name, "hodeidah-lifeline-2026.oramap")
+              self.assertEqual(missions["hodeidah-lifeline-2026"].player_slot, "Yemen")
+    +         self.assertEqual(missions["haitan-network-2026"].request_name, "haitan-network-2026.oramap")
+    +         self.assertEqual(missions["haitan-network-2026"].player_slot, "China")
+     +        self.assertEqual(missions["bab-al-mandab-passage-2026"].request_name, "bab-al-mandab-passage-2026.oramap")
+     +        self.assertEqual(missions["bab-al-mandab-passage-2026"].player_slot, "Saudi Arabia")
+      
+    @@ services/worldgen/tests/test_red_sea_assets.py: class RedSeaAssetTests(unittest.
+          def test_mission_package_is_deterministic_and_scripted(self) -> None:
+              required = {"map.yaml", "map.bin", "map.png", "rules.yaml", "map.ftl", "jizan-corridor.lua", "red-sea-mission-manifest.json"}
+              with zipfile.ZipFile(MISSION_PACKAGE) as mission:
+    -             self.assertTrue(required.issubset(mission.namelist()))
+    -             self.assertTrue(all(info.date_time == (2026, 8, 11, 0, 0, 0) for info in mission.infolist()))
+    -             map_yaml = mission.read("map.yaml").decode("utf-8")
+    --            rules = mission.read("rules.yaml").decode("utf-8")
+    -+            rules = mission.read("rules.yaml").decode("utf-8").replace("\r\n", "\n")
+    -             script = mission.read("jizan-corridor.lua").decode("utf-8")
+    -         self.assertIn("Visibility: MissionSelector", map_yaml)
+    -         self.assertIn("Faction: saudi", map_yaml)
+     @@ services/worldgen/tests/test_red_sea_assets.py: class RedSeaAssetTests(unittest.TestCase):
+    -         self.assertEqual(manifest["id"], "hodeidah-lifeline-2026")
+    -         self.assertEqual(len(manifest["features"]), 7)
+    +                 break
+    +             campaign.append(line)
+    +         self.assertEqual(
+    +-            ["jizan-corridor-2026", "hodeidah-lifeline-2026", "straits-shield-2026", "haitan-network-2026"],
+    ++            [
+    ++                "jizan-corridor-2026",
+    ++                "hodeidah-lifeline-2026",
+    ++                "straits-shield-2026",
+    ++                "haitan-network-2026",
+    ++                "bab-al-mandab-passage-2026",
+    ++            ],
+    +             [line.strip() for line in campaign if line.strip()],
+    +         )
+      
+     +    def test_mandab_is_a_deterministic_registered_playable_mission(self) -> None:
+     +        required = {

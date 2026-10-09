@@ -1,0 +1,81 @@
+1:  78d0801 ! 1:  96401da Deliver validated Turkey faction
+    @@ artifacts/turkey-faction/asset-build-telemetry.json (new)
+     @@
+     +ï»¿{
+     +    "schema":  "openra-ai.turkey-assets/v1",
+    -+    "generated_at":  "2026-08-12T07:11:31.0956979Z",
+    -+    "branch":  "codex/turkey-faction",
+    -+    "engine_commit":  "8d436c02090b6b7e53f2dba3d2b164065b8ce678",
+    ++    "generated_at":  "2026-08-12T08:37:49.0078235Z",
+    ++    "branch":  "main",
+    ++    "engine_commit":  "2ee9396c7a60ba48c801c6342c21b610eb0fb985",
+     +    "asset_packages":  54,
+     +    "frame_counts":  {
+     +                         "denizkaplanhusk":  64,
+    @@ docs/turkey-faction-validation.md (new)
+     @@
+     +# Turkey faction delivery and validation
+     +
+    -+Validated locally on 2026-08-12 from the dedicated worktree `OpenRA-AI-turkey` and branch `codex/turkey-faction`. No deployment or hosted CI was used.
+    ++Validated locally on 2026-08-12 first from the dedicated worktree `OpenRA-AI-turkey` and then from the exact canonical OpenRA `main` tree at `2ee9396c7a`. No deployment or hosted CI was used.
+     +
+     +## Delivered scope
+     +
+    @@ docs/turkey-faction-validation.md (new)
+     +powershell -NoProfile -ExecutionPolicy Bypass -File scripts\build-turkey-assets.ps1
+     +```
+     +
+    -+Result: exit 0 in 100.9 seconds against OpenRA commit `8d436c0209`. The build started with an empty Turkey staging directory, regenerated and installed 54 SHP packages, rebuilt the mission, and produced `artifacts/turkey-faction/asset-build-telemetry.json` with `validation: passed`. The shipped mission SHA-256 is `c55bb30b0cadcb863f5a7b3fb3ed2ccd515c0b9a9172ed7bce3019be08e6d90d`.
+    ++Result on integrated `main`: exit 0 in 125.2 seconds against OpenRA commit `2ee9396c7a`. The build started with an empty Turkey staging directory, regenerated and installed 54 SHP packages, rebuilt the mission, and produced `artifacts/turkey-faction/asset-build-telemetry.json` with `validation: passed`. The mission packer canonicalizes source line endings, and the shipped mission SHA-256 is reproducibly `c55bb30b0cadcb863f5a7b3fb3ed2ccd515c0b9a9172ed7bce3019be08e6d90d` across the feature and main worktrees.
+     +
+     +- Full OpenRA `--check-yaml` validation passed for the RA mod and every shipped map, including Straits Shield.
+     +- `--check-missing-sprites` passed for SNOW, INTERIOR, TEMPERAT, and DESERT.
+    -+- `services.worldgen.tests.test_turkey_faction`: 8/8 tests passed in 0.187 seconds.
+    ++- `services.worldgen.tests.test_turkey_faction`: 8/8 tests passed in 0.221 seconds on the final integrated `main` tree.
+     +- Selector contracts verify the `turkey` faction entry, its flag region, Random Allies membership, and exactly one matching chrome region.
+     +
+     +### Sprite frame and uniqueness audit
+    @@ docs/turkey-faction-validation.md (new)
+     +dotnet build OpenRA.sln -c Debug --nologo
+     +```
+     +
+    -+Result: exit 0 in 22.36 seconds; build succeeded with 75 analyzer warnings and 0 errors. The warnings are in unchanged pre-existing C# engine/AI bridge files; this faction commit adds no C# or custom engine code.
+    ++Result on integrated `main`: exit 0 in 24.37 seconds; build succeeded with 75 analyzer warnings and 0 errors. The warnings are in unchanged pre-existing C# engine/AI bridge files; this faction commit adds no C# or custom engine code.
+     +
+     +### Live mission movement and combat
+     +
+    @@ docs/turkey-faction-validation.md (new)
+     
+      ## engine/openra ##
+     @@
+    --Subproject commit 4dead6a150091b41a9b1a0719d224d7dfef8ef22
+    -+Subproject commit 8d436c02090b6b7e53f2dba3d2b164065b8ce678
+    +-Subproject commit 5eef3e21896e1b61f19ac300e79d5dadf1664b41
+    ++Subproject commit 2ee9396c7a60ba48c801c6342c21b610eb0fb985
+     
+      ## missions/turkey-faction/straits-shield/README.md (new) ##
+     @@
+    @@ scripts/build-turkey-mission.py (new)
+     +OUTPUT=ROOT/"generated"/"missions"/"straits-shield-2026.oramap"
+     +INSTALL=ROOT/"engine"/"openra"/"mods"/"ra"/"maps"/"straits-shield-2026.oramap"
+     +FIXED_TIME=(2026,8,12,0,0,0)
+    ++TEXT_SUFFIXES={".ftl",".json",".lua",".md",".txt",".yaml",".yml"}
+     +
+     +
+     +def info(name: str) -> zipfile.ZipInfo:
+     +	result=zipfile.ZipInfo(name,FIXED_TIME); result.compress_type=zipfile.ZIP_DEFLATED; result.external_attr=0o644<<16; return result
+     +
+     +
+    ++def source_bytes(path: Path) -> bytes:
+    ++	data=path.read_bytes()
+    ++	if path.suffix.lower() in TEXT_SUFFIXES:
+    ++		return data.replace(b"\r\n",b"\n").replace(b"\r",b"\n")
+    ++	return data
+    ++
+    ++
+     +def main() -> int:
+    -+	files={path.name:path.read_bytes() for path in sorted(SOURCE.iterdir()) if path.is_file() and path.name not in {"README.md"}}
+    ++	files={path.name:source_bytes(path) for path in sorted(SOURCE.iterdir()) if path.is_file() and path.name not in {"README.md"}}
+     +	files["map.bin"]=(TERRAIN/"map.bin").read_bytes(); files["map.png"]=(TERRAIN/"map.png").read_bytes()
+     +	manifest={
+     +		"schema":"openra-ai.scripted-mission/v1",

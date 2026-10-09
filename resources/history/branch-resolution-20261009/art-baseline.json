@@ -1,0 +1,62 @@
+[
+  {
+    "path": "mods/ra/bits/sa_frgt.shp",
+    "baselineSha256": "6876ae724242848b5969dfb2b76d7712837eec4521ae4c62d5accd36f764ba43",
+    "canonicalSha256": "3c03b3ad09b58f321747b5695f76288e47226f28c977725796a8a0fbb2a1eca4",
+    "decision": "Keep newer reviewed canonical sprite; original baseline remains in merged Git ancestry and the verified cleanup bundle."
+  },
+  {
+    "path": "mods/ra/bits/sa_frgt_turret.shp",
+    "baselineSha256": "ad65047b458ee6f3898b099ed868046f0f3816d17865d0ebe770331023a7a407",
+    "canonicalSha256": "2ec6d4229fbc7132d6247fb619a2ac967a0ccd1618c118809b1de098da1335d6",
+    "decision": "Keep newer reviewed canonical sprite; original baseline remains in merged Git ancestry and the verified cleanup bundle."
+  },
+  {
+    "path": "mods/ra/bits/sa_fss.shp",
+    "baselineSha256": "bc32c8786917845bde77331a7910ac6fd326cb8bda696090e6ca163f07792876",
+    "canonicalSha256": "3df214b8cf70e6feb0e9c3d59f45bd15a764b8990a5f4cbfc3564bdd4457cebb",
+    "decision": "Keep newer reviewed canonical sprite; original baseline remains in merged Git ancestry and the verified cleanup bundle."
+  },
+  {
+    "path": "mods/ra/bits/sa_intc.shp",
+    "baselineSha256": "4a10e2e7f492ed7f7e6c045ce21681d5bc5ac280b6ca29c7e5c7e77cbc2f6759",
+    "canonicalSha256": "4e9c1151d5835675ebecb685e69e332266615ac0f446b1c1ff98acf30df1e0b4",
+    "decision": "Keep newer reviewed canonical sprite; original baseline remains in merged Git ancestry and the verified cleanup bundle."
+  },
+  {
+    "path": "mods/ra/bits/sa_intc_turret.shp",
+    "baselineSha256": "9959d7b85b0efb4d93396278157963c251565247d1e4f2fbbd869f1e628fb60d",
+    "canonicalSha256": "66184ffd675371f56b59796f1ae157924092e6300bc403ef7c0bcae19b53294b",
+    "decision": "Keep newer reviewed canonical sprite; original baseline remains in merged Git ancestry and the verified cleanup bundle."
+  },
+  {
+    "path": "mods/ra/bits/ye_mslc.shp",
+    "baselineSha256": "cb338fc165c2fa42cab91ed43f029341b5c9469d69017337cce4c9db38439b42",
+    "canonicalSha256": "4476c413c7d0ad6a923d9a2d87e5a5808123fd7035637d88136dd96f5e27a031",
+    "decision": "Keep newer reviewed canonical sprite; original baseline remains in merged Git ancestry and the verified cleanup bundle."
+  },
+  {
+    "path": "mods/ra/bits/ye_mslc_turret.shp",
+    "baselineSha256": "9959d7b85b0efb4d93396278157963c251565247d1e4f2fbbd869f1e628fb60d",
+    "canonicalSha256": "66184ffd675371f56b59796f1ae157924092e6300bc403ef7c0bcae19b53294b",
+    "decision": "Keep newer reviewed canonical sprite; original baseline remains in merged Git ancestry and the verified cleanup bundle."
+  },
+  {
+    "path": "mods/ra/bits/ye_surve.shp",
+    "baselineSha256": "b22c801b7d471d860a0c978f600f590345e24d2d2cb6671cf5f8592b45bedf64",
+    "canonicalSha256": "9a40938f9c11fbe0b410a04ae55790b6e10e995f356f1b7ab06a491497ebfe41",
+    "decision": "Keep newer reviewed canonical sprite; original baseline remains in merged Git ancestry and the verified cleanup bundle."
+  },
+  {
+    "path": "mods/ra/bits/ye_surve_turret.shp",
+    "baselineSha256": "9959d7b85b0efb4d93396278157963c251565247d1e4f2fbbd869f1e628fb60d",
+    "canonicalSha256": "66184ffd675371f56b59796f1ae157924092e6300bc403ef7c0bcae19b53294b",
+    "decision": "Keep newer reviewed canonical sprite; original baseline remains in merged Git ancestry and the verified cleanup bundle."
+  },
+  {
+    "path": "mods/ra/bits/ye_usv.shp",
+    "baselineSha256": "4d9a6909fe80ae0032c52eefa66c12e9a4829cfea9d29ddcbc65ef1ef208df86",
+    "canonicalSha256": "6ad51f11a126c41c6a2117cdbfddae61906aa34e34490f4ba26f6ea2af67e8fb",
+    "decision": "Keep newer reviewed canonical sprite; original baseline remains in merged Git ancestry and the verified cleanup bundle."
+  }
+]

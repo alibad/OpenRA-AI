@@ -1,0 +1,54 @@
+{
+  "previousNativePin": "68c1e955578d804921f4907753af932fa7ed0e14",
+  "sharedEnginePin": "aed51fe4b1c699b487b9f9683dbc79215f3a96be",
+  "sharedEngineBranch": "rtsai/engine",
+  "browserDefault": "OpenRA-wt-rtsai-engine",
+  "optionalBrowserChanges": [
+    {
+      "path": "OpenRA.Game/GameRules/Ruleset.cs",
+      "gitObject": "ce608aba2be8c175f00645ba5ab0ac7fb236ac27",
+      "sha256": "a7a95bff050c359b6f329f4f2692329d5884d8ade5217a14f18419623e39ce2e"
+    },
+    {
+      "path": "OpenRA.Game/Graphics/SheetBuilder.cs",
+      "gitObject": "150dd2be273b975f4aa785941c12718d3c6ca66f",
+      "sha256": "7f7133808f58f2830b405f7738ec99113d5d58388d0f5e69f098bde45e771ae2"
+    },
+    {
+      "path": "OpenRA.Game/Graphics/SpriteCache.cs",
+      "gitObject": "d39636512dcdfe82e9141a0e34b478136fa14479",
+      "sha256": "ca3fbd7cec87a01996d97fc050a9bf19a73b08e9d3811374c4d33124b58ce448"
+    },
+    {
+      "path": "OpenRA.Game/Graphics/SpriteRenderable.cs",
+      "gitObject": "ee7b87c59ccd95bbd0c7748e2bff795543934317",
+      "sha256": "8f71358b6061dab286d131c4196d356789e3f64a3e63adfd5817f7bc8be8d7d5"
+    },
+    {
+      "path": "OpenRA.Game/Map/MapCache.cs",
+      "gitObject": "8f79b48103e250bca15d4dea5a791931437ca76a",
+      "sha256": "f8db20cb6ce233dc7051e6c6e2783ef04845a9b4164be1cb4e94d1a490d01dff"
+    },
+    {
+      "path": "OpenRA.Game/ObjectCreator.cs",
+      "gitObject": "7f41f62d2bd17d040ac764b7314c5a694d32fef8",
+      "sha256": "39db7d0622a574801595efc066cb35a2ce69beaa1b6b7d4bc0fe788655c28dea"
+    },
+    {
+      "path": "OpenRA.Game/OpenRA.Game.csproj",
+      "gitObject": "646f9011b9560a3ffafd1449a71b338a69b9af3f",
+      "sha256": "b970543c27126b122212b2e843406033f54f29ac93c8882937f4b7a2dcf05fbd"
+    },
+    {
+      "path": "OpenRA.Game/Sound/Sound.cs",
+      "gitObject": "12d9221bbb15ff72f5a29705935d524b913b2206",
+      "sha256": "8b122eaa1a1abb17cc3646c582aaaf3a18bbff2c3124366ef4b6120030a6822a"
+    },
+    {
+      "path": "OpenRA.Game/Support/Log.cs",
+      "gitObject": "8fb6b69be5ba26d0bd9f3f11b7507bde7cc22ec0",
+      "sha256": "b6bfa7a4a486b4773e75d337c02d7f2592b2706d6f07d5e9a37ef2132a8767bf"
+    }
+  ],
+  "legacyResolution": "Compatible fixes backported; historical float2/float3 ABI retained. Full upstream Vector2/Vector3 migration is already in shared product engine."
+}

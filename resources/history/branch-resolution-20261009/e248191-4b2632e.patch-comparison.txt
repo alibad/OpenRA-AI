@@ -1,0 +1,39 @@
+1:  e248191 ! 1:  4b2632e Add Red Sea infantry and experience authoring systems
+    @@ README.md: OpenRA map package that remains editable by hand.
+     +Its first playable theater is the scripted Red Sea 2026 vertical slice:
+      Saudi Arabia and Yemen, original directional sprites, Arabic vehicle responses,
+      bilingual campaign radio, native bot production weights, and a source-dated
+    - two-mission campaign slice. After setup, run `Play-Red-Sea-2026.cmd` to generate,
+    -@@ README.md: validate, install, and open Jizan Corridor, or run
+    - `.\scripts\play-red-sea-2026.ps1 -Mission hodeidah-lifeline-2026` to play the
+    - Yemen-side Hodeidah Lifeline mission.
+    + three-mission campaign slice. After setup, run `Play-Red-Sea-2026.cmd` to generate,
+    +@@ README.md: The third mission is available with
+    + Tech Center progression, coastal reconnaissance, actual civilian ship lanes,
+    + deadlock recovery, and a final combined-arms passage defense.
+      
+     -See [Red Sea 2026 vertical slice](docs/red-sea-2026.md).
+     +See the [Red Sea 2026 theater](docs/red-sea-2026.md).
+    @@ docs/red-sea-2026.md: Arabic with bilingual subtitles.
+      objectives require the player to protect civilian infrastructure, escort relief
+      supplies inland, disperse mobile assets before a surveillance sweep, and cover
+      the evacuation convoy on its return. Saudi combined-arms waves, the sweep
+    -@@ docs/red-sea-2026.md: The two playable contracts are:
+    - - `hodeidah-lifeline-2026`.
+    +@@ docs/red-sea-2026.md: The three playable contracts are:
+    + - `bab-al-mandab-passage-2026`.
+      
+      The mission packages are reproducible via `scripts/build-red-sea-mission.py` and
+     -are listed in order under **OpenRA AI** in the mission browser. Remaining release
+    @@ docs/upstream-reuse/sources.json (new)
+     +  ]
+     +}
+     
+    - ## engine/openra ##
+    -@@
+    --Subproject commit 4dead6a150091b41a9b1a0719d224d7dfef8ef22
+    -+Subproject commit 4fd8f8da0999a40dcf5b58464c8473e857e062ee
+    -
+      ## missions/red-sea-2026/hodeidah-lifeline/map.yaml ##
+     @@ missions/red-sea-2026/hodeidah-lifeline/map.yaml: Actors:
+      	YemenRadar: dome

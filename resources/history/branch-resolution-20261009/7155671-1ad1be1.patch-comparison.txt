@@ -1,0 +1,10 @@
+1:  7155671 ! 1:  1ad1be1 Validate modular faction profiles
+    @@ Commit message
+     
+      ## engine/openra ##
+     @@
+    --Subproject commit 0062dca4468f32291deb9a21ad780c2419722d00
+    +-Subproject commit a830b4da7c8e596eff99b5acc55bdf6213439be7
+     +Subproject commit e410de7265818eee8c007c7f93154d9b363c90fc
+     
+      ## scripts/check.ps1 ##

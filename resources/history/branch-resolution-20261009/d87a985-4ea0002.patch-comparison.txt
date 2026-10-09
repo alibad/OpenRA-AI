@@ -1,0 +1,12 @@
+1:  d87a985 ! 1:  4ea0002 Build complete China faction
+    @@ docs/china-faction-validation.md (new)
+     
+      ## engine/openra ##
+     @@
+    --Subproject commit 4dead6a150091b41a9b1a0719d224d7dfef8ef22
+    -+Subproject commit a5ae3f69e04d297f60b29cacc55b93fc75f9975f
+    +-Subproject commit 95fe7982edb94ea9e3e49821a9563463dce84d20
+    ++Subproject commit 69e693344bd07656dd03d8b86855d518b8254c7c
+     
+      ## missions/china-faction/ai-build-contract/README.md (new) ##
+     @@

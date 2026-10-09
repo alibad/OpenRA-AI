@@ -51,9 +51,10 @@ The browser model co-commander uses a local companion service. Native bots, tact
 - [x] Commit loose art models/candidates and film resources on their main branches.
 - [x] Preserve 5,104 legacy resource entries; verify 4,019 installed original-content resources.
 - [x] Preserve and hash-check 182 changed entries from six older overlapping companion/faction/installer branches in `resources/history/branch-variants-20261009.zip` with a tracked index.
-- [ ] Resolve older branch variants and engine differences without replacing newer reviewed assets or intentional build targets blindly.
+- [x] Reconcile the six historical companion/faction branches with their existing main integrations; retain newer reviewed assets and verify all 182 historical entries.
+- [x] Unify native/browser engine inputs on published `rtsai/engine` revision `aed51fe4b1`; backport compatible rotation, missile, model-depth and headless fixes to historical OpenRA main. The older Classic rendering ABI remains intentionally separate. See `engine-branch-resolution-20261009.md` for file decisions and validation.
 - [x] Retire 31 redundant/historical workspaces with verified snapshots and recovery refs; 44 checkouts reduced to 13. Index: `resources/history/workspace-retirement-20261009.json`. Five retained extra folders support native/browser builds, preview tooling and pinned generator history.
 
-Native slim and browser engine branches are build dependencies with different runtime requirements. Older worktree folders are not additional game releases. Research, generated alternatives and superseded installers remain source history; preservation is distinct from runtime activation.
+Native and browser consumers now share one engine input. Browser runtime adaptations are optional or guarded; their previous engine branch remains a historical reference. Historical Classic main retains its older rendering ABI with compatible fixes backported. Older worktree folders are not additional game releases. Research, generated alternatives and superseded installers remain source history; preservation is distinct from runtime activation.
 
 The owner explicitly requested online downloads and end-to-end testing on 9 October. Windows and the static web build were published for that request. No hosted CI, paid service or certificate purchase was added.

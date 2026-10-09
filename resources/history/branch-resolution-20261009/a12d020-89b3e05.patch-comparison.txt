@@ -1,0 +1,41 @@
+1:  a12d020 ! 1:  89b3e05 Build playable Iran faction
+    @@ docs/iran-faction-research.md (new)
+     +- Numerical balance is tuned against stock Red Alert costs and time-to-kill,
+     +  but competitive balance remains a subjective playtest concern.
+     
+    - ## engine/openra ##
+    -@@
+    --Subproject commit 4dead6a150091b41a9b1a0719d224d7dfef8ef22
+    -+Subproject commit e1e11e6934ebd004467a77dd6fb773dcd12f4b2d
+    -
+      ## scripts/build-iran-assets.ps1 (new) ##
+     @@
+     +[CmdletBinding()]
+    @@ scripts/build-iran-sprites.py (new)
+     +    raise SystemExit(main())
+     
+      ## scripts/build-red-sea-ui.py ##
+    -@@
+    --"""Build deterministic HiDPI Red Sea faction flags for the OpenRA chrome atlas."""
+    -+"""Build deterministic HiDPI regional faction flags for the OpenRA chrome atlas."""
+    - 
+    - from __future__ import annotations
+    - 
+    -@@ scripts/build-red-sea-ui.py: def draw_yemen_flag(draw: ImageDraw.ImageDraw, scale: int) -> None:
+    -     draw.rectangle((x, y + 2 * band, x + width - 1, y + 3 * band - 1), fill=(0, 0, 0, 255))
+    +@@ scripts/build-red-sea-ui.py: def draw_turkey_flag(draw: ImageDraw.ImageDraw, scale: int) -> None:
+    +     draw.polygon(points, fill=(255, 255, 255, 255))
+      
+      
+     +def draw_iran_flag(draw: ImageDraw.ImageDraw, scale: int) -> None:
+    @@ scripts/build-red-sea-ui.py: def draw_yemen_flag(draw: ImageDraw.ImageDraw, scal
+          suffix = "" if scale == 1 else f"-{scale}x"
+          source = UIBITS / f"glyphs{suffix}.png"
+     @@ scripts/build-red-sea-ui.py: def build_density(scale: int) -> Path:
+    -     draw = ImageDraw.Draw(atlas)
+          draw_saudi_flag(draw, scale)
+          draw_yemen_flag(draw, scale)
+    +     draw_turkey_flag(draw, scale)
+     +    draw_iran_flag(draw, scale)
+          atlas.save(output, optimize=True)
+          return output

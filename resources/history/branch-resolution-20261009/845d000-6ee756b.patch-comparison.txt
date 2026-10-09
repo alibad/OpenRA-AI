@@ -1,0 +1,13 @@
+1:  845d000 ! 1:  6ee756b Complete China faction coverage and validation
+    @@ docs/china-faction-validation.md: The three tactical evidence frames are transpa
+     -The committed SHP/WAV/mission assets are already playable; regeneration is only required when changing source art, audio, or mission inputs.
+     +Select `China` in a skirmish, or open Missions -> OpenRA AI -> `03: Haitan Network`. The committed SHP/WAV/mission assets are already playable; regeneration is only required when changing source art, audio, or mission inputs.
+     
+    - ## engine/openra ##
+    -@@
+    --Subproject commit a5ae3f69e04d297f60b29cacc55b93fc75f9975f
+    -+Subproject commit 667687c52f2d826dcb5f04581698e0f7b93c6fb6
+    -
+      ## missions/china-faction/ai-build-contract/README.md ##
+     @@
+      

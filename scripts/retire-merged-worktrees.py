@@ -28,7 +28,21 @@ def regular_files(p):
  regular_files.links=links
 
 def main():
- parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--execute',action='store_true');a=parser.parse_args()
+ parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--execute',action='store_true');parser.add_argument('--validation-record',type=Path);a=parser.parse_args()
+ if a.execute:
+  if not a.validation_record:raise RuntimeError('Canonical validation record required before any retirement')
+  validation=json.loads(a.validation_record.read_text())
+  if validation.get('status')!='passed' or not validation.get('repositories'):raise RuntimeError('Canonical validation did not pass')
+  names={Path(entry['path']).name for entry in validation['repositories']}
+  if not {'OpenRA','OpenRA-AI','RTSAI-Mod','RTSAI-WebGame'}.issubset(names):raise RuntimeError('Missing core canonical tree validation')
+  for entry in validation['repositories']:
+   canonical=Path(entry['path']).resolve()
+   if canonical.parent!=ROOT.resolve():raise RuntimeError('Validation path outside primary workspace')
+   if git(canonical,'rev-parse','main^{tree}')!=entry['tree']:raise RuntimeError('Canonical tree changed since validation')
+   if git(canonical,'status','--porcelain'):raise RuntimeError('Canonical checkout is dirty')
+   if not entry.get('checks'):raise RuntimeError('Missing validation checks')
+   for check in entry['checks']:
+    if check['exitCode']!=0 or digest(Path(check['log']))!=check['sha256']:raise RuntimeError('Validation evidence failed or changed')
  inventory=json.loads((ROOT/'artifacts/consolidation-20261009/workspace-state-before-cleanup.json').read_text());records=json.loads((BACKUP/'index.json').read_text());by_path={r['path']:r for r in records}
  for repo in inventory['repositories']:
   primary=Path(repo['path']).resolve()

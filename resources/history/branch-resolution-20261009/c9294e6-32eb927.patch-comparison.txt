@@ -1,0 +1,10 @@
+1:  c9294e6 ! 1:  32eb927 Validate live Red Sea air warfare
+    @@ docs/air-warfare-validation.md (new)
+      ## engine/openra ##
+     @@
+     -Subproject commit 6425899ad1d23a6bb81f0c8263b5fc3260c480f1
+    -+Subproject commit 4dead6a150091b41a9b1a0719d224d7dfef8ef22
+    ++Subproject commit 5eef3e21896e1b61f19ac300e79d5dadf1664b41
+     
+      ## services/worldgen/tests/test_air_warfare_assets.py ##
+     @@ services/worldgen/tests/test_air_warfare_assets.py: def test_samad_is_one_way_and_has_distinct_dive_sequence() -> None:
