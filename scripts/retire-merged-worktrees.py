@@ -35,6 +35,9 @@ def main():
   if validation.get('status')!='passed' or not validation.get('repositories'):raise RuntimeError('Canonical validation did not pass')
   names={Path(entry['path']).name for entry in validation['repositories']}
   if not {'OpenRA','OpenRA-AI','RTSAI-Mod','RTSAI-WebGame'}.issubset(names):raise RuntimeError('Missing core canonical tree validation')
+  shared=validation.get('sharedEngine')
+  if not shared or git(ROOT/'OpenRA','rev-parse','rtsai/engine')!=shared:raise RuntimeError('Shared engine changed since validation')
+  if (ROOT/'RTSAI-Mod/engine/VERSION').read_text().strip()!=shared:raise RuntimeError('Exported engine changed since validation')
   for entry in validation['repositories']:
    canonical=Path(entry['path']).resolve()
    if canonical.parent!=ROOT.resolve():raise RuntimeError('Validation path outside primary workspace')

@@ -1,8 +1,8 @@
 {
   "captured": "2026-10-09",
   "initialCheckouts": 44,
-  "activeCheckouts": 13,
-  "retiredCheckouts": 31,
+  "activeCheckouts": 12,
+  "retiredCheckouts": 32,
   "fullSnapshotIndex": "D:\\rtsai-consolidation\\cleanup-20261009\\index.json",
   "policy": "Historical source is archived and indexed, not falsely marked as runtime-integrated. Linked targets are preserved in canonical sources or indexed snapshots. Regenerable dependencies are recoverable from lockfiles.",
   "snapshots": [
@@ -374,6 +374,17 @@
       "status": "retired",
       "directoryLinks": 0,
       "sourceChanges": 0
+    },
+    {
+      "path": "C:\\Users\\Admin\\Code\\hq\\games\\OpenRA-wt-web",
+      "head": "aed51fe4b1c699b487b9f9683dbc79215f3a96be",
+      "replacement": "C:\\Users\\Admin\\Code\\hq\\games\\OpenRA-wt-rtsai-engine",
+      "archive": "D:\\rtsai-consolidation\\engine-resolution-20261009\\OpenRA-wt-web-source.zip",
+      "sha256": "8a9f69c29d3d7d53e0d88c061c38f2d39d69c508e5ed5196d676401e6b348323",
+      "status": "retired after exact canonical validation",
+      "excluded": "Regenerable ignored bin/obj outputs; no untracked source files or directory links",
+      "validationRecord": "D:\\rtsai-consolidation\\engine-resolution-20261009\\canonical-validation.json"
     }
-  ]
+  ],
+  "additionalValidationIndex": "D:/rtsai-consolidation/engine-resolution-20261009/canonical-validation.json"
 }

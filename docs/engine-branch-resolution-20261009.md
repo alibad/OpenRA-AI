@@ -84,8 +84,10 @@ All 182 original archive entries were verified before reconciliation.
 Local evidence is under `artifacts/consolidation-20261009` in the workspace:
 
 - OpenRA engine: 609 passed, two existing PNG tests skipped; complete Release build, zero warnings/errors.
+- Shared product engine: 518 passed, two existing PNG tests skipped.
 - OpenRA-AI: 398 companion tests (three skips), 73 worldgen tests and 31 gameplay evals passed.
 - RTSAI-Mod: shared-engine Release build and full native content/standalone/audio checks passed.
+- Both standalone native modes ran rendered skirmishes for 40 seconds, with recorded replays and no early exits. All 5,104 preserved entries and 4,019 installed resources verify.
 - RTSAI-WebGame: builds against the shared engine; recorded browser orders produce 500 matching native/AOT hashes. Interpreter replay also matches 500 hashes.
 
 Bots choose orders independently in a non-replay fidelity run, so that run is not
@@ -99,3 +101,10 @@ clean checkout state, a verified recovery snapshot, absence of unique commits
 relative to its replacement target, and absence of directory links are checked.
 The shared engine worktree remains a required input. Frozen public mod content,
 art preview and generator-history inputs remain until their consumers are ported.
+
+The duplicate `OpenRA-wt-web` checkout was subsequently retired only after the
+exact canonical main trees were validated and clean. Its source ZIP, checksum,
+replacement revision, source bundles and tested-tree evidence are saved under
+`D:/rtsai-consolidation/engine-resolution-20261009`. It contained no unique
+commits, untracked source files or directory links. Twelve checkouts remain:
+eight primary repositories and four required source/build inputs.
