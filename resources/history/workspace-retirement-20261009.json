@@ -1,0 +1,379 @@
+{
+  "captured": "2026-10-09",
+  "initialCheckouts": 44,
+  "activeCheckouts": 13,
+  "retiredCheckouts": 31,
+  "fullSnapshotIndex": "D:\\rtsai-consolidation\\cleanup-20261009\\index.json",
+  "policy": "Historical source is archived and indexed, not falsely marked as runtime-integrated. Linked targets are preserved in canonical sources or indexed snapshots. Regenerable dependencies are recoverable from lockfiles.",
+  "snapshots": [
+    {
+      "path": "C:\\Users\\Admin\\Code\\hq\\games\\RTSAI-Mod-wt-art",
+      "head": "9f5092c8f80b85f2c06735ab4fd00c49178e5f04",
+      "archive": "D:\\rtsai-consolidation\\cleanup-20261009\\RTSAI-Mod-wt-art.zip",
+      "sha256": "28809bef47ad3f1ec5871395373010e8f83841c986f299ba1834a5cf85575cc7",
+      "files": 5407,
+      "bytes": 171517557,
+      "status": "retired",
+      "directoryLinks": 0,
+      "sourceChanges": 0
+    },
+    {
+      "path": "C:\\Users\\Admin\\Code\\hq\\games\\RTSAI-Mod-wt-balance",
+      "head": "bb327d3936382a0f4b96231f715f1bc58c822f53",
+      "archive": "D:\\rtsai-consolidation\\cleanup-20261009\\RTSAI-Mod-wt-balance.zip",
+      "sha256": "ad577c7706a3af3825c7def8c4be5d245667199cfe247bdc937c9984dca4229c",
+      "files": 5465,
+      "bytes": 172307441,
+      "status": "retired",
+      "directoryLinks": 0,
+      "sourceChanges": 0
+    },
+    {
+      "path": "C:\\Users\\Admin\\Code\\hq\\games\\RTSAI-Mod-wt-hezbollah",
+      "head": "edd904b7dec537fc9d1c11ba15b745541d1c59a8",
+      "archive": "D:\\rtsai-consolidation\\cleanup-20261009\\RTSAI-Mod-wt-hezbollah.zip",
+      "sha256": "78d9507d4db4d549338cf60338a5e608e5ee04209983b2cf8d5c913103f5d93c",
+      "files": 6435,
+      "bytes": 193675376,
+      "status": "retired",
+      "directoryLinks": 0,
+      "sourceChanges": 0
+    },
+    {
+      "path": "C:\\Users\\Admin\\Code\\hq\\games\\RTSAI-Mod-wt-runtime",
+      "head": "e9f5b3dc6c306843c898376ee8fd65a39e366fc9",
+      "archive": "D:\\rtsai-consolidation\\cleanup-20261009\\RTSAI-Mod-wt-runtime.zip",
+      "sha256": "14d24733c5b35f41dcc960352609a9cbef7755ddd87001dd055d9a9b59295323",
+      "files": 6043,
+      "bytes": 324112502,
+      "status": "retired",
+      "directoryLinks": 0,
+      "sourceChanges": 0
+    },
+    {
+      "path": "C:\\Users\\Admin\\Code\\hq\\games\\RTSAI-Mod-wt-standalone",
+      "head": "0d8ce5e4f524feeeb8cf70aa7109d54ec15e69a2",
+      "archive": "D:\\rtsai-consolidation\\cleanup-20261009\\RTSAI-Mod-wt-standalone.zip",
+      "sha256": "38246b1cd4a7ea9700375692eaccac3e5ec93447c5e7d704c8d4f4fe7d5b02f3",
+      "files": 8930,
+      "bytes": 333623365,
+      "status": "retired",
+      "directoryLinks": 0,
+      "sourceChanges": 0
+    },
+    {
+      "path": "C:\\Users\\Admin\\Code\\hq\\games\\RTSAI-Mod-wt-standalone-art",
+      "head": "c3e6cf44e45c66d5e25c7aa45aa88c6508d79252",
+      "archive": "D:\\rtsai-consolidation\\cleanup-20261009\\RTSAI-Mod-wt-standalone-art.zip",
+      "sha256": "24901f53581f94d070cf6ff9d5fcaef15440c70a57206c970ae7a4397cc626e0",
+      "files": 4335,
+      "bytes": 224023206,
+      "status": "retired",
+      "directoryLinks": 1,
+      "sourceChanges": 0
+    },
+    {
+      "path": "C:\\Users\\Admin\\Code\\hq\\games\\RTSAI-Mod-wt-standalone-audio",
+      "head": "27cfcdcc091a57a33fc10179b8a8405d4f9d976b",
+      "archive": "D:\\rtsai-consolidation\\cleanup-20261009\\RTSAI-Mod-wt-standalone-audio.zip",
+      "sha256": "91905dd58d64d9d65c09344c05df9f7582038ed0fc8512f69cb8de997e3b3553",
+      "files": 4036,
+      "bytes": 197450537,
+      "status": "retired",
+      "directoryLinks": 1,
+      "sourceChanges": 0
+    },
+    {
+      "path": "C:\\Users\\Admin\\Code\\hq\\games\\RTSAI-Mod-wt-voices",
+      "head": "c796ac2be49281b5756ea928aeaed3b603cce5c3",
+      "archive": "D:\\rtsai-consolidation\\cleanup-20261009\\RTSAI-Mod-wt-voices.zip",
+      "sha256": "f15165b68c7256f5fefbca846b837adaabbf230e40a6b75b241722caca97f94d",
+      "files": 6175,
+      "bytes": 182190909,
+      "status": "retired",
+      "directoryLinks": 0,
+      "sourceChanges": 0
+    },
+    {
+      "path": "C:\\Users\\Admin\\Code\\hq\\games\\OpenRA-AI-wt-hezbollah",
+      "head": "51c04ebfa405887744d6b600c23b37088244bf74",
+      "archive": "D:\\rtsai-consolidation\\cleanup-20261009\\OpenRA-AI-wt-hezbollah.zip",
+      "sha256": "260132746a6af3ddba0b352f960f77fa8c9f7ac9cfd2eb88ad9bb875b26331ba",
+      "files": 778,
+      "bytes": 75811989,
+      "status": "retired",
+      "directoryLinks": 0,
+      "sourceChanges": 0
+    },
+    {
+      "path": "C:\\Users\\Admin\\Code\\hq\\games\\OpenRA-AI-wt-in-game-catalog",
+      "head": "b94eb286b087214621dccfc1e64944b4ea6e0377",
+      "archive": "D:\\rtsai-consolidation\\cleanup-20261009\\OpenRA-AI-wt-in-game-catalog.zip",
+      "sha256": "3c4d62939f24bf7affbf7d70c59b224d2fece51e84e52c4b19b6d8f076e0ec53",
+      "files": 6288,
+      "bytes": 316923187,
+      "status": "retired",
+      "engineBundle": {
+        "path": "D:\\rtsai-consolidation\\cleanup-20261009\\OpenRA-AI-wt-in-game-catalog-engine.bundle",
+        "sha256": "22e3c6095704a6c37a22bf6792d09af015319bf1948989d53603489cb2afb488"
+      },
+      "directoryLinks": 0,
+      "sourceChanges": 0
+    },
+    {
+      "path": "C:\\Users\\Admin\\Code\\hq\\games\\OpenRA-AI-wt-integrator",
+      "head": "565cd77e7b9701c67d0bf18af94bcbbbbaa8b1f9",
+      "archive": "D:\\rtsai-consolidation\\cleanup-20261009\\OpenRA-AI-wt-integrator.zip",
+      "sha256": "2b94df72ba0db0e226ae58e374d5f32d0ce9c5918b353d4c9cf7b240e2ec2369",
+      "files": 5530,
+      "bytes": 229600046,
+      "status": "retired",
+      "engineBundle": {
+        "path": "D:\\rtsai-consolidation\\cleanup-20261009\\OpenRA-AI-wt-integrator-engine.bundle",
+        "sha256": "4c141f035cccb1ab280f9435e45c983072ba96d3d8ef59fa867c1b95804fe119"
+      },
+      "directoryLinks": 0,
+      "sourceChanges": 0
+    },
+    {
+      "path": "C:\\Users\\Admin\\Code\\hq\\games\\OpenRA-AI-wt-narrative",
+      "head": "96171fbc07f4eaeafc91e3bba51f357b62357afe",
+      "archive": "D:\\rtsai-consolidation\\cleanup-20261009\\OpenRA-AI-wt-narrative.zip",
+      "sha256": "5f5c2bd8dfd8e484bf6d70e0214ebcfc5bba4d0e2e79b5e6e3ebf66a6b0ae82b",
+      "files": 779,
+      "bytes": 75874880,
+      "status": "retired",
+      "directoryLinks": 0,
+      "sourceChanges": 0
+    },
+    {
+      "path": "C:\\Users\\Admin\\Code\\hq\\games\\OpenRA-AI-wt-runtime",
+      "head": "ebb61e0f536a57fa0e92059e5bfe8e0bb80a8f66",
+      "archive": "D:\\rtsai-consolidation\\cleanup-20261009\\OpenRA-AI-wt-runtime.zip",
+      "sha256": "715e675a4fdbf0de7b4540e01459a7cbd57e5e21cb57e5c1e89d019f98a424da",
+      "files": 762,
+      "bytes": 75706466,
+      "status": "retired",
+      "directoryLinks": 0,
+      "sourceChanges": 0
+    },
+    {
+      "path": "C:\\Users\\Admin\\Code\\hq\\games\\OpenRA-AI-wt-usa-concept",
+      "head": "503bfa5db231e050aeb4e9d45e8847b056d5687a",
+      "archive": "D:\\rtsai-consolidation\\cleanup-20261009\\OpenRA-AI-wt-usa-concept.zip",
+      "sha256": "ac804fefe7cad6eaa2a927de99ec23ddb1c26da594f55fc1a2475b1f89d0e2c4",
+      "files": 675,
+      "bytes": 74916274,
+      "status": "retired",
+      "directoryLinks": 0,
+      "sourceChanges": 0
+    },
+    {
+      "path": "C:\\Users\\Admin\\Code\\hq\\games\\OpenRA-AI-wt-voices",
+      "head": "01a5dbd0bd9855c87d4d59b4b99f9a61e1d3b5c6",
+      "archive": "D:\\rtsai-consolidation\\cleanup-20261009\\OpenRA-AI-wt-voices.zip",
+      "sha256": "d741ed8a4045add8669c6ed1c870fd0dc32accf0dd038d37a797b0df936b1a26",
+      "files": 761,
+      "bytes": 75601324,
+      "status": "retired",
+      "directoryLinks": 0,
+      "sourceChanges": 0
+    },
+    {
+      "path": "C:\\Users\\Admin\\Code\\hq\\games\\RTSAI-Web-wt-app",
+      "head": "eeabcd4e17fd52a6404226a0049f233e3ab4fca1",
+      "archive": "D:\\rtsai-consolidation\\cleanup-20261009\\RTSAI-Web-wt-app.partial.zip",
+      "sha256": "9b6799227f031cd9d56f58c87dfbf1c093da5b151ab2f170e201ace915139f67",
+      "files": 71901,
+      "bytes": 4664310402,
+      "status": "retired",
+      "directoryLinks": 16,
+      "sourceChanges": 0
+    },
+    {
+      "path": "C:\\Users\\Admin\\Code\\hq\\games\\RTSAI-Web-wt-artlab",
+      "head": "08bc6a34eca5033c5b6536add75396bc52165f12",
+      "archive": "D:\\rtsai-consolidation\\cleanup-20261009\\RTSAI-Web-wt-artlab.zip",
+      "sha256": "566dbdb84fa1b4b37e73ad30fac062419ec4eedbec076d2ca949c4448b512df5",
+      "files": 31062,
+      "bytes": 840582203,
+      "status": "retired",
+      "directoryLinks": 12589,
+      "sourceChanges": 0
+    },
+    {
+      "path": "C:\\Users\\Admin\\Code\\hq\\games\\RTSAI-Web-wt-factions",
+      "head": "1f715e4f3d64ea16cde6572aca3a9c8d9545dfb1",
+      "archive": "D:\\rtsai-consolidation\\cleanup-20261009\\RTSAI-Web-wt-factions.zip",
+      "sha256": "a37e624d961cdcf0fad860c9aadeba2a2a2bd062bdb7e8d8bf16eb02610c58b7",
+      "files": 3986,
+      "bytes": 125538828,
+      "status": "retired",
+      "directoryLinks": 0,
+      "sourceChanges": 0
+    },
+    {
+      "path": "C:\\Users\\Admin\\Code\\hq\\games\\RTSAI-Web-wt-hosted-ai",
+      "head": "7b39b337849fe323d86bf37b12c7eff2eb73d55f",
+      "archive": "D:\\rtsai-consolidation\\cleanup-20261009\\RTSAI-Web-wt-hosted-ai.zip",
+      "sha256": "be9387049955820ceedbd0185756f5658586cdc0dcd301c2040c018a63fd4988",
+      "files": 744,
+      "bytes": 24904032,
+      "status": "retired",
+      "directoryLinks": 0,
+      "sourceChanges": 0
+    },
+    {
+      "path": "C:\\Users\\Admin\\Code\\hq\\games\\OpenRA-AI-wt-art-audit",
+      "head": "a8369a67d5e43188713fb9a0a59779b63418a4b0",
+      "archive": "D:\\rtsai-consolidation\\cleanup-20261009\\OpenRA-AI-wt-art-audit.zip",
+      "sha256": "4ec7ed9183a222c01d0959660a45a35f2bc88125200078328c7adc1e547a1ca8",
+      "files": 70167,
+      "bytes": 335380136,
+      "status": "retired",
+      "disposition": "historical source archive; unresolved resources are not runtime-integrated",
+      "historyRef": "refs/tags/workspace-archive-20261009-OpenRA-AI-wt-art-audit",
+      "directoryLinks": 1,
+      "sourceChanges": 1
+    },
+    {
+      "path": "C:\\Users\\Admin\\Code\\hq\\games\\OpenRA-AI-wt-harness",
+      "head": "eb8f6a1bf882baeade9891f59a0574e0fb018f50",
+      "archive": "D:\\rtsai-consolidation\\cleanup-20261009\\OpenRA-AI-wt-harness.zip",
+      "sha256": "1197703feb9001bebcee3c24174ab1293bd4f9306408790bf996f31fb65ea438",
+      "files": 15452,
+      "bytes": 1181451572,
+      "status": "retired",
+      "disposition": "historical source archive; unresolved resources are not runtime-integrated",
+      "historyRef": "refs/tags/workspace-archive-20261009-OpenRA-AI-wt-harness",
+      "engineBundle": {
+        "path": "D:\\rtsai-consolidation\\cleanup-20261009\\OpenRA-AI-wt-harness-engine.bundle",
+        "sha256": "b25645dca0eae33c00793d3903666f560cbebadbf8b35d6f73bf2a5e121ea286"
+      },
+      "directoryLinks": 279,
+      "sourceChanges": 4
+    },
+    {
+      "path": "C:\\Users\\Admin\\Code\\hq\\games\\OpenRA-AI-wt-nl-orders",
+      "head": "ba87197e0e9f10df8df8286e60978bbc6d1601da",
+      "archive": "D:\\rtsai-consolidation\\cleanup-20261009\\OpenRA-AI-wt-nl-orders.zip",
+      "sha256": "bc4f1214e7c42d5c3abf8cc5a58d9afab0c62f12e724ef391b451f6894e21e5f",
+      "files": 22132,
+      "bytes": 1012094695,
+      "status": "retired",
+      "disposition": "historical source archive; unresolved resources are not runtime-integrated",
+      "historyRef": "refs/tags/workspace-archive-20261009-OpenRA-AI-wt-nl-orders",
+      "engineBundle": {
+        "path": "D:\\rtsai-consolidation\\cleanup-20261009\\OpenRA-AI-wt-nl-orders-engine.bundle",
+        "sha256": "3d130e2f7679f8434f500973a176134648b2ff1359b4c3b2be13241b04cefc60"
+      },
+      "directoryLinks": 23,
+      "sourceChanges": 1
+    },
+    {
+      "path": "C:\\Users\\Admin\\Code\\hq\\games\\RTSAI-Web-wt-integration",
+      "head": "6330d9529b29d62ef1eab230f0c5cd2ec197e8c4",
+      "archive": "D:\\rtsai-consolidation\\cleanup-20261009\\RTSAI-Web-wt-integration.zip",
+      "sha256": "15d29993e679d6567a52e3998c033a2eb12c4508bd6cfd89b61a1d479e6357d1",
+      "files": 7418,
+      "bytes": 468421666,
+      "status": "retired",
+      "directoryLinks": 13,
+      "sourceChanges": 0
+    },
+    {
+      "path": "C:\\Users\\Admin\\Code\\hq\\games\\RTSAI-Web-wt-launch",
+      "head": "7f5b9309b97721fe9d840503b7650e9e3fdb343c",
+      "archive": "D:\\rtsai-consolidation\\cleanup-20261009\\RTSAI-Web-wt-launch.zip",
+      "sha256": "2fc4fe4d7d7737c18d73fc70b516f88fd506ffc7278988028b53bfb44995cd9e",
+      "files": 768,
+      "bytes": 29973377,
+      "status": "retired",
+      "directoryLinks": 0,
+      "sourceChanges": 0
+    },
+    {
+      "path": "C:\\Users\\Admin\\Code\\hq\\games\\RTSAI-Web-wt-ui",
+      "head": "690168537e595aa753b325009fea003eefb09ab6",
+      "archive": "D:\\rtsai-consolidation\\cleanup-20261009\\RTSAI-Web-wt-ui.zip",
+      "sha256": "e1ba216ab662119d0e972d5e946dc57f1407f55136bf8f2ab19df852b2d56fe4",
+      "files": 3471,
+      "bytes": 137284683,
+      "status": "retired",
+      "directoryLinks": 3,
+      "sourceChanges": 0
+    },
+    {
+      "path": "C:\\Users\\Admin\\Code\\hq\\games\\OpenRA-wt-art-audit",
+      "head": "0c34721b2060247d62b33beab2b97e11bdb550d9",
+      "archive": "D:\\rtsai-consolidation\\cleanup-20261009\\OpenRA-wt-art-audit.zip",
+      "sha256": "ca3f715abeb70e6d2c85816fceb4f0a352520a5a618540943ff542035a8fec51",
+      "files": 7850,
+      "bytes": 221214834,
+      "status": "retired",
+      "disposition": "historical source archive; unresolved resources are not runtime-integrated",
+      "historyRef": "refs/tags/workspace-archive-20261009-OpenRA-wt-art-audit",
+      "directoryLinks": 0,
+      "sourceChanges": 2642
+    },
+    {
+      "path": "C:\\Users\\Admin\\Code\\hq\\games\\OpenRA-wt-art-audit-baseline",
+      "head": "6e3f7fe139775a78fce09444587a277b8f2896ee",
+      "archive": "D:\\rtsai-consolidation\\cleanup-20261009\\OpenRA-wt-art-audit-baseline.zip",
+      "sha256": "69c489dd0383f417774df2807a4971a006e1a596ca092fb6e8c15489c3b2b5c9",
+      "files": 7612,
+      "bytes": 199869126,
+      "status": "retired",
+      "disposition": "historical source archive; unresolved resources are not runtime-integrated",
+      "historyRef": "refs/tags/workspace-archive-20261009-OpenRA-wt-art-audit-baseline",
+      "directoryLinks": 0,
+      "sourceChanges": 2406
+    },
+    {
+      "path": "C:\\Users\\Admin\\Code\\hq\\games\\OpenRA-wt-in-game-catalog",
+      "head": "a9821ed26f27ad13cbbb47679e1a20a0472d1bee",
+      "archive": "D:\\rtsai-consolidation\\cleanup-20261009\\OpenRA-wt-in-game-catalog.zip",
+      "sha256": "4bbb493afbb3b2c26b937e3d31d12546f0e3cb95056ccbbf987c4d94670fe8e6",
+      "files": 5394,
+      "bytes": 213682943,
+      "status": "retired",
+      "directoryLinks": 0,
+      "sourceChanges": 0
+    },
+    {
+      "path": "C:\\Users\\Admin\\Code\\hq\\games\\OpenRA-wt-integrator",
+      "head": "dc59fab109b3042b6422e07feba943477f1cdc3c",
+      "archive": "D:\\rtsai-consolidation\\cleanup-20261009\\OpenRA-wt-integrator.zip",
+      "sha256": "76bb2116a835aab443777cdd4c4109ddb52959106c2020250b8798e1743886fc",
+      "files": 5777,
+      "bytes": 237547851,
+      "status": "retired",
+      "directoryLinks": 0,
+      "sourceChanges": 0
+    },
+    {
+      "path": "C:\\Users\\Admin\\Code\\hq\\games\\OpenRA-wt-upstream",
+      "head": "62a1f9565c3ebbe283cded35a6241cd0f43c3f6b",
+      "archive": "D:\\rtsai-consolidation\\cleanup-20261009\\OpenRA-wt-upstream.zip",
+      "sha256": "9111d19f847d4d96f7d4708c5febec61e8b61d585f80187dd362a8cec60d496a",
+      "files": 5498,
+      "bytes": 217404216,
+      "status": "retired",
+      "disposition": "historical source archive; unresolved resources are not runtime-integrated",
+      "historyRef": "refs/tags/workspace-archive-20261009-OpenRA-wt-upstream",
+      "directoryLinks": 0,
+      "sourceChanges": 0
+    },
+    {
+      "path": "C:\\Users\\Admin\\Code\\hq\\games\\OpenRA-wt-usa-concept",
+      "head": "728a16c8aca667fe573f8f810eae843e03e4e307",
+      "archive": "D:\\rtsai-consolidation\\cleanup-20261009\\OpenRA-wt-usa-concept.zip",
+      "sha256": "f4e5fb8a19a223d3e3b08cbffbabe328e672de5e590d448bf0d18f91f92bd8bb",
+      "files": 5219,
+      "bytes": 201298840,
+      "status": "retired",
+      "directoryLinks": 0,
+      "sourceChanges": 0
+    }
+  ]
+}

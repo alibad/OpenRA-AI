@@ -21,7 +21,9 @@ The full earlier roadmap is preserved in `roadmap-before-consolidation-20261009.
 - [ ] Port additional historical Classic mechanics, maps and presentation retained in the older fork. This Classic profile presents shared standalone army rules on a rectangular grid; it does not reproduce every old Classic feature.
 - [ ] Integrate the complete browser workshop, coaching and call experience into the downloadable suite and verify parity.
 - [ ] Native-speaker review of outstanding voice sheet entries.
-- [ ] Optional signing and public distribution after an explicit release request.
+- [x] Public Windows release `v0.4.0-alpha.1` and verified download button at https://rtsai.net/download.
+- [x] Anonymous release download, real website button, SHA-256, installation, shortcut, mode switch, installed skirmishes in both profiles and uninstall checks.
+- [ ] Optional code signing.
 - [ ] macOS package and acceptance on the owner's Mac.
 
 One launch path: `RTSAI-Mod/launch-game.cmd`; choose the mode in **Game modes**. Packages have the same choice in `RTSAI.exe`.
@@ -38,7 +40,7 @@ One launch path: `RTSAI-Mod/launch-game.cmd`; choose the mode in **Game modes**.
 - [ ] Classic presentation in the browser bundle, with both mode choices verified.
 - [x] Fully static public bundle with a local preview tool; direct games make zero room API requests. Static hosting must preserve the supplied compression and isolation headers.
 - [ ] Cross-network WebRTC acceptance. Manual signaling and public STUN avoid an owned room server; restrictive networks may still need TURN. Do not promise universal connectivity without a relay.
-- [ ] Explicitly authorized deployment. Pushing RTSAI-Web main deploys production.
+- [x] Owner-authorized production deployment at https://rtsai.net/play/; public two-client direct peer acceptance: 199 matching hashes through frame 200, both human deploy orders, chat and synthetic video/audio, zero room API requests.
 
 The browser model co-commander uses a local companion service. Native bots, tactical personalities and scenario drills work without a model. Hosted or in-browser model inference is not delivered.
 
@@ -50,8 +52,8 @@ The browser model co-commander uses a local companion service. Native bots, tact
 - [x] Preserve 5,104 legacy resource entries; verify 4,019 installed original-content resources.
 - [x] Preserve and hash-check 182 changed entries from six older overlapping companion/faction/installer branches in `resources/history/branch-variants-20261009.zip` with a tracked index.
 - [ ] Resolve older branch variants and engine differences without replacing newer reviewed assets or intentional build targets blindly.
-- [ ] Retire redundant worktrees only after unique files and commits have verified destinations. No deletion is part of this delivery.
+- [x] Retire 31 redundant/historical workspaces with verified snapshots and recovery refs; 44 checkouts reduced to 13. Index: `resources/history/workspace-retirement-20261009.json`. Five retained extra folders support native/browser builds, preview tooling and pinned generator history.
 
 Native slim and browser engine branches are build dependencies with different runtime requirements. Older worktree folders are not additional game releases. Research, generated alternatives and superseded installers remain source history; preservation is distinct from runtime activation.
 
-Development stays local. No new hosted CI, paid service, certificate purchase, public release or production deployment is implied.
+The owner explicitly requested online downloads and end-to-end testing on 9 October. Windows and the static web build were published for that request. No hosted CI, paid service or certificate purchase was added.

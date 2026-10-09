@@ -1,0 +1,15 @@
+diff --git a/docs/roadmap.md b/docs/roadmap.md
+index 61e04e9..2ad1c28 100644
+--- a/docs/roadmap.md
++++ b/docs/roadmap.md
+@@ -23,7 +23,9 @@ Updated 12 September 2026. This is the handoff roadmap for the next build cycle.
+ 
+ - Add Saudi Arabia and Yemen to the RA2 overlay when their rules, art, AI and balance are actually complete.
+ - Render the shared faction/unit catalog inside the native game and companion, with mode-aware details and deep links back to the web.
+-- Add replay-backed faction balance tests, headless AI match evaluation, and deterministic mission acceptance.
++- Tune faction balance from the headless bot-vs-bot harness (`scripts/balance_harness.py`) and its
++  [September baseline](balance-baseline-2026-09.md); add replay-backed regression thresholds and
++  deterministic mission acceptance.
+ - Establish a polished media pipeline for original concept art, UI portraits, sprites, live captures, audio and accessibility review.
+ - Add release update, rollback, repair and uninstall diagnostics for installed users.
+ 
