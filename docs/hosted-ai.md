@@ -1,4 +1,32 @@
-# Hosted AI (Phase 3)
+# Hosted AI preparation
+
+Current main, 11 October 2026: public hosted access is disabled by default.
+First launch uses local AI. An explicitly selected hosted provider still cannot
+register, query status or call the network unless the operator deliberately
+sets `OPENRA_AI_HOSTED_ENABLED=1`. Neither this work nor local mock tests authorize
+that activation. Local models and deterministic alert fallbacks remain usable.
+
+`services/companion/src/openra_ai_companion/hosted_policy.py` provides the tested
+server adoption seam: verified UID (never a client-supplied identity), atomic
+worst-case micro-USD reservations, per-user/global daily spend, per-minute rates,
+per-user/global concurrency and one dispatch per request ID. `dispatch` authenticates
+and reserves before invoking an injected server-only provider closure; a lost
+upstream response retains the whole reservation conservatively. Settlement refuses
+costs above the reservation. A production implementation must clamp provider
+input/output against a conservative cost bound, persist this transaction in the
+remote store, retain failed/ambiguous charges until reconciled, expire old rate
+windows, and use a server-held provider key. This in-memory reference is for local
+rehearsal and is not deployed billing enforcement or cross-process accounting.
+The existing remote website proxy is outside this session's ownership; its actual
+auth integration, durable transaction adoption and deployment remain pending.
+
+The minimal loopback client contract is documented in [companion-client-contract.md](companion-client-contract.md).
+The historical design below describes the earlier preparation, not current
+activation, first-launch defaults, current deployment or live-provider validation.
+
+---
+
+# Historical hosted AI design (Phase 3)
 
 Updated 2 October 2026. Branches: `rtsai/hosted-ai` in OpenRA-AI and in
 RTSAI-Web. Neither branch is pushed or deployed.

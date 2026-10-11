@@ -2716,6 +2716,19 @@ class Companion:
             response.interrupted = True
         return response
 
+    def propose_only(self, instruction: str) -> CompanionResponse:
+        if _is_confirm_intent(instruction) or _is_cancel_intent(instruction):
+            raise ValueError("confirmation and cancellation require an explicit proposal id")
+        if detect_strategy_intent(instruction)[0] == "set":
+            raise ValueError("native doctrine changes use the explicit native controls")
+        if instruction.lower().startswith(nl_orders.AUTO_INSTRUCTION_PREFIX):
+            raise ValueError("automatic instructions are not accepted by the proposal API")
+        self.begin_user_turn()
+        try:
+            return self.handle_player_input(instruction)
+        finally:
+            self.end_user_turn()
+
     def confirm_action(self, proposal_id: str = "") -> CompanionResponse:
         generation = self._begin()
         if not self.enabled:
@@ -2824,7 +2837,12 @@ class Companion:
             )
 
         # Clear before the call: the proposal id remains the idempotency key if the response is lost.
-        self._withdraw(proposal)
+        if not self._withdraw(proposal):
+            return CompanionResponse(
+                "That proposal was already confirmed or cancelled; no duplicate orders were sent.",
+                "action-confirmation",
+                metadata={"action": {"state": "missing", "proposal_id": proposal.proposal_id}},
+            )
         self.goal_blackboard.mark_dispatched(proposal.proposal_id, snapshot.tick)
         try:
             receipt = executor(proposal.proposal_id, snapshot.tick, commands)

@@ -105,7 +105,9 @@ class HostedClient:
         *,
         timeout: float = 18.0,
         version: str = "",
+        enabled: bool | None = None,
     ):
+        self.enabled = (os.environ.get("OPENRA_AI_HOSTED_ENABLED") == "1") if enabled is None else enabled
         self.endpoint = endpoint.rstrip("/")
         self._load_token = load_token
         self._save_token = save_token
@@ -125,6 +127,8 @@ class HostedClient:
 
     # -- token -----------------------------------------------------------------
     def _http(self, method: str, path: str, body: bytes | None, headers: dict[str, str]) -> tuple[int, bytes, dict[str, str]]:
+        if not self.enabled:
+            return 503, json.dumps({"error": {"code": "hosted_disabled", "rtsai_state": "paused", "message": "Hosted AI is disabled; local AI and deterministic alerts remain available."}}).encode(), {"x-rtsai-ai-state": "paused"}
         request = urllib.request.Request(f"{self.endpoint}{path}", data=body, headers=headers, method=method)
         try:
             with urllib.request.urlopen(request, timeout=self.timeout) as response:

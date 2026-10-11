@@ -96,7 +96,7 @@ class HostedGatewayTests(unittest.TestCase):
     def setUp(self) -> None:
         self.directory = tempfile.TemporaryDirectory()
         self.root = Path(self.directory.name)
-        self.environment = patch.dict(os.environ, {"APPDATA": str(self.root)})
+        self.environment = patch.dict(os.environ, {"APPDATA": str(self.root), "OPENRA_AI_HOSTED_ENABLED": "1"})
         self.environment.start()
         os.environ.pop("OPENRA_AI_HOSTED_ENDPOINT", None)
         self.behaviour = {"calls": [], "installs": 0, "chat": []}
@@ -254,7 +254,7 @@ class HostedSetupTests(unittest.TestCase):
     def setUp(self) -> None:
         self.directory = tempfile.TemporaryDirectory()
         self.root = Path(self.directory.name)
-        self.environment = patch.dict(os.environ, {"APPDATA": str(self.root)})
+        self.environment = patch.dict(os.environ, {"APPDATA": str(self.root), "OPENRA_AI_HOSTED_ENABLED": "1"})
         self.environment.start()
         for name in ("OPENRA_AI_MODEL_PROVIDER", "OPENRA_AI_TEXT_MODEL", "OPENRA_AI_ROUTER_URL"):
             os.environ.pop(name, None)
@@ -282,11 +282,11 @@ class HostedSetupTests(unittest.TestCase):
             auto_start=False,
         )
 
-    def test_first_launch_defaults_to_hosted_thinking_and_local_voice(self) -> None:
+    def test_first_launch_defaults_to_local_thinking_and_voice(self) -> None:
         with patch("openra_ai_companion.settings._load_project_env", return_value={}):
             settings = Settings.from_env()
             self.assertEqual((settings.model_provider, settings.text_model, settings.transcribe_model, settings.speech_model),
-                             ("hosted", HOSTED_MODEL, "local-whisper", "local-kokoro"))
+                             ("local", "local-coder", "local-whisper", "local-kokoro"))
             Settings(model_provider="local").save()
             self.assertEqual(Settings.from_env().model_provider, "local", "an explicit choice is never overridden")
 

@@ -4,6 +4,25 @@ Owner direction: 9 October 2026. Two ways to play one standalone game: **Web RTS
 
 The full earlier roadmap is preserved in `roadmap-before-consolidation-20261009.md`. This is the current delivery view; unfinished historical research and review gates remain open.
 
+## Local continuation accepted — 11 October 2026
+
+The ten-session continuation is integrated on the existing main checkouts and remains unpublished. The sections below retain the 9 October public-delivery history; their historical checkboxes do not advertise the new local candidates. Exact source/artifact bindings and the publication proposal are in `../../.session-artifacts/S10/HANDOFF.md`.
+
+- [x] Actual browser Classic/top-down and isometric mode entry, rendering, missions, save/replay and direct/room regressions against the fixed `aed51fe4b1` engine input.
+- [x] Native and browser faction/English voice preferences with persistence and cosmetic-only selection; existing voice families, shared effects and human-review records preserved.
+- [x] Local companion explicit-ID review/confirmation, rejection, timeout and offline paths; hosted reference configuration remains default-deny.
+- [x] Local macOS 15+ ad-hoc DMG candidate: universal game, ARM64 companion, both modes, save/load, explicit deploy and assisted campaign cases. Not notarized; Intel execution and another Mac remain pending. No neural runtime/model/microphone demonstration is included.
+- [x] Website standalone facts from both actual mode profiles: 16 factions and 197 unique configured actors per profile. Workshop exports now select `rtsai-topdown` or `rtsai` correctly; browser simulation remains approximate.
+- [x] Integrated website/game navigation and bounded local start receipts for both modes and two direct peers; 50 matching direct simulation hashes. Remote analytics delivery remains unmeasured.
+- [x] Dated 48-second review video with accepted browser captures, labeled native stills, original soundtrack and captions. Existing 42-second public trailer and public release manifests are unchanged. Human listening remains pending.
+- [x] Local content/media integrity, 270 passing website tests with eight expected admin-only skips, lint, typecheck, normal and Vercel target builds.
+- [ ] Fresh Windows OS, another Mac/Gatekeeper, Intel, different-network peers, actual Safari/camera/microphone, independent campaigns/balance and fluent voice reviews. See `../../.session-artifacts/S10/HUMAN-DEVICE-GATES.md`.
+- [ ] New public deployment/release, durable hosted authentication/budgets and optional neural runtime activation require separate owner authorization.
+
+The native acceptance audit records a normal OpenRA support-directory touch during app selection and unavoidable pinned-engine ModMetadata registration. Those files were preserved because no preimage was available. See `../../.session-artifacts/S07/isolation-audit/INCIDENT.md`. Fixed-engine OpenAL bootstrap and generic no-model HUD hints remain disclosed; no main-only engine-strategy blocker prevented this scoped local continuation.
+
+## Published history — 9 October 2026
+
 ## Downloadable RTS — RTSAI-Mod main
 
 - [x] Consolidate standalone and reviewed art work into the canonical checkout.

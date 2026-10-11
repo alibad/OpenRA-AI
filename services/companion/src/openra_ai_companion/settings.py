@@ -56,15 +56,6 @@ def _load_user_settings() -> dict[str, str | float | bool]:
 
 
 HOSTED_MODEL = "claude-haiku-4-5"
-# First launch with no saved provider: thinking goes to the RTS AI hosted proxy
-# through the loopback gateway, while speech stays on this machine.
-HOSTED_DEFAULTS = {
-    "model_provider": "hosted",
-    "text_model": HOSTED_MODEL,
-    "vision_model": HOSTED_MODEL,
-    "transcribe_model": "local-whisper",
-    "speech_model": "local-kokoro",
-}
 
 
 def explicit_model_provider() -> str | None:
@@ -102,10 +93,6 @@ class Settings:
     def from_env(cls) -> "Settings":
         file_values = _load_project_env()
         user_values = _load_user_settings()
-        if explicit_model_provider() is None:
-            # Out of the box: hosted thinking plus local voice. Explicit values
-            # (environment, saved settings or the installer) always win.
-            user_values = {**HOSTED_DEFAULTS, **user_values}
 
         def get(name: str, default: str) -> str:
             field_name = {

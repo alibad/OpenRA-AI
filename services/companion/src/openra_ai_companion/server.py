@@ -6,6 +6,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, urlparse
 
+from .client_contract import CONTRACT_VERSION, contract, validate_request
 from .core import Companion
 from .feedback import FeedbackStore, feedback_page
 from .game_content import import_owned_ra2
@@ -33,7 +34,10 @@ class CompanionHandler(BaseHTTPRequestHandler):
         self.send_response(status)
         self.send_header("Content-Type", content_type)
         self.send_header("Content-Length", str(length))
-        self.send_header("Access-Control-Allow-Origin", "http://localhost:3000")
+        origin = self.headers.get("Origin", "")
+        if origin and self._trusted_request():
+            self.send_header("Access-Control-Allow-Origin", origin)
+            self.send_header("Vary", "Origin")
         for key, value in extra.items():
             self.send_header(key.replace("_", "-"), value)
         self.end_headers()
@@ -173,20 +177,61 @@ class CompanionHandler(BaseHTTPRequestHandler):
             "settings": state["config"],
         }
 
-    def _payload(self, limit: int = 256_000) -> bytes:
-        size = int(self.headers.get("Content-Length", "0"))
+    def _trusted_request(self) -> bool:
+        hosts = self.headers.get_all("Host", [])
+        origins = self.headers.get_all("Origin", [])
+        if len(hosts) != 1 or len(origins) > 1:
+            return False
+        try:
+            parsed = urlparse("http://" + hosts[0])
+            if (parsed.hostname not in {"localhost", "127.0.0.1", "::1"}
+                    or parsed.port != self.server.server_port
+                    or parsed.username or parsed.password or parsed.path or parsed.query or parsed.fragment):
+                return False
+            if not origins:
+                return True
+            origin = urlparse(origins[0])
+            return (origin.scheme == "http" and origin.netloc == parsed.netloc
+                    and not origin.path and not origin.query and not origin.fragment)
+        except ValueError:
+            return False
+
+    def _content_length(self, limit: int) -> int:
+        lengths = self.headers.get_all("Content-Length", [])
+        if len(lengths) > 1 or self.headers.get("Transfer-Encoding"):
+            raise ValueError("ambiguous request length")
+        raw = lengths[0] if lengths else "0"
+        if not raw.isascii() or not raw.isdecimal() or len(raw) > 10:
+            raise ValueError("Content-Length must be a nonnegative integer")
+        size = int(raw)
         if size > limit:
             raise ValueError("request too large")
-        return self.rfile.read(size)
+        return size
+
+    def _payload(self, limit: int = 256_000) -> bytes:
+        size = self._content_length(limit)
+        body = self.rfile.read(size)
+        if len(body) != size:
+            raise ValueError("incomplete request body")
+        return body
 
     def do_OPTIONS(self) -> None:  # noqa: N802
+        if not self._trusted_request():
+            self._json(HTTPStatus.FORBIDDEN, {"error": "untrusted_origin_or_host"})
+            return
         self.send_response(HTTPStatus.NO_CONTENT)
-        self.send_header("Access-Control-Allow-Origin", "http://localhost:3000")
+        origin = self.headers.get("Origin", "")
+        if origin:
+            self.send_header("Access-Control-Allow-Origin", origin)
+            self.send_header("Vary", "Origin")
         self.send_header("Access-Control-Allow-Headers", "Content-Type")
         self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
         self.end_headers()
 
     def do_GET(self) -> None:  # noqa: N802
+        if not self._trusted_request():
+            self._json(HTTPStatus.FORBIDDEN, {"error": "untrusted_origin_or_host"})
+            return
         path = urlparse(self.path).path
         if path == "/":
             self._html(AI_CONSOLE_HTML)
@@ -197,6 +242,8 @@ class CompanionHandler(BaseHTTPRequestHandler):
             if manager:
                 status["local_ai"] = manager.status()
             self._json(HTTPStatus.OK, status)
+        elif path == "/v1/contract":
+            self._json(HTTPStatus.OK, contract(self.companion.router.settings.timeout_seconds))
         elif path == "/v1/config":
             self._json(HTTPStatus.OK, self.companion.router.settings.as_dict())
         elif path == "/v1/factions":
@@ -302,8 +349,24 @@ class CompanionHandler(BaseHTTPRequestHandler):
 
     def do_POST(self) -> None:  # noqa: N802
         path = urlparse(self.path).path
+        if not self._trusted_request():
+            self._json(HTTPStatus.FORBIDDEN, {"error": "untrusted_origin_or_host"})
+            return
         try:
-            if path == "/v1/content/ra2/import":
+            self._content_length(20_000_000)
+            if path in {"/v1/advice", "/v1/proposals", "/v1/proposals/confirm", "/v1/proposals/cancel"}:
+                payload = json.loads(self._payload() or b"{}")
+                if path == "/v1/advice":
+                    response = self.companion.ask(validate_request(payload, "question"))
+                elif path == "/v1/proposals":
+                    response = self.companion.propose_only(validate_request(payload, "instruction"))
+                elif path.endswith("/confirm"):
+                    response = self.companion.confirm_action(validate_request(payload, "proposal_id"))
+                else:
+                    response = self.companion.cancel_action(validate_request(payload, "proposal_id"))
+                self._publish_action_response(response)
+                self._json(HTTPStatus.OK, {"contract_version": CONTRACT_VERSION, **response.as_dict()})
+            elif path == "/v1/content/ra2/import":
                 self._payload()
                 self._json(HTTPStatus.OK, import_owned_ra2())
             elif path == "/v1/factions/live":
@@ -412,11 +475,10 @@ class CompanionHandler(BaseHTTPRequestHandler):
                 self._json(HTTPStatus.OK, response.as_dict())
             elif path == "/v1/actions/propose":
                 payload = json.loads(self._payload() or b"{}")
-                self.companion.begin_user_turn()
-                try:
-                    response = self.companion.handle_player_input(str(payload.get("instruction", "")))
-                finally:
-                    self.companion.end_user_turn()
+                instruction = payload.get("instruction")
+                if not isinstance(instruction, str):
+                    raise ValueError("instruction must be text")
+                response = self.companion.propose_only(instruction)
                 self._publish_action_response(response)
                 self._json(HTTPStatus.OK, response.as_dict())
             elif path == "/v1/actions/confirm":

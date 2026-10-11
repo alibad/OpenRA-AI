@@ -43,9 +43,11 @@ disallowed command responses; it is not part of the downloadable catalogue.
 
 OpenRA AI talks to the bundled loopback gateway (the launcher picks its port,
 `http://127.0.0.1:4000` by default). The gateway has three explicit modes.
-**Hosted**, the default when no provider has been chosen, sends text and vision
-to the RTS AI proxy on rtsai.net (Claude Haiku 4.5) and keeps Whisper and
-Kokoro local; see [hosted-ai.md](hosted-ai.md). **Local** starts the models and
+**Local** is the default when no provider has been chosen. **Hosted** requires
+explicit provider selection and `OPENRA_AI_HOSTED_ENABLED=1`; otherwise its
+gateway makes no registration, status or model requests and uses local/alert
+fallbacks. Its prepared proxy route keeps Whisper and Kokoro local; see
+[hosted-ai.md](hosted-ai.md). **Local** starts the models and
 CPU inference runtimes from the installed target AI pack. **External** forwards
 the same OpenAI-compatible contracts to the endpoint chosen during setup. The
 game itself receives route names and the loopback URL, never the provider key
