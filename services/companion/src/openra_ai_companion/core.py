@@ -470,12 +470,12 @@ class Companion:
             name = strategy_contract(self.native_strategy)["name"].upper()
             profile = self.native_profile.upper()
             return f"auto-active:{self.native_profile}", f"AUTO ASSISTANT ON  •  {name}  •  {profile} NATIVE BRAIN"
-        if self.muted:
-            return "muted", "AI VOICE OFF  •  TEXT INSIGHTS STAY ON"
         service = self.ai_service_status()
         if service["degraded"]:
             # The state code stays ready:<profile> so OpenRA keeps AUTO semantics; only the line changes.
             return f"ready:{self.native_profile}", service["hud"]
+        if self.muted:
+            return "muted", "AI VOICE OFF  •  TEXT INSIGHTS STAY ON"
         return f"ready:{self.native_profile}", "AI READY  •  HOLD ASK KEY TO SPEAK OR SET STRATEGY"
 
     def ai_service_status(self) -> dict:
@@ -486,8 +486,8 @@ class Companion:
         state = str(service.get("state") or "")
         provider = str(getattr(getattr(self.router, "settings", None), "model_provider", ""))
         hosted = provider == "hosted"
-        degraded = hosted and (route in {"local-fallback", "none"} or state == "gateway_unreachable")
-        reason = HOSTED_REASONS.get(state, "HOSTED AI UNAVAILABLE")
+        degraded = (hosted and route == "local-fallback") or route == "none" or state == "gateway_unreachable"
+        reason = HOSTED_REASONS.get(state, "HOSTED AI UNAVAILABLE") if hosted or state == "gateway_unreachable" else "MODEL UNAVAILABLE"
         if not degraded:
             hud = ""
         elif route == "local-fallback":

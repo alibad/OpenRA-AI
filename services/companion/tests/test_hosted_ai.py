@@ -250,6 +250,20 @@ class RouterServiceStateTests(unittest.TestCase):
         self.assertEqual(Companion(router=router).idle_status()[1], "AI ALERTS ONLY  •  AI GATEWAY NOT RUNNING")
 
 
+class LocalServiceReadinessTests(unittest.TestCase):
+    def test_unavailable_local_or_custom_model_is_honest_even_with_voice_muted(self) -> None:
+        for provider in ("local", "custom"):
+            for voice in (False, True):
+                with self.subTest(provider=provider, voice=voice):
+                    router = AIRouter(Settings(router_url="http://127.0.0.1:9", model_provider=provider,
+                                               voice_enabled=voice, timeout_seconds=1))
+                    with self.assertRaises(RouterError):
+                        router.chat([{"role": "user", "content": "status?"}])
+                    companion = Companion(router=router)
+                    self.assertTrue(companion.ai_service_status()["degraded"])
+                    self.assertEqual(companion.idle_status()[1], "AI ALERTS ONLY  •  AI GATEWAY NOT RUNNING")
+
+
 class HostedSetupTests(unittest.TestCase):
     def setUp(self) -> None:
         self.directory = tempfile.TemporaryDirectory()
