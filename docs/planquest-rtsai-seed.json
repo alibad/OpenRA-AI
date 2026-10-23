@@ -1,0 +1,30 @@
+{
+  "schema": 1,
+  "checkpoint_date": "2026-10-23",
+  "timezone": "Asia/Riyadh",
+  "intended_plan_name": "RTS AI — Product delivery",
+  "connection_state": "Hosted MCP healthy and registered in Codex; user sign-in and OAuth approval pending",
+  "import_state": "Prepared locally; no Plan Quest changes made",
+  "import_rules": [
+    "List plans and read the matching RTS AI plan before writing; reuse existing plan and tasks.",
+    "Preserve existing notes, dates, collaborators and progress.",
+    "Use notes and an undated backlog until dates are agreed.",
+    "Keep tested locally, source pushed, and verified live as separate evidence states.",
+    "Re-read Git and release receipts before importing this dated checkpoint."
+  ],
+  "workstreams": ["Desktop", "Faction Studio", "Website", "Web Game", "Engine and shared content", "Companion and AI"],
+  "verified_completed": [
+    {"title": "Apply the approved four-app Command Red identity", "workstream": "Shared", "evidence": ["RTSAI-Mod@e46b652", "RTSAI-Web@ddf0be9", "RTSAI-WebGame@f107a6d"], "publication": "Source pushed; website icons verified live; native app and game UI verified locally"},
+    {"title": "Install four distinct Desktop and Start Menu entries", "workstream": "Shared", "evidence": ["RTSAI-Mod/tools/install-app-shortcuts.ps1", "RTSAI-Web/scripts/launch-app.ps1"], "publication": "Installed on the owner's Windows machine"},
+    {"title": "Verify saved content in Classic/RA2 on native and web", "workstream": "Engine and shared content", "evidence": ["studio-20261023-194632-98225d5a", "receipt SHA256 0b98ca09c8183f14d05a64fee17d9367af60ba2e19a6b37e041951de706588c2"], "publication": "Accepted local build; newer gameplay changes remain a separate verification concern"},
+    {"title": "Publish and verify Website app identity", "workstream": "Website", "evidence": ["RTSAI-Web@737a5d1", "Vercel dpl_H2NvakSNAuyeFyLrxMsdMHRJGyj1 READY", "Live Website and Studio icon SHA256s match committed files", "Public /play/BUILD.json returns 200 JSON with COOP same-origin"], "publication": "Verified live"}
+  ],
+  "next_queue": [
+    {"title": "Complete and verify the active official gameplay release", "workstream": "Web Game", "state": "In progress in the gameplay chat", "done_when": "Official promote receipt and public BUILD.json match; live gateway and save-compatibility checks pass"},
+    {"title": "Package the new native identity in the next desktop release", "workstream": "Desktop", "state": "Queued", "done_when": "Installer contains approved icons and passes clean-Windows install, launch, both modes and uninstall acceptance"},
+    {"title": "Review Command Red during actual play with the owner", "workstream": "Web Game", "state": "Ready for review", "done_when": "Owner feedback is captured and requested visual corrections are checked in the real game"},
+    {"title": "Integrate approved Studio art candidates into verified builds", "workstream": "Faction Studio", "state": "Ongoing", "done_when": "Each selected asset has provenance, in-game checks and a receipt; generated and decided assets are not treated as already installed"},
+    {"title": "Finish independent device, network, campaign and voice acceptance", "workstream": "Shared", "state": "Open acceptance gates", "done_when": "Separate-device/network multiplayer, clean OS/Mac cases, independent mission/balance playthroughs and fluent voice reviews have evidence"},
+    {"title": "Keep optional neural companion capability accurately scoped", "workstream": "Companion and AI", "state": "Ongoing", "done_when": "Each claimed model, speech and microphone flow is demonstrated with its installed runtime; built-in adviser is distinguished from hosted inference"}
+  ]
+}
