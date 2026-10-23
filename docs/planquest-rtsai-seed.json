@@ -21,6 +21,7 @@
   ],
   "next_queue": [
     {"title": "Complete and verify the active official gameplay release", "workstream": "Web Game", "state": "In progress in the gameplay chat", "done_when": "Official promote receipt and public BUILD.json match; live gateway and save-compatibility checks pass"},
+    {"title": "Refresh the shared local build after the latest runtime fix", "workstream": "Engine and shared content", "state": "Queued after the latest runtime changes", "done_when": "An accepted native/browser Classic/RA2 build includes ae730bf, and Studio/Website Play freshness guards permit the current game entry"},
     {"title": "Package the new native identity in the next desktop release", "workstream": "Desktop", "state": "Queued", "done_when": "Installer contains approved icons and passes clean-Windows install, launch, both modes and uninstall acceptance"},
     {"title": "Review Command Red during actual play with the owner", "workstream": "Web Game", "state": "Ready for review", "done_when": "Owner feedback is captured and requested visual corrections are checked in the real game"},
     {"title": "Integrate approved Studio art candidates into verified builds", "workstream": "Faction Studio", "state": "Ongoing", "done_when": "Each selected asset has provenance, in-game checks and a receipt; generated and decided assets are not treated as already installed"},
