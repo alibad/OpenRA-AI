@@ -1,5 +1,7 @@
 # RTS AI delivery roadmap
 
+Latest product checkpoint: [23 October 2026 — four apps, source/publication state and Plan Quest setup](status-20261023.md). The dated history below remains preserved; its older open checkboxes are not a fresh audit of today's builds.
+
 Owner direction: 9 October 2026. Two ways to play one standalone game: **Web RTS** and **Downloadable RTS**. Windows first; macOS is built and checked later on the owner's Mac. Neither mode requires owning Red Alert or Red Alert 2. Keep custom resources and earlier work recoverable.
 
 The full earlier roadmap is preserved in `roadmap-before-consolidation-20261009.md`. This is the current delivery view; unfinished historical research and review gates remain open.
